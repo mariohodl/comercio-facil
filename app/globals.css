@@ -9,13 +9,14 @@ body {
 
 @layer base {
   :root {
+    --primary: #7e0512;
+    
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 20 14.3% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 20 14.3% 4.1%;
-    --primary: 24.6 95% 53.1%;
     --primary-foreground: 60 9.1% 97.8%;
     --secondary: 60 4.8% 95.9%;
     --secondary-foreground: 24 9.8% 10%;
@@ -34,6 +35,23 @@ body {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    --black: #191716;
+    --black-darker: #000000;
+    --black-text: rgba(25, 23, 22, 1);
+    --black-light: rgba(25, 23, 22, .7);
+    --gray: #f1eee7;
+    --gray-lighter: rgba(241, 238, 231, .5);
+    --white: #FFFFFF;
+    --white-text: rgba(255, 255, 255, .75);
+    --main: #9c2330;
+    --main-darker: #7e0512;
+    --main-lighter: rgba(156, 35, 48, .5);
+    --second: #bda881;
+    --red: #9c2330;
+    --font-main: 'Poppins';
+    --font-headers: 'Barlow';
+    --font-subheaders: 'Sacramento';
   }
 
   .dark {
