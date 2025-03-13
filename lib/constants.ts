@@ -4,3 +4,5 @@ export const APP_DESCRIPTION =
 	process.env.APP_DESCRIPTION ||
 	'Distribuidor de carnes de occidente, el privilegio de..';
 export const APP_SLOGAN = process.env.APP_SLOGAN || 'Come mas, gasta menos';
+
+export const PAGE_SIZE = Number(process.env.PAGE_SIZE || 9);
