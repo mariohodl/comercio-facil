@@ -6,6 +6,7 @@ import { toSlug } from '@/lib/utils'
 import data from '@/lib/data'
 
 import { Card, CardContent } from '@/components/ui/card'
+import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 
 export default async function HomePage() {
   const categories = (await getAllCategories()).slice(0, 4)
@@ -80,6 +81,9 @@ export default async function HomePage() {
             <ProductSlider title={"Best Selling Products"} products={bestSellingProducts} hideDetails/>
           </CardContent>
         </Card>
+      </div>
+      <div className='p-4 bg-background'>
+        <BrowsingHistoryList />
       </div>
     </>
   )
