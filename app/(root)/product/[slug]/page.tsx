@@ -115,9 +115,7 @@ export default async function ProductDetails(props: {
                     Out of Stock
                   </div>
                 )}
-              </CardContent>
-            </Card>
-            {product.countInStock !== 0 && (
+                {product.countInStock !== 0 && (
                     <div className='flex justify-center items-center'>
                       <AddToCart
                         item={{
@@ -136,6 +134,9 @@ export default async function ProductDetails(props: {
                       />
                     </div>
                   )}
+              </CardContent>
+            </Card>
+            
           </div>
         </div>
       </section>

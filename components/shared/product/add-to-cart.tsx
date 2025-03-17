@@ -37,9 +37,9 @@ export default function AddToCart({
       onClick={() => {
         try {
           addItem(item, 1)
-          showSuccess('Added to cart', {duration: 3000})
+          showSuccess('Added to cart', {duration: 3000, position: 'top-center', important: true})
         } catch (error: any) {
-            showError(error.message, {duration: 3000})
+            showError(error.message, {duration: 3000, position: 'top-center', important: true})
         }
       }}
     >
@@ -71,7 +71,7 @@ export default function AddToCart({
             const itemId = await addItem(item, quantity)
             router.push(`/cart/${itemId}`)
           } catch (error: any) {
-            showError(error.message, {duration: 3000})
+            showError(error.message, {duration: 3000, position: 'top-center', important: true})
           }
         }}
       >
@@ -84,7 +84,7 @@ export default function AddToCart({
             addItem(item, quantity)
             router.push(`/checkout`)
           } catch (error: any) {
-            showError(error.message, {duration: 3000})
+            showError(error.message, {duration: 3000, position: 'top-center', important: true})
           }
         }}
         className='w-full rounded-full '

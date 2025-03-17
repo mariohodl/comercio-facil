@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card'
 import AddToCart from '@/components/shared/product/add-to-cart'
 import { IProduct } from '@/lib/db/models/product.model'
 import { generateId, round2 } from '@/lib/utils'
@@ -117,6 +117,10 @@ const ProductCard = ({
           <CardContent className='p-3 flex-1  text-center'>
             <ProductDetails />
           </CardContent>
+          <CardFooter className='p-3'>
+          { !hideAddToCart && <AddButton/>}
+
+          </CardFooter>
         </>
       )}
     </Card>
