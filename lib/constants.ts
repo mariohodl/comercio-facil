@@ -6,3 +6,7 @@ export const APP_DESCRIPTION =
 export const APP_SLOGAN = process.env.APP_SLOGAN || 'Come mas, gasta menos';
 
 export const PAGE_SIZE = Number(process.env.PAGE_SIZE || 9);
+
+export const FREE_SHIPPING_MIN_PRICE = Number(
+	process.env.FREE_SHIPPING_MIN_PRICE || 35
+);
