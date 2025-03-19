@@ -93,6 +93,10 @@ body {
 }
 
 @layer utilities {
+  .highlight-link a,
+  a.highlight-link {
+    @apply text-sky-700  hover:text-orange-700 hover:underline;
+  }
   .web-page-content p {
     @apply py-2;
   }
@@ -117,6 +121,3 @@ body {
   }
 }
 
-.h2-bold {
-  @apply font-bold text-lg lg:text-xl;
-}
