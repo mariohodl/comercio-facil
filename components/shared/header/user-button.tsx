@@ -21,9 +21,9 @@ export default async function UserButton() {
       <DropdownMenu>
         <DropdownMenuTrigger className='header-button' asChild>
           <div className='flex items-center'>
-            <div className='flex flex-col text-xs text-left'>
-              <span>Hello, {session ? session.user.name : 'sign in'}</span>
-              <span className='font-bold'>Account & Orders</span>
+            <div className='flex flex-col text-sm text-left'>
+              <span>Hola, {session ? session.user.name : 'Ingresa'}</span>
+              <span className='font-bold'>Cuenta y Pedidos</span>
             </div>
             <ChevronDown />
           </div>
@@ -42,10 +42,10 @@ export default async function UserButton() {
             </DropdownMenuLabel>
             <DropdownMenuGroup>
               <Link className='w-full' href='/account'>
-                <DropdownMenuItem>Your account</DropdownMenuItem>
+                <DropdownMenuItem>Mi Cuenta</DropdownMenuItem>
               </Link>
               <Link className='w-full' href='/account/orders'>
-                <DropdownMenuItem>Your orders</DropdownMenuItem>
+                <DropdownMenuItem>Mis Ordenes</DropdownMenuItem>
               </Link>
 
               {session.user.role === 'Admin' && (
@@ -60,7 +60,7 @@ export default async function UserButton() {
                   className='w-full py-4 px-2 h-4 justify-start'
                   variant='ghost'
                 >
-                  Sign out
+                  Salir
                 </Button>
               </form>
             </DropdownMenuItem>
@@ -73,13 +73,13 @@ export default async function UserButton() {
                   className={cn(buttonVariants(), 'w-full')}
                   href='/sign-in'
                 >
-                  Sign in
+                  Ingresar
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuLabel>
               <div className='font-normal'>
-                New Customer? <Link href='/sign-up'>Sign up</Link>
+                ¿Cliente Nuevo? <Link href='/sign-up'><span className='underline'>Regístrate</span></Link>
               </div>
             </DropdownMenuLabel>
           </DropdownMenuContent>

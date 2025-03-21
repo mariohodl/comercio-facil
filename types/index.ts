@@ -20,6 +20,7 @@ export type Data = {
 		image: string;
 		url: string;
 		title: string;
+		description: string;
 		buttonCaption: string;
 		isPublished: boolean;
 	}[];

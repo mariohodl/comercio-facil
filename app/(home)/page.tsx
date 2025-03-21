@@ -24,9 +24,9 @@ export default async function HomePage() {
   })
   const cards = [
     {
-      title: 'Categories to explore',
+      title: 'Categorías para explorar',
       link: {
-        text: 'See More',
+        text: 'Ver más',
         href: '/search',
       },
       items: categories.map((category) => ({
@@ -36,26 +36,26 @@ export default async function HomePage() {
       })),
     },
     {
-      title: 'Explore New Arrivals',
+      title: 'Explora Nuevos productos',
       items: newArrivals,
       link: {
-        text: 'View All',
+        text: 'Ver todos',
         href: '/search?tag=new-arrival',
       },
     },
     {
-      title: 'Discover Best Sellers',
+      title: 'Descubre los más vendidos',
       items: bestSellers,
       link: {
-        text: 'View All',
+        text: 'Ver todos',
         href: '/search?tag=new-arrival',
       },
     },
     {
-      title: 'Featured Products',
+      title: 'Productos destacados',
       items: featureds,
       link: {
-        text: 'Shop Now',
+        text: 'Comprar ahora',
         href: '/search?tag=new-arrival',
       },
     },
@@ -70,7 +70,7 @@ export default async function HomePage() {
         <HomeCard cards={cards} />
         <Card className='w-full rounded-none'>
           <CardContent className='p-4 items-center gap-3'>
-            <ProductSlider title={"Today's Deals"} products={todaysDeals} />
+            <ProductSlider title={"Ofertas del Día"} products={todaysDeals} />
           </CardContent>
         </Card>
       </div>
@@ -78,7 +78,7 @@ export default async function HomePage() {
       <div className='md:p-4 md:space-y-4 bg-border'>
         <Card className='w-full rounded-none'>
           <CardContent className='p-4 items-center gap-3'>
-            <ProductSlider title={"Best Selling Products"} products={bestSellingProducts} hideDetails/>
+            <ProductSlider title={"Productos más vendidos"} products={bestSellingProducts} hideDetails/>
           </CardContent>
         </Card>
       </div>

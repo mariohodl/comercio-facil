@@ -9,7 +9,7 @@ body {
 
 @layer base {
   :root {
-    --primary: #7e0512;
+    --primary: #9c2330;
     
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
@@ -118,6 +118,9 @@ body {
   }
   .flex-between {
     @apply flex justify-between items-center;
+  }
+  .my-container {
+    max-width: 1700px;
   }
 }
 

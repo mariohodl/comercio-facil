@@ -1005,22 +1005,27 @@ const data: Data = {
 
 	carousels: [
 		{
-			title: 'Most Popular Shoes For Sale',
-			buttonCaption: 'Shop Now',
+			title: 'Carne Premium, Prerium',
+			description:
+				'Tenemos la mejor selección de carnes de calidad para consumidores premium, no olvides cuidar el paladar de tus clientes de los sighentes compormados.',
+			buttonCaption: 'Comprar ahora',
 			image: '/images/SLIDE_01.jpg',
 			url: '/search?category=Shoes',
 			isPublished: true,
 		},
 		{
-			title: 'Best Sellers in T-Shirts',
-			buttonCaption: 'Shop Now',
+			title: 'Finos cortes de carne ',
+			description:
+				'Nuestra selección de carnes de alta calidad para consumidores premium de todas las edades y de todos los gustos para todos los gustos.',
+			buttonCaption: 'Comprar ahora',
 			image: '/images/SLIDE_02.jpg',
 			url: '/search?category=T-Shirts',
 			isPublished: true,
 		},
 		{
-			title: 'Best Deals on Wrist Watches',
-			buttonCaption: 'See More',
+			title: 'Chef, restaurantes y más',
+			description: 'Un chef puede necesitar carne para sus platos',
+			buttonCaption: 'Ver más',
 			image: '/images/SLIDE_03.jpg',
 			url: '/search?category=Wrist Watches',
 			isPublished: true,
