@@ -1,5 +1,7 @@
 'use client'
 import { Button } from '@/components/ui/button'
+import { createOrder } from '@/lib/actions/order.actions'
+import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import {
   Form,
@@ -65,6 +67,9 @@ const shippingAddressDefaultValues =
       }
 
 const CheckoutForm = () => {
+      const {
+        showSuccess,
+        showError, } = useToast()
   const router = useRouter()
 
   const {
@@ -81,6 +86,7 @@ const CheckoutForm = () => {
     setShippingAddress,
     setPaymentMethod,
     updateItem,
+    clearCart,
     removeItem,
     setDeliveryDateIndex,
   } = useCartStore()
@@ -113,7 +119,26 @@ const CheckoutForm = () => {
     useState<boolean>(false)
 
   const handlePlaceOrder = async () => {
-    // TODO: place order
+    const res = await createOrder({
+      items,
+      shippingAddress,
+      expectedDeliveryDate: calculateFutureDate(
+        AVAILABLE_DELIVERY_DATES[deliveryDateIndex!].daysToDeliver
+      ),
+      deliveryDateIndex,
+      paymentMethod,
+      itemsPrice,
+      shippingPrice,
+      taxPrice,
+      totalPrice,
+    })
+    if (!res.success) {
+      showError(res.message, {duration: 3000, position: 'top-center', important: true})
+    } else {
+      showSuccess(res.message, {duration: 3000, position: 'top-center', important: true})
+      clearCart()
+      router.push(`/checkout/${res.data?.orderId}`)
+    }
   }
   const handleSelectPaymentMethod = () => {
     setIsAddressSelected(true)
