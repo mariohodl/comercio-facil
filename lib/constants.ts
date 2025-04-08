@@ -1,4 +1,10 @@
 export const APP_NAME = process.env.APP_NAME || 'Master Karne';
+export const SERVER_URL =
+	process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+
+export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
+export const SENDER_NAME = process.env.SENDER_NAME || APP_NAME;
+
 export const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 export const APP_DESCRIPTION =
 	process.env.APP_DESCRIPTION ||
