@@ -1,7 +1,7 @@
 import { HomeCard } from '@/components/shared/home/home-card'
 import { HomeCarousel } from '@/components/shared/home/home-carousel'
 import ProductSlider from '@/components/shared/product/product-slider'
-import { getAllCategories, getProductsForCard, getProductsByTag } from '@/lib/actions/product.action'
+import { getAllCategories, getProductsForCard, getProductsByTag } from '@/lib/actions/product.actions'
 import { toSlug } from '@/lib/utils'
 import data from '@/lib/data'
 

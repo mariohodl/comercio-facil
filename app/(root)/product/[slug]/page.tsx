@@ -4,7 +4,7 @@ import { generateId, round2 } from '@/lib/utils'
 import {
   getProductBySlug,
   getRelatedProductsByCategory,
-} from '@/lib/actions/product.action'
+} from '@/lib/actions/product.actions'
 
 import SelectVariant from '@/components/shared/product/select-variant'
 import ProductPrice from '@/components/shared/product/product-price'

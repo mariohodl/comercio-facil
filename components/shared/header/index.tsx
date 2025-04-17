@@ -3,12 +3,13 @@ import Container from '@/components/shared/Container'
 // import Image from 'next/image'
 import Link from 'next/link'
 import Menu from './menu'
-// import { Button } from '@/components/ui/button'
-// import { MenuIcon } from 'lucide-react'
 // import data from '@/lib/data'
+import Sidebar from './sidebar'
 import Search from './search'
+import { getAllCategories } from '@/lib/actions/product.actions'
 
-export default function Header() {
+export default async function Header() {
+  const categories = await getAllCategories()
   return (
     <header className='bg-black  text-white'>
       <Container>
@@ -60,6 +61,7 @@ export default function Header() {
             ))}
           </div>
         </div> */}
+        <Sidebar categories={categories} />
       </Container>
       
     </header>
