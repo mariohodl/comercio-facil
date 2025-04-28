@@ -191,3 +191,10 @@ export const ProductUpdateSchema = ProductInputSchema.extend({
 	_id: z.string(),
   })
 
+
+export const UserUpdateSchema = z.object({
+	_id: MongoId,
+	name: UserName,
+	email: Email,
+	role: UserRole,
+})
