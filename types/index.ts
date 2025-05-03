@@ -22,6 +22,7 @@ export type IReviewDetails = IReviewInput & {
 }
 
 export type IProductInput = z.infer<typeof ProductInputSchema>;
+
 export type Data = {
 	users: IUserInput[];
 	products: IProductInput[];

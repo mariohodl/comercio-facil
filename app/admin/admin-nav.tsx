@@ -15,6 +15,10 @@ const links = [
     href: '/admin/products',
   },
   {
+    title: 'Recepción de compra',
+    href: '/admin/recepcion-de-compra',
+  },
+  {
     title: 'Orders',
     href: '/admin/orders',
   },

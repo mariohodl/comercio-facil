@@ -207,8 +207,6 @@ const ProductForm = ({
               </FormItem>
             )}
           />
-        </div>
-        <div className='flex flex-col gap-5 md:flex-row'>
           <FormField
             control={form.control}
             name='listPrice'
