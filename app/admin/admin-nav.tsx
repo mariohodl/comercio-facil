@@ -15,8 +15,12 @@ const links = [
     href: '/admin/products',
   },
   {
-    title: 'Recepción de compra',
-    href: '/admin/recepcion-de-compra',
+    title: 'Ordenes de compra',
+    href: '/admin/ordenes-de-compra',
+  },
+  {
+    title: 'Proveedores',
+    href: '/admin/proveedores',
   },
   {
     title: 'Orders',

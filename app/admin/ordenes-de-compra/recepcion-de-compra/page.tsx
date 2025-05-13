@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 // import Link from 'next/link'
 import { auth } from '@/auth'
 import OrderReceptionDetails from './OrderReceptionDetails'
-import ProductReceptionForm from './ProductReceptionForm'
+// import ProductReceptionForm from './ProductReceptionForm'
 
 
 export const metadata: Metadata = {
@@ -20,16 +20,16 @@ export const metadata: Metadata = {
                 <h3 className='text-2xl font-bold'>Recepción de compra</h3>
 
                 <div>
-                    <p>Fecha de ingreso: <span className='bg-primary p-2 text-white rounded-sm'>{new Date().toLocaleDateString()}</span></p>
+                    <p>Fecha de ingreso: <span className='bg-black p-2 text-white rounded-sm'>{new Date().toLocaleDateString()}</span></p>
                 </div>
             </div>
             <div className='my-8'>
                 <OrderReceptionDetails />
             </div>
 
-            <div className='my-8'>
+            {/* <div className='my-8'>
                 <ProductReceptionForm  />
-            </div>
+            </div> */}
         </main>
     )
 }

@@ -64,3 +64,87 @@ export const AVAILABLE_DELIVERY_DATES = [
 ];
 
 export const USER_ROLES = ['Admin', 'User', 'Customer', 'Seller']
+export const ROL_ADMIN = 'Admin';
+export const ROL_USER = 'User';
+export const ROL_CUSTOMER = 'Customer';
+export const ROL_SELLER = 'Seller';
+export const ROL_SUPER_ADMIN = 'SuperAdmin';
+export const ROL_RECEPTOR = 'Receptor';
+
+
+export const AVAILABLE_CATEGORIES = [
+	{
+	  id: "res",
+	  name: "Carne de Res",
+	  description: "Cortes premium de carne de res",
+	  icon: "beef"
+	},
+	{
+	  id: "cerdo",
+	  name: "Cerdo",
+	  description: "Variedad de cortes de cerdo",
+	  icon: "bacon"
+	},
+	{
+	  id: "pollo",
+	  name: "Pollo",
+	  description: "Pollo fresco y sus partes",
+	  icon: "drumstick"
+	},
+	{
+	  id: "cordero",
+	  name: "Cordero",
+	  description: "Especialidad en cordero y borrego",
+	  icon: "wheat"
+	},
+	{
+	  id: "embutidos",
+	  name: "Embutidos",
+	  description: "Salchichas, jamones y chorizos",
+	  icon: "scissors"
+	},
+	{
+	  id: "cortes-especiales",
+	  name: "Cortes Especiales",
+	  description: "Cortes premium y de exportación",
+	  icon: "medal"
+	},
+	{
+	  id: "visceras",
+	  name: "Vísceras",
+	  description: "Órganos y menudencias selectas",
+	  icon: "heart"
+	},
+	{
+	  id: "carnes-procesadas",
+	  name: "Carnes Procesadas",
+	  description: "Carnes ahumadas y preparadas",
+	  icon: "sparkles"
+	},
+	{
+	  id: "carnes-marinadas",
+	  name: "Carnes Marinadas",
+	  description: "Carnes listas para cocinar",
+	  icon: "utensils"
+	},
+	{
+	  id: "carnes-molidas",
+	  name: "Carnes Molidas",
+	  description: "Diferentes tipos de carne molida",
+	  icon: "scissors"
+	},
+	{
+	  id: "aves-especiales",
+	  name: "Aves Especiales",
+	  description: "Pavo, pato y otras aves",
+	  icon: "bird"
+	},
+	{
+	  id: "adobados",
+	  name: "Adobados",
+	  description: "Carnes con adobo especial de la casa",
+	  icon: "flame"
+	}
+  ];
+
+  export const TAX_RATE = 0.16 as number;

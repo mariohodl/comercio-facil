@@ -18,7 +18,7 @@ export interface InputProps <T extends FieldValues> extends HTMLAttributes<HTMLI
   label?: string;
 }
 
-export const MKInput =  <T extends FieldValues>(props: InputProps<T>) => {
+export const MKTextarea =  <T extends FieldValues>(props: InputProps<T>) => {
 
     const {  
       register,

@@ -41,8 +41,6 @@ export const ProductInputSchema = z.object({
 		.int()
 		.nonnegative('count in stock must be a non-negative number'),
 	tags: z.array(z.string()).default([]),
-	sizes: z.array(z.string()).default([]),
-	colors: z.array(z.string()).default([]),
 	avgRating: z.coerce
 		.number()
 		.min(0, 'Average rating must be at least 0')
@@ -197,4 +195,52 @@ export const UserUpdateSchema = z.object({
 	name: UserName,
 	email: Email,
 	role: UserRole,
+})
+
+export const OrderReceptionSchema = z.object({
+	nameProvider: z.string().min(6, 'Name is required'),
+	clave: z.string().min(2, 'Clave is required'),
+	facturaNumber: z.string().min(1, 'Factura number is required'),
+	rfc: z.string().min(12, 'RFC is required'),
+	observations: z.string().optional(),
+	isPaid: z.boolean().optional(),
+	subtotal: z.coerce
+		.number().optional(),
+
+	total: z.coerce
+		.number().optional(),
+	iva: z.coerce
+		.number().optional(),
+	products: z
+		.array(
+			z.object({
+				name: z.string().min(1, 'Name is required'),
+				productId: z.string().min(1, 'Product ID is required'),
+				quantity: z
+					.coerce
+					.number()
+					.int()
+					.nonnegative('Quantity must be a non-negative number'),
+				price: z
+					.coerce
+					.number()
+					.refine(
+						(value) =>
+							/^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
+						'Price must have exactly two decimal places (e.g., 49.99)'
+					),
+				category: z.string().min(1, 'Category is required'),
+				isProductKg: z.boolean(),
+			})
+		)
+		.min(1, 'Order must contain at least one item'),
+})
+
+
+
+export const ProveedorInputSchema = z.object({
+	nameProvider: z.string().min(6, 'Name is required'),
+	clave: z.string().min(2, 'Clave is required'),
+	facturaNumber: z.string().min(1, 'Factura number is required'),
+	rfc: z.string().min(12, 'RFC is required'),
 })

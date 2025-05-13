@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import qs from 'query-string'
+import { TAX_RATE } from '@/lib/constants';
+
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -19,8 +21,8 @@ export const toSlug = (text: string): string =>
 		.replace(/^-+|-+$/g, '')
 		.replace(/-+/g, '-');
 
-const CURRENCY_FORMATTER = new Intl.NumberFormat('en-US', {
-	currency: 'USD',
+const CURRENCY_FORMATTER = new Intl.NumberFormat('es-MX', {
+	currency: 'MXN',
 	style: 'currency',
 	minimumFractionDigits: 2,
 });
@@ -28,10 +30,40 @@ export function formatCurrency(amount: number) {
 	return CURRENCY_FORMATTER.format(amount);
 }
 
-const NUMBER_FORMATTER = new Intl.NumberFormat('en-US');
+const NUMBER_FORMATTER = new Intl.NumberFormat('es-MX');
 export function formatNumber(number: number) {
 	return NUMBER_FORMATTER.format(number);
 }
+
+export const calculateTotalPriceOfProducts = (
+	products: {
+		price: number;
+		quantity: number;
+	}[],
+	includeTax: boolean = false,
+	formatPrice: boolean = false
+  ): number | string => {
+	
+	// Calculate the subtotal by summing the price * quantity for each product
+	const subtotal = products.reduce((total, product) => {
+	  return total + (product.price * product.quantity);
+	}, 0);
+	
+	// If tax should be included, calculate and add it
+	if (includeTax) {
+		if (formatPrice) {
+			return formatCurrency(subtotal + (subtotal * TAX_RATE));
+		}
+	  return subtotal + (subtotal * TAX_RATE);
+	}
+
+	if (formatPrice) {
+		return formatCurrency(subtotal);
+	}
+	// If not including tax, just return the subtotal
+	
+	return subtotal;
+  };
 
 export const round2 = (num: number) =>
 	Math.round((num + Number.EPSILON) * 100) / 100;

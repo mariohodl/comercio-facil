@@ -9,6 +9,8 @@ import {
 	ReviewInputSchema,
 	UserSignUpSchema,
 	UserNameSchema,
+	OrderReceptionSchema,
+	ProveedorInputSchema
 } from '@/lib/validator';
 import { z } from 'zod';
 
@@ -63,3 +65,10 @@ export type IUserInput = z.infer<typeof UserInputSchema>;
 export type IUserSignIn = z.infer<typeof UserSignInSchema>;
 export type IUserSignUp = z.infer<typeof UserSignUpSchema>;
 export type IUserName = z.infer<typeof UserNameSchema>
+
+// order reception
+export type IOrderReceptionInput = z.infer<typeof OrderReceptionSchema>;
+
+
+// Proveedores
+export type IProveedorInput = z.infer<typeof ProveedorInputSchema>;
