@@ -2,6 +2,7 @@ import { APP_DESCRIPTION, APP_NAME, APP_SLOGAN } from '@/lib/constants'
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ClientProviders from '@/components/shared/client-providers';
+import { Toaster } from "sonner";
 import "./globals.css";
 import "../config/index";
 
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Toaster />
         <ClientProviders>{children}</ClientProviders>
       </body>
     </html>

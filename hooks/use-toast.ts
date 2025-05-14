@@ -16,19 +16,19 @@ interface ToastOptions {
 
 export const useToast = () => {
 	const showToast = (message: string, options?: ToastOptions) => {
-		return toast(message, options);
+		return toast(message, options || {position: 'top-right'});
 	};
 
 	const showSuccess = (message: string, options?: ToastOptions) => {
-		return toast.success(message, options);
+		return toast.success(message, options || {position: 'top-right'});
 	};
 
 	const showError = (message: string, options?: ToastOptions) => {
-		return toast.error(message, options);
+		return toast.error(message, options || {position: 'top-right'});
 	};
 
 	const showWarning = (message: string, options?: ToastOptions) => {
-		return toast.warning(message, options);
+		return toast.warning(message, options || {position: 'top-right'});
 	};
 
 	const showPromise = <T>(

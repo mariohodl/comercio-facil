@@ -14,7 +14,7 @@ type FormFields = {
 }
 
 const CreateProveedor = () => {
-  const toast = useToast();
+  const { showSuccess, showWarning } = useToast()
 
   const { register, handleSubmit,} = useForm<FormFields>({
     defaultValues: {
@@ -29,7 +29,8 @@ const CreateProveedor = () => {
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     // validations about the total and subtotal amount are needed here and in the backend before saaving to DB
     console.log('data', data)
-    toast['success']('Proveedor creado con éxito', 10000);
+    showSuccess('Proveedor creado correctamente')
+    showWarning('UPSSS Proveedor creado correctamente')
     return
     const proveedorData = {
       ...data,
