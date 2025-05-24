@@ -45,8 +45,6 @@ const productDefaultValues: IProductInput =
         numSales: 0,
         isPublished: false,
         tags: [],
-        sizes: [],
-        colors: [],
         ratingDistribution: [],
         reviews: [],
       }
@@ -65,8 +63,6 @@ const productDefaultValues: IProductInput =
         numSales: 0,
         isPublished: false,
         tags: [],
-        sizes: [],
-        colors: [],
         ratingDistribution: [],
         reviews: [],
       }

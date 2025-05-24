@@ -4,6 +4,10 @@ import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { FieldValues, UseFormRegister, FieldPath } from 'react-hook-form';
+type autossugestObj = {
+  name: string
+  nameProvider: string
+}
 
 export interface InputProps <T extends FieldValues> extends HTMLAttributes<HTMLInputElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -16,6 +20,11 @@ export interface InputProps <T extends FieldValues> extends HTMLAttributes<HTMLI
   placeholder?: string;
   classNames?: string;
   label?: string;
+  autoCompleteData?: autossugestObj[];
+  showAutoComplete?: boolean;
+  onAutoCompleteSelected?: (item: {}) => void;
+  onChangeInput?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  typeInput?: 'text' | 'number' 
 }
 
 export const MKInput =  <T extends FieldValues>(props: InputProps<T>) => {
@@ -30,7 +39,12 @@ export const MKInput =  <T extends FieldValues>(props: InputProps<T>) => {
       leftIcon,
       rightIcon,
       label,
+      autoCompleteData,
+      showAutoComplete,
+      onAutoCompleteSelected,
+      typeInput = 'text'
      } = props
+
 
     const baseStyles = "border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground h-10 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm";
     
@@ -51,12 +65,37 @@ export const MKInput =  <T extends FieldValues>(props: InputProps<T>) => {
     return (
       <div>
         {label && <p>{label}</p>}
-        <div className="flex w-full">
+        <div className="flex w-full relative">
+          {
+            !showAutoComplete && !!autoCompleteData && autoCompleteData?.length > 0 &&  (
+            <div className='absolute -bottom-40 mb-4 left-0 bg-gray-100 w-full z-10 h-36 overflow-y-auto'>
+              <ul>
+                {
+                  autoCompleteData?.map((item, index) => (
+                    <li key={index} className="text-gray-500 text-sm p-3  hover:bg-gray-200 cursor-pointer" style={{ borderBottom: '1px solid #e5e7eb' }} onClick={ () => {
+                      if (onAutoCompleteSelected) {
+                        onAutoCompleteSelected(item)
+                      }
+                    }}>
+                      {
+                        field === 'productToAddName' && <span>{item.name}</span>
+                      }
+                      {
+                        field === 'nameProvider' && <span>{item.nameProvider}</span>
+                      }
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>)
+          }
+          
           {!isLoading && leftIcon && (
             <span className="ml-2">{leftIcon}</span>
           )}
           <input
-            type="text"
+            type={typeInput}
+            min="0"
             placeholder={props.placeholder}
             {...register(field)}
             className={

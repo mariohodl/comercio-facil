@@ -1,22 +1,26 @@
-import { Document, Model, model, models, Schema } from 'mongoose';
-import { IProductInput } from '@/types';
+import { Document, Model, model, models, Schema } from 'mongoose'
+import { IProductInput } from '@/types'
 
 export interface IProduct extends Document, IProductInput {
-	_id: string;
-	createdAt: Date;
-	updatedAt: Date;
+	_id: string
+	createdAt: Date
+	updatedAt: Date
 }
 
 const productSchema = new Schema<IProduct>(
 	{
+		productId: {
+			type: Number,
+			required: true,
+		},
 		name: {
 			type: String,
 			required: true,
 		},
 		slug: {
 			type: String,
-			required: true,
-			unique: true,
+			required: false,
+			unique: false, //cambiar a true
 		},
 		category: {
 			type: String,
@@ -25,7 +29,7 @@ const productSchema = new Schema<IProduct>(
 		images: [String],
 		brand: {
 			type: String,
-			required: true,
+			required: false,
 		},
 		description: {
 			type: String,
@@ -39,32 +43,34 @@ const productSchema = new Schema<IProduct>(
 			type: Number,
 			required: true,
 		},
+		discountPrice: {
+			type: Number,
+			required: false,
+		},
 		countInStock: {
 			type: Number,
 			required: true,
 		},
 		tags: { type: [String], default: ['new arrival'] },
-		colors: { type: [String], default: ['White', 'Red', 'Black'] },
-		sizes: { type: [String], default: ['S', 'M', 'L'] },
 		avgRating: {
 			type: Number,
-			required: true,
+			required: false,
 			default: 0,
 		},
 		numReviews: {
 			type: Number,
-			required: true,
+			required: false,
 			default: 0,
 		},
 		ratingDistribution: [
 			{
 				rating: {
 					type: Number,
-					required: true,
+					required: false,
 				},
 				count: {
 					type: Number,
-					required: true,
+					required: false,
 				},
 			},
 		],
@@ -78,6 +84,11 @@ const productSchema = new Schema<IProduct>(
 			required: true,
 			default: false,
 		},
+		isProductKg: {
+			type: Boolean,
+			required: true,
+			default: true,
+		},
 		reviews: [
 			{
 				type: Schema.Types.ObjectId,
@@ -89,10 +100,10 @@ const productSchema = new Schema<IProduct>(
 	{
 		timestamps: true,
 	}
-);
+)
 
 const Product =
 	(models.Product as Model<IProduct>) ||
-	model<IProduct>('Product', productSchema);
+	model<IProduct>('Product', productSchema)
 
-export default Product;
+export default Product

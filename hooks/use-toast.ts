@@ -1,35 +1,44 @@
-'use client';
+'use client'
 
-import { toast } from 'sonner';
+import { toast } from 'sonner'
 
 interface ToastOptions {
-	duration?: number;
+	duration?: number
 	position?:
 		| 'top-left'
 		| 'top-right'
 		| 'bottom-left'
 		| 'bottom-right'
 		| 'top-center'
-		| 'bottom-center';
-	important?: boolean;
+		| 'bottom-center'
+	important?: boolean
 }
 
 export const useToast = () => {
 	const showToast = (message: string, options?: ToastOptions) => {
-		return toast(message, options || {position: 'top-right'});
-	};
+		return toast(message, options || { position: 'top-right', duration: 6000 })
+	}
 
 	const showSuccess = (message: string, options?: ToastOptions) => {
-		return toast.success(message, options || {position: 'top-right'});
-	};
+		return toast.success(
+			message,
+			options || { position: 'top-right', duration: 6000 }
+		)
+	}
 
 	const showError = (message: string, options?: ToastOptions) => {
-		return toast.error(message, options || {position: 'top-right'});
-	};
+		return toast.error(
+			message,
+			options || { position: 'top-right', duration: 6000 }
+		)
+	}
 
 	const showWarning = (message: string, options?: ToastOptions) => {
-		return toast.warning(message, options || {position: 'top-right'});
-	};
+		return toast.warning(
+			message,
+			options || { position: 'top-right', duration: 6000 }
+		)
+	}
 
 	const showPromise = <T>(
 		promise: Promise<T>,
@@ -39,9 +48,9 @@ export const useToast = () => {
 			error = 'Error!',
 			...options
 		}: {
-			loading?: string;
-			success?: string | ((data: T) => string);
-			error?: string | ((error: unknown) => string);
+			loading?: string
+			success?: string | ((data: T) => string)
+			error?: string | ((error: unknown) => string)
 		} & ToastOptions = {}
 	) => {
 		return toast.promise(promise, {
@@ -49,8 +58,8 @@ export const useToast = () => {
 			success,
 			error,
 			...options,
-		});
-	};
+		})
+	}
 
 	return {
 		showToast,
@@ -58,8 +67,8 @@ export const useToast = () => {
 		showError,
 		showWarning,
 		showPromise,
-	};
-};
+	}
+}
 
 // const TOAST_LIMIT = 1
 // const TOAST_REMOVE_DELAY = 1000000

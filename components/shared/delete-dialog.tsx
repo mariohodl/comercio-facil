@@ -21,7 +21,7 @@ export default function DeleteDialog({
 }: {
   id: string
   action: (id: string) => Promise<{ success: boolean; message: string }>
-  callbackAction?: () => void
+  callbackAction?: () => void,
 }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -30,18 +30,18 @@ export default function DeleteDialog({
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button size='sm' variant='outline'>
-          Delete
+          Eliminar
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>{'¿Estás absolutamente seguro de eliminar?'}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone.
+            Esta acción no se podrá deshacer.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
 
           <Button
             variant='destructive'
@@ -65,7 +65,7 @@ export default function DeleteDialog({
               })
             }
           >
-            {isPending ? 'Deleting...' : 'Delete'}
+            {isPending ? 'Eliminando...' : 'Eliminar'}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

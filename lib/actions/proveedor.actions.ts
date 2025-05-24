@@ -14,16 +14,16 @@ export async function createProveedor(data: IProveedorInput) {
     if (!session) throw new Error('User not authenticated');
     const proveedorData = ProveedorInputSchema.parse(data);
     try {
-        await connectToDatabase();
-    const proveedor = await Proveedor.create(proveedorData);
-    // revalidatePath('/admin/recepcion-de-compra');
-    return {
-        success: true,
-        message: 'Proveedor created successfully',
-        data: JSON.parse(JSON.stringify(proveedor)),
-    };
+      await connectToDatabase();
+      const proveedor = await Proveedor.create(proveedorData);
+      revalidatePath('/admin/proveedores');
+      return {
+          success: true,
+          message: 'Proveedor created successfully',
+          data: JSON.parse(JSON.stringify(proveedor)),
+      };
     } catch (error) {
-    throw new Error(formatError(error));
+      throw new Error(formatError(error));
     }
 }
 

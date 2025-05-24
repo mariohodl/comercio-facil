@@ -5,6 +5,8 @@ import { MKButton } from '@/components/shared/MKButton'
 import { useForm, SubmitHandler} from 'react-hook-form'
 import { createProveedor } from '@/lib/actions/proveedor.actions'
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+
 
 type FormFields = {
   nameProvider: string
@@ -14,7 +16,8 @@ type FormFields = {
 }
 
 const CreateProveedor = () => {
-  const { showSuccess, showWarning } = useToast()
+  const router = useRouter();
+  const { showSuccess, showError } = useToast()
 
   const { register, handleSubmit,} = useForm<FormFields>({
     defaultValues: {
@@ -28,19 +31,23 @@ const CreateProveedor = () => {
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     // validations about the total and subtotal amount are needed here and in the backend before saaving to DB
-    console.log('data', data)
-    showSuccess('Proveedor creado correctamente')
-    showWarning('UPSSS Proveedor creado correctamente')
-    return
     const proveedorData = {
       ...data,
     }
     console.log('proveedorData', proveedorData)
     createProveedor(proveedorData)
       .then((res) => {
-        console.log('res', res)
+        if (res?.success) {
+          showSuccess('Proveedor creado correctamente')
+          setTimeout(() => {
+            router.push('/admin/proveedores')
+          }, 500)
+        } else {
+          showError('Error al crear el proveedor')
+        }
       })
       .catch((err) => {
+        showError('Error al crear el proveedor')
         console.log('err', err)
       })
 

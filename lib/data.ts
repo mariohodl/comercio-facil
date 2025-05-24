@@ -1,7 +1,7 @@
-import { Data, IProductInput, IUserInput } from '@/types';
-import { toSlug } from './utils';
+import { Data, IProductInput, IUserInput } from '@/types'
+import { toSlug } from './utils'
 
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs'
 const users: IUserInput[] = [
 	{
 		name: 'Ricardo',
@@ -71,114 +71,115 @@ const users: IUserInput[] = [
 		paymentMethod: 'Stripe',
 		emailVerified: false,
 	},
-
-];
+]
 
 const reviews = [
 	{
-	  rating: 1,
-	  title: 'Poor quality',
-	  comment:
-		'Very disappointed. The item broke after just a few uses. Not worth the money.',
+		rating: 1,
+		title: 'Poor quality',
+		comment:
+			'Very disappointed. The item broke after just a few uses. Not worth the money.',
 	},
 	{
-	  rating: 2,
-	  title: 'Disappointed',
-	  comment:
-		"Not as expected. The material feels cheap, and it didn't fit well. Wouldn't buy again.",
+		rating: 2,
+		title: 'Disappointed',
+		comment:
+			"Not as expected. The material feels cheap, and it didn't fit well. Wouldn't buy again.",
 	},
 	{
-	  rating: 2,
-	  title: 'Needs improvement',
-	  comment:
-		"It looks nice but doesn't perform as expected. Wouldn't recommend without upgrades.",
+		rating: 2,
+		title: 'Needs improvement',
+		comment:
+			"It looks nice but doesn't perform as expected. Wouldn't recommend without upgrades.",
 	},
 	{
-	  rating: 3,
-	  title: 'not bad',
-	  comment:
-		'This product is decent, the quality is good but it could use some improvements in the details.',
+		rating: 3,
+		title: 'not bad',
+		comment:
+			'This product is decent, the quality is good but it could use some improvements in the details.',
 	},
 	{
-	  rating: 3,
-	  title: 'Okay, not great',
-	  comment:
-		'It works, but not as well as I hoped. Quality is average and lacks some finishing.',
+		rating: 3,
+		title: 'Okay, not great',
+		comment:
+			'It works, but not as well as I hoped. Quality is average and lacks some finishing.',
 	},
 	{
-	  rating: 3,
-	  title: 'Good product',
-	  comment:
-		'This product is amazing, I love it! The quality is top notch, the material is comfortable and breathable.',
+		rating: 3,
+		title: 'Good product',
+		comment:
+			'This product is amazing, I love it! The quality is top notch, the material is comfortable and breathable.',
 	},
 	{
-	  rating: 4,
-	  title: 'Pretty good',
-	  comment:
-		"Solid product! Great value for the price, but there's room for minor improvements.",
+		rating: 4,
+		title: 'Pretty good',
+		comment:
+			"Solid product! Great value for the price, but there's room for minor improvements.",
 	},
 	{
-	  rating: 4,
-	  title: 'Very satisfied',
-	  comment:
-		'Good product! High quality and worth the price. Would consider buying again.',
+		rating: 4,
+		title: 'Very satisfied',
+		comment:
+			'Good product! High quality and worth the price. Would consider buying again.',
 	},
 	{
-	  rating: 4,
-	  title: 'Absolutely love it!',
-	  comment:
-		'Perfect in every way! The quality, design, and comfort exceeded all my expectations.',
+		rating: 4,
+		title: 'Absolutely love it!',
+		comment:
+			'Perfect in every way! The quality, design, and comfort exceeded all my expectations.',
 	},
 	{
-	  rating: 4,
-	  title: 'Exceeded expectations!',
-	  comment:
-		'Fantastic product! High quality, feels durable, and performs well. Highly recommend!',
+		rating: 4,
+		title: 'Exceeded expectations!',
+		comment:
+			'Fantastic product! High quality, feels durable, and performs well. Highly recommend!',
 	},
 	{
-	  rating: 5,
-	  title: 'Perfect purchase!',
-	  comment:
-		"Couldn't be happier with this product. The quality is excellent, and it works flawlessly!",
+		rating: 5,
+		title: 'Perfect purchase!',
+		comment:
+			"Couldn't be happier with this product. The quality is excellent, and it works flawlessly!",
 	},
 	{
-	  rating: 5,
-	  title: 'Highly recommend',
-	  comment:
-		"Amazing product! Worth every penny, great design, and feels premium. I'm very satisfied.",
+		rating: 5,
+		title: 'Highly recommend',
+		comment:
+			"Amazing product! Worth every penny, great design, and feels premium. I'm very satisfied.",
 	},
 	{
-	  rating: 5,
-	  title: 'Just what I needed',
-	  comment:
-		'Exactly as described! Quality exceeded my expectations, and it arrived quickly.',
+		rating: 5,
+		title: 'Just what I needed',
+		comment:
+			'Exactly as described! Quality exceeded my expectations, and it arrived quickly.',
 	},
 	{
-	  rating: 5,
-	  title: 'Excellent choice!',
-	  comment:
-		'This product is outstanding! Everything about it feels top-notch, from material to functionality.',
+		rating: 5,
+		title: 'Excellent choice!',
+		comment:
+			'This product is outstanding! Everything about it feels top-notch, from material to functionality.',
 	},
 	{
-	  rating: 5,
-	  title: "Couldn't ask for more!",
-	  comment:
-		"Love this product! It's durable, stylish, and works great. Would buy again without hesitation.",
+		rating: 5,
+		title: "Couldn't ask for more!",
+		comment:
+			"Love this product! It's durable, stylish, and works great. Would buy again without hesitation.",
 	},
-  ]
-  
+]
 
 const products: IProductInput[] = [
 	{
-		name: 'Nike Mens Slim-fit Long-Sleeve T-Shirt',
-		slug: toSlug('Nike Mens Slim-fit Long-Sleeve T-Shirt'),
-		category: 'T-Shirts',
+		productId: 1,
+		name: 'Pechuga sin hueso Corte-Irlandés',
+		slug: toSlug('Pechuga sin hueso Corte-Irlandés'),
+		category: 'pollo',
 		images: ['/images/p11-1.jpg', '/images/p11-2.jpg'],
 		tags: ['new-arrival'],
 		isPublished: true,
+		isProductKg: true,
 		price: 21.8,
-		listPrice: 0,
-		brand: 'Nike',
+		listPrice: 19.05, //precio del proveedor
+		discountPrice: 0,
+		brand: 'Patito',
 		avgRating: 4.71,
 		numReviews: 7,
 		ratingDistribution: [
@@ -191,49 +192,22 @@ const products: IProductInput[] = [
 		numSales: 9,
 		countInStock: 11,
 		description:
-			'Made with chemicals safer for human health and the environment',
+			'Pechuga de pollo con alto detalle en el corte, especialmente para cadenas de comida que preparan saugue.',
 		reviews: [],
 	},
 	{
-		name: 'Jerzees Long-Sleeve Heavyweight Blend T-Shirt',
-		slug: toSlug('Jerzees Long-Sleeve Heavyweight Blend T-Shirt'),
-		category: 'T-Shirts',
-		images: [
-			'/images/p12-1.jpg',
-			'/images/p12-2.jpg',
-			'/images/p12-3.jpg',
-			'/images/p12-4.jpg',
-		],
-		tags: ['featured'],
-		isPublished: true,
-		price: 23.78,
-		listPrice: 0,
-		brand: 'Jerzees',
-		avgRating: 4.2,
-		numReviews: 10,
-		ratingDistribution: [
-			{ rating: 1, count: 1 },
-			{ rating: 2, count: 0 },
-			{ rating: 3, count: 0 },
-			{ rating: 4, count: 4 },
-			{ rating: 5, count: 5 },
-		],
-		numSales: 29,
-		countInStock: 12,
-		description:
-			'Made with sustainably sourced USA grown cotton; Shoulder-to-shoulder tape; double-needle coverstitched front neck; Set-in sleeves; Rib cuffs with concealed seams; Seamless body for a wide printing area',
-		reviews: [],
-	},
-	{
-		name: "Jerzees Men's Long-Sleeve T-Shirt",
-		slug: toSlug('Jerzees Men Long-Sleeve T-Shirt'),
-		category: 'T-Shirts',
-		brand: 'Jerzees',
+		productId: 2,
+		name: 'Arrachera angus Top End',
+		slug: toSlug('Arrachera angus Top End'),
+		category: 'res',
+		brand: 'Angus',
 		images: ['/images/p13-1.jpg', '/images/p13-2.jpg'],
 		tags: ['best-seller'],
 		isPublished: true,
-		price: 13.86,
-		listPrice: 16.03,
+		isProductKg: true,
+		price: 19.86,
+		listPrice: 16.03, //precio del proveedor
+		discountPrice: 18.9,
 		avgRating: 4,
 		numReviews: 12,
 		ratingDistribution: [
@@ -246,19 +220,22 @@ const products: IProductInput[] = [
 		numSales: 55,
 		countInStock: 13,
 		description:
-			'The Jerzees long sleeve t-shirt is made with dri-power technology that wicks away moisture to keep you cool and dry throughout your day. We also included a rib collar and cuffs for added durability, and a lay-flat collar for comfort. If you are looking for a versatile shirt that you can wear throughout the transitioning seasons, then look no further.',
+			'Arrachera con alto contenido de proteina ideal para consumidaores Top-End, alcanza los limites de  added durability, and a lay-flat collar for comfort. If you are looking for a versatile shirt that you can wear throughout the transitioning seasons, then look no further.',
 		reviews: [],
 	},
 	{
-		name: 'Dickies Mens Relaxed Fit Carpenter Jean',
-		slug: toSlug('Dickies Mens Relaxed Fit Carpenter Jean'),
-		category: 'Jeans',
+		productId: 3,
+		name: 'Carne para asar Pecho de Paloma',
+		slug: toSlug('Carne para asar Pecho de Paloma'),
+		category: 'res',
 		brand: 'Dickies',
 		images: ['/images/p25-1.jpg', '/images/p25-2.jpg'],
 		tags: ['new-arrival', 'featured'],
 		isPublished: true,
+		isProductKg: true,
 		price: 95.34,
-		listPrice: 0,
+		listPrice: 92.3,
+		discountPrice: 0,
 		avgRating: 3.66,
 		numReviews: 15,
 		ratingDistribution: [
@@ -271,19 +248,22 @@ const products: IProductInput[] = [
 		countInStock: 25,
 		numSales: 48,
 		description:
-			'Relaxed work jean with traditional carpenter-style pockets and logo patch at back pockets',
+			'Carne roja rojisimas para asar en fiestas. impresiona a tus comensales con este tipo de carne.',
 		reviews: [],
 	},
 	{
-		name: 'Wrangler mens Premium Performance Cowboy Cut Slim Fit Jean',
-		slug: toSlug('Wrangler mens Premium Performance Cowboy Cut Slim Fit Jean'),
-		category: 'Jeans',
+		productId: 4,
+		name: 'Lengua de Cerdo',
+		slug: toSlug('Lengua de Cerdo'),
+		category: 'cerdo',
 		brand: 'Wrangler',
 		images: ['/images/p26-1.jpg', '/images/p26-2.jpg'],
 		tags: ['best-seller', 'todays-deal'],
 		isPublished: true,
+		isProductKg: false,
 		price: 81.78,
-		listPrice: 149.99,
+		listPrice: 79.99,
+		discountPrice: 80.0,
 		avgRating: 3.46,
 		numReviews: 13,
 		ratingDistribution: [
@@ -296,19 +276,22 @@ const products: IProductInput[] = [
 		countInStock: 26,
 		numSales: 48,
 		description:
-			'Designed with a functional fit in mind, these jeans are made to stack over your favorite pair of boots. Constructed with a slim fit in the waist, seat, and thigh, this jean is made for both function and comfort for long days in the saddle.',
+			'Lengua de cerdo premiun con corte expandido. Constructed with a slim fit in the waist, seat, and thigh, this jean is made for both function and comfort for long days in the saddle.',
 		reviews: [],
 	},
 	{
-		name: "Seiko Men's Analogue Watch with Black Dial",
-		slug: toSlug("Seiko Men's Analogue Watch with Black Dial"),
-		category: 'Wrist Watches',
-		brand: 'Seiko',
+		productId: 5,
+		name: 'Sirlon de res KAKU',
+		slug: toSlug('Sirlon de res KAKU'),
+		category: 'res',
+		brand: 'Kaku',
 		images: ['/images/p31-1.jpg', '/images/p31-2.jpg'],
 		tags: ['new-arrival'],
 		isPublished: true,
+		isProductKg: true,
 		price: 530.0,
 		listPrice: 0,
+		discountPrice: 0,
 		avgRating: 4.71,
 		numReviews: 7,
 		ratingDistribution: [
@@ -321,21 +304,22 @@ const products: IProductInput[] = [
 		countInStock: 31,
 		numSales: 48,
 		description:
-			'Casing: Case made of stainless steel Case shape: round Case colour: silver Glass: Hardlex Clasp type: Fold over clasp with safety',
+			'Sirlon de res KAKU, increible para buenas recetas de comida, steel Case shape: round Case colour: silver Glass: Hardlex Clasp type: Fold over clasp with safety',
 		reviews: [],
 	},
 	{
-		name: 'SEIKO 5 Sport SRPJ83 Beige Dial Nylon Automatic Watch, Beige, Automatic Watch',
-		slug: toSlug(
-			'SEIKO 5 Sport SRPJ83 Beige Dial Nylon Automatic Watch, Beige, Automatic Watch'
-		),
-		category: 'Wrist Watches',
-		brand: 'Seiko',
+		productId: 6,
+		name: 'Pierna de pollo',
+		slug: toSlug('Pierna de pollo'),
+		category: 'pollo',
+		brand: 'PIO',
 		images: ['/images/p32-1.jpg', '/images/p32-2.jpg'],
 		tags: ['featured'],
 		isPublished: true,
-		price: 375.83,
-		listPrice: 400,
+		isProductKg: false,
+		price: 21.83,
+		listPrice: 17.05,
+		discountPrice: 20.9,
 		avgRating: 4.2,
 		numReviews: 10,
 		ratingDistribution: [
@@ -348,21 +332,22 @@ const products: IProductInput[] = [
 		countInStock: 32,
 		numSales: 48,
 		description:
-			'Seiko 5 Sports Collection Inspired by vintage field/aviator style: Automatic with manual winding capability',
+			'Piernas de pollo PIO con recorte inferior fino, olvidate de incomodas resenas cuanbdo tus comensales eligen este producto.',
 		reviews: [],
 	},
 	{
-		name: "Casio Men's Heavy Duty Analog Quartz Stainless Steel Strap, Silver, 42 Casual Watch ",
-		slug: toSlug(
-			"Casio Men's Heavy Duty Analog Quartz Stainless Steel Strap, Silver, 42 Casual Watch"
-		),
-		category: 'Wrist Watches',
+		productId: 7,
+		name: 'Chuleta de pureco ahumada',
+		slug: toSlug('Chuleta de pureco ahumada'),
+		category: 'puerco',
 		brand: 'Casio',
 		images: ['/images/p33-1.jpg', '/images/p33-2.jpg'],
 		tags: ['best-seller'],
 		isPublished: true,
+		isProductKg: true,
 		price: 60.78,
 		listPrice: 0,
+		discountPrice: 0,
 		avgRating: 4,
 		numReviews: 12,
 		ratingDistribution: [
@@ -375,19 +360,22 @@ const products: IProductInput[] = [
 		countInStock: 33,
 		numSales: 48,
 		description:
-			'The Casio range is growing with this model  MWA-100H-1AVEF. Sporting a stainless steel case with a brushed finish, it will easily withstand all the shocks of everyday life.',
+			'Chuleta ahumada con la mejor calidad en corte de hueso. this model  MWA-100H-1AVEF. Sporting a stainless steel case with a brushed finish, it will easily withstand all the shocks of everyday life.',
 		reviews: [],
 	},
 	{
-		name: 'adidas Mens Grand Court 2.0 Training Shoes Training Shoes',
-		slug: toSlug('adidas Mens Grand Court 2.0 Training Shoes Training Shoes'),
-		category: 'Shoes',
-		brand: 'adidas',
+		productId: 8,
+		name: 'Carne mixta adobada',
+		slug: toSlug('Carne mixta adobada'),
+		category: 'adobados',
+		brand: 'almo',
 		images: ['/images/p41-1.jpg', '/images/p41-2.jpg'],
 		tags: ['new-arrival'],
 		isPublished: true,
+		isProductKg: true,
 		price: 81.99,
-		listPrice: 0,
+		listPrice: 75.2,
+		discountPrice: 79.75,
 		avgRating: 4.71,
 		numReviews: 7,
 		ratingDistribution: [
@@ -400,37 +388,10 @@ const products: IProductInput[] = [
 		countInStock: 41,
 		numSales: 48,
 		description:
-			'Cloudfoam Comfort sockliner is ultra-soft and plush, with two layers of cushioning topped with soft, breathable mesh',
+			'Carne adobada mista, especialmente para asar pero tambien puedes ponerla en cocido,cushioning topped with soft, breathable mesh',
 		reviews: [],
 	},
-	{
-		name: "ziitop Men's Running Walking Shoes Fashion Sneakers Mesh Dress Shoes Business Oxfords Shoes Lightweight Casual Breathable Work Formal Shoes",
-		slug: toSlug(
-			"ziitop Men's Running Walking Shoes Fashion Sneakers Mesh Dress Shoes Business Oxfords Shoes Lightweight Casual Breathable Work Formal Shoes"
-		),
-		category: 'Shoes',
-		brand: 'ziitop',
-		images: ['/images/p42-1.jpg', '/images/p42-2.jpg'],
-		tags: ['featured'],
-		isPublished: true,
-		price: 39.97,
-		listPrice: 49.96,
-		avgRating: 4.2,
-		numReviews: 10,
-		ratingDistribution: [
-			{ rating: 1, count: 1 },
-			{ rating: 2, count: 0 },
-			{ rating: 3, count: 0 },
-			{ rating: 4, count: 4 },
-			{ rating: 5, count: 5 },
-		],
-		countInStock: 42,
-		numSales: 50,
-		description:
-			'Cloudfoam Comfort sockliner is ultra-soft and plush, with two layers of cushioning topped with soft, breathable mesh',
-		reviews: [],
-	},
-];
+]
 
 const data: Data = {
 	headerMenus: [
@@ -499,7 +460,7 @@ const data: Data = {
 	products,
 	users,
 	reviews,
-};
+}
 
 // const meatProductsToRefine = [
 // 	{
@@ -611,4 +572,4 @@ const data: Data = {
 // 	},
 // ];
 
-export default data;
+export default data

@@ -26,10 +26,6 @@ export const metadata: Metadata = {
             <div className='my-8'>
                 <OrderReceptionDetails />
             </div>
-
-            {/* <div className='my-8'>
-                <ProductReceptionForm  />
-            </div> */}
         </main>
     )
 }

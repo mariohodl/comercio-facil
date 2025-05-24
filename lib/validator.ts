@@ -1,9 +1,9 @@
-import { z } from 'zod';
-import { formatNumberWithDecimal } from './utils';
+import { z } from 'zod'
+import { formatNumberWithDecimal } from './utils'
 
 const MongoId = z
 	.string()
-	.regex(/^[0-9a-fA-F]{24}$/, { message: 'Invalid MongoDB ID' });
+	.regex(/^[0-9a-fA-F]{24}$/, { message: 'Invalid MongoDB ID' })
 
 // Common
 const Price = (field: string) =>
@@ -12,7 +12,7 @@ const Price = (field: string) =>
 		.refine(
 			(value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
 			`${field} must have exactly two decimal places (e.g., 49.99)`
-		);
+		)
 
 export const ReviewInputSchema = z.object({
 	product: MongoId,
@@ -27,15 +27,21 @@ export const ReviewInputSchema = z.object({
 		.max(5, 'Rating must be at most 5'),
 })
 export const ProductInputSchema = z.object({
+	productId: z.coerce
+		.number()
+		.int()
+		.nonnegative('Number of sales must be a non-negative number'),
 	name: z.string().min(3, 'Name must be at least 3 characters'),
 	slug: z.string().min(3, 'Slug must be at least 3 characters'),
 	category: z.string().min(1, 'Category is required'),
 	images: z.array(z.string()).min(1, 'Product must have at least one image'),
-	brand: z.string().min(1, 'Brand is required'),
-	description: z.string().min(1, 'Description is required'),
+	brand: z.string().optional(),
+	description: z.string().optional(),
 	isPublished: z.boolean(),
+	isProductKg: z.boolean(),
 	price: Price('Price'),
-	listPrice: Price('List price'),
+	listPrice: Price('List price'), //precio del proveedor
+	discountPrice: Price('Precio con descuento'),
 	countInStock: z.coerce
 		.number()
 		.int()
@@ -57,7 +63,7 @@ export const ProductInputSchema = z.object({
 		.number()
 		.int()
 		.nonnegative('Number of sales must be a non-negative number'),
-});
+})
 
 // Order Item
 export const OrderItemSchema = z.object({
@@ -78,7 +84,7 @@ export const OrderItemSchema = z.object({
 	price: Price('Price'),
 	size: z.string().optional(),
 	color: z.string().optional(),
-});
+})
 export const ShippingAddressSchema = z.object({
 	fullName: z.string().min(1, 'Full name is required'),
 	street: z.string().min(1, 'Address is required'),
@@ -87,7 +93,7 @@ export const ShippingAddressSchema = z.object({
 	province: z.string().min(1, 'Province is required'),
 	phone: z.string().min(1, 'Phone number is required'),
 	country: z.string().min(1, 'Country is required'),
-});
+})
 
 export const OrderInputSchema = z.object({
 	user: z.union([
@@ -124,7 +130,7 @@ export const OrderInputSchema = z.object({
 	deliveredAt: z.date().optional(),
 	isPaid: z.boolean().default(false),
 	paidAt: z.date().optional(),
-});
+})
 
 export const CartSchema = z.object({
 	items: z
@@ -139,16 +145,16 @@ export const CartSchema = z.object({
 	paymentMethod: z.optional(z.string()),
 	deliveryDateIndex: z.optional(z.number()),
 	expectedDeliveryDate: z.optional(z.date()),
-});
+})
 
 // USER
 const UserName = z
 	.string()
 	.min(2, { message: 'Username must be at least 2 characters' })
-	.max(50, { message: 'Username must be at most 30 characters' });
-const Email = z.string().min(1, 'Email is required').email('Email is invalid');
-const Password = z.string().min(3, 'Password must be at least 3 characters');
-const UserRole = z.string().min(1, 'role is required');
+	.max(50, { message: 'Username must be at most 30 characters' })
+const Email = z.string().min(1, 'Email is required').email('Email is invalid')
+const Password = z.string().min(3, 'Password must be at least 3 characters')
+const UserRole = z.string().min(1, 'role is required')
 
 export const UserInputSchema = z.object({
 	name: UserName,
@@ -167,11 +173,11 @@ export const UserInputSchema = z.object({
 		country: z.string().min(1, 'Country is required'),
 		phone: z.string().min(1, 'Phone number is required'),
 	}),
-});
+})
 export const UserSignInSchema = z.object({
 	email: Email,
 	password: Password,
-});
+})
 
 export const UserSignUpSchema = UserSignInSchema.extend({
 	name: UserName,
@@ -179,7 +185,7 @@ export const UserSignUpSchema = UserSignInSchema.extend({
 }).refine((data) => data.password === data.confirmPassword, {
 	message: "Passwords don't match",
 	path: ['confirmPassword'],
-});
+})
 
 export const UserNameSchema = z.object({
 	name: UserName,
@@ -187,8 +193,7 @@ export const UserNameSchema = z.object({
 
 export const ProductUpdateSchema = ProductInputSchema.extend({
 	_id: z.string(),
-  })
-
+})
 
 export const UserUpdateSchema = z.object({
 	_id: MongoId,
@@ -204,29 +209,22 @@ export const OrderReceptionSchema = z.object({
 	rfc: z.string().min(12, 'RFC is required'),
 	observations: z.string().optional(),
 	isPaid: z.boolean().optional(),
-	subtotal: z.coerce
-		.number().optional(),
-
-	total: z.coerce
-		.number().optional(),
-	iva: z.coerce
-		.number().optional(),
+	subtotal: z.coerce.number().optional(),
+	total: z.coerce.number().optional(),
+	iva: z.coerce.number().optional(),
 	products: z
 		.array(
 			z.object({
 				name: z.string().min(1, 'Name is required'),
 				productId: z.string().min(1, 'Product ID is required'),
-				quantity: z
-					.coerce
+				quantity: z.coerce
 					.number()
 					.int()
 					.nonnegative('Quantity must be a non-negative number'),
-				price: z
-					.coerce
+				price: z.coerce
 					.number()
 					.refine(
-						(value) =>
-							/^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
+						(value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
 						'Price must have exactly two decimal places (e.g., 49.99)'
 					),
 				category: z.string().min(1, 'Category is required'),
@@ -235,8 +233,6 @@ export const OrderReceptionSchema = z.object({
 		)
 		.min(1, 'Order must contain at least one item'),
 })
-
-
 
 export const ProveedorInputSchema = z.object({
 	nameProvider: z.string().min(6, 'Name is required'),
