@@ -2,7 +2,9 @@
 'use client'
 import Link from 'next/link'
 import { IOrderReception } from '@/lib/db/models/orderReception.model';
-
+import { CheckCircleIcon } from 'lucide-react'
+import { OctagonXIcon } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils';
 
 import DeleteDialog from '@/components/shared/delete-dialog'
 import { Button } from '@/components/ui/button'
@@ -27,7 +29,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 type ProductListDataProps = {
   orders: IOrderReception[]
   totalPages: number
-  totalProducts: number
+  totalOrders: number
   to: number
   from: number
 }
@@ -56,7 +58,7 @@ const ProductList = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setInputValue(value)
-    if (value) {
+    if (value.length > 3) {
       clearTimeout((window as any).debounce)
       ;(window as any).debounce = setTimeout(() => {
         startTransition(async () => {
@@ -94,13 +96,13 @@ const ProductList = () => {
               />
 
               {isPending ? (
-                <p>Loading...</p>
+                <p>Cargando...</p>
               ) : (
                 <p>
-                  {data?.totalProducts === 0
-                    ? 'No'
-                    : `${data?.from}-${data?.to} of ${data?.totalProducts}`}
-                  {' results'}
+                  {data?.totalOrders === 0
+                    ? 'No hay'
+                    : `${data?.from}-${data?.to} de ${data?.totalOrders}`}
+                  {' resultados'}
                 </p>
               )}
             </div>
@@ -114,12 +116,12 @@ const ProductList = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Id</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead className='text-right'>Monto</TableHead>
-                <TableHead>Pagada</TableHead>
-                <TableHead>Fecha de creación</TableHead>
-                <TableHead className='w-[100px]'>Acciones</TableHead>
+                <TableHead className='font-bold'>Id</TableHead>
+                <TableHead className='font-bold'>Nombre</TableHead>
+                <TableHead className='text-right font-bold'>Monto</TableHead>
+                <TableHead className='font-bold text-center w-[120]'>Pagada</TableHead>
+                <TableHead className='font-bold'>Fecha de creación</TableHead>
+                <TableHead className='w-[100px] font-bold'>Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -131,18 +133,19 @@ const ProductList = () => {
                       {ordenReceived.nameProvider}
                     </Link>
                   </TableCell>
-                  <TableCell className='text-right'>${ordenReceived.total}</TableCell>
-                  <TableCell>{ordenReceived.isPaid ? 'Si' : 'No'}</TableCell>
+                  <TableCell className='text-right'>{formatCurrency(ordenReceived?.total || 0)}</TableCell>
+                  <TableCell className='text-center flex justify-center w-[120]'>
+                    {ordenReceived.isPaid ? <p className='flex text-green-700'>Sí <CheckCircleIcon size={20}/></p> : <p className='flex text-red-700'>No <OctagonXIcon size={20}/></p>}</TableCell>
                   <TableCell>
                     {formatDateTime(ordenReceived.updatedAt).dateTime}
                   </TableCell>
                   <TableCell className='flex gap-1'>
-                    <Button asChild variant='outline' size='sm'>
+                    {/* <Button asChild variant='outline' size='sm'>
                       <Link href={`/admin/products/${ordenReceived._id}`}>Edit</Link>
-                    </Button>
+                    </Button> */}
                     <Button asChild variant='outline' size='sm'>
-                      <Link target='_blank' href={`/ordenReceived/${ordenReceived._id}`}>
-                        View
+                      <Link href={`/admin/ordenes-de-compra/${ordenReceived._id}`}>
+                        Ver orden
                       </Link>
                     </Button>
                     <DeleteDialog
@@ -170,16 +173,16 @@ const ProductList = () => {
                 disabled={Number(page) <= 1}
                 className='w-24'
               >
-                <ChevronLeft /> Previous
+                <ChevronLeft /> Anterior
               </Button>
-              Page {page} of {data?.totalPages}
+              Página {page} de {data?.totalPages}
               <Button
                 variant='outline'
                 onClick={() => handlePageChange('next')}
                 disabled={Number(page) >= (data?.totalPages ?? 0)}
                 className='w-24'
               >
-                Next <ChevronRight />
+                Siguiente <ChevronRight />
               </Button>
             </div>
           )}

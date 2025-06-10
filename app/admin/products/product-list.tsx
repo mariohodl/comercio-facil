@@ -55,7 +55,7 @@ const ProductList = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setInputValue(value)
-    if (value) {
+    if (value.length > 3) {
       clearTimeout((window as any).debounce)
       ;(window as any).debounce = setTimeout(() => {
         startTransition(async () => {
@@ -72,7 +72,7 @@ const ProductList = () => {
   }
   useEffect(() => {
     startTransition(async () => {
-      const data = await getAllProductsForAdmin({ query: '' })
+      const data = await getAllProductsForAdmin({ query: '', sort: 'asc' })
       setData(data)
     })
   }, [])
@@ -82,7 +82,7 @@ const ProductList = () => {
       <div className='space-y-2'>
         <div className='flex-between flex-wrap gap-2'>
           <div className='flex flex-wrap items-center gap-2 '>
-            <h1 className='font-bold text-lg'>Products</h1>
+            <h1 className='font-bold text-lg'>Productos</h1>
             <div className='flex flex-wrap items-center  gap-2 '>
               <Input
                 className='w-auto'
@@ -93,7 +93,7 @@ const ProductList = () => {
               />
 
               {isPending ? (
-                <p>Loading...</p>
+                <p>Cargando...</p>
               ) : (
                 <p>
                   {data?.totalProducts === 0
@@ -106,22 +106,21 @@ const ProductList = () => {
           </div>
 
           <Button asChild variant='default'>
-            <Link href='/admin/products/create'>Create Product</Link>
+            <Link href='/admin/products/create'>Crear Producto</Link>
           </Button>
         </div>
         <div>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Id</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead className='text-right'>Price</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Rating</TableHead>
-                <TableHead>Published</TableHead>
-                <TableHead>Last Update</TableHead>
-                <TableHead className='w-[100px]'>Actions</TableHead>
+                <TableHead className='font-bold'>Id</TableHead>
+                <TableHead className='font-bold'>Nombre</TableHead>
+                <TableHead className='font-bold text-right'>Precio</TableHead>
+                <TableHead className='font-bold'>Categoria</TableHead>
+                <TableHead className='font-bold'>Stock</TableHead>
+                <TableHead className='font-bold'>Publicado</TableHead>
+                <TableHead className='font-bold'>Actualización</TableHead>
+                <TableHead className='font-bold w-[100px]'>Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -136,18 +135,17 @@ const ProductList = () => {
                   <TableCell className='text-right'>${product.price}</TableCell>
                   <TableCell>{product.category}</TableCell>
                   <TableCell>{product.countInStock}</TableCell>
-                  <TableCell>{product.avgRating}</TableCell>
-                  <TableCell>{product.isPublished ? 'Yes' : 'No'}</TableCell>
+                  <TableCell>{product.isPublished ? 'Sí' : 'No'}</TableCell>
                   <TableCell>
                     {formatDateTime(product.updatedAt).dateTime}
                   </TableCell>
                   <TableCell className='flex gap-1'>
                     <Button asChild variant='outline' size='sm'>
-                      <Link href={`/admin/products/${product._id}`}>Edit</Link>
+                      <Link href={`/admin/products/${product._id}`}>Editar</Link>
                     </Button>
                     <Button asChild variant='outline' size='sm'>
                       <Link target='_blank' href={`/product/${product.slug}`}>
-                        View
+                        Ver
                       </Link>
                     </Button>
                     <DeleteDialog
@@ -175,16 +173,16 @@ const ProductList = () => {
                 disabled={Number(page) <= 1}
                 className='w-24'
               >
-                <ChevronLeft /> Previous
+                <ChevronLeft /> Anterior
               </Button>
-              Page {page} of {data?.totalPages}
+              Página {page} de {data?.totalPages}
               <Button
                 variant='outline'
                 onClick={() => handlePageChange('next')}
                 disabled={Number(page) >= (data?.totalPages ?? 0)}
                 className='w-24'
               >
-                Next <ChevronRight />
+                Siguiente <ChevronRight />
               </Button>
             </div>
           )}

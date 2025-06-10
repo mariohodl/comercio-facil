@@ -94,13 +94,13 @@ const ProveedoresList = () => {
               />
 
               {isPending ? (
-                <p>Loading...</p>
+                <p>Cargando...</p>
               ) : (
                 <p>
                   {data?.totalProducts === 0
-                    ? 'No'
-                    : `${data?.from}-${data?.to} of ${data?.totalProducts}`}
-                  {' results'}
+                    ? 'No hay'
+                    : `${data?.from}-${data?.to} de ${data?.totalProducts}`}
+                  {' resultados'}
                 </p>
               )}
             </div>
@@ -115,7 +115,8 @@ const ProveedoresList = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Id</TableHead>
-                <TableHead>Name</TableHead>
+                <TableHead>Nombre</TableHead>
+                <TableHead>Clave</TableHead>
                 <TableHead>Fecha de creación</TableHead>
                 <TableHead className='w-[100px]'>Acciones</TableHead>
               </TableRow>
@@ -130,16 +131,14 @@ const ProveedoresList = () => {
                     </Link>
                   </TableCell>
                   <TableCell>
+                      {proveedor.clave}
+                  </TableCell>
+                  <TableCell>
                     {formatDateTime(proveedor.updatedAt).dateTime}
                   </TableCell>
                   <TableCell className='flex gap-1'>
                     <Button asChild variant='outline' size='sm'>
-                      <Link href={`/admin/products/${proveedor._id}`}>Edit</Link>
-                    </Button>
-                    <Button asChild variant='outline' size='sm'>
-                      <Link target='_blank' href={`/proveedores/${proveedor._id}`}>
-                        View
-                      </Link>
+                      <Link href={`/admin/products/${proveedor._id}`}>Editar</Link>
                     </Button>
                     <DeleteDialog
                       id={proveedor._id}
@@ -166,16 +165,16 @@ const ProveedoresList = () => {
                 disabled={Number(page) <= 1}
                 className='w-24'
               >
-                <ChevronLeft /> Previous
+                <ChevronLeft /> Anterior
               </Button>
-              Page {page} of {data?.totalPages}
+              Página {page} de {data?.totalPages}
               <Button
                 variant='outline'
                 onClick={() => handlePageChange('next')}
                 disabled={Number(page) >= (data?.totalPages ?? 0)}
                 className='w-24'
               >
-                Next <ChevronRight />
+                Siguiente <ChevronRight />
               </Button>
             </div>
           )}

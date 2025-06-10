@@ -209,6 +209,7 @@ export const OrderReceptionSchema = z.object({
 	rfc: z.string().min(12, 'RFC is required'),
 	observations: z.string().optional(),
 	isPaid: z.boolean().optional(),
+	paidAt: z.date().optional(),
 	subtotal: z.coerce.number().optional(),
 	total: z.coerce.number().optional(),
 	iva: z.coerce.number().optional(),
@@ -217,11 +218,11 @@ export const OrderReceptionSchema = z.object({
 			z.object({
 				name: z.string().min(1, 'Name is required'),
 				productId: z.string().min(1, 'Product ID is required'),
-				quantity: z.coerce
+				countInStock: z.coerce
 					.number()
 					.int()
 					.nonnegative('Quantity must be a non-negative number'),
-				price: z.coerce
+				listPrice: z.coerce
 					.number()
 					.refine(
 						(value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
@@ -237,6 +238,5 @@ export const OrderReceptionSchema = z.object({
 export const ProveedorInputSchema = z.object({
 	nameProvider: z.string().min(6, 'Name is required'),
 	clave: z.string().min(2, 'Clave is required'),
-	facturaNumber: z.string().min(1, 'Factura number is required'),
 	rfc: z.string().min(12, 'RFC is required'),
 })

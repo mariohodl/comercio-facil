@@ -17,7 +17,6 @@ const proveedorSchema = new Schema<IProveedor>(
     {
         nameProvider: { type: String, required: true },
         clave: { type: String, required: true },
-        facturaNumber: { type: String, required: true },
         createdAt: { type: Date, default: Date.now },
         rfc: { type: String, required: true },
     },

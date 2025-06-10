@@ -6,7 +6,7 @@ import {
   getRelatedProductsByCategory,
 } from '@/lib/actions/product.actions'
 
-import SelectVariant from '@/components/shared/product/select-variant'
+// import SelectVariant from '@/components/shared/product/select-variant'
 import ProductPrice from '@/components/shared/product/product-price'
 import ProductGallery from '@/components/shared/product/product-gallery'
 import { Separator } from '@/components/ui/separator'
@@ -88,13 +88,13 @@ export default async function ProductDetails(props: {
                 </div>
               </div>
             </div>
-            <div>
+            {/* <div>
               <SelectVariant
                 product={product}
                 size={size || product.sizes[0]}
                 color={color || product.colors[0]}
               />
-            </div>
+            </div> */}
             <Separator className='my-2' />
             <div className='flex flex-col gap-2'>
               <p className='p-bold-20 text-grey-600'>Description:</p>
@@ -133,8 +133,8 @@ export default async function ProductDetails(props: {
                           price: round2(product.price),
                           quantity: 1,
                           image: product.images[0],
-                          size: size || product.sizes[0],
-                          color: color || product.colors[0],
+                          // size: size || product.sizes[0],
+                          // color: color || product.colors[0],
                         }}
                       />
                     </div>

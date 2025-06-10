@@ -393,6 +393,11 @@ const products: IProductInput[] = [
 	},
 ]
 
+// crear lista de proveedores 
+
+// crear recepccion de ordenes
+
+
 const data: Data = {
 	headerMenus: [
 		{

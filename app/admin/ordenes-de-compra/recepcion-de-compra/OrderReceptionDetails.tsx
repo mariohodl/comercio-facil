@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect, useTransition } from 'react'
+import { v4 as uuidv4 } from 'uuid';
 // import Product from '@/lib/db/models/product.model';
 import { MKInput } from '@/components/shared/MKInput'
 import { MKButton } from '@/components/shared/MKButton'
@@ -8,7 +9,7 @@ import { MKTextarea } from '@/components/shared/MKTextarea'
 import { AVAILABLE_CATEGORIES } from '@/lib/constants'
 import { createOrderReception } from '@/lib/actions/orderReception.actions'
 import { getAllProveedoresForAdmin } from '@/lib/actions/proveedor.actions'
-import { getAllProductsForAdmin } from '@/lib/actions/product.actions'
+import { getAllExistingProducts } from '@/lib/actions/product.actions'
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { calculateTotalPriceOfProducts } from '@/lib/utils'
@@ -22,13 +23,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { IProduct } from '@/lib/db/models/product.model'
-import { count } from 'console'
 
 type ProductPreAddedType = {
   name: string
   productId: number
   countInStock: number
-  price: number
+  listPrice: number
   category: string
   isProductKg: boolean
 }
@@ -76,7 +76,7 @@ const OrderReceptionDetails = () => {
   const { register, handleSubmit, watch , setValue} = useForm<FormFields>({
     defaultValues: {
       nameProvider: '',
-      clave: '',
+      clave: uuidv4().toString().substring(0, 8),
       facturaNumber: '',
       rfc: '',
       observations: '',
@@ -95,6 +95,9 @@ const OrderReceptionDetails = () => {
   })
 
   const nameProviderWatcher = watch('nameProvider')
+  const RFCWatcher = watch('rfc')
+  const facturaWatcher = watch('facturaNumber')
+
   const productToAddNameWatcher = watch('productToAddName');
   const productToAddProductIdWatcher = watch('productToAddProductId');
   const productToAddCategoryWatcher = watch('productToAddCategory');
@@ -140,6 +143,7 @@ const OrderReceptionDetails = () => {
   useEffect(() => {
 
     if (productToAddNameWatcher?.length > 2 && productsData?.length > 0) {
+      console.log(productToAddNameWatcher)
       const results = productsData?.filter((item: any) => {
         return item?.name?.toLowerCase().includes(productToAddNameWatcher?.toLowerCase())
       })
@@ -161,8 +165,27 @@ const OrderReceptionDetails = () => {
 
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
+    let isAtLeastOneError = false
+    if(nameProviderWatcher.length < 3){
+      showError('Ingresa un nombre de proveedor válido!')
+      isAtLeastOneError = true
+    }
+
+    if(RFCWatcher.length < 8){
+      showError('Ingresa un RFC válido!')
+      isAtLeastOneError = true
+    }
+
+    if(facturaWatcher.length < 4){
+      showError('Ingresa un Número de factura válido!')
+      isAtLeastOneError = true
+    }
+
+    if(isAtLeastOneError){
+      return
+    }
+
     // validations about the total and subtotal amount are needed here and in the backend before saaving to DB
-    console.log('data', data)
     const orderReceptionData = {
       ...data,
       subtotal: Number(calculateTotalPriceOfProducts(productsPreAdded, false, false)),
@@ -170,7 +193,6 @@ const OrderReceptionDetails = () => {
       iva: TAX_RATE,
       products: productsPreAdded,
     }
-    console.log('orderReceptionData', orderReceptionData)
     createOrderReception(orderReceptionData)
       .then((res) => {
         console.log('res', res)
@@ -199,11 +221,12 @@ const OrderReceptionDetails = () => {
 
     useEffect(() => {
       startTransition(async () => {
-        const data = await getAllProductsForAdmin({ query: '' })
+        const data = await getAllExistingProducts()
         const idResult = getHighetsProductId(data.products)
         setIdBasedOnSavedProducts(idResult);
         const idSuggested = idResult + 1;
         setValue('productToAddProductId', idSuggested)
+        console.log('PRODUCTOS',data.products)
         setProductsData(data?.products) 
       })
     }, [])
@@ -335,7 +358,7 @@ const OrderReceptionDetails = () => {
           <MKInput
             label="Clave del proveedor"
             field='clave'
-            disabled={autosuggestProveedoresSelected}
+            disabled={true}
             register={register}
             placeholder="Ingresa la clave del proveedor"
           />

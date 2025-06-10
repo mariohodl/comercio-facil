@@ -11,7 +11,6 @@ import { useRouter } from 'next/navigation';
 type FormFields = {
   nameProvider: string
   clave: string
-  facturaNumber: string
   rfc: string
 }
 
@@ -23,7 +22,6 @@ const CreateProveedor = () => {
     defaultValues: {
       nameProvider: '',
       clave: '',
-      facturaNumber: '',
       rfc: '',
     },
   })
@@ -73,18 +71,7 @@ const CreateProveedor = () => {
             placeholder="Ingresa la clave del proveedor"
           />
         </div>
-
-        <div className='m-3 w-1/3'>
-          <MKInput
-            label="Número de factura"
-            field='facturaNumber'
-            register={register}
-            placeholder="Ingresa el numero de factura"
-          />
-        </div>
-      </div>
-
-      <div className='flex'>
+        
         <div className='m-3 w-1/3'>
           <MKInput
             label="RFC del proveedor"

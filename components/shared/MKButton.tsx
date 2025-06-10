@@ -9,6 +9,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
+  handleClick?: () => void
 }
 
 export const MKButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -23,6 +24,7 @@ export const MKButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
       fullWidth = false,
       children,
       disabled,
+      handleClick,
       ...props
     },
     ref
@@ -45,6 +47,7 @@ export const MKButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
+        onClick={handleClick}
         ref={ref}
         className={cn(
           baseStyles,

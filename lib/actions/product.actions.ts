@@ -275,7 +275,14 @@ export async function getAllProductsForAdmin({
 		to: pageSize * (Number(page) - 1) + products.length,
 	}
 }
+export async function getAllExistingProducts() {
+	await connectToDatabase()
 
+	const products = await Product.find().lean()
+	return {
+		products: JSON.parse(JSON.stringify(products)) as IProduct[],
+	}
+}
 // CREATE
 export async function createProduct(data: IProductInput) {
 	try {

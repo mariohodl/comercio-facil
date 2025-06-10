@@ -8,55 +8,56 @@ import OrderReception, {
 } from '@/lib/db/models/orderReception.model'
 import Product, { IProduct } from '@/lib/db/models/product.model'
 
-import { OrderReceptionSchema } from '../validator'
 import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '@/lib/constants'
 
 // CREATE
 export async function createOrderReception(data: IOrderReceptionInput) {
-	// console.log('dataToSAve', data)
-
-	// return {
-	// 	success: false,
-	// 	message: 'Order reception failed',
-	// }
-
+	const orderReceptionToSave = await JSON.parse(JSON.stringify(data));
 	const session = await auth()
 	if (!session) throw new Error('User not authenticated')
-	// const orderRecieved = OrderReceptionSchema.parse(data)
 	try {
 		await connectToDatabase()
-		const idsToSearch = data.products.map((item) => item.productId)
+		const productBulk = Product.collection.initializeUnorderedBulkOp()
 
-		// console.log(newProductsAdded)
+		for (const singleProduct of data.products) {
+			// findSingleProduct
+			let productFound = await Product.findOne({ productId: singleProduct.productId });
+			const parsedProduct  = await JSON.parse(JSON.stringify(productFound)) as IProduct;
+			if(productFound){
+				singleProduct.listPrice = (Number(parsedProduct.listPrice) + Number(singleProduct.listPrice)) / 2;
+				singleProduct.countInStock= Number(parsedProduct.countInStock) + Number(singleProduct.countInStock);
+			}
+			
+			productBulk
+				.find({ productId: singleProduct.productId })
+				.upsert()
+				.update({
+					$set: {
+						...singleProduct,
+					},
+				})
 
-		const productsAvailable = await Product.find({
-			productId: { $in: idsToSearch },
-		}).lean()
-		const existingIds = productsAvailable.map((item) => item.productId)
+			productFound = null
+		}
 
-		const newProducts = data.products.filter(
-			(item) => !existingIds.includes(item?.productId)
-		)
+		productBulk
+			.execute()
+			.then((result) => {
+				console.log(result)
+			})
+			.catch((error) => {
+				console.log('Error-->', error)
+				throw new Error(formatError(error))
+			})
 
-		console.log('dsd', productsAvailable)
-		console.log('newPRos', newProducts)
-
-		const newProductsAdded = await Product.insertMany(newProducts)
-
+		const orderReception = await OrderReception.create(orderReceptionToSave)
+		revalidatePath('/admin/recepcion-de-compra')
 		return {
 			success: true,
-			productsAvailable: JSON.parse(JSON.stringify(newProductsAdded)),
-			// ...data,
+			message: 'Order reception created successfully',
+			data: JSON.parse(JSON.stringify(orderReception)),
 		}
-		// const newProducts = Product.insertMany()
-		// const orderReception = await OrderReception.create(orderRecieved)
-		// revalidatePath('/admin/recepcion-de-compra');
-		// return {
-		// 	success: true,
-		// 	message: 'Order reception created successfully',
-		// 	data: JSON.parse(JSON.stringify(orderReception)),
-		// }
 	} catch (error) {
 		console.log('Error-->', error)
 		throw new Error(formatError(error))
@@ -72,7 +73,7 @@ export async function deleteOrderReceived(id: string) {
 		revalidatePath('/admin/ordenes-de-compra')
 		return {
 			success: true,
-			message: 'Product deleted successfully',
+			message: 'Order deleted successfully',
 		}
 	} catch (error) {
 		return { success: false, message: formatError(error) }
@@ -83,7 +84,7 @@ export async function deleteOrderReceived(id: string) {
 export async function getAllOrdersReceivedForAdmin({
 	query,
 	page = 1,
-	sort = 'latest',
+	// sort = 'latest',
 	limit,
 }: {
 	query: string
@@ -97,39 +98,67 @@ export async function getAllOrdersReceivedForAdmin({
 	const queryFilter =
 		query && query !== 'all'
 			? {
-					name: {
+					nameProvider: {
 						$regex: query,
 						$options: 'i',
 					},
 				}
 			: {}
 
-	const order: Record<string, 1 | -1> =
-		sort === 'best-selling'
-			? { numSales: -1 }
-			: sort === 'price-low-to-high'
-				? { price: 1 }
-				: sort === 'price-high-to-low'
-					? { price: -1 }
-					: sort === 'avg-customer-review'
-						? { avgRating: -1 }
-						: { _id: -1 }
+	// const order: Record<string, 1 | -1> =
+	// 	sort === 'best-selling'
+	// 		? { numSales: -1 }
+	// 		: sort === 'price-low-to-high'
+	// 			? { price: 1 }
+	// 			: sort === 'price-high-to-low'
+	// 				? { price: -1 }
+	// 				: sort === 'avg-customer-review'
+	// 					? { avgRating: -1 }
+	// 					: { _id: -1 }
 	const orders = await OrderReception.find({
 		...queryFilter,
 	})
-		.sort(order)
+		// .sort(order)
 		.skip(pageSize * (Number(page) - 1))
 		.limit(pageSize)
 		.lean()
 
-	const countProducts = await OrderReception.countDocuments({
+	const countOrders = await OrderReception.countDocuments({
 		...queryFilter,
 	})
+	orders.reverse()
 	return {
 		orders: JSON.parse(JSON.stringify(orders)) as IOrderReception[],
-		totalPages: Math.ceil(countProducts / pageSize),
-		totalProducts: countProducts,
+		totalPages: Math.ceil(countOrders / pageSize),
+		totalOrders: countOrders,
 		from: pageSize * (Number(page) - 1) + 1,
 		to: pageSize * (Number(page) - 1) + orders.length,
 	}
 }
+
+// GET ONE ORDER BY ID
+export async function getOrderById(orderId: string) {
+	await connectToDatabase()
+	const order = await OrderReception.findById(orderId)
+	return JSON.parse(JSON.stringify(order)) as IOrderReception
+}
+
+
+  export async function updateOrderReceptionToPaid(orderId: string) {
+	try {
+	  await connectToDatabase()
+	  const order = await OrderReception.findById(orderId)
+	  if (!order) throw new Error('OrderReception not found')
+	  if (order.isPaid) throw new Error('OrderReception is already paid')
+	  order.isPaid = true
+	  order.paidAt = new Date()
+	  await order.save()
+	//   if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
+		// await updateProductStock(order._id)
+	//   if (order.user.email) await sendPurchaseReceipt({ order })
+	  revalidatePath(`/admin/ordenes-de-compra`)
+	  return { success: true, message: 'OrderReception paid successfully' }
+	} catch (err) {
+	  return { success: false, message: formatError(err) }
+	}
+  }
