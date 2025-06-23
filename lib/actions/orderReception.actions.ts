@@ -10,6 +10,7 @@ import Product, { IProduct } from '@/lib/db/models/product.model'
 
 import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '@/lib/constants'
+import {  sendOrderReceptionSavedEmail } from '@/emails'
 
 // CREATE
 export async function createOrderReception(data: IOrderReceptionInput) {
@@ -52,6 +53,7 @@ export async function createOrderReception(data: IOrderReceptionInput) {
 			})
 
 		const orderReception = await OrderReception.create(orderReceptionToSave)
+		await sendOrderReceptionSavedEmail({order: orderReception});
 		revalidatePath('/admin/recepcion-de-compra')
 		return {
 			success: true,
@@ -155,7 +157,7 @@ export async function getOrderById(orderId: string) {
 	  await order.save()
 	//   if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
 		// await updateProductStock(order._id)
-	//   if (order.user.email) await sendPurchaseReceipt({ order })
+	//   if (order.user.email) await sendOrderReceptionSavedEmail({ order })
 	  revalidatePath(`/admin/ordenes-de-compra`)
 	  return { success: true, message: 'OrderReception paid successfully' }
 	} catch (err) {
