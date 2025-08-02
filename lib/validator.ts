@@ -202,6 +202,23 @@ export const UserUpdateSchema = z.object({
 	role: UserRole,
 })
 
+export const IOrderReceptionProduct = z.object({
+	name: z.string().min(1, 'Name is required'),
+	productId: z.string().min(1, 'Product ID is required'),
+	countInStock: z.coerce
+		.number()
+		.int()
+		.nonnegative('Quantity must be a non-negative number'),
+	listPrice: z.coerce
+		.number()
+		.refine(
+			(value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
+			'Price must have exactly two decimal places (e.g., 49.99)'
+		),
+	category: z.string().min(1, 'Category is required'),
+	isProductKg: z.boolean(),
+})
+
 export const OrderReceptionSchema = z.object({
 	nameProvider: z.string().min(6, 'Name is required'),
 	clave: z.string().min(2, 'Clave is required'),
@@ -214,24 +231,7 @@ export const OrderReceptionSchema = z.object({
 	total: z.coerce.number().optional(),
 	iva: z.coerce.number().optional(),
 	products: z
-		.array(
-			z.object({
-				name: z.string().min(1, 'Name is required'),
-				productId: z.string().min(1, 'Product ID is required'),
-				countInStock: z.coerce
-					.number()
-					.int()
-					.nonnegative('Quantity must be a non-negative number'),
-				listPrice: z.coerce
-					.number()
-					.refine(
-						(value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
-						'Price must have exactly two decimal places (e.g., 49.99)'
-					),
-				category: z.string().min(1, 'Category is required'),
-				isProductKg: z.boolean(),
-			})
-		)
+		.array(IOrderReceptionProduct)
 		.min(1, 'Order must contain at least one item'),
 })
 
@@ -239,4 +239,58 @@ export const ProveedorInputSchema = z.object({
 	nameProvider: z.string().min(6, 'Name is required'),
 	clave: z.string().min(2, 'Clave is required'),
 	rfc: z.string().min(12, 'RFC is required'),
+})
+
+export const IDateRange = z.object({
+	from: z.date()
+	.refine(
+		(value) => value < new Date(),
+		'La fecha esperada debe ser una fecha del pasado'
+	),
+	to: z.date()
+	.refine(
+		(value) => value > new Date(),
+		'La fecha esperada debe ser una fecha del futuro'
+	),
+})
+
+export const IReportInput = z.object({
+	title: z.string().min(5, 'Nombre es requerido con almenos 5 caracters'),
+	status: z.string(),
+	type:  z.string(),
+	dateRange: z.object({
+		from: z.date()
+		.refine(
+			(value) => value < new Date(),
+			'La fecha esperada debe ser una fecha del pasado'
+		),
+		to: z.date()
+		.refine(
+			(value) => value > new Date(),
+			'La fecha esperada debe ser una fecha del futuro'
+		),
+	})
+})
+
+export const ReportInputProduct = z.object({
+	name: z.string(),
+	productId: MongoId || z.string(),
+	countInStock: z.coerce.number(),
+	price: z.coerce.number(),
+	category: z.string(),
+	isValidProduct: z.boolean().optional(),
+})
+
+export const ReportInputSchema = z.object({
+	title: z.string().min(6, 'Title report is required'),
+	type: z.string().min(3, 'Type of report is required'),
+	status: z.string().min(3, 'Status of report is required'),
+	allTotalValue: z.coerce.number(),
+	allSubTotalValue: z.coerce.number(),
+	allProducts: z.array(ReportInputProduct),
+	productsCount: z.coerce.number(),
+	dateRangeFormatted: z.string(),
+	dateRange: IDateRange,
+	filtersUsed: z.optional(IReportInput),
+	reportItems: z.array(z.unknown())
 })

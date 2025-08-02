@@ -224,3 +224,13 @@ export const getFilterUrl = ({
 	if (sort) newParams.sort = sort
 	return `/search?${new URLSearchParams(newParams).toString()}`
 }
+
+
+export const formatDateWithHours = (date: Date) => {
+
+	const datestring = ("0" + date.getDate()).slice(-2) + "/" + ("0"+(date.getMonth()+1)).slice(-2) + "/" +
+    date.getFullYear();
+
+	return datestring;
+	//will return something like 16-05-2020 09:50
+}

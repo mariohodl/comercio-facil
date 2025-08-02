@@ -1,33 +1,34 @@
 import { APP_NAME } from '@/lib/constants'
 import Container from '@/components/shared/Container'
-// import Image from 'next/image'
+import Image from 'next/image'
 import Link from 'next/link'
 import Menu from './menu'
 // import data from '@/lib/data'
-import Sidebar from './sidebar'
+// import Sidebar from './sidebar'
 import Search from './search'
-import { getAllCategories } from '@/lib/actions/product.actions'
+// import { getAllCategories } from '@/lib/actions/product.actions'
 
 export default async function Header() {
-  const categories = await getAllCategories()
+  // const categories = await getAllCategories()
   return (
     <header className='bg-black  text-white'>
       <Container>
-        <div className='py-5'>
+        <div className='py-2'>
           <div className='flex items-center justify-between w-full'>
             <section className='flex items-center w-1/2'>
               <div className='flex items-center'>
                 <Link
                   href='/'
-                  className='flex items-center header-button font-extrabold text-2xl m-1 '
+                  className='flex items-center header-button font-extrabold text-2xl m-1 rounded'
                 >
-                  {/* <Image
-                    src='/icons/master-meat.svg'
-                    width={40}
-                    height={40}
+                  <Image
+                    src='/images/logo-prueba2.png'
+                    width={60}
+                    height={60}
                     alt={`${APP_NAME} logo`}
-                  /> */}
-                  {APP_NAME}
+                    className='rounded-full'
+                  />
+                  {/* {APP_NAME} */}
                 </Link>
               </div>
               <div className='hidden md:block flex-1 max-w-xl'>
@@ -61,7 +62,7 @@ export default async function Header() {
             ))}
           </div>
         </div> */}
-        <Sidebar categories={categories} />
+        {/* <Sidebar categories={categories} /> */}
       </Container>
       
     </header>

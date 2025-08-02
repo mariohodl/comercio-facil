@@ -15,14 +15,20 @@ export default async function AdminLayout({
       <div className='flex flex-col'>
         <div className='bg-black text-white'>
           <div className='flex h-16 items-center px-2'>
-            <Link href='/' className=' '>
-              <Image
-                src='/icons/logo.svg'
-                width={48}
-                height={48}
-                alt={`${APP_NAME} logo`}
-              />
-            </Link>
+            <div className='flex items-center'>
+              <Link
+                href='/'
+                className='flex items-center header-button font-extrabold text-2xl m-1 rounded'
+              >
+                <Image
+                  src='/images/logo-prueba3.png'
+                  width={60}
+                  height={60}
+                  alt={`${APP_NAME} logo`}
+                  className='rounded-full'
+                />
+              </Link>
+            </div>
             <AdminNav className='mx-6 hidden md:flex' />
             <div className='ml-auto flex items-center space-x-4'>
               <Menu forAdmin />

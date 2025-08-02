@@ -23,6 +23,10 @@ const links = [
     href: '/admin/proveedores',
   },
   {
+    title: 'Reporte de Movimientos',
+    href: '/admin/reporte-movimientos',
+  },
+  {
     title: 'Orders',
     href: '/admin/orders',
   },
@@ -62,7 +66,7 @@ export function AdminNav({
           href={item.href}
           className={cn(
             '',
-            pathname.includes(item.href) ? '' : 'text-muted-foreground'
+            pathname.includes(item.href) ? '' : 'text-muted-foreground underline'
           )}
         >
           {item.title}
