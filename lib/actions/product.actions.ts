@@ -7,6 +7,7 @@ import { formatError } from '../utils'
 import { ProductInputSchema, ProductUpdateSchema } from '../validator'
 import { IProductInput } from '@/types'
 import { z } from 'zod'
+import { utapi } from '@/app/api/uploadthing/core'
 
 export async function getProductsByTag({
 	tag,
@@ -319,6 +320,28 @@ export async function getProductById(productId: string) {
 	await connectToDatabase()
 	const product = await Product.findById(productId)
 	return JSON.parse(JSON.stringify(product)) as IProduct
+}
+
+// Add Image url to product
+export async function addProductImg(productId: string, imgUrl: string, imgKey: string) {
+	await connectToDatabase()
+	const product = await Product.updateOne({ _id: productId },
+	{ $push: { images: { imgUrl, imgKey } }})
+	return JSON.parse(JSON.stringify(product)) as IProduct
+}
+
+// Delete Image url From product
+export async function deleteProductImg(productId: string, imgKey: string) {
+	await connectToDatabase()
+	try {
+		const uatiRes = await utapi.deleteFiles(imgKey)
+		console.log('UATRE', uatiRes)
+		const product = await Product.updateOne({ _id: productId },
+			{ $pull: { images: { imgKey } }})
+			return {success: true, product: JSON.parse(JSON.stringify(product)) as IProduct}
+	} catch (error) {
+		return { success: false, errorMessage: 'Error deleting files', error: JSON.stringify(error)}
+	}
 }
 
 //   export async function createOrUpdateManyProducts(){}

@@ -31,7 +31,7 @@ export default async function HomePage() {
       },
       items: categories.map((category) => ({
         name: category,
-        image: `/images/${toSlug(category)}.jpg`,
+        image: `/images/${toSlug(category)}-category-product.jpg`,
         href: `/search?category=${category}`,
       })),
     },
@@ -66,7 +66,7 @@ export default async function HomePage() {
   return (
     <>
       <HomeCarousel items={data.carousels} />
-      <div className='md:p-4 md:space-y-4 bg-border'>
+      {/* <div className='md:p-4 md:space-y-4 bg-border'>
         <HomeCard cards={cards} />
         <Card className='w-full rounded-none'>
           <CardContent className='p-4 items-center gap-3'>
@@ -81,10 +81,10 @@ export default async function HomePage() {
             <ProductSlider title={"Productos más vendidos"} products={bestSellingProducts} hideDetails/>
           </CardContent>
         </Card>
-      </div>
-      <div className='p-4 bg-background'>
+      </div> */}
+      {/* <div className='p-4 bg-background'>
         <BrowsingHistoryList />
-      </div>
+      </div> */}
     </>
   )
 }

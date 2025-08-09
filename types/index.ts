@@ -48,6 +48,12 @@ export type Data = {
 		isPublished: boolean;
 	}[];
 };
+
+export type ProductImage = { 
+	imgUrl: string,
+	imgKey: string
+}
+
 export type IOrderList = IOrderInput & {
 	_id: string
 	user: {

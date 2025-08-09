@@ -339,7 +339,7 @@ const products: IProductInput[] = [
 		productId: 7,
 		name: 'Chuleta de pureco ahumada',
 		slug: toSlug('Chuleta de pureco ahumada'),
-		category: 'puerco',
+		category: 'cerdo',
 		brand: 'Casio',
 		images: ['/images/p33-1.jpg', '/images/p33-2.jpg'],
 		tags: ['best-seller'],

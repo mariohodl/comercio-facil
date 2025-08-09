@@ -28,14 +28,14 @@ const ProductCard = ({
       <div className='relative h-52'>
         {product.images.length > 1 ? (
           <ImageHover
-            src={product.images[0]}
-            hoverSrc={product.images[1]}
+            src={product.images?.[0]?.imgUrl || `/images/${product.category.toLocaleLowerCase()}-category-product.jpg`}
+            hoverSrc={product.images?.[1].imgUrl}
             alt={product.name}
           />
         ) : (
           <div className='relative h-52'>
             <Image
-              src={product.images[0]}
+              src={product.images?.[0]?.imgUrl || `/images/${product.category.toLocaleLowerCase()}-category-product.jpg`}
               alt={product.name}
               fill
               sizes='80vw'
@@ -81,15 +81,13 @@ const ProductCard = ({
         item={{
           clientId: generateId(),
           product: product._id,
-          size: product.sizes[0],
-          color: product.colors[0],
           countInStock: product.countInStock,
           name: product.name,
           slug: product.slug,
           category: product.category,
           price: round2(product.price),
           quantity: 1,
-          image: product.images[0],
+          image: product.images?.[0]?.imgUrl,
         }}
       />
     </div>

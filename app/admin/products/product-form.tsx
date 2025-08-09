@@ -19,13 +19,13 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 // import { useToast } from '@/hooks/use-toast'
-import { createProduct, updateProduct } from '@/lib/actions/product.actions'
+import { createProduct, updateProduct, deleteProductImg } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { UploadButton } from '@/lib/uploadthing'
 import { ProductInputSchema, ProductUpdateSchema } from '@/lib/validator'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toSlug } from '@/lib/utils'
-import { IProductInput } from '@/types'
+import { IProductInput, ProductImage } from '@/types'
 import { Trash } from 'lucide-react'
 
 const productDefaultValues: IProductInput =
@@ -74,7 +74,7 @@ const ProductForm = ({
 }: {
   type: 'Create' | 'Update'
   product?: IProduct
-  productId?: string
+  productId: string
 }) => {
   const router = useRouter()
 
@@ -119,7 +119,13 @@ const ProductForm = ({
   }
   const images = form.watch('images')
 
-  console.log(form.formState.errors)
+  const handleRemoveImage = async (image: ProductImage) => {
+    const res = await deleteProductImg(productId, image.imgKey)
+    console.log(res)
+    if(res?.success){
+      form.setValue('images', images.filter((img: ProductImage) => img.imgUrl !== image.imgUrl))
+    }
+  }
   return (
     <Form {...form}>
       <form
@@ -258,10 +264,10 @@ const ProductForm = ({
                 <Card>
                   <CardContent className='space-y-2 mt-2 min-h-48'>
                     <div className='flex justify-start items-center space-x-2'>
-                    {images.map((image: string) => (
-                        <Card key={image} className='relative '>
+                    {images.map((image: ProductImage) => (
+                        <Card key={image.imgKey} className='relative '>
                           <Image
-                            src={image}
+                            src={image.imgUrl}
                             alt='product image'
                             className='w-36 h-36 object-cover object-center rounded-sm'
                             width={100}
@@ -272,12 +278,7 @@ const ProductForm = ({
                             className='absolute top-1 right-1'
                             type='button'
                             size='icon'
-                            onClick={() => {
-                              form.setValue(
-                                'images',
-                                images.filter((img: string) => img !== image)
-                              )
-                            }}
+                            onClick={ ()=> handleRemoveImage(image)}
                           >
                             <Trash />
                           </Button>
@@ -286,8 +287,13 @@ const ProductForm = ({
                       <FormControl>
                         <UploadButton
                           endpoint='imageUploader'
-                          onClientUploadComplete={(res: { url: string }[]) => {
-                            form.setValue('images', [...images, res[0].url])
+                          onClientUploadComplete={(res: { url: string, key: string }[]) => {
+                            console.log('resIMG', res)
+                            const imgUploaded: ProductImage = {
+                              imgUrl: res[0].url,
+                              imgKey: res[0].key
+                            }
+                            form.setValue('images', [...images, imgUploaded])
                           }}
                           onUploadError={(error: Error) => {
                             console.log(error)
