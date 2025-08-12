@@ -50,7 +50,7 @@ export function HomeCarousel({
                 />
                 <div className='absolute bg-neutral-900 bg-opacity-50  w-full h-full  top-1/2 transform -translate-y-1/2 flex flex-col items-center justify-center'>
                 <div className=''>
-                  <h2 className='text-center text-7xl md:text-7xl font-bold mb-4 text-white max-w-[850px] mx-auto'>
+                  <h2 className='text-center text-7xl md:text-7xl font-medium mb-4 text-white max-w-[850px] mx-auto'>
                     {item.title}
                   </h2>
                   <h3 className='text-center mt-3 text-2xl mb-4 text-white max-w-[1050px] mx-auto'>

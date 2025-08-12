@@ -1,20 +1,21 @@
 import { APP_DESCRIPTION, APP_NAME, APP_SLOGAN } from '@/lib/constants'
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Playfair_Display, Lora } from "next/font/google";
 import ClientProviders from '@/components/shared/client-providers';
 import { Toaster } from "sonner";
 import "./globals.css";
 import "../config/index";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+
+
+const PlayFairFont = Playfair_Display({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const lora = Lora({
   subsets: ["latin"],
 });
+
 
 export const metadata: Metadata = {
   title: {
@@ -28,10 +29,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log(PlayFairFont)
   return (
     <html lang='es' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${lora.className}`}
       >
         <Toaster />
         <ClientProviders>{children}</ClientProviders>

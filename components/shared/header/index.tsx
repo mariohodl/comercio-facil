@@ -11,36 +11,40 @@ import Search from './search'
 export default async function Header() {
   // const categories = await getAllCategories()
   return (
-    <header className='bg-black  text-white'>
+    <header className='bg-white text-black'>
       <Container>
-        <div className='py-2'>
+        <div className='p-1'>
           <div className='flex items-center justify-between w-full'>
-            <section className='flex items-center w-1/2'>
-              <div className='flex items-center'>
+            <section className='flex items-center w-2/3'>
+              <div className='flex items-center w-full'>
                 <Link
                   href='/'
-                  className='flex items-center header-button font-extrabold text-2xl m-1 rounded'
+                  className='flex items-center header-button font-extrabold text-2xl rounded'
                 >
                   <Image
                     src='/images/logo-prueba2.png'
-                    width={60}
-                    height={60}
+                    width={50}
+                    height={50}
                     alt={`${APP_NAME} logo`}
                     className='rounded-full'
                   />
-                  {/* {APP_NAME} */}
+                  <div className='w-full'>
+                    <h3 className='ml-2 w-full text-lg'>{APP_NAME}</h3>
+                  </div>
+                  
                 </Link>
+
+                <div className='hidden md:block  w-2/4'>
+                  <Search />
+                </div>
               </div>
-              <div className='hidden md:block flex-1 max-w-xl'>
-                <Search />
-              </div>
+              
             </section>
-            
             <Menu />
           </div>
-          <div className='md:hidden block py-3'>
+          {/* <div className='md:hidden block py-3'>
             <Search />
-          </div>
+          </div> */}
         </div>
         {/* <div className='flex items-center px-3 mb-[1px]  bg-gray-800'>
           <Button

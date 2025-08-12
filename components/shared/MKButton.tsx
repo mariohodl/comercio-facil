@@ -29,7 +29,7 @@ export const MKButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed min-w-[200px] font-bold';
+    const baseStyles = 'inline-flex items-center justify-center  transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed min-w-[200px] font-normal uppercase font-sans';
     
     const variants = {
       primary: 'bg-primary text-white hover:bg-black  focus:ring-primary-500 hover:text-white',
@@ -41,7 +41,7 @@ export const MKButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const sizes = {
       sm: 'text-sm px-3 py-1.5',
-      md: 'text-base px-4 py-2',
+      md: 'text-base px-4 py-3',
       lg: 'text-lg px-6 py-3',
     };
 
