@@ -29,7 +29,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log(PlayFairFont)
   return (
     <html lang='es' suppressHydrationWarning>
       <body

@@ -96,7 +96,6 @@ export default async function HomePage() {
       <WhatWeDoCategories />
       <WidgetVideo />
       {/* <OurFreshProducts /> */}
-      
     </>
   )
 }

@@ -5,27 +5,32 @@ import { CustomH4 } from '../CustomH4';
 import { CustomP } from '../CustomP'
 import Image from 'next/image';
 import { MoveRight } from 'lucide-react';
+import Link from 'next/link';
 
 export const WhatWeDoCategories = () => {
   const categories = [{
       name: 'Res',
       description: 'Una carne popular que viene en muchos cortes y es conocida por su sabor rico y sabroso.',
-      categoryType: 'beef'
+      categoryType: 'beef',
+      url:'/search?category=res'
     },
     {
       name: 'Pollo',
       description: 'Una fuente de proteína magra que es fácil de cocinar y se puede usar en muchas recetas diferentes.',
-      categoryType: 'chicken'
+      categoryType: 'chicken',
+      url:'/search?category=pollo'
     },
     {
       name: 'Cerdo',
       description: 'Una carne popular que viene en muchos cortes y es conocida por su sabor rico y sabroso.',
-      categoryType: 'pork'
+      categoryType: 'pork',
+      url:'/search?category=cerdo'
     },
     {
       name: 'Cordero',
       description: 'xxxx',
-      categoryType: 'lamb'
+      categoryType: 'lamb',
+      url:'/search?category=cordero'
     },
   ]
   return (
@@ -45,7 +50,7 @@ export const WhatWeDoCategories = () => {
           </CustomP>
         </div>
 
-        <div className='flex flex-col md:flex-row md:flex-wrap item-center justify-center mt-7'>
+        <div className='flex flex-col md:flex-row md:flex-wrap lg:flex-nowrap item-center justify-center mt-7'>
           {
             categories?.length > 0 && categories.map((category, index) => {
               return (
@@ -58,11 +63,12 @@ export const WhatWeDoCategories = () => {
                     </div>
                     <div className='p-5'>
                       <CustomH3 classNames="text-center mb-2">{category.name}</CustomH3>
-                      <CustomP classNames="text-base text-center font-sans">{category.description}</CustomP>
+                      <CustomP classNames="text-base text-center font-sans !text-base">{category.description}</CustomP>
                       <div className='flex justify-center'>
-                        <CustomH4 classNames="uppercase font-sans font-semibold text-center text-primary mt-3 hover:underline hover:cursor-pointer flex items-center">Descubrir <MoveRight className='ml-2' size={25}/></CustomH4>
+                        <CustomH4 classNames="uppercase font-sans font-semibold text-center text-primary mt-3 hover:underline hover:cursor-pointer flex items-center">
+                          <Link className='flex' href={category.url}>Descubrir<MoveRight className='ml-2' size={25}/></Link>
+                        </CustomH4>
                       </div>
-                      
                     </div>
                     
                   </div>

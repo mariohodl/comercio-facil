@@ -1,34 +1,47 @@
 'use client'
 
-import { ChevronUp } from 'lucide-react'
-import { Button } from '../ui/button'
-import Link from 'next/link'
+import { ArrowUp } from 'lucide-react'
+// import { Button } from '../ui/button'
+// import Link from 'next/link'
 import { APP_NAME } from '@/lib/constants'
+import { CustomH3 } from './CustomH3'
+import { CustomP } from './CustomP'
 
 export default function Footer() {
+
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+
   return (
-    <footer className='bg-black  text-white underline-link'>
-      <div className='w-full'>
-        <Button
-          variant='ghost'
-          className='bg-gray-800 w-full  rounded-none '
+    <footer className='bg-[#fef8ef]  text-black underline-link'>
+      <div className='rounded-full fixed bottom-10 right-4'>
+        <p
+          className='bg-gray-800 cursor-pointer rounded-full w-12 h-12 '
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          <ChevronUp className='mr-2 h-4 w-4' />
-          Back to top
-        </Button>
+          <ArrowUp className='h-8 w-8 text-white ml-2 pt-3' />
+        </p>
       </div>
-      <div className='p-4'>
-        <div className='flex justify-center  gap-3 text-sm'>
-          <Link href='/page/conditions-of-use'>Conditions of Use</Link>
-          <Link href='/page/privacy-policy'> Privacy Notice</Link>
-          <Link href='/page/help'>Help</Link>
+      <div className='p-3'>
+        <div className='flex justify-between text-sm p-16 mx-10'>
+          <div>
+            <CustomH3 classNames="!text-[38px] font-semibold mb-7">Master Karne</CustomH3>
+            <CustomP classNames="!text-black !text-[20px] font-extralight ml-1">Lleva tu negocio a nuevas alturas.</CustomP>
+          </div>
+
+          <div>
+            <CustomH3 classNames="!text-[38px] font-semibold mb-7">ventas@masterkarne.com</CustomH3>
+            <CustomP classNames="!text-black !text-[20px] font-extralight ml-1">Lunes - Viernes 9:00am - 6:00pm</CustomP>
+          </div>
+
+          <div>
+            <CustomH3 classNames="!text-[38px] font-semibold mb-7">(234) 567.890.11</CustomH3>
+            <CustomP classNames="!text-black !text-[20px] font-extralight ml-1">Whatsapp o Llamadas</CustomP>
+          </div>
         </div>
-        <div className='flex justify-center text-sm'>
-          <p> © 2000-2024, {APP_NAME}, Inc. or its affiliates</p>
-        </div>
-        <div className='mt-8 flex justify-center text-sm text-gray-400'>
-          123, Main Street, Anytown, CA, Zip 12345 | +1 (123) 456-7890
+        <div className='pt-3 flex justify-center text-sm text-gray-500 border-t border-dashed'>
+          <p>Copyright © {currentYear}, {APP_NAME}, Inc.</p>
+          {/* 123, Main Street, Anytown, CA, Zip 12345 | +1 (123) 456-7890 */}
         </div>
       </div>
     </footer>

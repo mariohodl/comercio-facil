@@ -11,7 +11,7 @@ import Search from './search'
 export default async function Header() {
   // const categories = await getAllCategories()
   return (
-    <header className='bg-white text-black'>
+    <header className='bg-white text-black border border-b-slate-200'>
       <Container>
         <div className='p-1'>
           <div className='flex items-center justify-between w-full'>
