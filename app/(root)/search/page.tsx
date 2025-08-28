@@ -16,11 +16,11 @@ import Rating from '@/components/shared/product/rating'
 import CollapsibleOnMobile from '@/components/shared/collapsible-on-mobile'
 
 const sortOrders = [
-  { value: 'price-low-to-high', name: 'Price: Low to high' },
-  { value: 'price-high-to-low', name: 'Price: High to low' },
-  { value: 'newest-arrivals', name: 'Newest arrivals' },
-  { value: 'avg-customer-review', name: 'Avg. customer review' },
-  { value: 'best-selling', name: 'Best selling' },
+  { value: 'price-low-to-high', name: 'Precio: de menor a mayor' },
+  { value: 'price-high-to-low', name: 'Precio: de mayor a menor' },
+  { value: 'newest-arrivals', name: 'Recien agregado' },
+  { value: 'avg-customer-review', name: 'Promedio de opinion del cliente' },
+  { value: 'best-selling', name: 'los más vendido' },
 ]
 
 const prices = [
@@ -122,19 +122,19 @@ export default async function SearchPage(props: {
           {data.totalProducts === 0
             ? 'No'
             : `${data.from}-${data.to} of ${data.totalProducts}`}{' '}
-          results
+          resultados
           {(q !== 'all' && q !== '') ||
           (category !== 'all' && category !== '') ||
           (tag !== 'all' && tag !== '') ||
           rating !== 'all' ||
           price !== 'all'
-            ? ` for `
+            ? ` para `
             : null}
           {q !== 'all' && q !== '' && '"' + q + '"'}
-          {category !== 'all' && category !== '' && `  Category: ` + category}
+          {category !== 'all' && category !== '' && `  Categoría: ` + category}
           {tag !== 'all' && tag !== '' && `   Tag: ` + tag}
-          {price !== 'all' && `    Price: ` + price}
-          {rating !== 'all' && `   Rating: ` + rating + ` & up`}
+          {price !== 'all' && `    Precio: ` + price}
+          {rating !== 'all' && `   Opiniones: ` + rating + ` o más`}
           &nbsp;
           {(q !== 'all' && q !== '') ||
           (category !== 'all' && category !== '') ||
@@ -142,7 +142,7 @@ export default async function SearchPage(props: {
           rating !== 'all' ||
           price !== 'all' ? (
             <Button variant={'link'} asChild>
-              <Link href='/search'>Clear</Link>
+              <Link href='/search' className='underline'>Limpiar Filtros</Link>
             </Button>
           ) : null}
         </div>
@@ -158,22 +158,22 @@ export default async function SearchPage(props: {
         <CollapsibleOnMobile title='Filters'>
           <div className='space-y-4'>
             <div>
-              <div className='font-bold'>Department</div>
+              <div className='font-bold'>Departmento</div>
               <ul>
                 <li>
                   <Link
                     className={`${
-                      ('all' === category || '' === category) && 'text-primary'
+                      ('all' === category || '' === category) && 'text-primary underline'
                     }`}
                     href={getFilterUrl({ category: 'all', params })}
                   >
-                    All
+                    Todo
                   </Link>
                 </li>
                 {categories.map((c: string) => (
                   <li key={c}>
                     <Link
-                      className={`${c === category && 'text-primary'}`}
+                      className={`${c === category && 'text-primary underline'}`}
                       href={getFilterUrl({ category: c, params })}
                     >
                       {c}
@@ -183,21 +183,21 @@ export default async function SearchPage(props: {
               </ul>
             </div>
             <div>
-              <div className='font-bold'>Price</div>
+              <div className='font-bold'>Precio</div>
               <ul>
                 <li>
                   <Link
-                    className={`${'all' === price && 'text-primary'}`}
+                    className={`${'all' === price && 'text-primary underline'}`}
                     href={getFilterUrl({ price: 'all', params })}
                   >
-                    All
+                    Todo
                   </Link>
                 </li>
                 {prices.map((p) => (
                   <li key={p.value}>
                     <Link
                       href={getFilterUrl({ price: p.value, params })}
-                      className={`${p.value === price && 'text-primary'}`}
+                      className={`${p.value === price && 'text-primary underline'}`}
                     >
                       {p.name}
                     </Link>
@@ -206,46 +206,46 @@ export default async function SearchPage(props: {
               </ul>
             </div>
             <div>
-              <div className='font-bold'>Customer Review</div>
+              <div className='font-bold'>Opiniones de los clientes</div>
               <ul>
                 <li>
                   <Link
                     href={getFilterUrl({ rating: 'all', params })}
-                    className={`${'all' === rating && 'text-primary'}`}
+                    className={`${'all' === rating && 'text-primary underline'}`}
                   >
-                    All
+                    Todo
                   </Link>
                 </li>
 
                 <li>
                   <Link
                     href={getFilterUrl({ rating: '4', params })}
-                    className={`${'4' === rating && 'text-primary'}`}
+                    className={`${'4' === rating && 'text-primary underline'}`}
                   >
                     <div className='flex'>
-                      <Rating size={4} rating={4} /> & Up
+                      <Rating size={4} rating={4} /> &nbsp; o más
                     </div>
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <div className='font-bold'>Tag</div>
+              <div className='font-bold'>Etiquetas</div>
               <ul>
                 <li>
                   <Link
                     className={`${
-                      ('all' === tag || '' === tag) && 'text-primary'
+                      ('all' === tag || '' === tag) && 'text-primary underline'
                     }`}
                     href={getFilterUrl({ tag: 'all', params })}
                   >
-                    All
+                    Todo
                   </Link>
                 </li>
                 {tags.map((t: string) => (
                   <li key={t}>
                     <Link
-                      className={`${toSlug(t) === tag && 'text-primary'}`}
+                      className={`${toSlug(t) === tag && 'text-primary underline'}`}
                       href={getFilterUrl({ tag: t, params })}
                     >
                       {t}
@@ -259,12 +259,12 @@ export default async function SearchPage(props: {
 
         <div className='md:col-span-4 space-y-4'>
           <div>
-            <div className='font-bold text-xl'>Results</div>
-            <div>Check each product page for other buying options</div>
+            <div className='font-bold text-xl'>Resultados</div>
+            <div>Busca en cada página otras opciones de producto.</div>
           </div>
 
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2  lg:grid-cols-3  '>
-            {data.products.length === 0 && <div>No product found</div>}
+            {data.products.length === 0 && <div>No se encontraron productos</div>}
             {data.products.map((product: IProduct) => (
               <ProductCard key={product._id} product={product} />
             ))}

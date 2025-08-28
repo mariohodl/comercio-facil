@@ -50,7 +50,7 @@ export function CalendarDateRangePicker({
                 formatDateTime(calendarDate.from).dateOnly
               )
             ) : (
-              <span>Pick a date</span>
+              <span>Selecciona una fecha</span>
             )}
           </Button>
         </PopoverTrigger>
@@ -68,10 +68,10 @@ export function CalendarDateRangePicker({
           />
           <div className='flex gap-4 p-4 pt-0'>
             <PopoverClose asChild>
-              <Button onClick={() => setDate(calendarDate)}>Apply</Button>
+              <Button onClick={() => setDate(calendarDate)}>Aplicar</Button>
             </PopoverClose>
             <PopoverClose asChild>
-              <Button variant={'outline'}>Cancel</Button>
+              <Button variant={'outline'}>Cancelar</Button>
             </PopoverClose>
           </div>
         </PopoverContent>

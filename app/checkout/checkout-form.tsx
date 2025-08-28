@@ -156,11 +156,10 @@ const CheckoutForm = () => {
               className='rounded-full w-full'
               onClick={handleSelectShippingAddress}
             >
-              Ship to this address
+              Enviar a esta dirección
             </Button>
             <p className='text-xs text-center py-2'>
-              Choose a shipping address and payment method in order to calculate
-              shipping, handling, and tax.
+              Elige una dirección de envío y método de pago para poder calcular envío, impuestos y recepción.
             </p>
           </div>
         )}
@@ -170,52 +169,50 @@ const CheckoutForm = () => {
               className='rounded-full w-full'
               onClick={handleSelectPaymentMethod}
             >
-              Use this payment method
+              Usar este método de pago
             </Button>
 
             <p className='text-xs text-center py-2'>
-              Choose a payment method to continue checking out. You&apos;ll
-              still have a chance to review and edit your order before it&apos;s
-              final.
+              Elige método de pago para continuar. Aún tendrás la oportunidad de revisar y editar tu orden antes de finalizar.
             </p>
           </div>
         )}
         {isPaymentMethodSelected && isAddressSelected && (
           <div>
             <Button onClick={handlePlaceOrder} className='rounded-full w-full'>
-              Place Your Order
+              Completar Orden
             </Button>
             <p className='text-xs text-center py-2'>
-              By placing your order, you agree to {APP_NAME}&apos;s{' '}
-              <Link href='/page/privacy-policy'>privacy notice</Link> and
-              <Link href='/page/conditions-of-use'> conditions of use</Link>.
+              Al completar tu Orden, estarás aceptando el 
+              <Link href='/page/privacy-policy'> Aviso de Privacidad</Link> y las
+              <Link href='/page/conditions-of-use'> Condiciones de Uso</Link> de {APP_NAME}.
             </p>
           </div>
         )}
 
         <div>
-          <div className='text-lg font-bold'>Order Summary</div>
+          <div className='text-lg font-bold'>Resumen</div>
           <div className='space-y-2'>
             <div className='flex justify-between'>
-              <span>Items:</span>
+              <span>Productos:</span>
               <span>
                 <ProductPrice price={itemsPrice} plain />
               </span>
             </div>
             <div className='flex justify-between'>
-              <span>Shipping & Handling:</span>
+              <span>Envío:</span>
               <span>
                 {shippingPrice === undefined ? (
                   '--'
                 ) : shippingPrice === 0 ? (
-                  'FREE'
+                  'GRATIS'
                 ) : (
                   <ProductPrice price={shippingPrice} plain />
                 )}
               </span>
             </div>
             <div className='flex justify-between'>
-              <span> Tax:</span>
+              <span> Impuestos:</span>
               <span>
                 {taxPrice === undefined ? (
                   '--'
@@ -225,7 +222,7 @@ const CheckoutForm = () => {
               </span>
             </div>
             <div className='flex justify-between  pt-4 font-bold text-lg'>
-              <span> Order Total:</span>
+              <span> Total de la Orden:</span>
               <span>
                 <ProductPrice price={totalPrice} plain />
               </span>
@@ -246,7 +243,7 @@ const CheckoutForm = () => {
               <div className='grid grid-cols-1 md:grid-cols-12    my-3  pb-3'>
                 <div className='col-span-5 flex text-lg font-bold '>
                   <span className='w-8'>1 </span>
-                  <span>Shipping address</span>
+                  <span>Dirección de envío</span>
                 </div>
                 <div className='col-span-5 '>
                   <p>
@@ -264,7 +261,7 @@ const CheckoutForm = () => {
                       setIsDeliveryDateSelected(true)
                     }}
                   >
-                    Change
+                    Cambiar
                   </Button>
                 </div>
               </div>
@@ -272,7 +269,7 @@ const CheckoutForm = () => {
               <>
                 <div className='flex text-primary text-lg font-bold my-2'>
                   <span className='w-8'>1 </span>
-                  <span>Enter shipping address</span>
+                  <span>Ingresar dirección de envío</span>
                 </div>
                 <Form {...shippingAddressForm}>
                   <form
@@ -285,7 +282,7 @@ const CheckoutForm = () => {
                     <Card className='md:ml-8 my-4'>
                       <CardContent className='p-4 space-y-2'>
                         <div className='text-lg font-bold mb-2'>
-                          Your address
+                          Tu dirección
                         </div>
 
                         <div className='flex flex-col gap-5 md:flex-row'>
@@ -294,10 +291,10 @@ const CheckoutForm = () => {
                             name='fullName'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Full Name</FormLabel>
+                                <FormLabel>Nombre completo</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter full name'
+                                    placeholder='Ingresar nombre completo'
                                     {...field}
                                   />
                                 </FormControl>
@@ -312,10 +309,10 @@ const CheckoutForm = () => {
                             name='street'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Address</FormLabel>
+                                <FormLabel>Dirección</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter address'
+                                    placeholder='Ingresa dirección'
                                     {...field}
                                   />
                                 </FormControl>
@@ -330,9 +327,9 @@ const CheckoutForm = () => {
                             name='city'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>City</FormLabel>
+                                <FormLabel>Ciudad</FormLabel>
                                 <FormControl>
-                                  <Input placeholder='Enter city' {...field} />
+                                  <Input placeholder='Ingresa ciudad' {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -343,10 +340,10 @@ const CheckoutForm = () => {
                             name='province'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Province</FormLabel>
+                                <FormLabel>Colonia</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter province'
+                                    placeholder='Ingresa colonia'
                                     {...field}
                                   />
                                 </FormControl>
@@ -377,10 +374,10 @@ const CheckoutForm = () => {
                             name='postalCode'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Postal Code</FormLabel>
+                                <FormLabel>Código postal</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter postal code'
+                                    placeholder='Ingresa código postal'
                                     {...field}
                                   />
                                 </FormControl>
@@ -393,10 +390,10 @@ const CheckoutForm = () => {
                             name='phone'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Phone number</FormLabel>
+                                <FormLabel>Teléfono</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter phone number'
+                                    placeholder='Ingresa teléfono'
                                     {...field}
                                   />
                                 </FormControl>
@@ -411,7 +408,7 @@ const CheckoutForm = () => {
                           type='submit'
                           className='rounded-full font-bold'
                         >
-                          Ship to this address
+                          Enviar a esta dirección
                         </Button>
                       </CardFooter>
                     </Card>
@@ -426,7 +423,7 @@ const CheckoutForm = () => {
               <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
                 <div className='flex text-lg font-bold  col-span-5'>
                   <span className='w-8'>2 </span>
-                  <span>Payment Method</span>
+                  <span>Método de pago</span>
                 </div>
                 <div className='col-span-5 '>
                   <p>{paymentMethod}</p>
@@ -439,7 +436,7 @@ const CheckoutForm = () => {
                       if (paymentMethod) setIsDeliveryDateSelected(true)
                     }}
                   >
-                    Change
+                    Cambiar
                   </Button>
                 </div>
               </div>
@@ -447,7 +444,7 @@ const CheckoutForm = () => {
               <>
                 <div className='flex text-primary text-lg font-bold my-2'>
                   <span className='w-8'>2 </span>
-                  <span>Choose a payment method</span>
+                  <span>Elige un método de pago</span>
                 </div>
                 <Card className='md:ml-8 my-4'>
                   <CardContent className='p-4'>
@@ -476,7 +473,7 @@ const CheckoutForm = () => {
                       onClick={handleSelectPaymentMethod}
                       className='rounded-full font-bold'
                     >
-                      Use this payment method
+                      Usar este método de pago
                     </Button>
                   </CardFooter>
                 </Card>
@@ -484,7 +481,7 @@ const CheckoutForm = () => {
             ) : (
               <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
                 <span className='w-8'>2 </span>
-                <span>Choose a payment method</span>
+                <span>Elige un método de pago</span>
               </div>
             )}
           </div>
@@ -494,11 +491,11 @@ const CheckoutForm = () => {
               <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
                 <div className='flex text-lg font-bold  col-span-5'>
                   <span className='w-8'>3 </span>
-                  <span>Items and shipping</span>
+                  <span>Productos y Envío</span>
                 </div>
                 <div className='col-span-5'>
                   <p>
-                    Delivery date:{' '}
+                    Fecha de envío:{' '}
                     {
                       formatDateTime(
                         calculateFutureDate(
@@ -532,13 +529,13 @@ const CheckoutForm = () => {
               <>
                 <div className='flex text-primary  text-lg font-bold my-2'>
                   <span className='w-8'>3 </span>
-                  <span>Review items and shipping</span>
+                  <span>Revisa productos y envío</span>
                 </div>
                 <Card className='md:ml-8'>
                   <CardContent className='p-4'>
                     <p className='mb-2'>
                       <span className='text-lg font-bold text-green-700'>
-                        Arriving{' '}
+                        Llegando{' '}
                         {
                           formatDateTime(
                             calculateFutureDate(
@@ -548,8 +545,8 @@ const CheckoutForm = () => {
                           ).dateOnly
                         }
                       </span>{' '}
-                      If you order in the next {timeUntilMidnight().hours} hours
-                      and {timeUntilMidnight().minutes} minutes.
+                      Si ordenas en las próximas {timeUntilMidnight().hours} horas
+                      y {timeUntilMidnight().minutes} minutos.
                     </p>
                     <div className='grid md:grid-cols-2 gap-6'>
                       <div>
@@ -584,7 +581,7 @@ const CheckoutForm = () => {
                               >
                                 <SelectTrigger className='w-24'>
                                   <SelectValue>
-                                    Qty: {item.quantity}
+                                    Cantidad: {item.quantity}
                                   </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent position='popper'>
@@ -596,7 +593,7 @@ const CheckoutForm = () => {
                                     </SelectItem>
                                   ))}
                                   <SelectItem key='delete' value='0'>
-                                    Delete
+                                    Eliminar
                                   </SelectItem>
                                 </SelectContent>
                               </Select>
@@ -606,7 +603,7 @@ const CheckoutForm = () => {
                       </div>
                       <div>
                         <div className=' font-bold'>
-                          <p className='mb-2'> Choose a shipping speed:</p>
+                          <p className='mb-2'> Elige velocidad de envío:</p>
 
                           <ul>
                             <RadioGroup
@@ -644,7 +641,7 @@ const CheckoutForm = () => {
                                       itemsPrice >= dd.freeShippingMinPrice
                                         ? 0
                                         : dd.shippingPrice) === 0 ? (
-                                        'FREE Shipping'
+                                        'Envío GRATIS'
                                       ) : (
                                         <ProductPrice
                                           price={dd.shippingPrice}
@@ -666,7 +663,7 @@ const CheckoutForm = () => {
             ) : (
               <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
                 <span className='w-8'>3 </span>
-                <span>Items and shipping</span>
+                <span>Productos y envío</span>
               </div>
             )}
           </div>
@@ -679,22 +676,22 @@ const CheckoutForm = () => {
               <Card className='hidden md:block '>
                 <CardContent className='p-4 flex flex-col md:flex-row justify-between items-center gap-3'>
                   <Button onClick={handlePlaceOrder} className='rounded-full'>
-                    Place Your Order
+                    Completar Orden
                   </Button>
                   <div className='flex-1'>
                     <p className='font-bold text-lg'>
-                      Order Total: <ProductPrice price={totalPrice} plain />
+                      Total: <ProductPrice price={totalPrice} plain />
                     </p>
                     <p className='text-xs'>
                       {' '}
-                      By placing your order, you agree to {APP_NAME}&apos;s <Link href='/page/privacy-policy'>
-                        privacy notice
-                      </Link> and
+                      Al completar tu orden, estarás aceptando el <Link href='/page/privacy-policy'>
+                        aviso de privacidad
+                      </Link> y las 
                       <Link href='/page/conditions-of-use'>
                         {' '}
-                        conditions of use
-                      </Link>
-                      .
+                        condiciones de uso
+                      </Link> de
+                      {APP_NAME}
                     </p>
                   </div>
                 </CardContent>

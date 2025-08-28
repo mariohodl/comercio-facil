@@ -23,11 +23,11 @@ export default function CartButton() {
         {isMounted && (
           <span
             className={cn(
-              `bg-primary  w-5 h-5 rounded-full text-white text-base font-bold absolute right-[30px] top-[-6px] z-10`,
-              cartItemsCount >= 10 && 'text-sm '
+              `bg-primary  w-5 h-5 rounded-full text-white text-base  absolute right-[30px] top-[-6px] z-10 flex items-center justify-center`,
+              cartItemsCount >= 10 && 'text-sm'
             )}
           >
-            <span className='relative left-[6px] top-[-2px]'>{cartItemsCount}</span>
+            <span className='text-[12px] '>{cartItemsCount}</span>
           </span>
         )}
         <span className='font-bold'>Carrito</span>

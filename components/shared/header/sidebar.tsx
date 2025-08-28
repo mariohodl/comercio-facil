@@ -38,7 +38,7 @@ export default async function Sidebar({
                   <DrawerClose asChild>
                     <Link href='/account'>
                       <span className='text-lg font-semibold'>
-                        Hello, {session.user.name}
+                        Hola, {session.user.name}
                       </span>
                     </Link>
                   </DrawerClose>
@@ -46,7 +46,7 @@ export default async function Sidebar({
                   <DrawerClose asChild>
                     <Link href='/sign-in'>
                       <span className='text-lg font-semibold'>
-                        Hello, sign in
+                        Hola, Inicia sesión
                       </span>
                     </Link>
                   </DrawerClose>
@@ -57,7 +57,7 @@ export default async function Sidebar({
             <DrawerClose asChild>
               <Button variant='ghost' size='icon' className='mr-2'>
                 <X className='h-5 w-5' />
-                <span className='sr-only'>Close</span>
+                <span className='sr-only'>Cerrar</span>
               </Button>
             </DrawerClose>
           </div>
@@ -65,7 +65,7 @@ export default async function Sidebar({
           {/* Shop By Category */}
           <div className='flex-1 overflow-y-auto'>
             <div className='p-4 border-b'>
-              <h2 className='text-lg font-semibold'>Shop By Department</h2>
+              <h2 className='text-lg font-semibold'>Comprar por Departmento</h2>
             </div>
             <nav className='flex flex-col'>
               {categories.map((category) => (
@@ -85,16 +85,16 @@ export default async function Sidebar({
           {/* Setting and Help */}
           <div className='border-t flex flex-col '>
             <div className='p-4'>
-              <h2 className='text-lg font-semibold'>Help & Settings</h2>
+              <h2 className='text-lg font-semibold'>Configuración y Ayuda</h2>
             </div>
             <DrawerClose asChild>
               <Link href='/account' className='item-button'>
-                Your account
+                Mi Cuenta
               </Link>
             </DrawerClose>{' '}
             <DrawerClose asChild>
               <Link href='/page/customer-service' className='item-button'>
-                Customer Service
+                Servicio a Cliente
               </Link>
             </DrawerClose>
             {session ? (
@@ -103,12 +103,12 @@ export default async function Sidebar({
                   className='w-full justify-start item-button text-base'
                   variant='ghost'
                 >
-                  Sign out
+                  Salir
                 </Button>
               </form>
             ) : (
               <Link href='/sign-in' className='item-button'>
-                Sign in
+                Iniciar sesión
               </Link>
             )}
           </div>

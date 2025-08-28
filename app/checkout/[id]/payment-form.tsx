@@ -56,9 +56,9 @@ console.log('ORDER', order)
     const [{ isPending, isRejected }] = usePayPalScriptReducer()
     let status = ''
     if (isPending) {
-      status = 'Loading PayPal...'
+      status = 'Cargando PayPal...'
     } else if (isRejected) {
-      status = 'Error in loading PayPal.'
+      status = 'Error al cargar  PayPal.'
     }
     return status
   }
@@ -78,29 +78,29 @@ console.log('ORDER', order)
     <Card>
       <CardContent className='p-4'>
         <div>
-          <div className='text-lg font-bold'>Order Summary</div>
+          <div className='text-lg font-bold'>Resumen</div>
           <div className='space-y-2'>
             <div className='flex justify-between'>
-              <span>Items:</span>
+              <span>Productos:</span>
               <span>
                 {' '}
                 <ProductPrice price={itemsPrice} plain />
               </span>
             </div>
             <div className='flex justify-between'>
-              <span>Shipping & Handling:</span>
+              <span>Envío:</span>
               <span>
                 {shippingPrice === undefined ? (
                   '--'
                 ) : shippingPrice === 0 ? (
-                  'FREE'
+                  'GRATIS'
                 ) : (
                   <ProductPrice price={shippingPrice} plain />
                 )}
               </span>
             </div>
             <div className='flex justify-between'>
-              <span> Tax:</span>
+              <span> Impuestos:</span>
               <span>
                 {taxPrice === undefined ? (
                   '--'
@@ -110,7 +110,7 @@ console.log('ORDER', order)
               </span>
             </div>
             <div className='flex justify-between  pt-1 font-bold text-lg'>
-              <span> Order Total:</span>
+              <span> Total:</span>
               <span>
                 {' '}
                 <ProductPrice price={totalPrice} plain />
@@ -148,7 +148,7 @@ console.log('ORDER', order)
                 className='w-full rounded-full'
                 onClick={() => router.push(`/account/orders/${order._id}`)}
               >
-                View Order
+                Ver Orden de Compra
               </Button>
             )}
           </div>
@@ -169,7 +169,7 @@ console.log('ORDER', order)
           <div>
             <div className='grid md:grid-cols-3 my-3 pb-3'>
               <div className='text-lg font-bold'>
-                <span>Shipping Address</span>
+                <span>Dirección de envío</span>
               </div>
               <div className='col-span-2'>
                 <p>
@@ -195,11 +195,11 @@ console.log('ORDER', order)
 
           <div className='grid md:grid-cols-3 my-3 pb-3'>
             <div className='flex text-lg font-bold'>
-              <span>Items and shipping</span>
+              <span>Productos y Envío</span>
             </div>
             <div className='col-span-2'>
               <p>
-                Delivery date:
+                Fecha de entrega: 
                 {formatDateTime(expectedDeliveryDate).dateOnly}
               </p>
               <ul>

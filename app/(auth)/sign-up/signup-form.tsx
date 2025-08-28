@@ -86,9 +86,9 @@ export default function SignUpForm() {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Nombre</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter name address' {...field} />
+                  <Input placeholder='Ingresar nombre' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -102,7 +102,7 @@ export default function SignUpForm() {
               <FormItem className='w-full'>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter email address' {...field} />
+                  <Input placeholder='Ingresar email' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -114,11 +114,11 @@ export default function SignUpForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>Contraseña</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='Enter password'
+                    placeholder='Ingresar contraseña'
                     {...field}
                   />
                 </FormControl>
@@ -131,11 +131,11 @@ export default function SignUpForm() {
             name='confirmPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel>Confirmar Contraseña</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='Confirm Password'
+                    placeholder='Confirmar Contraseña'
                     {...field}
                   />
                 </FormControl>
@@ -144,18 +144,19 @@ export default function SignUpForm() {
             )}
           />
           <div>
-            <Button type='submit'>Sign Up</Button>
+            <Button type='submit'>Crear Cuenta</Button>
           </div>
           <div className='text-sm'>
-            By creating an account, you agree to {APP_NAME}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
-            <Link href='/page/privacy-policy'> Privacy Notice. </Link>
+            Al crear una cuenta, estarás aceptando las {' '}
+            <Link href='/page/conditions-of-use'>Condiciones de Uso</Link> y{' '}
+            <Link href='/page/privacy-policy'>Aviso de Privacidad.</Link> de{' '}
+            {APP_NAME}
           </div>
           <Separator className='mb-4' />
           <div className='text-sm'>
-            Already have an account?{' '}
+            Ya tienes una cuenta?{' '}
             <Link className='link' href={`/sign-in?callbackUrl=${callbackUrl}`}>
-              Sign In
+             Inicia sesión
             </Link>
           </div>
         </div>

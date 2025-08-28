@@ -35,7 +35,7 @@ export default function CartSidebar() {
             </div>
             {itemsPrice > FREE_SHIPPING_MIN_PRICE && (
               <div className=' text-center text-xs'>
-                Your order qualifies for FREE Shipping
+                Tu orden aplica para ENVÍO GRATIS
               </div>
             )}
 
@@ -46,7 +46,7 @@ export default function CartSidebar() {
               )}
               href='/cart'
             >
-              Go to Cart
+              Ver carrito
             </Link>
             <Separator className='mt-3' />
           </div>
@@ -76,7 +76,7 @@ export default function CartSidebar() {
                         updateItem(item, Number(value))
                       }}
                     >
-                      <SelectTrigger className='text-xs w-12 ml-1 h-auto py-0'>
+                      <SelectTrigger className='text-xs w-14 ml-1 h-auto py-0'>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

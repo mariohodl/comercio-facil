@@ -4,8 +4,9 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Zoom from 'react-medium-image-zoom'
 import 'react-medium-image-zoom/dist/styles.css'
+import { ProductImage } from '@/types'
 
-export default function ProductGallery({ images }: { images: string[] }) {
+export default function ProductGallery({ images }: { images: ProductImage[] }) {
   const [selectedImage, setSelectedImage] = useState(0)
   return (
     <div className='flex gap-2'>
@@ -25,12 +26,17 @@ export default function ProductGallery({ images }: { images: string[] }) {
                 : 'ring-1 ring-gray-300'
             }`}
           >
-            <Image
-              src={image}
-              alt={'product image'}
-              width={48}
-              height={48}
-            />
+            {
+              image?.imgUrl && (
+                <Image
+                  src={image?.imgUrl}
+                  alt={'product image'}
+                  width={48}
+                  height={48}
+                />
+              )
+            }
+            
           </button>
         ))}
       </div>
@@ -38,14 +44,19 @@ export default function ProductGallery({ images }: { images: string[] }) {
       <div className='w-full'>
         <Zoom>
           <div className='relative h-[500px]'>
-            <Image
-              src={images[selectedImage]}
-              alt={'product image'}
-              fill
-              sizes='90vw'
-              className='object-contain'
-              priority
-            />
+            {
+              images[selectedImage]?.imgUrl && (
+                <Image
+                  src={images[selectedImage]?.imgUrl}
+                  alt={'product image'}
+                  fill
+                  sizes='90vw'
+                  className='object-contain'
+                  priority
+                />
+              )
+            }
+            
           </div>
         </Zoom>
       </div>

@@ -34,13 +34,25 @@ const ProductCard = ({
           />
         ) : (
           <div className='relative h-52'>
-            <Image
-              src={product.images?.[0]?.imgUrl || `/images/${product.category.toLocaleLowerCase()}-category-product.jpg`}
-              alt={product.name}
-              fill
-              sizes='80vw'
-              className='object-contain'
-            />
+            {
+              product.images?.[0]?.imgUrl ? (
+                <Image
+                  src={product.images?.[0]?.imgUrl}
+                  alt={product.name}
+                  fill
+                  sizes='80vw'
+                  className='object-contain'
+                />
+              ) : (
+                <Image
+                  src={`/images/${product.category.toLocaleLowerCase()}-category-product.jpg`}
+                  alt={product.category.toLocaleLowerCase()}
+                  fill
+                  sizes='80vw'
+                  className='object-contain'
+                />
+              )
+            }
           </div>
         )}
       </div>

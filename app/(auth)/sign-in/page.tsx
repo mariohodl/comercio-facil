@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { APP_NAME } from '@/lib/constants'
 
 export const metadata: Metadata = {
-  title: 'Sign In',
+  title: 'Iniciar sesión',
 }
 
 export default async function SignIn(props: {
@@ -33,7 +33,7 @@ export default async function SignIn(props: {
     <div className='w-full'>
       <Card>
         <CardHeader>
-          <CardTitle className='text-2xl'>Sign In</CardTitle>
+          <CardTitle className='text-2xl'>Iniciar sesión</CardTitle>
         </CardHeader>
         <CardContent>
           <div>
@@ -45,11 +45,11 @@ export default async function SignIn(props: {
           </div>
         </CardContent>
       </Card>
-      <SeparatorWithOr>New to {APP_NAME}?</SeparatorWithOr>
+      <SeparatorWithOr>Nuevo en {APP_NAME}?</SeparatorWithOr>
 
       <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
         <Button className='w-full' variant='outline'>
-          Create your {APP_NAME} account
+          Crea tu cuenta en {APP_NAME}
         </Button>
       </Link>
     </div>

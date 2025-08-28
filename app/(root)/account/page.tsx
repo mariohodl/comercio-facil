@@ -5,7 +5,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import React from 'react'
 
-const PAGE_TITLE = 'Your Account'
+const PAGE_TITLE = 'Mi Cuenta'
 export const metadata: Metadata = {
   title: PAGE_TITLE,
 }
@@ -21,9 +21,9 @@ export default function AccountPage() {
                 <PackageCheckIcon className='w-12 h-12' />
               </div>
               <div>
-                <h2 className='text-xl font-bold'>Orders</h2>
+                <h2 className='text-xl font-bold'>Ordenes</h2>
                 <p className='text-muted-foreground'>
-                  Track, return, cancel an order, download invoice or buy again
+                  Sigue, devuelve y cancela una orden de compra, ve tu historial  o compra de nuevo.
                 </p>
               </div>
             </CardContent>
@@ -37,9 +37,9 @@ export default function AccountPage() {
                 <User className='w-12 h-12' />
               </div>
               <div>
-                <h2 className='text-xl font-bold'>Login & security</h2>
+                <h2 className='text-xl font-bold'>Inicio de sesión y Seguridad</h2>
                 <p className='text-muted-foreground'>
-                  Manage password, email and mobile number
+                  Administra tu contraseña, correo y número de teléfono
                 </p>
               </div>
             </CardContent>
@@ -53,9 +53,9 @@ export default function AccountPage() {
                 <Home className='w-12 h-12' />
               </div>
               <div>
-                <h2 className='text-xl font-bold'>Addresses</h2>
+                <h2 className='text-xl font-bold'>Direcciones</h2>
                 <p className='text-muted-foreground'>
-                  Edit, remove or set default address
+                  Edita, elimina ó elige una direccion por defecto
                 </p>
               </div>
             </CardContent>

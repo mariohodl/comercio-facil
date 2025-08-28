@@ -40,7 +40,7 @@ import {
           if (error.type === 'card_error' || error.type === 'validation_error') {
             setErrorMessage(error.message)
           } else {
-            setErrorMessage('An unknown error occurred')
+            setErrorMessage('Un Error descoocido ha ocurrido')
           }
         })
         .finally(() => setIsLoading(false))
@@ -60,10 +60,10 @@ import {
           disabled={stripe == null || elements == null || isLoading}
         >
           {isLoading ? (
-            'Purchasing...'
+            'Pagando...'
           ) : (
             <div>
-              Purchase - <ProductPrice price={priceInCents / 100} plain />
+              Pagar - <ProductPrice price={priceInCents / 100} plain />
             </div>
           )}
         </Button>

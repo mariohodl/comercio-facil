@@ -19,7 +19,7 @@ export const FREE_SHIPPING_MIN_PRICE = Number(
 
 export const APP_COPYRIGHT =
 	process.env.NEXT_PUBLIC_APP_COPYRIGHT ||
-	`Copyright © 2025 ${APP_NAME}. All rights reserved.`
+	`Copyright © 2025 ${APP_NAME}. Todos los derechos reservados.`
 
 export const AVAILABLE_PAYMENT_METHODS = [
 	{

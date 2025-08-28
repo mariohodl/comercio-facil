@@ -15,7 +15,7 @@ export default function Rating({
   return (
     <div
       className='flex items-center'
-      aria-label={`Rating: ${rating} out of 5 stars`}
+      aria-label={`Calificación: ${rating} de 5 estrellas`}
     >
       {[...Array(fullStars)].map((_, i) => (
         <Star

@@ -37,7 +37,7 @@ export default async function ProductDetails(props: {
 }) {
   const searchParams = await props.searchParams
 
-  const { page, color, size } = searchParams
+  const { page } = searchParams
 
   const params = await props.params
 
@@ -65,7 +65,7 @@ export default async function ProductDetails(props: {
           <div className='flex w-full flex-col gap-2 md:p-5 col-span-2'>
             <div className='flex flex-col gap-3'>
               <p className='p-medium-16 rounded-full bg-grey-500/10   text-grey-500'>
-                Brand {product.brand} {product.category}
+                Marca: {product.brand} - {product.category}
               </p>
               <h1 className='font-bold text-lg lg:text-xl'>
                 {product.name}
@@ -97,7 +97,7 @@ export default async function ProductDetails(props: {
             </div> */}
             <Separator className='my-2' />
             <div className='flex flex-col gap-2'>
-              <p className='p-bold-20 text-grey-600'>Description:</p>
+              <p className='p-bold-20 text-grey-600'>Descripción:</p>
               <p className='p-medium-16 lg:p-regular-18'>
                 {product.description}
               </p>
@@ -110,14 +110,14 @@ export default async function ProductDetails(props: {
 
                 {product.countInStock > 0 && product.countInStock <= 3 && (
                   <div className='text-destructive font-bold'>
-                    {`Only ${product.countInStock} left in stock - order soon`}
+                    {`Solo ${product.countInStock} quedan en existencia - ordena pronto`}
                   </div>
                 )}
                 {product.countInStock !== 0 ? (
-                  <div className='text-green-700 text-xl'>In Stock</div>
+                  <div className='text-green-700 text-xl'>En existencia</div>
                 ) : (
                   <div className='text-destructive text-xl'>
-                    Out of Stock
+                    No disponible
                   </div>
                 )}
                 {product.countInStock !== 0 && (
@@ -132,7 +132,7 @@ export default async function ProductDetails(props: {
                           category: product.category,
                           price: round2(product.price),
                           quantity: 1,
-                          image: product.images[0],
+                          image: product.images?.[0].imgUrl,
                           // size: size || product.sizes[0],
                           // color: color || product.colors[0],
                         }}
@@ -148,7 +148,7 @@ export default async function ProductDetails(props: {
 
       <section className='mt-10'>
         <h2 className='h2-bold mb-2' id='reviews'>
-          Customer Reviews
+          Opiniones de Clientes
         </h2>
         <ReviewList product={product} userId={session?.user.id} />
       </section>
@@ -156,7 +156,7 @@ export default async function ProductDetails(props: {
       <section className='mt-10'>
         <ProductSlider
           products={relatedProducts.data}
-          title={`Best Sellers in ${product.category}`}
+          title={`Los más vendidos en categoría: ${product.category}`}
         />
       </section>
       <section>

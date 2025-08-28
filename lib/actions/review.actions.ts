@@ -2,7 +2,7 @@
 
 import mongoose from 'mongoose'
 import { revalidatePath } from 'next/cache'
-import { z } from 'zod'
+import { number, z } from 'zod'
 
 import { auth } from '@/auth'
 
@@ -47,7 +47,7 @@ export async function createUpdateReview({
       revalidatePath(path)
       return {
         success: true,
-        message: 'Review updated successfully',
+        message: 'Opinion actualizada de forma correcta',
         // data: JSON.parse(JSON.stringify(existReview)),
       }
     } else {
@@ -56,7 +56,7 @@ export async function createUpdateReview({
       revalidatePath(path)
       return {
         success: true,
-        message: 'Review created successfully',
+        message: 'Opinion creada de forma correcta',
         // data: JSON.parse(JSON.stringify(newReview)),
       }
     }
@@ -92,7 +92,7 @@ const updateProductReview = async (productId: string) => {
   // Ensure all ratings 1-5 are represented, with missing ones set to count: 0
   const ratingDistribution = []
   for (let i = 1; i <= 5; i++) {
-    ratingDistribution.push({ rating: i, count: ratingMap[i] || 0 })
+    ratingDistribution.push({ rating: i, count: ratingMap[i] || 0 });
   }
   // Update product fields with calculated values
   await Product.findByIdAndUpdate(productId, {

@@ -34,10 +34,10 @@ const ProductPrice = ({
     <div className='space-y-2'>
       <div className='flex justify-center items-center gap-2'>
         <span className='bg-red-700 rounded-sm p-1 text-white text-sm font-semibold'>
-          {discountPercent}% Off
+          {discountPercent}% Menos
         </span>
         <span className='text-red-700 text-xs font-bold'>
-          Limited time deal
+          Oferta por tiempo limitado
         </span>
       </div>
       <div
@@ -51,7 +51,7 @@ const ProductPrice = ({
           <span className='text-xs align-super'>{floatValue}</span>
         </div>
         <div className='text-muted-foreground text-xs py-2'>
-          Was:{' '}
+          Antas:{' '}
           <span className='line-through'>{formatCurrency(listPrice)}</span>
         </div>
       </div>
@@ -67,7 +67,7 @@ const ProductPrice = ({
         </div>
       </div>
       <div className='text-muted-foreground text-xs py-2'>
-        List price:{' '}
+        Precio base:{' '}
         <span className='line-through'>{formatCurrency(listPrice)}</span>
       </div>
     </div>

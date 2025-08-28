@@ -16,7 +16,7 @@ import { formatDateTime, formatId } from '@/lib/utils'
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import ProductPrice from '@/components/shared/product/product-price'
 
-const PAGE_TITLE = 'Your Orders'
+const PAGE_TITLE = 'Mis Ordenes'
 export const metadata: Metadata = {
   title: PAGE_TITLE,
 }
@@ -31,7 +31,7 @@ export default async function OrdersPage(props: {
   return (
     <div>
       <div className='flex gap-2'>
-        <Link href='/account'>Your Account</Link>
+        <Link href='/account'>Mi Cuenta</Link>
         <span>›</span>
         <span>{PAGE_TITLE}</span>
       </div>
@@ -41,18 +41,18 @@ export default async function OrdersPage(props: {
           <TableHeader>
             <TableRow>
               <TableHead>Id</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Fecha</TableHead>
               <TableHead>Total</TableHead>
-              <TableHead>Paid</TableHead>
-              <TableHead>Delivered</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>Pagadas</TableHead>
+              <TableHead>Enviados</TableHead>
+              <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {orders.data.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className=''>
-                  You have no orders.
+                  No tienes órdenes.
                 </TableCell>
               </TableRow>
             )}
@@ -81,7 +81,7 @@ export default async function OrdersPage(props: {
                 </TableCell>
                 <TableCell>
                   <Link href={`/account/orders/${order._id}`}>
-                    <span className='px-2'>Details</span>
+                    <span className='px-2'>Detalles</span>
                   </Link>
                 </TableCell>
               </TableRow>

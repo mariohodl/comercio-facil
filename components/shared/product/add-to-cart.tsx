@@ -43,7 +43,7 @@ export default function AddToCart({
         }
       }}
     >
-      Add to Cart
+      Agregar a carrito
     </Button>
   ) : (
     <div className='w-full space-y-2'>
@@ -52,7 +52,7 @@ export default function AddToCart({
         onValueChange={(i) => setQuantity(Number(i))}
       >
         <SelectTrigger className=''>
-          <SelectValue>Quantity: {quantity}</SelectValue>
+          <SelectValue>Cantidad: {quantity}</SelectValue>
         </SelectTrigger>
         <SelectContent position='popper'>
           {Array.from({ length: item.countInStock }).map((_, i) => (
@@ -75,7 +75,7 @@ export default function AddToCart({
           }
         }}
       >
-        Add to Cart
+        Agregar a carrito
       </Button>
       <Button
         variant='secondary'
@@ -89,7 +89,7 @@ export default function AddToCart({
         }}
         className='w-full rounded-full '
       >
-        Buy Now
+        Comprar ahora
       </Button>
     </div>
   )

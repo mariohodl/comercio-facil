@@ -25,7 +25,7 @@ import { APP_NAME } from '@/lib/constants'
 const signInDefaultValues =
   process.env.NODE_ENV === 'development'
     ? {
-        email: 'admin@example.com',
+        email: 'mario@example.com',
         password: '123456',
       }
     : {
@@ -73,9 +73,9 @@ export default function CredentialsSignInForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Correo</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter email address' {...field} />
+                  <Input placeholder='Ingresar correo' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -87,11 +87,11 @@ export default function CredentialsSignInForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>Contraseña</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='Enter password'
+                    placeholder='Ingresar contraseña'
                     {...field}
                   />
                 </FormControl>
@@ -101,12 +101,13 @@ export default function CredentialsSignInForm() {
           />
 
           <div>
-            <Button type='submit'>Sign In</Button>
+            <Button type='submit'>Entrar</Button>
           </div>
           <div className='text-sm'>
-            By signing in, you agree to {APP_NAME}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
-            <Link href='/page/privacy-policy'>Privacy Notice.</Link>
+            Al entrar, estarás aceptando las {' '}
+            <Link href='/page/conditions-of-use'>Condiciones de Uso</Link> y{' '}
+            <Link href='/page/privacy-policy'>Aviso de Privacidad.</Link> de{' '}
+            {APP_NAME}
           </div>
         </div>
       </form>
