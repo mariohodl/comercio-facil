@@ -4,13 +4,16 @@ import { toSlug } from './utils'
 import bcrypt from 'bcryptjs'
 const users: IUserInput[] = [
 	{
-		name: 'Ricardo',
-		email: 'ricardo@example.com',
+		name: 'Robe',
+		email: 'robe@example.com',
 		password: bcrypt.hashSync('123456', 5),
-		role: 'Admin',
+		role: 'Seller',
+		storeName: '',
+		storeId: '',
+		isStore: true,
 		address: {
-			fullName: 'Ricardo García',
-			street: 'Juan Manuel 279',
+			fullName: 'Roberto García',
+			street: 'Juan Manuel 1249',
 			city: 'Guadalajara',
 			province: 'Jal',
 			postalCode: '64200',
@@ -24,7 +27,10 @@ const users: IUserInput[] = [
 		name: 'Mario',
 		email: 'mario@example.com',
 		password: bcrypt.hashSync('123456', 5),
-		role: 'Admin',
+		role: 'SuperAdmin',
+		storeName: '',
+		storeId: '',
+		isStore: false,
 		address: {
 			fullName: 'Mario López',
 			street: 'Manuel M. Dieguez 900',
@@ -41,7 +47,10 @@ const users: IUserInput[] = [
 		name: 'Jack',
 		email: 'jack@example.com',
 		password: bcrypt.hashSync('123456', 5),
-		role: 'User',
+		role: '',
+		storeName: '',
+		storeId: '',
+		isStore: false,
 		address: {
 			fullName: 'Jack Ryan',
 			street: '333 Main St',
@@ -53,24 +62,7 @@ const users: IUserInput[] = [
 		},
 		paymentMethod: 'PayPal',
 		emailVerified: false,
-	},
-	{
-		name: 'Ezo',
-		email: 'enzo@example.com',
-		password: bcrypt.hashSync('123456', 5),
-		role: 'Receptor',
-		address: {
-			fullName: 'Enzo rodriguez',
-			street: 'Av. prolongacion 123',
-			city: 'Monterrey',
-			province: 'NL',
-			postalCode: '44617',
-			country: 'MX',
-			phone: '123-456-7890',
-		},
-		paymentMethod: 'Stripe',
-		emailVerified: false,
-	},
+	}
 ]
 
 const reviews = [

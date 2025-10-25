@@ -5,6 +5,8 @@ import { connectToDatabase } from '.';
 import Product from './models/product.model';
 import { cwd } from 'process';
 import { loadEnvConfig } from '@next/env';
+import { IReviewInput } from '@/types'
+
 
 loadEnvConfig(cwd());
 
@@ -20,7 +22,7 @@ const main = async () => {
 		const createdProducts = await Product.insertMany(products);
 
 		await Review.deleteMany()
-    const rws = []
+    const rws: IReviewInput[] = []
     for (let i = 0; i < createdProducts.length; i++) {
       let x = 0
       const { ratingDistribution } = createdProducts[i]

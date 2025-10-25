@@ -25,12 +25,12 @@ export default function Footer() {
       <div className='p-3'>
         <div className='flex justify-between text-sm p-16 mx-10'>
           <div>
-            <CustomH3 classNames="!text-[38px] font-semibold mb-7">Master Karne</CustomH3>
+            <CustomH3 classNames="!text-[38px] font-semibold mb-7">Comercio Fácil</CustomH3>
             <CustomP classNames="!text-black !text-[20px] font-extralight ml-1">Lleva tu negocio a nuevas alturas.</CustomP>
           </div>
 
           <div>
-            <CustomH3 classNames="!text-[38px] font-semibold mb-7">ventas@masterkarne.com</CustomH3>
+            <CustomH3 classNames="!text-[38px] font-semibold mb-7">ventas@comerciofacil.com</CustomH3>
             <CustomP classNames="!text-black !text-[20px] font-extralight ml-1">Lunes - Viernes 9:00am - 6:00pm</CustomP>
           </div>
 

@@ -1,4 +1,4 @@
-export const APP_NAME = process.env.APP_NAME || 'Master Karne'
+export const APP_NAME = process.env.APP_NAME || 'Comercio Facil'
 export const SERVER_URL =
 	process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
@@ -8,7 +8,7 @@ export const SENDER_NAME = process.env.SENDER_NAME || APP_NAME
 export const APP_URL = process.env.APP_URL || 'http://localhost:3000'
 export const APP_DESCRIPTION =
 	process.env.APP_DESCRIPTION ||
-	'Distribuidor de carnes de occidente, el privilegio de..'
+	'Distribuidor de occidente, el hacer tu comercio más facil nos motiva..'
 export const APP_SLOGAN = process.env.APP_SLOGAN || 'Come mas, gasta menos'
 
 export const PAGE_SIZE = Number(process.env.PAGE_SIZE || 9)
@@ -63,13 +63,11 @@ export const AVAILABLE_DELIVERY_DATES = [
 	},
 ]
 
-export const USER_ROLES = ['Admin', 'User', 'Customer', 'Seller']
+export const USER_ROLES = ['Admin', 'Customer', 'Seller']
 export const ROL_ADMIN = 'Admin'
-export const ROL_USER = 'User'
 export const ROL_CUSTOMER = 'Customer'
 export const ROL_SELLER = 'Seller'
 export const ROL_SUPER_ADMIN = 'SuperAdmin'
-export const ROL_RECEPTOR = 'Receptor'
 
 export const AVAILABLE_CATEGORIES = [
 	{
