@@ -8,8 +8,8 @@ const users: IUserInput[] = [
 		email: 'robe@example.com',
 		password: bcrypt.hashSync('123456', 5),
 		role: 'Seller',
-		storeName: '',
-		storeId: '',
+		storeName: 'Mi super tiendita',
+		storeId: '7jDf45ff',
 		isStore: true,
 		address: {
 			fullName: 'Roberto García',

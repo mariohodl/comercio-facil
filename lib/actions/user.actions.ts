@@ -1,5 +1,6 @@
 'use server';
 import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 import { auth, signIn, signOut } from '@/auth'
 import { IUserName, IUserSignIn, IUserSignUp } from '@/types'
 import { connectToDatabase } from '../db';
@@ -9,6 +10,8 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '../constants'
 import { UserSignUpSchema, UserUpdateSchema } from '../validator'
+import { ROL_CUSTOMER, ROL_SELLER } from '@/lib/constants'
+
 import { z } from 'zod'
 
 export async function signInWithCredentials(user: IUserSignIn) {
@@ -32,15 +35,30 @@ export async function registerUser(userSignUp: IUserSignUp) {
 			email: userSignUp.email,
 			password: userSignUp.password,
 			confirmPassword: userSignUp.confirmPassword,
+			isStore: userSignUp.isStore,
+			storeName: userSignUp.storeName,
+			storeId: uuidv4().toString().substring(0, 8),
+			role: userSignUp.isStore ? ROL_SELLER : ROL_CUSTOMER 
 		});
 
 		await connectToDatabase();
-		await User.create({
+		const userCreated = await User.create({
 			...user,
 			password: await bcrypt.hash(user.password, 5),
 		});
-		return { success: true, message: 'User created successfully' };
+		console.log(userCreated)
+		const userInfo = {
+			storeId: userCreated.storeId,
+			email: userCreated.email,
+			isStore: userCreated.isStore,
+			name: userCreated.name,
+			role: userCreated.role
+		}
+		const redirectUrl = userCreated.isStore ? `/${userCreated.storeId}/dashboard` : '/'
+		
+		return { success: true, message: 'User created successfully' , userInfo, redirectUrl};
 	} catch (error) {
+		console.log(error)
 		return { success: false, error: formatError(error) };
 	}
 }

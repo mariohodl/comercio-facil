@@ -1,8 +1,9 @@
 'use client'
 import { redirect, useSearchParams } from 'next/navigation'
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { CustomH2 } from '@/components/shared/CustomH2'
+import { CustomP } from '@/components/shared/CustomP'
 import Link from 'next/link'
 import {
   Form,
@@ -64,53 +65,60 @@ export default function CredentialsSignInForm() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <input type='hidden' name='callbackUrl' value={callbackUrl} />
-        <div className='space-y-6'>
-          <FormField
-            control={control}
-            name='email'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Correo</FormLabel>
-                <FormControl>
-                  <Input placeholder='Ingresar correo' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <section className=''>
+      <div>
+        <CustomH2>Ingresar</CustomH2>
+        <CustomP>Accede a tu cuenta de {APP_NAME} usando tu correo y contraseña.</CustomP>
+      </div>
+      <Form {...form}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <input type='hidden' name='callbackUrl' value={callbackUrl} />
+          <div className='space-y-6'>
+            <FormField
+              control={control}
+              name='email'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel>Correo<span className='text-red-800'>*</span></FormLabel>
+                  <FormControl>
+                    <Input placeholder='Ingresar correo' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          
+            <FormField
+              control={control}
+              name='password'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel>Contraseña<span className='text-red-800'>*</span></FormLabel>
+                  <FormControl>
+                    <Input
+                      type='password'
+                      placeholder='Ingresar contraseña'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={control}
-            name='password'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Contraseña</FormLabel>
-                <FormControl>
-                  <Input
-                    type='password'
-                    placeholder='Ingresar contraseña'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div>
-            <Button type='submit'>Entrar</Button>
+            <div>
+              <Button type='submit'>Entrar</Button>
+            </div>
+            <div className='text-sm'>
+              Al ingresar, estás aceptando las {' '}
+              <Link href='/page/conditions-of-use'>Condiciones de Uso</Link> y{' '}
+              <Link href='/page/privacy-policy'>Aviso de Privacidad.</Link> de{' '}
+              {APP_NAME}
+            </div>
           </div>
-          <div className='text-sm'>
-            Al entrar, estarás aceptando las {' '}
-            <Link href='/page/conditions-of-use'>Condiciones de Uso</Link> y{' '}
-            <Link href='/page/privacy-policy'>Aviso de Privacidad.</Link> de{' '}
-            {APP_NAME}
-          </div>
-        </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </section>
+    
   )
 }

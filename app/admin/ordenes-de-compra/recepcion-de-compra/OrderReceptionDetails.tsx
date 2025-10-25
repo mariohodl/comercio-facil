@@ -171,7 +171,7 @@ const OrderReceptionDetails = () => {
       isAtLeastOneError = true
     }
 
-    if(RFCWatcher.length < 8){
+    if(RFCer.length < 8){
       showError('Ingresa un RFC válido!')
       isAtLeastOneError = true
     }
