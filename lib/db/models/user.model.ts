@@ -25,7 +25,7 @@ const userSchema = new Schema<IUser>(
 		emailVerified: { type: Boolean, default: false },
 		isStore: { type: Boolean, default: false },
 		storeName: { type: String, required: false },
-		storeId: { type: String, required: true },
+		storeId: { type: String, required: false },
 	},
 	{
 		timestamps: true,

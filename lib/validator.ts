@@ -156,8 +156,8 @@ const Email = z.string().min(1, 'Email is required').email('Email is invalid')
 const Password = z.string().min(3, 'Password must be at least 3 characters')
 const UserRole = z.string().optional()
 const IsStore = z.boolean()
-const StoreName = z.string().min(4, 'Password must be at least 4 characters')
-const StoreId = z.string().min(4).optional()
+const StoreName = z.string()
+const StoreId = z.string().optional()
 
 export const UserInputSchema = z.object({
 	name: UserName,

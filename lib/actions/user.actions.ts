@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '../constants'
 import { UserSignUpSchema, UserUpdateSchema } from '../validator'
-import { ROL_CUSTOMER, ROL_SELLER } from '@/lib/constants'
+import { ROL_CUSTOMER, ROL_ADMIN } from '@/lib/constants'
 
 import { z } from 'zod'
 
@@ -18,9 +18,8 @@ export async function signInWithCredentials(user: IUserSignIn) {
 	return await signIn('credentials', { ...user, redirect: false });
 }
 export const SignOut = async () => {
-	const redirectTo = await signOut({ redirect: false });
-
-	redirect(redirectTo.redirect);
+	await signOut({ redirect: false });
+	redirect('/');
 };
 
 export const SignInWithGoogle = async () => {
@@ -30,15 +29,16 @@ export const SignInWithGoogle = async () => {
 // CREATE
 export async function registerUser(userSignUp: IUserSignUp) {
 	try {
+		const storeIdCreated = uuidv4().toString().substring(0, 8);
 		const user = await UserSignUpSchema.parseAsync({
 			name: userSignUp.name,
 			email: userSignUp.email,
 			password: userSignUp.password,
 			confirmPassword: userSignUp.confirmPassword,
 			isStore: userSignUp.isStore,
-			storeName: userSignUp.storeName,
-			storeId: uuidv4().toString().substring(0, 8),
-			role: userSignUp.isStore ? ROL_SELLER : ROL_CUSTOMER 
+			storeName: userSignUp.isStore ? userSignUp.storeName : '',
+			storeId: userSignUp.isStore ? storeIdCreated : '',
+			role: userSignUp.isStore ? ROL_ADMIN : ROL_CUSTOMER 
 		});
 
 		await connectToDatabase();
@@ -46,7 +46,6 @@ export async function registerUser(userSignUp: IUserSignUp) {
 			...user,
 			password: await bcrypt.hash(user.password, 5),
 		});
-		console.log(userCreated)
 		const userInfo = {
 			storeId: userCreated.storeId,
 			email: userCreated.email,
@@ -54,7 +53,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
 			name: userCreated.name,
 			role: userCreated.role
 		}
-		const redirectUrl = userCreated.isStore ? `/${userCreated.storeId}/dashboard` : '/'
+		const redirectUrl = userCreated.isStore ? `/admin/${userCreated.storeId}/overview` : '/'
 		
 		return { success: true, message: 'User created successfully' , userInfo, redirectUrl};
 	} catch (error) {

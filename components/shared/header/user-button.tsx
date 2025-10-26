@@ -16,6 +16,7 @@ import Link from 'next/link'
 
 export default async function UserButton() {
   const session = await auth()
+  console.log('SESSION', session)
   return (
     <div className='flex gap-2 items-center'>
       <DropdownMenu>
@@ -49,7 +50,7 @@ export default async function UserButton() {
               </Link>
 
               {session.user.role === 'Admin' && (
-                <Link className='w-full' href='/admin/overview'>
+                <Link className='w-full' href={`/admin/${session?.user.storeId}/overview`}>
                   <DropdownMenuItem>Admin</DropdownMenuItem>
                 </Link>
               )}
