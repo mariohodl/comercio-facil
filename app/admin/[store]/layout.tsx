@@ -2,18 +2,20 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import Menu from '@/components/shared/header/menu'
+import { AdminHeader } from './admin-header'
 import { AdminNav } from './admin-nav'
 import { APP_NAME } from '@/lib/constants'
-
+import { auth } from '@/auth'
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await auth()
   return (
     <>
       <div className='flex flex-col'>
-        <div className='bg-black text-white'>
+        <div className='bg-black text-white fixed top-0 left-0 w-full z-10'>
           <div className='flex h-16 items-center px-2'>
             <div className='flex items-center'>
               <Link
@@ -29,16 +31,23 @@ export default async function AdminLayout({
                 />
               </Link>
             </div>
-            <AdminNav className='mx-6 hidden md:flex' />
+            <AdminHeader className='mx-6 hidden md:flex' />
             <div className='ml-auto flex items-center space-x-4'>
               <Menu forAdmin />
             </div>
           </div>
           <div>
-            <AdminNav className='flex md:hidden px-4 pb-2' />
+            <AdminHeader className='flex md:hidden px-4 pb-2' />
           </div>
         </div>
-        <div className='flex-1 p-4'>{children}</div>
+        <section className='flex justify-end'>
+          <div className=''>
+            <AdminNav storeId={session?.user?.storeId || ''}/>
+          </div>
+          <div className='relative top-16 w-10/12'>
+            <div className='flex-1 p-4'>{children}</div>
+          </div>
+        </section>
       </div>
     </>
   )

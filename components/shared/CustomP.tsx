@@ -1,7 +1,7 @@
 import React from 'react'
 
-export const CustomP = ({children, classNames}) => {
+export const CustomP = ({children, classNames}: { children: React.ReactNode, classNames: string}) => {
   return (
-    <p className={`text-lg md:text-lg/5 text-[#7A7A7A] font-light font-sans ${classNames}`}>{children || 'CustomP'}</p>
+    <p className={`text-sm ${classNames}`}>{children || 'CustomP'}</p>
   ) 
 }

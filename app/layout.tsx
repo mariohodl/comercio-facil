@@ -1,6 +1,6 @@
 import { APP_DESCRIPTION, APP_NAME, APP_SLOGAN } from '@/lib/constants'
 import type { Metadata } from "next";
-import { Playfair_Display, Lora } from "next/font/google";
+import { Nunito } from "next/font/google";
 import ClientProviders from '@/components/shared/client-providers';
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -8,13 +8,13 @@ import "../config/index";
 
 
 
-const PlayFairFont = Playfair_Display({
+
+
+const NunitoFont = Nunito({
   subsets: ["latin"],
 });
 
-const lora = Lora({
-  subsets: ["latin"],
-});
+
 
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang='es' suppressHydrationWarning>
       <body
-        className={`${lora.className}`}
+        className={`${NunitoFont.className}`}
       >
         <Toaster />
         <ClientProviders>{children}</ClientProviders>
