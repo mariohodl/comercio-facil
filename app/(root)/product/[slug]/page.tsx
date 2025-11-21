@@ -121,27 +121,27 @@ export default async function ProductDetails(props: {
                   </div>
                 )}
                 {product.countInStock !== 0 && (
-                    <div className='flex justify-center items-center'>
-                      <AddToCart
-                        item={{
-                          clientId: generateId(),
-                          product: product._id,
-                          countInStock: product.countInStock,
-                          name: product.name,
-                          slug: product.slug,
-                          category: product.category,
-                          price: round2(product.price),
-                          quantity: 1,
-                          image: product.images?.[0].imgUrl,
-                          // size: size || product.sizes[0],
-                          // color: color || product.colors[0],
-                        }}
-                      />
-                    </div>
-                  )}
+                  <div className='flex justify-center items-center'>
+                    <AddToCart
+                      item={{
+                        clientId: generateId(),
+                        product: product._id,
+                        countInStock: product.countInStock,
+                        name: product.name,
+                        slug: product.slug,
+                        category: product.category,
+                        price: round2(product.price),
+                        quantity: 1,
+                        image: product.images?.[0]?.imgUrl || `/images/${product.category.toLocaleLowerCase()}-category-product.jpg`,
+                        // size: size || product.sizes[0],
+                        // color: color || product.colors[0],
+                      }}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
-            
+
           </div>
         </div>
       </section>

@@ -48,28 +48,28 @@ import {
 const shippingAddressDefaultValues =
   process.env.NODE_ENV === 'development'
     ? {
-        fullName: 'Basir',
-        street: '1911, 65 Sherbrooke Est',
-        city: 'Montreal',
-        province: 'Quebec',
-        phone: '4181234567',
-        postalCode: 'H2X 1C4',
-        country: 'Canada',
-      }
+      fullName: 'Basir',
+      street: '1911, 65 Sherbrooke Est',
+      city: 'Montreal',
+      province: 'Quebec',
+      phone: '4181234567',
+      postalCode: 'H2X 1C4',
+      country: 'Canada',
+    }
     : {
-        fullName: '',
-        street: '',
-        city: '',
-        province: '',
-        phone: '',
-        postalCode: '',
-        country: '',
-      }
+      fullName: '',
+      street: '',
+      city: '',
+      province: '',
+      phone: '',
+      postalCode: '',
+      country: '',
+    }
 
 const CheckoutForm = () => {
-      const {
-        showSuccess,
-        showError, } = useToast()
+  const {
+    showSuccess,
+    showError, } = useToast()
   const router = useRouter()
 
   const {
@@ -119,6 +119,15 @@ const CheckoutForm = () => {
     useState<boolean>(false)
 
   const handlePlaceOrder = async () => {
+    // Validate cart has items
+    if (!items || items.length === 0) {
+      showError('Tu carrito está vacío. Agrega productos antes de completar la orden.', {
+        duration: 3000,
+        position: 'top-center',
+        important: true
+      })
+      return
+    }
     const res = await createOrder({
       items,
       shippingAddress,
@@ -133,9 +142,9 @@ const CheckoutForm = () => {
       totalPrice,
     })
     if (!res.success) {
-      showError(res.message, {duration: 3000, position: 'top-center', important: true})
+      showError(res.message, { duration: 3000, position: 'top-center', important: true })
     } else {
-      showSuccess(res.message, {duration: 3000, position: 'top-center', important: true})
+      showSuccess(res.message, { duration: 3000, position: 'top-center', important: true })
       clearCart()
       router.push(`/checkout/${res.data?.orderId}`)
     }
@@ -183,7 +192,7 @@ const CheckoutForm = () => {
               Completar Orden
             </Button>
             <p className='text-xs text-center py-2'>
-              Al completar tu Orden, estarás aceptando el 
+              Al completar tu Orden, estarás aceptando el
               <Link href='/page/privacy-policy'> Aviso de Privacidad</Link> y las
               <Link href='/page/conditions-of-use'> Condiciones de Uso</Link> de {APP_NAME}.
             </p>
@@ -554,7 +563,7 @@ const CheckoutForm = () => {
                           <div key={_index} className='flex gap-4 py-2'>
                             <div className='relative w-16 h-16'>
                               <Image
-                                src={item.image}
+                                src={item.image || `/images/${item.category.toLowerCase()}-category-product.jpg`}
                                 alt={item.name}
                                 fill
                                 sizes='20vw'
@@ -638,7 +647,7 @@ const CheckoutForm = () => {
                                     </div>
                                     <div>
                                       {(dd.freeShippingMinPrice > 0 &&
-                                      itemsPrice >= dd.freeShippingMinPrice
+                                        itemsPrice >= dd.freeShippingMinPrice
                                         ? 0
                                         : dd.shippingPrice) === 0 ? (
                                         'Envío GRATIS'
@@ -686,7 +695,7 @@ const CheckoutForm = () => {
                       {' '}
                       Al completar tu orden, estarás aceptando el <Link href='/page/privacy-policy'>
                         aviso de privacidad
-                      </Link> y las 
+                      </Link> y las
                       <Link href='/page/conditions-of-use'>
                         {' '}
                         condiciones de uso

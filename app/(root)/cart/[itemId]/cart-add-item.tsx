@@ -25,7 +25,7 @@ export default function CartAddItem({ itemId }: { itemId: string }) {
           <CardContent className='flex h-full items-center justify-center  gap-3 py-4'>
             <Link href={`/product/${item.slug}`}>
               <Image
-                src={item.image}
+                src={item.image || `/images/${item.category.toLowerCase()}-category-product.jpg`}
                 alt={item.name}
                 width={80}
                 height={80}

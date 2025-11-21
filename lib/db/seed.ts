@@ -11,17 +11,17 @@ import { IReviewInput } from '@/types'
 loadEnvConfig(cwd());
 
 const main = async () => {
-	try {
-		const { products, reviews, users } = data;
-		await connectToDatabase(process.env.MONGODB_URI);
+  try {
+    const { products, reviews, users } = data;
+    await connectToDatabase(process.env.MONGODB_URI);
 
-		await User.deleteMany();
-		const createdUsers = await User.insertMany(users);
+    await User.deleteMany();
+    const createdUsers = await User.insertMany(users);
 
-		await Product.deleteMany();
-		const createdProducts = await Product.insertMany(products);
+    await Product.deleteMany();
+    const createdProducts = await Product.insertMany(products);
 
-		await Review.deleteMany()
+    await Review.deleteMany()
     const rws: IReviewInput[] = []
     for (let i = 0; i < createdProducts.length; i++) {
       let x = 0
@@ -31,7 +31,7 @@ const main = async () => {
           x++
           rws.push({
             ...reviews.filter((x) => x.rating === j + 1)[
-              x % reviews.filter((x) => x.rating === j + 1).length
+            x % reviews.filter((x) => x.rating === j + 1).length
             ],
             isVerifiedPurchase: true,
             product: createdProducts[i]._id,
@@ -42,20 +42,20 @@ const main = async () => {
         }
       }
     }
-	const createdReviews = await Review.insertMany(rws);
+    const createdReviews = await Review.insertMany(rws);
 
-		console.log({
-			createdUsers,
-			createdProducts,
-			createdReviews,
-			message: 'Seeded database successfully',
-		});
-		
-		process.exit(0);
-	} catch (error) {
-		console.error(error);
-		throw new Error('Failed to seed database');
-	}
+    console.log({
+      createdUsers,
+      createdProducts,
+      createdReviews,
+      message: 'Seeded database successfully',
+    });
+
+    process.exit(0);
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to seed database');
+  }
 };
 
 main();

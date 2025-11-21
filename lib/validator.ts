@@ -123,8 +123,12 @@ export const OrderInputSchema = z.object({
 	expectedDeliveryDate: z
 		.date()
 		.refine(
-			(value) => value > new Date(),
-			'Expected delivery date must be in the future'
+			(value) => {
+				const today = new Date();
+				today.setHours(0, 0, 0, 0); // Start of today
+				return value >= today;
+			},
+			'Expected delivery date must be today or in the future'
 		),
 	isDelivered: z.boolean().default(false),
 	deliveredAt: z.date().optional(),
@@ -253,32 +257,32 @@ export const ProveedorInputSchema = z.object({
 
 export const IDateRange = z.object({
 	from: z.date()
-	.refine(
-		(value) => value < new Date(),
-		'La fecha esperada debe ser una fecha del pasado'
-	),
+		.refine(
+			(value) => value < new Date(),
+			'La fecha esperada debe ser una fecha del pasado'
+		),
 	to: z.date()
-	.refine(
-		(value) => value > new Date(),
-		'La fecha esperada debe ser una fecha del futuro'
-	),
+		.refine(
+			(value) => value > new Date(),
+			'La fecha esperada debe ser una fecha del futuro'
+		),
 })
 
 export const IReportInput = z.object({
 	title: z.string().min(5, 'Nombre es requerido con almenos 5 caracters'),
 	status: z.string(),
-	type:  z.string(),
+	type: z.string(),
 	dateRange: z.object({
 		from: z.date()
-		.refine(
-			(value) => value < new Date(),
-			'La fecha esperada debe ser una fecha del pasado'
-		),
+			.refine(
+				(value) => value < new Date(),
+				'La fecha esperada debe ser una fecha del pasado'
+			),
 		to: z.date()
-		.refine(
-			(value) => value > new Date(),
-			'La fecha esperada debe ser una fecha del futuro'
-		),
+			.refine(
+				(value) => value > new Date(),
+				'La fecha esperada debe ser una fecha del futuro'
+			),
 	})
 })
 
@@ -303,4 +307,31 @@ export const ReportInputSchema = z.object({
 	dateRange: IDateRange,
 	filtersUsed: z.optional(IReportInput),
 	reportItems: z.array(z.unknown())
+})
+
+export const POSOrderSchema = z.object({
+	items: z.array(
+		z.object({
+			product: z.string(),
+			name: z.string(),
+			slug: z.string(),
+			image: z.string(),
+			category: z.string(),
+			price: z.number(),
+			countInStock: z.number(),
+			quantity: z.number().min(1),
+		})
+	).min(1, 'Cart is empty'),
+	paymentMethod: z.enum(['Cash', 'Card', 'Split']),
+	totalPrice: z.number(),
+	receivedAmount: z.number().optional(), // For cash payments
+	change: z.number().optional(), // For cash payments
+	paymentSplits: z
+		.array(
+			z.object({
+				method: z.enum(['Cash', 'Card']),
+				amount: z.number(),
+			})
+		)
+		.optional(),
 })

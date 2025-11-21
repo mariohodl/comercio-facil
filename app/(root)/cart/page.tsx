@@ -54,7 +54,7 @@ export default function CartPage() {
                       <Link href={`/product/${item.slug}`}>
                         <div className='relative w-40 h-40'>
                           <Image
-                            src={item.image}
+                            src={item.image || `/images/${item.category.toLowerCase()}-category-product.jpg`}
                             alt={item.name}
                             fill
                             sizes='20vw'

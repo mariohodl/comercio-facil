@@ -2,7 +2,7 @@
 
 import mongoose from 'mongoose'
 import { revalidatePath } from 'next/cache'
-import { number, z } from 'zod'
+import { z } from 'zod'
 
 import { auth } from '@/auth'
 

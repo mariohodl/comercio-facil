@@ -41,72 +41,10 @@ interface Product {
   stock: number
 }
 
-interface ReportData {
-  title: string
-  type: "sales" | "inventory" | "financial" | "custom"
-  status: "completed" | "pending" | "processing" | "failed"
-  allTotalValue: number
-  allSubTotalValue: number
-  allProducts: Product[]
-  productsCount: number
-  dateRangeFormatted: string
-  dateRange: {
-    from: string
-    to: string
-  }
-  filtersUsed: string[]
-  reportItems: ReportItem[]
-}
+
 
 // Datos de ejemplo
-const mockReportData: ReportData = {
-  title: "Reporte de Ventas Q4 2024",
-  type: "sales",
-  status: "completed",
-  allTotalValue: 45750.0,
-  allSubTotalValue: 38950.0,
-  allProducts: [
-    { id: "1", name: "Laptop Pro", category: "Electronics", price: 1299.99, stock: 25 },
-    { id: "2", name: "Wireless Mouse", category: "Accessories", price: 29.99, stock: 150 },
-    { id: "3", name: "Monitor 4K", category: "Electronics", price: 399.99, stock: 45 },
-  ],
-  productsCount: 156,
-  dateRangeFormatted: "Oct 1, 2024 - Dec 31, 2024",
-  dateRange: {
-    from: "2024-10-01",
-    to: "2024-12-31",
-  },
-  filtersUsed: ["Categoría: Electronics", "Estado: Activo", "Región: Norte"],
-  reportItems: [
-    {
-      id: "item-1",
-      name: 'Laptop Pro 15"',
-      quantity: 25,
-      unitPrice: 1299.99,
-      totalPrice: 32499.75,
-      category: "Electronics",
-      sku: "LP-001",
-    },
-    {
-      id: "item-2",
-      name: "Wireless Mouse RGB",
-      quantity: 89,
-      unitPrice: 29.99,
-      totalPrice: 2669.11,
-      category: "Accessories",
-      sku: "WM-002",
-    },
-    {
-      id: "item-3",
-      name: "Monitor 4K Ultra",
-      quantity: 42,
-      unitPrice: 399.99,
-      totalPrice: 16799.58,
-      category: "Electronics",
-      sku: "M4K-003",
-    },
-  ],
-}
+
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -163,7 +101,7 @@ export default async function ReportItemView(props) {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            
+
             <div>
               <div className="flex items-center gap-3 mb-1">
                 {/* {getTypeIcon(reportData.type)} */}
@@ -281,7 +219,7 @@ export default async function ReportItemView(props) {
                         </TableCell>
                         <TableCell className="font-mono text-sm">{item.category}</TableCell>
                         <TableCell className="text-right">{item.countInStock}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(item.listPrice)}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(item.price)}</TableCell>
                         {/* <TableCell className="text-right font-medium">{formatCurrency(item.totalPrice)}</TableCell> */}
                       </TableRow>
                     ))}
@@ -345,7 +283,7 @@ export default async function ReportItemView(props) {
                   <div className="mt-1">
                     <div className="text-sm">{report.dateRangeFormatted}</div>
                     <div className="text-xs text-muted-foreground">
-                      {report.dateRange.from} - {report.dateRange.to}
+                      {new Date(report.dateRange.from).toLocaleDateString()} - {new Date(report.dateRange.to).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -373,10 +311,11 @@ export default async function ReportItemView(props) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {report.filtersUsed.length > 0 ? (
+                  {report.filtersUsed && report.filtersUsed.length > 0 ? (
+                    // @ts-expect-error
                     report.filtersUsed.map((filter, index) => (
                       <Badge key={index} variant="secondary" className="block w-fit">
-                        {filter}
+                        {filter.toString()}
                       </Badge>
                     ))
                   ) : (

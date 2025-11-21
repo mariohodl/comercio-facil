@@ -2,6 +2,7 @@ import { IOrderInput } from '@/types';
 import { Document, Model, model, models, Schema } from 'mongoose';
 
 export interface IOrder extends Document, IOrderInput {
+	paymentSplits?: { method: string; amount: number }[];
 	_id: string;
 	createdAt: Date;
 	updatedAt: Date;
@@ -44,6 +45,12 @@ const orderSchema = new Schema<IOrder>(
 		},
 		expectedDeliveryDate: { type: Date, required: true },
 		paymentMethod: { type: String, required: true },
+		paymentSplits: [
+			{
+				method: { type: String, required: true },
+				amount: { type: Number, required: true },
+			},
+		],
 		paymentResult: { id: String, status: String, email_address: String },
 		itemsPrice: { type: Number, required: true },
 		shippingPrice: { type: Number, required: true },

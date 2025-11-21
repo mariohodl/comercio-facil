@@ -104,7 +104,7 @@ export default function OrderDetailsForm({
                         className='flex items-center'
                       >
                         <Image
-                          src={item.image}
+                          src={item.image || `/images/${item.category.toLowerCase()}-category-product.jpg`}
                           alt={item.name}
                           width={50}
                           height={50}

@@ -99,7 +99,7 @@ const ProductCard = ({
           category: product.category,
           price: round2(product.price),
           quantity: 1,
-          image: product.images?.[0]?.imgUrl,
+          image: product.images?.[0]?.imgUrl || `/images/${product.category.toLocaleLowerCase()}-category-product.jpg`,
         }}
       />
     </div>
@@ -113,7 +113,7 @@ const ProductCard = ({
           <div className='p-3 flex-1 text-center'>
             <ProductDetails />
           </div>
-          {!hideAddToCart && <AddButton/>}
+          {!hideAddToCart && <AddButton />}
         </>
       )}
     </div>
@@ -128,7 +128,7 @@ const ProductCard = ({
             <ProductDetails />
           </CardContent>
           <CardFooter className='p-3'>
-          { !hideAddToCart && <AddButton/>}
+            {!hideAddToCart && <AddButton />}
 
           </CardFooter>
         </>

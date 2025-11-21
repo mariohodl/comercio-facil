@@ -1,6 +1,9 @@
 import { Data, IProductInput, IUserInput } from '@/types'
 import { toSlug } from './utils'
 
+const uniqueStoreId = '7jDf45ff'
+const uniqueStoreName = 'Mi super tiendita'
+
 import bcrypt from 'bcryptjs'
 const users: IUserInput[] = [
 	{
@@ -8,9 +11,9 @@ const users: IUserInput[] = [
 		email: 'robe@example.com',
 		password: bcrypt.hashSync('123456', 5),
 		role: 'Seller',
-		storeName: 'Mi super tiendita',
-		storeId: '7jDf45ff',
-		isStore: true,
+		storeName: uniqueStoreName,
+		storeId: uniqueStoreId,
+		isStore: false,
 		address: {
 			fullName: 'Roberto García',
 			street: 'Juan Manuel 1249',
@@ -24,8 +27,8 @@ const users: IUserInput[] = [
 		emailVerified: false,
 	},
 	{
-		name: 'Mario',
-		email: 'mario@example.com',
+		name: 'Mario SuperAdmin',
+		email: 'mariosuperadmin@example.com',
 		password: bcrypt.hashSync('123456', 5),
 		role: 'SuperAdmin',
 		storeName: '',
@@ -44,12 +47,32 @@ const users: IUserInput[] = [
 		emailVerified: false,
 	},
 	{
+		name: 'Mario',
+		email: 'mario@example.com',
+		password: bcrypt.hashSync('123456', 5),
+		role: 'Admin',
+		storeName: uniqueStoreName,
+		storeId: uniqueStoreId,
+		isStore: false,
+		address: {
+			fullName: 'Mario López',
+			street: 'Manuel M. Dieguez 900',
+			city: 'Guadalajara',
+			province: 'Jal',
+			postalCode: '64610',
+			country: 'MX',
+			phone: '123-456-7890',
+		},
+		paymentMethod: 'Cash On Delivery',
+		emailVerified: false,
+	},
+	{
 		name: 'Jack',
 		email: 'jack@example.com',
 		password: bcrypt.hashSync('123456', 5),
-		role: '',
-		storeName: '',
-		storeId: '',
+		role: 'Seller',
+		storeName: uniqueStoreName,
+		storeId: uniqueStoreId,
 		isStore: false,
 		address: {
 			fullName: 'Jack Ryan',
