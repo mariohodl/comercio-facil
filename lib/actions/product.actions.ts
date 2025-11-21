@@ -121,11 +121,11 @@ export async function getAllProducts({
 	const queryFilter =
 		query && query !== 'all'
 			? {
-					name: {
-						$regex: query,
-						$options: 'i',
-					},
-				}
+				name: {
+					$regex: query,
+					$options: 'i',
+				},
+			}
 			: {}
 	const categoryFilter = category && category !== 'all' ? { category } : {}
 	const tagFilter = tag && tag !== 'all' ? { tags: tag } : {}
@@ -133,20 +133,20 @@ export async function getAllProducts({
 	const ratingFilter =
 		rating && rating !== 'all'
 			? {
-					avgRating: {
-						$gte: Number(rating),
-					},
-				}
+				avgRating: {
+					$gte: Number(rating),
+				},
+			}
 			: {}
 	// 10-50
 	const priceFilter =
 		price && price !== 'all'
 			? {
-					price: {
-						$gte: Number(price.split('-')[0]),
-						$lte: Number(price.split('-')[1]),
-					},
-				}
+				price: {
+					$gte: Number(price.split('-')[0]),
+					$lte: Number(price.split('-')[1]),
+				},
+			}
 			: {}
 	const order: Record<string, 1 | -1> =
 		sort === 'best-selling'
@@ -222,17 +222,27 @@ export async function deleteProduct(id: string) {
 	}
 }
 
+export async function getAllBrands() {
+	await connectToDatabase()
+	const brands = await Product.find({ isPublished: true }).distinct('brand')
+	return brands
+}
+
 // GET ALL PRODUCTS FOR ADMIN
 export async function getAllProductsForAdmin({
 	query,
 	page = 1,
 	sort = 'latest',
 	limit,
+	category,
+	brand,
 }: {
 	query: string
 	page?: number
 	sort?: string
 	limit?: number
+	category?: string
+	brand?: string
 }) {
 	await connectToDatabase()
 
@@ -240,12 +250,14 @@ export async function getAllProductsForAdmin({
 	const queryFilter =
 		query && query !== 'all'
 			? {
-					name: {
-						$regex: query,
-						$options: 'i',
-					},
-				}
+				name: {
+					$regex: query,
+					$options: 'i',
+				},
+			}
 			: {}
+	const categoryFilter = category && category !== 'all' ? { category } : {}
+	const brandFilter = brand && brand !== 'all' ? { brand } : {}
 
 	const order: Record<string, 1 | -1> =
 		sort === 'best-selling'
@@ -259,6 +271,8 @@ export async function getAllProductsForAdmin({
 						: { _id: -1 }
 	const products = await Product.find({
 		...queryFilter,
+		...categoryFilter,
+		...brandFilter,
 	})
 		.sort(order)
 		.skip(pageSize * (Number(page) - 1))
@@ -267,6 +281,8 @@ export async function getAllProductsForAdmin({
 
 	const countProducts = await Product.countDocuments({
 		...queryFilter,
+		...categoryFilter,
+		...brandFilter,
 	})
 	return {
 		products: JSON.parse(JSON.stringify(products)) as IProduct[],
@@ -284,6 +300,7 @@ export async function getAllExistingProducts() {
 		products: JSON.parse(JSON.stringify(products)) as IProduct[],
 	}
 }
+// CREATE
 // CREATE
 export async function createProduct(data: IProductInput) {
 	try {
@@ -326,7 +343,7 @@ export async function getProductById(productId: string) {
 export async function addProductImg(productId: string, imgUrl: string, imgKey: string) {
 	await connectToDatabase()
 	const product = await Product.updateOne({ _id: productId },
-	{ $push: { images: { imgUrl, imgKey } }})
+		{ $push: { images: { imgUrl, imgKey } } })
 	return JSON.parse(JSON.stringify(product)) as IProduct
 }
 
@@ -337,10 +354,10 @@ export async function deleteProductImg(productId: string, imgKey: string) {
 		const uatiRes = await utapi.deleteFiles(imgKey)
 		console.log('UATRE', uatiRes)
 		const product = await Product.updateOne({ _id: productId },
-			{ $pull: { images: { imgKey } }})
-			return {success: true, product: JSON.parse(JSON.stringify(product)) as IProduct}
+			{ $pull: { images: { imgKey } } })
+		return { success: true, product: JSON.parse(JSON.stringify(product)) as IProduct }
 	} catch (error) {
-		return { success: false, errorMessage: 'Error deleting files', error: JSON.stringify(error)}
+		return { success: false, errorMessage: 'Error deleting files', error: JSON.stringify(error) }
 	}
 }
 

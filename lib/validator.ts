@@ -34,23 +34,29 @@ export const ProductInputSchema = z.object({
 	name: z.string().min(3, 'Name must be at least 3 characters'),
 	slug: z.string().min(3, 'Slug must be at least 3 characters'),
 	category: z.string().min(1, 'Category is required'),
+	sku: z.string().min(1, 'SKU is required'),
 	images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })),
 	brand: z.string().optional(),
 	description: z.string().optional(),
 	isPublished: z.boolean(),
-	isProductKg: z.boolean(),
-	price: Price('Price'),
-	listPrice: Price('List price'), //precio del proveedor
-	discountPrice: Price('Precio con descuento'),
+	isProductKg: z.boolean().default(false),
+	price: z.coerce
+		.number()
+		.nonnegative('Price must be a non-negative number'),
+	listPrice: z.coerce
+		.number()
+		.nonnegative('List price must be a non-negative number'),
+	discountPrice: z.coerce
+		.number()
+		.nonnegative('Discount price must be a non-negative number'),
 	countInStock: z.coerce
 		.number()
 		.int()
-		.nonnegative('count in stock must be a non-negative number'),
+		.nonnegative('Count in stock must be a non-negative number'),
 	tags: z.array(z.string()).default([]),
 	avgRating: z.coerce
 		.number()
-		.min(0, 'Average rating must be at least 0')
-		.max(5, 'Average rating must be at most 5'),
+		.nonnegative('Average rating must be a non-negative number'),
 	numReviews: z.coerce
 		.number()
 		.int()
@@ -58,7 +64,7 @@ export const ProductInputSchema = z.object({
 	ratingDistribution: z
 		.array(z.object({ rating: z.number(), count: z.number() }))
 		.max(5),
-	reviews: z.array(ReviewInputSchema).default([]),
+	reviews: z.array(z.string()).default([]),
 	numSales: z.coerce
 		.number()
 		.int()
@@ -72,6 +78,7 @@ export const OrderItemSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	slug: z.string().min(1, 'Slug is required'),
 	category: z.string().min(1, 'Category is required'),
+	sku: z.string().min(1, 'SKU is required'),
 	quantity: z
 		.number()
 		.int()
@@ -81,9 +88,9 @@ export const OrderItemSchema = z.object({
 		.int()
 		.nonnegative('Quantity must be a non-negative number'),
 	image: z.string().min(1, 'Image is required'),
-	price: Price('Price'),
-	size: z.string().optional(),
+	price: z.number().nonnegative('Price must be a non-negative number'),
 	color: z.string().optional(),
+	size: z.string().optional(),
 })
 export const ShippingAddressSchema = z.object({
 	fullName: z.string().min(1, 'Full name is required'),

@@ -26,10 +26,11 @@ const productSchema = new Schema<IProduct>(
 			type: String,
 			required: true,
 		},
+		sku: { type: String, required: true, unique: true },
 		images: [
 			{
-				imgUrl: { type: String, required: true},
-				imgKey: { type: String, required: true}
+				imgUrl: { type: String, required: true },
+				imgKey: { type: String, required: true }
 			}
 		],
 		brand: {

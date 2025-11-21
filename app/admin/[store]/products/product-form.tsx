@@ -31,41 +31,49 @@ import { Trash } from 'lucide-react'
 const productDefaultValues: IProductInput =
   process.env.NODE_ENV === 'development'
     ? {
-        name: 'Sample Product',
-        slug: 'sample-product',
-        category: 'Sample Category',
-        images: ['/images/p11-1.jpg'],
-        brand: 'Sample Brand',
-        description: 'This is a sample description of the product.',
-        price: 99.99,
-        listPrice: 0,
-        countInStock: 15,
-        numReviews: 0,
-        avgRating: 0,
-        numSales: 0,
-        isPublished: false,
-        tags: [],
-        ratingDistribution: [],
-        reviews: [],
-      }
+      name: 'Sample Product',
+      slug: 'sample-product',
+      category: 'Sample Category',
+      sku: 'SAMPLE-SKU',
+      images: [{ imgUrl: '/images/p11-1.jpg', imgKey: 'sample-key' }],
+      brand: 'Sample Brand',
+      description: 'This is a sample description of the product.',
+      price: 99.99,
+      listPrice: 0,
+      discountPrice: 0,
+      countInStock: 15,
+      numReviews: 0,
+      avgRating: 0,
+      numSales: 0,
+      isPublished: false,
+      isProductKg: false,
+      productId: 0,
+      tags: [],
+      ratingDistribution: [],
+      reviews: [],
+    }
     : {
-        name: '',
-        slug: '',
-        category: '',
-        images: [],
-        brand: '',
-        description: '',
-        price: 0,
-        listPrice: 0,
-        countInStock: 0,
-        numReviews: 0,
-        avgRating: 0,
-        numSales: 0,
-        isPublished: false,
-        tags: [],
-        ratingDistribution: [],
-        reviews: [],
-      }
+      name: '',
+      slug: '',
+      category: '',
+      sku: '',
+      images: [],
+      brand: '',
+      description: '',
+      price: 0,
+      listPrice: 0,
+      discountPrice: 0,
+      countInStock: 0,
+      numReviews: 0,
+      avgRating: 0,
+      numSales: 0,
+      isPublished: false,
+      isProductKg: false,
+      productId: 0,
+      tags: [],
+      ratingDistribution: [],
+      reviews: [],
+    }
 
 const ProductForm = ({
   type,
@@ -85,7 +93,7 @@ const ProductForm = ({
       product && type === 'Update' ? product : productDefaultValues,
   })
 
-//   const { toast } = useToast()
+  //   const { toast } = useToast()
   async function onSubmit(values: IProductInput) {
     if (type === 'Create') {
       const res = await createProduct(values)
@@ -122,7 +130,7 @@ const ProductForm = ({
   const handleRemoveImage = async (image: ProductImage) => {
     const res = await deleteProductImg(productId, image.imgKey)
     console.log(res)
-    if(res?.success){
+    if (res?.success) {
       form.setValue('images', images.filter((img: ProductImage) => img.imgUrl !== image.imgUrl))
     }
   }
@@ -189,6 +197,20 @@ const ProductForm = ({
                 <FormLabel>Category</FormLabel>
                 <FormControl>
                   <Input placeholder='Enter category' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='sku'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>SKU</FormLabel>
+                <FormControl>
+                  <Input placeholder='Enter SKU' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -264,7 +286,7 @@ const ProductForm = ({
                 <Card>
                   <CardContent className='space-y-2 mt-2 min-h-48'>
                     <div className='flex justify-start items-center space-x-2'>
-                    {images.map((image: ProductImage) => (
+                      {images.map((image: ProductImage) => (
                         <Card key={image.imgKey} className='relative '>
                           <Image
                             src={image.imgUrl}
@@ -278,7 +300,7 @@ const ProductForm = ({
                             className='absolute top-1 right-1'
                             type='button'
                             size='icon'
-                            onClick={ ()=> handleRemoveImage(image)}
+                            onClick={() => handleRemoveImage(image)}
                           >
                             <Trash />
                           </Button>

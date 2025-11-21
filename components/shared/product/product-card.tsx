@@ -76,6 +76,9 @@ const ProductCard = ({
         <Rating rating={product.avgRating} />
         <span>({formatNumber(product.numReviews)})</span>
       </div>
+      {product.sku && (
+        <p className='text-xs text-gray-500'>SKU: {product.sku}</p>
+      )}
 
       <ProductPrice
         isDeal={product.tags.includes('todays-deal')}
@@ -97,6 +100,7 @@ const ProductCard = ({
           name: product.name,
           slug: product.slug,
           category: product.category,
+          sku: product.sku || 'NO-SKU',
           price: round2(product.price),
           quantity: 1,
           image: product.images?.[0]?.imgUrl || `/images/${product.category.toLocaleLowerCase()}-category-product.jpg`,

@@ -36,8 +36,6 @@ const main = async () => {
             isVerifiedPurchase: true,
             product: createdProducts[i]._id,
             user: createdUsers[x % createdUsers.length]._id,
-            updatedAt: Date.now(),
-            createdAt: Date.now(),
           })
         }
       }
