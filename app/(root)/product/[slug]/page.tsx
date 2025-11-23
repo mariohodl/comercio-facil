@@ -54,29 +54,41 @@ export default async function ProductDetails(props: {
   const session = await auth()
 
   return (
-    <div>
+    <div className="container mx-auto py-8">
       <AddToBrowsingHistory id={product._id} category={product.category} />
       <section>
-        <div className='grid grid-cols-1 md:grid-cols-5  '>
+        <div className='grid grid-cols-1 md:grid-cols-5 gap-4'>
           <div className='col-span-2'>
             <ProductGallery images={product.images} />
           </div>
 
-          <div className='flex w-full flex-col gap-2 md:p-5 col-span-2'>
-            <div className='flex flex-col gap-3'>
-              <p className='p-medium-16 rounded-full bg-grey-500/10   text-grey-500'>
-                Marca: {product.brand} - {product.category}
-              </p>
-              <h1 className='font-bold text-lg lg:text-xl'>
+          <div className='flex w-full flex-col gap-4 col-span-2'>
+            <div className='flex flex-col gap-4'>
+              <div className="flex items-center gap-2">
+                <span className='px-3 py-1 rounded-full bg-neutral-100 text-navy text-sm font-medium'>
+                  {product.category}
+                </span>
+                <span className="text-neutral-400">|</span>
+                <span className='text-neutral-600 text-sm'>
+                  Marca: <span className="font-medium text-navy">{product.brand}</span>
+                </span>
+              </div>
+
+              <h1 className='font-bold text-3xl text-navy'>
                 {product.name}
               </h1>
-              <RatingSummary
-                avgRating={product.avgRating}
-                numReviews={product.numReviews}
-                asPopover
-                ratingDistribution={product.ratingDistribution}
-              />
-              <Separator />
+
+              <div className="flex items-center gap-2">
+                <RatingSummary
+                  avgRating={product.avgRating}
+                  numReviews={product.numReviews}
+                  asPopover
+                  ratingDistribution={product.ratingDistribution}
+                />
+              </div>
+
+              <Separator className="bg-neutral-200" />
+
               <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
                 <div className='flex gap-3'>
                   <ProductPrice
@@ -84,6 +96,7 @@ export default async function ProductDetails(props: {
                     listPrice={product.listPrice}
                     isDeal={product.tags.includes('todays-deal')}
                     forListing={false}
+                    className="text-orange"
                   />
                 </div>
               </div>
@@ -95,33 +108,48 @@ export default async function ProductDetails(props: {
                 color={color || product.colors[0]}
               />
             </div> */}
-            <Separator className='my-2' />
-            <div className='flex flex-col gap-2'>
-              <p className='p-bold-20 text-grey-600'>Descripción:</p>
-              <p className='p-medium-16 lg:p-regular-18'>
+            <Separator className='my-4 bg-neutral-200' />
+            <div className='flex flex-col gap-3'>
+              <p className='font-bold text-xl text-navy'>Descripción</p>
+              <p className='text-neutral-600 leading-relaxed'>
                 {product.description}
               </p>
             </div>
           </div>
           <div>
-            <Card>
-              <CardContent className='p-4 flex flex-col  gap-4'>
-                <ProductPrice price={product.price} />
+            <Card className="border-neutral-200 shadow-sm rounded-lg overflow-hidden">
+              <CardContent className='p-6 flex flex-col gap-6'>
+                <div className="flex flex-col gap-2">
+                  <ProductPrice price={product.price} className="text-3xl font-bold text-navy" />
+                  {product.listPrice > product.price && (
+                    <div className="text-sm text-neutral-500">
+                      Precio de lista: <span className="line-through">${product.listPrice}</span>
+                    </div>
+                  )}
+                </div>
 
                 {product.countInStock > 0 && product.countInStock <= 3 && (
-                  <div className='text-destructive font-bold'>
-                    {`Solo ${product.countInStock} quedan en existencia - ordena pronto`}
+                  <div className='text-orange font-bold text-sm bg-orange-50 p-2 rounded'>
+                    {`¡Solo quedan ${product.countInStock} en existencia!`}
                   </div>
                 )}
-                {product.countInStock !== 0 ? (
-                  <div className='text-green-700 text-xl'>En existencia</div>
-                ) : (
-                  <div className='text-destructive text-xl'>
-                    No disponible
-                  </div>
-                )}
+
+                <div className="flex items-center gap-2">
+                  {product.countInStock !== 0 ? (
+                    <>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className='text-green-700 font-medium'>En existencia</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <span className='text-destructive font-medium'>No disponible</span>
+                    </>
+                  )}
+                </div>
+
                 {product.countInStock !== 0 && (
-                  <div className='flex justify-center items-center'>
+                  <div className='flex justify-center items-center w-full'>
                     <AddToCart
                       item={{
                         clientId: generateId(),
@@ -130,6 +158,7 @@ export default async function ProductDetails(props: {
                         name: product.name,
                         slug: product.slug,
                         category: product.category,
+                        sku: product.sku,
                         price: round2(product.price),
                         quantity: 1,
                         image: product.images?.[0]?.imgUrl || `/images/${product.category.toLocaleLowerCase()}-category-product.jpg`,
@@ -146,21 +175,21 @@ export default async function ProductDetails(props: {
         </div>
       </section>
 
-      <section className='mt-10'>
-        <h2 className='h2-bold mb-2' id='reviews'>
+      <section className='mt-16'>
+        <h2 className='font-bold text-2xl text-navy mb-6' id='reviews'>
           Opiniones de Clientes
         </h2>
         <ReviewList product={product} userId={session?.user.id} />
       </section>
 
-      <section className='mt-10'>
+      <section className='mt-16'>
         <ProductSlider
           products={relatedProducts.data}
-          title={`Los más vendidos en categoría: ${product.category}`}
+          title={`Los más vendidos en ${product.category}`}
         />
       </section>
       <section>
-        <BrowsingHistoryList className='mt-10' />
+        <BrowsingHistoryList className='mt-16' />
       </section>
     </div>
   )

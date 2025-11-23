@@ -25,11 +25,11 @@ export default function DeleteDialog({
 }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
-//   const { toast } = useToast()
+  //   const { toast } = useToast()
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button size='sm' variant='outline'>
+        <Button size='sm' className='w-20' variant='outline'>
           Eliminar
         </Button>
       </AlertDialogTrigger>
@@ -51,15 +51,15 @@ export default function DeleteDialog({
               startTransition(async () => {
                 const res = await action(id)
                 if (!res.success) {
-                //   toast({
-                //     variant: 'destructive',
-                //     description: res.message,
-                //   })
+                  //   toast({
+                  //     variant: 'destructive',
+                  //     description: res.message,
+                  //   })
                 } else {
                   setOpen(false)
-                //   toast({
-                //     description: res.message,
-                //   })
+                  //   toast({
+                  //     description: res.message,
+                  //   })
                   if (callbackAction) callbackAction()
                 }
               })

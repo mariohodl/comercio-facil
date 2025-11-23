@@ -16,7 +16,9 @@ const ProductPrice = ({
   forListing?: boolean
   plain?: boolean
 }) => {
+  // Ensure we don't show negative discounts if price > listPrice
   const discountPercent = Math.round(100 - (price / listPrice) * 100)
+  const hasDiscount = listPrice > 0 && listPrice > price && discountPercent > 0
   const stringValue = price.toString()
   const [intValue, floatValue] = stringValue.includes('.')
     ? stringValue.split('.')
@@ -24,7 +26,7 @@ const ProductPrice = ({
 
   return plain ? (
     formatCurrency(price)
-  ) : listPrice == 0 ? (
+  ) : listPrice == 0 || !hasDiscount ? (
     <div className={cn('text-3xl', className)}>
       <span className='text-xs align-super'>$</span>
       {intValue}
@@ -41,9 +43,8 @@ const ProductPrice = ({
         </span>
       </div>
       <div
-        className={`flex ${
-          forListing && 'justify-center'
-        } items-center gap-2`}
+        className={`flex ${forListing && 'justify-center'
+          } items-center gap-2`}
       >
         <div className={cn('text-3xl', className)}>
           <span className='text-xs align-super'>$</span>
@@ -51,24 +52,23 @@ const ProductPrice = ({
           <span className='text-xs align-super'>{floatValue}</span>
         </div>
         <div className='text-muted-foreground text-xs py-2'>
-          Antas:{' '}
+          Antes:{' '}
           <span className='line-through'>{formatCurrency(listPrice)}</span>
         </div>
       </div>
     </div>
   ) : (
-    <div className=''>
-      <div className='flex justify-center gap-3'>
-        <div className='text-3xl text-orange-700'>-{discountPercent}%</div>
-        <div className={cn('text-3xl', className)}>
-          <span className='text-xs align-super'>$</span>
-          {intValue}
-          <span className='text-xs align-super'>{floatValue}</span>
-        </div>
+    <div className='flex items-center gap-2'>
+      <div className={cn('text-3xl font-bold', className)}>
+        <span className='text-xs align-super'>$</span>
+        {intValue}
+        <span className='text-xs align-super'>{floatValue}</span>
       </div>
-      <div className='text-muted-foreground text-xs py-2'>
-        Precio base:{' '}
-        <span className='line-through'>{formatCurrency(listPrice)}</span>
+      <div className='text-muted-foreground text-sm line-through'>
+        {formatCurrency(listPrice)}
+      </div>
+      <div className='text-orange font-bold text-lg'>
+        {discountPercent}% OFF
       </div>
     </div>
   )

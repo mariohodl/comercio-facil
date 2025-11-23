@@ -116,33 +116,56 @@ export default async function SearchPage(props: {
     sort,
   })
   return (
-    <div>
-      <div className='mb-2 py-2 md:border-b flex-between flex-col md:flex-row '>
-        <div className='flex items-center'>
-          {data.totalProducts === 0
-            ? 'No'
-            : `${data.from}-${data.to} of ${data.totalProducts}`}{' '}
-          resultados
+    <div className="container mx-auto">
+      <div className='mb-6 bg-white p-4 rounded-lg shadow-sm border border-neutral-200 flex flex-col md:flex-row justify-between items-center gap-4'>
+        <div className='flex items-center flex-wrap gap-2 text-navy'>
+          <span className="font-medium">
+            {data.totalProducts === 0
+              ? 'No'
+              : `${data.from}-${data.to} of ${data.totalProducts}`}
+          </span>
+          <span>resultados</span>
           {(q !== 'all' && q !== '') ||
-          (category !== 'all' && category !== '') ||
-          (tag !== 'all' && tag !== '') ||
-          rating !== 'all' ||
-          price !== 'all'
-            ? ` para `
+            (category !== 'all' && category !== '') ||
+            (tag !== 'all' && tag !== '') ||
+            rating !== 'all' ||
+            price !== 'all'
+            ? <span className="text-neutral-400">|</span>
             : null}
-          {q !== 'all' && q !== '' && '"' + q + '"'}
-          {category !== 'all' && category !== '' && `  Categoría: ` + category}
-          {tag !== 'all' && tag !== '' && `   Tag: ` + tag}
-          {price !== 'all' && `    Precio: ` + price}
-          {rating !== 'all' && `   Opiniones: ` + rating + ` o más`}
-          &nbsp;
+
+          {q !== 'all' && q !== '' && (
+            <span className="bg-neutral-100 text-neutral-800 px-2 py-1 rounded text-sm">
+              "{q}"
+            </span>
+          )}
+          {category !== 'all' && category !== '' && (
+            <span className="bg-neutral-100 text-neutral-800 px-2 py-1 rounded text-sm">
+              Categoría: {category}
+            </span>
+          )}
+          {tag !== 'all' && tag !== '' && (
+            <span className="bg-neutral-100 text-neutral-800 px-2 py-1 rounded text-sm">
+              Tag: {tag}
+            </span>
+          )}
+          {price !== 'all' && (
+            <span className="bg-neutral-100 text-neutral-800 px-2 py-1 rounded text-sm">
+              Precio: {price}
+            </span>
+          )}
+          {rating !== 'all' && (
+            <span className="bg-neutral-100 text-neutral-800 px-2 py-1 rounded text-sm">
+              Opiniones: {rating} o más
+            </span>
+          )}
+
           {(q !== 'all' && q !== '') ||
-          (category !== 'all' && category !== '') ||
-          (tag !== 'all' && tag !== '') ||
-          rating !== 'all' ||
-          price !== 'all' ? (
-            <Button variant={'link'} asChild>
-              <Link href='/search' className='underline'>Limpiar Filtros</Link>
+            (category !== 'all' && category !== '') ||
+            (tag !== 'all' && tag !== '') ||
+            rating !== 'all' ||
+            price !== 'all' ? (
+            <Button variant={'link'} asChild className="text-orange hover:text-orange-dark p-0 h-auto ml-2">
+              <Link href='/search'>Limpiar Filtros</Link>
             </Button>
           ) : null}
         </div>
@@ -154,17 +177,18 @@ export default async function SearchPage(props: {
           />
         </div>
       </div>
-      <div className='bg-card grid md:grid-cols-5 md:gap-4'>
-        <CollapsibleOnMobile title='Filters'>
-          <div className='space-y-4'>
+      <div className='grid md:grid-cols-5 md:gap-8'>
+        <CollapsibleOnMobile title='Filtros'>
+          <div className='space-y-6 bg-white p-6 rounded-lg shadow-sm border border-neutral-200'>
             <div>
-              <div className='font-bold'>Departmento</div>
-              <ul>
+              <div className='font-bold text-navy text-lg mb-3'>Departamento</div>
+              <ul className="space-y-2">
                 <li>
                   <Link
-                    className={`${
-                      ('all' === category || '' === category) && 'text-primary underline'
-                    }`}
+                    className={`block px-2 py-1 rounded transition-colors ${('all' === category || '' === category)
+                      ? 'bg-orange-50 text-orange font-medium'
+                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-navy'
+                      }`}
                     href={getFilterUrl({ category: 'all', params })}
                   >
                     Todo
@@ -173,7 +197,10 @@ export default async function SearchPage(props: {
                 {categories.map((c: string) => (
                   <li key={c}>
                     <Link
-                      className={`${c === category && 'text-primary underline'}`}
+                      className={`block px-2 py-1 rounded transition-colors ${c === category
+                        ? 'bg-orange-50 text-orange font-medium'
+                        : 'text-neutral-600 hover:bg-neutral-50 hover:text-navy'
+                        }`}
                       href={getFilterUrl({ category: c, params })}
                     >
                       {c}
@@ -182,12 +209,16 @@ export default async function SearchPage(props: {
                 ))}
               </ul>
             </div>
+            <div className="h-px bg-neutral-200 my-4"></div>
             <div>
-              <div className='font-bold'>Precio</div>
-              <ul>
+              <div className='font-bold text-navy text-lg mb-3'>Precio</div>
+              <ul className="space-y-2">
                 <li>
                   <Link
-                    className={`${'all' === price && 'text-primary underline'}`}
+                    className={`block px-2 py-1 rounded transition-colors ${'all' === price
+                      ? 'bg-orange-50 text-orange font-medium'
+                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-navy'
+                      }`}
                     href={getFilterUrl({ price: 'all', params })}
                   >
                     Todo
@@ -197,7 +228,10 @@ export default async function SearchPage(props: {
                   <li key={p.value}>
                     <Link
                       href={getFilterUrl({ price: p.value, params })}
-                      className={`${p.value === price && 'text-primary underline'}`}
+                      className={`block px-2 py-1 rounded transition-colors ${p.value === price
+                        ? 'bg-orange-50 text-orange font-medium'
+                        : 'text-neutral-600 hover:bg-neutral-50 hover:text-navy'
+                        }`}
                     >
                       {p.name}
                     </Link>
@@ -205,13 +239,17 @@ export default async function SearchPage(props: {
                 ))}
               </ul>
             </div>
+            <div className="h-px bg-neutral-200 my-4"></div>
             <div>
-              <div className='font-bold'>Opiniones de los clientes</div>
-              <ul>
+              <div className='font-bold text-navy text-lg mb-3'>Opiniones</div>
+              <ul className="space-y-2">
                 <li>
                   <Link
                     href={getFilterUrl({ rating: 'all', params })}
-                    className={`${'all' === rating && 'text-primary underline'}`}
+                    className={`block px-2 py-1 rounded transition-colors ${'all' === rating
+                      ? 'bg-orange-50 text-orange font-medium'
+                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-navy'
+                      }`}
                   >
                     Todo
                   </Link>
@@ -220,23 +258,28 @@ export default async function SearchPage(props: {
                 <li>
                   <Link
                     href={getFilterUrl({ rating: '4', params })}
-                    className={`${'4' === rating && 'text-primary underline'}`}
+                    className={`block px-2 py-1 rounded transition-colors ${'4' === rating
+                      ? 'bg-orange-50 text-orange font-medium'
+                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-navy'
+                      }`}
                   >
-                    <div className='flex'>
+                    <div className='flex items-center'>
                       <Rating size={4} rating={4} /> &nbsp; o más
                     </div>
                   </Link>
                 </li>
               </ul>
             </div>
+            <div className="h-px bg-neutral-200 my-4"></div>
             <div>
-              <div className='font-bold'>Etiquetas</div>
-              <ul>
+              <div className='font-bold text-navy text-lg mb-3'>Etiquetas</div>
+              <ul className="space-y-2">
                 <li>
                   <Link
-                    className={`${
-                      ('all' === tag || '' === tag) && 'text-primary underline'
-                    }`}
+                    className={`block px-2 py-1 rounded transition-colors ${('all' === tag || '' === tag)
+                      ? 'bg-orange-50 text-orange font-medium'
+                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-navy'
+                      }`}
                     href={getFilterUrl({ tag: 'all', params })}
                   >
                     Todo
@@ -245,7 +288,10 @@ export default async function SearchPage(props: {
                 {tags.map((t: string) => (
                   <li key={t}>
                     <Link
-                      className={`${toSlug(t) === tag && 'text-primary underline'}`}
+                      className={`block px-2 py-1 rounded transition-colors ${toSlug(t) === tag
+                        ? 'bg-orange-50 text-orange font-medium'
+                        : 'text-neutral-600 hover:bg-neutral-50 hover:text-navy'
+                        }`}
                       href={getFilterUrl({ tag: t, params })}
                     >
                       {t}
@@ -257,20 +303,26 @@ export default async function SearchPage(props: {
           </div>
         </CollapsibleOnMobile>
 
-        <div className='md:col-span-4 space-y-4'>
-          <div>
-            <div className='font-bold text-xl'>Resultados</div>
-            <div>Busca en cada página otras opciones de producto.</div>
+        <div className='md:col-span-4 space-y-6'>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+            <div className='font-bold text-2xl text-navy mb-2'>Resultados</div>
+            <div className="text-neutral-500">Busca en cada página otras opciones de producto.</div>
           </div>
 
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2  lg:grid-cols-3  '>
-            {data.products.length === 0 && <div>No se encontraron productos</div>}
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+            {data.products.length === 0 && (
+              <div className="col-span-full text-center py-12 bg-white rounded-lg border border-neutral-200">
+                <p className="text-neutral-500 text-lg">No se encontraron productos</p>
+              </div>
+            )}
             {data.products.map((product: IProduct) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>
           {data.totalPages > 1 && (
-            <Pagination page={page} totalPages={data.totalPages} />
+            <div className="mt-8">
+              <Pagination page={page} totalPages={data.totalPages} />
+            </div>
           )}
         </div>
       </div>

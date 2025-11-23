@@ -10,7 +10,7 @@ export default function ProductGallery({ images }: { images: ProductImage[] }) {
   const [selectedImage, setSelectedImage] = useState(0)
   return (
     <div className='flex gap-2'>
-      <div className='flex flex-col gap-2 mt-8'>
+      <div className='flex flex-col gap-2'>
         {images.map((image, index) => (
           <button
             key={index}
@@ -20,11 +20,10 @@ export default function ProductGallery({ images }: { images: ProductImage[] }) {
             onMouseOver={() => {
               setSelectedImage(index)
             }}
-            className={`bg-white rounded-lg overflow-hidden ${
-              selectedImage === index
+            className={`bg-white rounded-lg overflow-hidden ${selectedImage === index
                 ? 'ring-2 ring-blue-500'
                 : 'ring-1 ring-gray-300'
-            }`}
+              }`}
           >
             {
               image?.imgUrl && (
@@ -36,14 +35,14 @@ export default function ProductGallery({ images }: { images: ProductImage[] }) {
                 />
               )
             }
-            
+
           </button>
         ))}
       </div>
 
       <div className='w-full'>
         <Zoom>
-          <div className='relative h-[500px]'>
+          <div className='relative h-[400px]'>
             {
               images[selectedImage]?.imgUrl && (
                 <Image
@@ -56,7 +55,7 @@ export default function ProductGallery({ images }: { images: ProductImage[] }) {
                 />
               )
             }
-            
+
           </div>
         </Zoom>
       </div>

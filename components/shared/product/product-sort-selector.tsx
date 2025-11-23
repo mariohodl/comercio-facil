@@ -34,9 +34,9 @@ export default function ProductSortSelector({
       }}
       value={sort}
     >
-      <SelectTrigger>
+      <SelectTrigger className="bg-white border-neutral-200">
         <SelectValue>
-          <span className='font-bold'>Ordenar por: </span>{sortOrders.find((s) => s.value === sort)!.name}
+          <span className='font-bold text-navy'>Ordenar por: </span>{sortOrders.find((s) => s.value === sort)!.name}
         </SelectValue>
       </SelectTrigger>
 

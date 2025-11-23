@@ -63,13 +63,13 @@ export default function RatingSummary({
   }
 
   return asPopover ? (
-    <div className='flex items-center gap-1'>
+    <div className='flex items-center gap-2'>
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant='ghost' className='px-2 [&_svg]:size-6 text-base'>
+          <Button variant='ghost' className='px-0 hover:bg-transparent [&_svg]:size-5 text-base font-medium text-navy gap-1 h-auto'>
             <span>{avgRating.toFixed(1)}</span>
             <Rating rating={avgRating} />
-            <ChevronDownIcon className='w-5 h-5 text-muted-foreground' />
+            <ChevronDownIcon className='w-4 h-4 text-neutral-400' />
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-auto p-4' align='end'>
@@ -77,14 +77,14 @@ export default function RatingSummary({
             <RatingDistribution />
             <Separator />
 
-            <Link className='highlight-link text-center' href='#reviews'>
+            <Link className='highlight-link text-center text-orange hover:text-orange-dark hover:underline' href='#reviews'>
               Ver opiniones de clientes
             </Link>
           </div>
         </PopoverContent>
       </Popover>
-      <div className=' '>
-        <Link href='#reviews' className='highlight-link'>
+      <div className='text-sm text-neutral-500'>
+        <Link href='#reviews' className='hover:text-orange hover:underline transition-colors'>
           {numReviews} {numReviews === 1 ? 'opinión' : 'opiniones'}
         </Link>
       </div>
