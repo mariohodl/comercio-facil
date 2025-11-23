@@ -114,8 +114,8 @@ export default function OverviewReport() {
           value={formatCurrency(0)}
           icon={RefreshCw}
           percentage={-22}
-          className='bg-slate-900 text-white border-slate-800'
-          iconClassName='bg-slate-800 text-white'
+          className='bg-navy text-white border-navy-dark'
+          iconClassName='bg-navy-dark text-white'
         />
         <SummaryCard
           title='Total Purchase'

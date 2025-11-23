@@ -120,18 +120,18 @@ const ProductList = () => {
           <Button variant='outline' size='icon' onClick={() => fetchData()}>
             <RefreshCw className='w-4 h-4' />
           </Button>
-          <Button asChild className='bg-orange-500 hover:bg-orange-600 text-white'>
+          <Button asChild className='bg-orange hover:bg-orange-dark text-white'>
             <Link href='/admin/products/create'>
               <Plus className='w-4 h-4 mr-2' /> Add Product
             </Link>
           </Button>
-          <Button variant='default' className='bg-slate-900 text-white'>
+          <Button variant='default' className='bg-navy hover:bg-navy-dark text-white'>
             <Import className='w-4 h-4 mr-2' /> Import Product
           </Button>
         </div>
       </div>
 
-      <div className='bg-white p-4 rounded-lg border shadow-sm space-y-4'>
+      <div className='bg-white p-4 rounded-lg border border-neutral-warm shadow-sm space-y-4'>
         <div className='flex flex-col md:flex-row justify-between gap-4'>
           <div className='relative w-full md:w-72'>
             <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
@@ -298,7 +298,7 @@ const ProductList = () => {
                     key={i}
                     variant={page === i + 1 ? 'default' : 'outline'}
                     size='icon'
-                    className={`h-8 w-8 ${page === i + 1 ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+                    className={`h-8 w-8 ${page === i + 1 ? 'bg-orange hover:bg-orange-dark text-white' : ''}`}
                     onClick={() => {
                       setPage(i + 1)
                       fetchData(i + 1)

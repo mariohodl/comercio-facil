@@ -66,7 +66,7 @@ export default function TopCategoriesChart({ data }: TopCategoriesChartProps) {
                     </div>
                     <div className='flex justify-between text-sm'>
                         <span className='flex items-center gap-2'>
-                            <span className='h-2 w-2 rounded-full bg-orange-500'></span>
+                            <span className='h-2 w-2 rounded-full bg-orange'></span>
                             Total Sales
                         </span>
                         <span className='font-bold'>{totalSales}</span>
