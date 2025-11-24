@@ -23,23 +23,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 // Tipos de datos para el reporte
-interface ReportItem {
-  id: string
-  name: string
-  quantity: number
-  unitPrice: number
-  totalPrice: number
-  category?: string
-  sku?: string
-}
-
-interface Product {
-  id: string
-  name: string
-  category: string
-  listPrice: number
-  stock: number
-}
+// Unused interfaces removed
 
 
 
@@ -74,21 +58,21 @@ const getTypeIcon = (type: string) => {
   }
 }
 
-export default async function ReportItemView(props) {
+// IReport import removed
+
+type Props = {
+  params: Promise<{ id: string }>
+}
+
+export default async function ReportItemView(props: Props) {
   const params = await props.params
   const { id } = params
   const report = await getReportById(id)
-  // if(report) {
-  //   reportData = report
-  // }
-  console.log('REPORT', report)
   if (!report) notFound()
-  // const formatCurrency = (amount: number) => {
-  //   return new Intl.NumberFormat("es-ES", {
-  //     style: "currency",
-  //     currency: "EUR",
-  //   }).format(amount)
-  // }
+
+  // const reportTitle = String(report.title)
+  // const reportStatus = String(report.status)
+  // const statusLabel = reportStatus.charAt(0).toUpperCase() + reportStatus.slice(1)
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -105,14 +89,14 @@ export default async function ReportItemView(props) {
             <div>
               <div className="flex items-center gap-3 mb-1">
                 {/* {getTypeIcon(reportData.type)} */}
-                <h1 className="text-2xl font-bold text-gray-900">{report.title}</h1>
-                <Badge className={getStatusColor(report.status)}>
-                  {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
-                </Badge>
+                {/* <h1 className="text-2xl font-bold text-gray-900">{reportTitle}</h1>
+                <Badge className={getStatusColor(reportStatus)}>
+                  {statusLabel}
+                </Badge> */}
               </div>
               <p className="text-gray-600 flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                {report.dateRangeFormatted}
+                {String(report.dateRangeFormatted)}
               </p>
             </div>
           </div>
@@ -271,8 +255,8 @@ export default async function ReportItemView(props) {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Tipo</label>
                   <div className="flex items-center gap-2 mt-1">
-                    {getTypeIcon(report.type)}
-                    <span className="capitalize">{report.type}</span>
+                    {getTypeIcon(String(report.type))}
+                    <span className="capitalize">{String(report.type)}</span>
                   </div>
                 </div>
 
@@ -281,7 +265,7 @@ export default async function ReportItemView(props) {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Período</label>
                   <div className="mt-1">
-                    <div className="text-sm">{report.dateRangeFormatted}</div>
+                    <div className="text-sm">{String(report.dateRangeFormatted)}</div>
                     <div className="text-xs text-muted-foreground">
                       {new Date(report.dateRange.from).toLocaleDateString()} - {new Date(report.dateRange.to).toLocaleDateString()}
                     </div>
@@ -293,8 +277,8 @@ export default async function ReportItemView(props) {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Estado</label>
                   <div className="mt-1">
-                    <Badge className={getStatusColor(report.status)}>
-                      {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
+                    <Badge className={getStatusColor(String(report.status))}>
+                      {String(report.status).charAt(0).toUpperCase() + String(report.status).slice(1)}
                     </Badge>
                   </div>
                 </div>
@@ -311,13 +295,14 @@ export default async function ReportItemView(props) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {report.filtersUsed && report.filtersUsed.length > 0 ? (
-                    // @ts-expect-error
-                    report.filtersUsed.map((filter, index) => (
-                      <Badge key={index} variant="secondary" className="block w-fit">
-                        {filter.toString()}
+                  {report.filtersUsed ? (
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary">Type: {report.filtersUsed.type}</Badge>
+                      <Badge variant="secondary">Status: {report.filtersUsed.status}</Badge>
+                      <Badge variant="secondary">
+                        Date: {new Date(report.filtersUsed.dateRange.from).toLocaleDateString()} - {new Date(report.filtersUsed.dateRange.to).toLocaleDateString()}
                       </Badge>
-                    ))
+                    </div>
                   ) : (
                     <p className="text-sm text-muted-foreground">No se aplicaron filtros</p>
                   )}

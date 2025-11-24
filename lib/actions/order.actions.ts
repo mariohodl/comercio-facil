@@ -457,7 +457,7 @@ async function getRecentTransactions(date: DateRange) {
 		...sales.map((sale) => ({
 			id: sale._id,
 			date: sale.createdAt,
-			name: sale.user ? (sale.user as any).name : 'Deleted User',
+			name: sale.user ? (sale.user as { name: string }).name : 'Deleted User',
 			total: sale.totalPrice,
 			status: sale.isDelivered ? 'Completed' : sale.isPaid ? 'Processing' : 'Pending',
 			type: 'Sale',

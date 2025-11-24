@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils'
 import Image from 'next/image'
-import Link from 'next/link'
+// Link removed
 
 interface TopSellingProductsProps {
     data: {

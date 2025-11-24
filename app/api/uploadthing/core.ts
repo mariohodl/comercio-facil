@@ -20,16 +20,19 @@ export const ourFileRouter = {
       // If you throw, the user will not be able to upload
       if (!session) throw new UploadThingError('Unauthorized')
       // const params = useSearchParams()
-        // console.log('PIDDD',params.get('id'))
-      
+      // console.log('PIDDD',params.get('id'))
+
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return { userId: session?.user?.id, productId: idValue }
     })
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable removed
     .onUploadComplete(async ({ metadata, file }) => {
       // This code RUNS ON YOUR SERVER after upload
-      const productUpdated = await addProductImg( metadata.productId, file.ufsUrl, file.key)
-      console.log(productUpdated)
+      // Only update the product if we have a valid product ID (not "create")
+      if (metadata.productId && metadata.productId !== 'create') {
+        const productUpdated = await addProductImg(metadata.productId, file.url, file.key)
+        console.log(productUpdated)
+      }
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.userId }
     }),

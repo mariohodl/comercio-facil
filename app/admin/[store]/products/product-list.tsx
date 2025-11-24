@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable removed
 'use client'
 import Link from 'next/link'
 import {
@@ -12,7 +12,6 @@ import {
   Plus,
   RefreshCw,
   Search,
-  Trash,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { IOrderList } from '@/types'
-import Image from 'next/image'
+// Image removed
 
 interface RecentSalesListProps {
     data: IOrderList[]
@@ -33,10 +33,10 @@ export default function RecentSalesList({ data }: RecentSalesListProps) {
                             <div className='text-right'>
                                 <p className='font-medium'>{formatCurrency(order.totalPrice)}</p>
                                 <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${order.isDelivered
-                                        ? 'bg-green-100 text-green-700'
-                                        : order.isPaid
-                                            ? 'bg-blue-100 text-blue-700'
-                                            : 'bg-yellow-100 text-yellow-700'
+                                    ? 'bg-green-100 text-green-700'
+                                    : order.isPaid
+                                        ? 'bg-blue-100 text-blue-700'
+                                        : 'bg-yellow-100 text-yellow-700'
                                     }`}>
                                     {order.isDelivered ? 'Completed' : order.isPaid ? 'Processing' : 'Pending'}
                                 </span>

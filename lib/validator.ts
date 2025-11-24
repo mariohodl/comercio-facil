@@ -69,6 +69,20 @@ export const ProductInputSchema = z.object({
 		.number()
 		.int()
 		.nonnegative('Number of sales must be a non-negative number'),
+	// New fields for Create Product View
+	store: z.string().min(1, 'Store is required'),
+	warehouse: z.string().min(1, 'Warehouse is required'),
+	sellingType: z.string().min(1, 'Selling type is required'),
+	subCategory: z.string().min(1, 'Sub category is required'),
+	unit: z.string().min(1, 'Unit is required'),
+	barcodeSymbology: z.string().min(1, 'Barcode symbology is required'),
+	itemBarcode: z.string().min(1, 'Item barcode is required'),
+	productType: z.string().min(1, 'Product type is required'),
+	taxType: z.string().min(1, 'Tax type is required'),
+	tax: z.coerce.number().nonnegative('Tax must be a non-negative number'),
+	discountType: z.string().optional(),
+	discountValue: z.coerce.number().optional(),
+	quantityAlert: z.coerce.number().int().nonnegative('Quantity alert must be a non-negative number'),
 })
 
 // Order Item

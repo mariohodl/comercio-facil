@@ -25,8 +25,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { usePOSStore } from '@/hooks/use-pos-store'
 import { formatCurrency } from '@/lib/utils'
 import { toast } from 'sonner'
-import { Loader2, Plus, Trash2, CreditCard, Banknote } from 'lucide-react'
-import { Separator } from '@/components/ui/separator'
+import { Loader2, Trash2, CreditCard, Banknote } from 'lucide-react'
 
 const PaymentSchema = z.object({
     paymentMethod: z.enum(['Cash', 'Card', 'Split']),
@@ -93,7 +92,7 @@ export default function PaymentModal() {
 
     const onSubmit = async (data: z.infer<typeof PaymentSchema>) => {
         let finalSplits: PaymentSplit[] = []
-        let finalPaymentMethod = data.paymentMethod
+        const finalPaymentMethod = data.paymentMethod
 
         if (data.paymentMethod === 'Split') {
             if (remaining > 0.01) { // Tolerance for float errors
