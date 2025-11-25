@@ -4,6 +4,7 @@ import { getProductById } from '@/lib/actions/product.actions'
 import Link from 'next/link'
 import ProductForm from '../product-form'
 import { Metadata } from 'next'
+import { getActiveCategories } from '@/lib/actions/category.actions'
 
 export const metadata: Metadata = {
   title: 'Edit Product',
@@ -22,6 +23,9 @@ const UpdateProduct = async (props: UpdateProductProps) => {
 
   const product = await getProductById(id)
   if (!product) notFound()
+
+  const categories = await getActiveCategories()
+
   return (
     <main className='max-w-6xl mx-auto p-4'>
       <div className='flex mb-4'>
@@ -31,7 +35,7 @@ const UpdateProduct = async (props: UpdateProductProps) => {
       </div>
 
       <div className='my-8'>
-        <ProductForm type='Update' product={product} productId={product._id} />
+        <ProductForm type='Update' product={product} productId={product._id} categories={categories} />
       </div>
     </main>
   )

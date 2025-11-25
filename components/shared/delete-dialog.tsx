@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button'
 // import { useToast } from '@/hooks/use-toast'
 
-export default function DeleteDialog({
+export default function DeleteDialogWithAction({
   id,
   action,
   callbackAction,
@@ -66,6 +66,38 @@ export default function DeleteDialog({
             }
           >
             {isPending ? 'Eliminando...' : 'Eliminar'}
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+// Named export version with simpler API for reusability
+export function DeleteDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+  title = 'Delete Item',
+  description = 'Are you sure you want to delete this item? This action cannot be undone.',
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => void
+  title?: string
+  description?: string
+}) {
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <Button variant="destructive" onClick={onConfirm}>
+            Delete
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

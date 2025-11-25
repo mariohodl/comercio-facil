@@ -12,17 +12,20 @@ import {
 	OrderReceptionSchema,
 	ProveedorInputSchema,
 	IReportInput,
-	ReportInputSchema
+	ReportInputSchema,
+	CategoryInputSchema,
+	CategoryUpdateSchema,
+	SubCategoryInputSchema,
 } from '@/lib/validator';
 import { z } from 'zod';
 
 export type IReviewInput = z.infer<typeof ReviewInputSchema>
 export type IReviewDetails = IReviewInput & {
-  _id: string
-  createdAt: string
-  user: {
-    name: string
-  }
+	_id: string
+	createdAt: string
+	user: {
+		name: string
+	}
 }
 
 export type IProductInput = z.infer<typeof ProductInputSchema>;
@@ -47,9 +50,11 @@ export type Data = {
 		buttonCaption: string;
 		isPublished: boolean;
 	}[];
+	categories: ICategoryInput[];
+	subCategories: ISubCategoryInput[];
 };
 
-export type ProductImage = { 
+export type ProductImage = {
 	imgUrl: string,
 	imgKey: string
 }
@@ -57,11 +62,11 @@ export type ProductImage = {
 export type IOrderList = IOrderInput & {
 	_id: string
 	user: {
-	  name: string
-	  email: string
+		name: string
+		email: string
 	}
 	createdAt: Date
-  }
+}
 
 export type IOrderInput = z.infer<typeof OrderInputSchema>;
 export type OrderItem = z.infer<typeof OrderItemSchema>;
@@ -86,3 +91,7 @@ export type IProveedorInput = z.infer<typeof ProveedorInputSchema>;
 
 export type IReportInput = z.infer<typeof IReportInput>;
 export type IReportSchema = z.infer<typeof ReportInputSchema>
+
+// Categories
+export type ICategoryInput = z.infer<typeof CategoryInputSchema>
+export type ISubCategoryInput = z.infer<typeof SubCategoryInputSchema>;

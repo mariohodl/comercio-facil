@@ -1,10 +1,49 @@
 import { Data, IProductInput, IUserInput } from '@/types'
 import { toSlug } from './utils'
+import bcrypt from 'bcryptjs'
 
 const uniqueStoreId = '7jDf45ff'
 const uniqueStoreName = 'Mi super tiendita'
 
-import bcrypt from 'bcryptjs'
+const categories = [
+	{ categoryName: 'Materiales', categorySlug: 'materiales', status: true },
+	{ categoryName: 'Herramientas', categorySlug: 'herramientas', status: true },
+	{ categoryName: 'Equipo', categorySlug: 'equipo', status: true },
+	{ categoryName: 'Electricidad', categorySlug: 'electricidad', status: true },
+	{ categoryName: 'Plomería', categorySlug: 'plomeria', status: true },
+	{ categoryName: 'Pintura', categorySlug: 'pintura', status: true },
+	{ categoryName: 'Ferretería', categorySlug: 'ferreteria', status: true },
+	{ categoryName: 'Construcción', categorySlug: 'construccion', status: true },
+];
+
+const subCategories = [
+	// Materiales
+	{ name: 'Cemento', slug: 'cemento', parentCategory: 'Materiales', code: 'MAT-CEM', description: 'Todo tipo de cementos', status: true },
+	{ name: 'Arena', slug: 'arena', parentCategory: 'Materiales', code: 'MAT-ARE', description: 'Arena para construcción', status: true },
+	{ name: 'Grava', slug: 'grava', parentCategory: 'Materiales', code: 'MAT-GRA', description: 'Grava de diferentes tamaños', status: true },
+	// Herramientas
+	{ name: 'Manuales', slug: 'manuales', parentCategory: 'Herramientas', code: 'HER-MAN', description: 'Herramientas de mano', status: true },
+	{ name: 'Eléctricas', slug: 'electricas', parentCategory: 'Herramientas', code: 'HER-ELE', description: 'Herramientas eléctricas', status: true },
+	// Equipo
+	{ name: 'Seguridad', slug: 'seguridad', parentCategory: 'Equipo', code: 'EQP-SEG', description: 'Equipo de protección personal', status: true },
+	{ name: 'Pesado', slug: 'pesado', parentCategory: 'Equipo', code: 'EQP-PES', description: 'Maquinaria pesada', status: true },
+	// Electricidad
+	{ name: 'Cables', slug: 'cables', parentCategory: 'Electricidad', code: 'ELE-CAB', description: 'Cables y alambres eléctricos', status: true },
+	{ name: 'Iluminación', slug: 'iluminacion', parentCategory: 'Electricidad', code: 'ELE-ILU', description: 'Focos y lámparas', status: true },
+	// Plomería
+	{ name: 'Tubería', slug: 'tuberia', parentCategory: 'Plomería', code: 'PLO-TUB', description: 'Tubos y conexiones', status: true },
+	{ name: 'Grifería', slug: 'griferia', parentCategory: 'Plomería', code: 'PLO-GRI', description: 'Llaves y mezcladoras', status: true },
+	// Pintura
+	{ name: 'Vinílica', slug: 'vinilica', parentCategory: 'Pintura', code: 'PIN-VIN', description: 'Pinturas a base de agua', status: true },
+	{ name: 'Esmalte', slug: 'esmalte', parentCategory: 'Pintura', code: 'PIN-ESM', description: 'Pinturas a base de aceite', status: true },
+	// Ferretería
+	{ name: 'Tornillería', slug: 'tornilleria', parentCategory: 'Ferretería', code: 'FER-TOR', description: 'Tornillos, tuercas y rondanas', status: true },
+	{ name: 'Cerraduras', slug: 'cerraduras', parentCategory: 'Ferretería', code: 'FER-CER', description: 'Chapas y candados', status: true },
+	// Construcción
+	{ name: 'Acabados', slug: 'acabados', parentCategory: 'Construcción', code: 'CON-ACA', description: 'Pisos y azulejos', status: true },
+	{ name: 'Estructural', slug: 'estructural', parentCategory: 'Construcción', code: 'CON-EST', description: 'Vigas y castillos', status: true },
+];
+
 const users: IUserInput[] = [
 	{
 		name: 'Robe',
@@ -748,6 +787,8 @@ const data: Data = {
 	products,
 	users,
 	reviews,
+	categories,
+	subCategories,
 }
 
 

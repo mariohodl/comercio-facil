@@ -356,3 +356,27 @@ export const POSOrderSchema = z.object({
 		)
 		.optional(),
 })
+
+export const CategoryInputSchema = z.object({
+	categoryName: z.string().min(1, 'Category name is required'),
+	categorySlug: z.string().min(1, 'Category slug is required'),
+	status: z.boolean().default(true),
+})
+
+export const CategoryUpdateSchema = CategoryInputSchema.extend({
+	_id: MongoId,
+})
+
+export const SubCategoryInputSchema = z.object({
+	name: z.string().min(1, 'Name is required'),
+	slug: z.string().min(1, 'Slug is required'),
+	parentCategory: z.string().min(1, 'Parent category is required'),
+	code: z.string().min(1, 'Category code is required'),
+	description: z.string().optional(),
+	image: z.string().optional(),
+	status: z.boolean().default(true),
+})
+
+export const SubCategoryUpdateSchema = SubCategoryInputSchema.extend({
+	_id: MongoId,
+})

@@ -5,6 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { useState, useEffect } from 'react'
+import { getSubCategoriesByCategory } from '@/lib/actions/sub-category.actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -113,12 +115,17 @@ const ProductForm = ({
   type,
   product,
   productId,
+  categories = [],
 }: {
   type: 'Create' | 'Update'
   product?: IProduct
-  productId: string
+  productId?: string
+  categories?: { _id: string; categoryName: string; categorySlug: string }[]
 }) => {
   const router = useRouter()
+
+
+  const [subCategories, setSubCategories] = useState<{ name: string; slug: string }[]>([])
 
 
   const form = useForm<any>({
@@ -128,6 +135,37 @@ const ProductForm = ({
   })
 
   const { showSuccess, showError } = useToast()
+
+  const selectedCategory = form.watch('category')
+
+  useEffect(() => {
+    const fetchSubCategories = async () => {
+      if (!selectedCategory) {
+        setSubCategories([])
+        form.setValue('subCategory', '')
+        return
+      }
+
+      const category = categories.find(c => c.categoryName === selectedCategory)
+      if (category && category._id) {
+        const subs = await getSubCategoriesByCategory(category._id)
+        setSubCategories(subs)
+
+        // Check if current subCategory is valid for the new category
+        const currentSub = form.getValues('subCategory')
+        const isValid = subs.some(s => s.name === currentSub)
+        if (currentSub && !isValid) {
+          form.setValue('subCategory', '')
+        }
+      } else {
+        setSubCategories([])
+        form.setValue('subCategory', '')
+      }
+    }
+
+    fetchSubCategories()
+  }, [selectedCategory, categories, form])
+
   async function onSubmit(values: IProductInput) {
     if (type === 'Create') {
       const res = await createProduct(values)
@@ -155,10 +193,16 @@ const ProductForm = ({
   const images = form.watch('images')
 
   const handleRemoveImage = async (image: ProductImage) => {
+    if (!productId) {
+      showError('Product ID is required to delete images')
+      return
+    }
     const res = await deleteProductImg(productId, image.imgKey)
-    console.log(res)
-    if (res?.success) {
-      form.setValue('images', images.filter((img: ProductImage) => img.imgUrl !== image.imgUrl))
+    if (res.success) {
+      showSuccess('Image deleted successfully')
+      form.setValue('images', images.filter((img) => img.imgKey !== image.imgKey))
+    } else {
+      showError(res.errorMessage || 'Failed to delete image')
     }
   }
   return (
@@ -322,16 +366,31 @@ const ProductForm = ({
                       <FormLabel>Category <span className="text-red-500">*</span></FormLabel>
                       <div className="flex gap-2 items-center">
                         <div className="w-full flex-1">
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select
+                            onValueChange={(value) => {
+                              field.onChange(value)
+                              form.setValue('subCategory', '')
+                              setSubCategories([])
+                            }}
+                            defaultValue={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="Materiales">Materiales</SelectItem>
-                              <SelectItem value="Herramientas">Herramientas</SelectItem>
-                              <SelectItem value="Equipo">Equipo</SelectItem>
+                              {categories.length > 0 ? (
+                                categories.map((cat) => (
+                                  <SelectItem key={cat.categorySlug} value={cat.categoryName}>
+                                    {cat.categoryName}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="no-categories" disabled>
+                                  No categories available
+                                </SelectItem>
+                              )}
                             </SelectContent>
                           </Select>
                         </div>
@@ -349,7 +408,7 @@ const ProductForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Sub Category <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select" />
@@ -357,6 +416,11 @@ const ProductForm = ({
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="None">None</SelectItem>
+                          {subCategories.map((sub) => (
+                            <SelectItem key={sub.slug} value={sub.name}>
+                              {sub.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -673,10 +737,10 @@ const ProductForm = ({
                           <FormControl>
                             <UploadButton
                               endpoint='imageUploader'
-                              onClientUploadComplete={(res: { url: string, key: string }[]) => {
+                              onClientUploadComplete={(res: any[]) => {
                                 console.log('resIMG', res)
                                 const imgUploaded: ProductImage = {
-                                  imgUrl: res[0].url,
+                                  imgUrl: res[0].ufsUrl || res[0].url,
                                   imgKey: res[0].key
                                 }
                                 form.setValue('images', [...images, imgUploaded])

@@ -30,8 +30,13 @@ export const ourFileRouter = {
       // This code RUNS ON YOUR SERVER after upload
       // Only update the product if we have a valid product ID (not "create")
       if (metadata.productId && metadata.productId !== 'create') {
-        const productUpdated = await addProductImg(metadata.productId, file.url, file.key)
-        console.log(productUpdated)
+        // Check if productId is a valid MongoDB ObjectId (24 hex characters)
+        const isValidId = /^[0-9a-fA-F]{24}$/.test(metadata.productId);
+        if (isValidId) {
+          const fileUrl = (file as any).ufsUrl || file.url;
+          const productUpdated = await addProductImg(metadata.productId, fileUrl, file.key)
+          console.log(productUpdated)
+        }
       }
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.userId }
