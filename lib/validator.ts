@@ -380,3 +380,13 @@ export const SubCategoryInputSchema = z.object({
 export const SubCategoryUpdateSchema = SubCategoryInputSchema.extend({
 	_id: MongoId,
 })
+
+export const BrandInputSchema = z.object({
+	name: z.string().min(1, 'Name is required'),
+	image: z.string().min(1, 'Image is required'),
+	status: z.boolean().default(true),
+})
+
+export const BrandUpdateSchema = BrandInputSchema.extend({
+	_id: MongoId,
+})

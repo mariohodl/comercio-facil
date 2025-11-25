@@ -24,7 +24,7 @@ import { createProduct, updateProduct, deleteProductImg } from '@/lib/actions/pr
 import { IProduct } from '@/lib/db/models/product.model'
 import { UploadButton } from '@/lib/uploadthing'
 import { ProductInputSchema, ProductUpdateSchema } from '@/lib/validator'
-// Checkbox, toSlug removed
+import { toSlug } from '@/lib/utils'
 import { IProductInput, ProductImage } from '@/types'
 import { Trash, PlusCircle, RefreshCw, ChevronLeft } from 'lucide-react'
 import {
@@ -116,11 +116,13 @@ const ProductForm = ({
   product,
   productId,
   categories = [],
+  brands = [],
 }: {
   type: 'Create' | 'Update'
   product?: IProduct
   productId?: string
   categories?: { _id: string; categoryName: string; categorySlug: string }[]
+  brands?: { _id: string; name: string; slug: string }[]
 }) => {
   const router = useRouter()
 
@@ -137,6 +139,13 @@ const ProductForm = ({
   const { showSuccess, showError } = useToast()
 
   const selectedCategory = form.watch('category')
+  const productName = form.watch('name')
+
+  useEffect(() => {
+    if (type === 'Create' && productName) {
+      form.setValue('slug', toSlug(productName))
+    }
+  }, [productName, type, form])
 
   useEffect(() => {
     const fetchSubCategories = async () => {
@@ -306,7 +315,7 @@ const ProductForm = ({
                       <FormLabel>Slug <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <div className='relative'>
-                          <Input placeholder='Enter product slug' {...field} />
+                          <Input placeholder='Enter product slug' {...field} disabled />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -443,9 +452,15 @@ const ProductForm = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Generico">Generico</SelectItem>
-                          <SelectItem value="Truper">Truper</SelectItem>
-                          <SelectItem value="Cemex">Cemex</SelectItem>
+                          {brands.length > 0 ? (
+                            brands.map((brand) => (
+                              <SelectItem key={brand.slug} value={brand.name}>
+                                {brand.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="Generico">Generico</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />

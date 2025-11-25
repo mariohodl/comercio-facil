@@ -44,6 +44,20 @@ const subCategories = [
 	{ name: 'Estructural', slug: 'estructural', parentCategory: 'Construcción', code: 'CON-EST', description: 'Vigas y castillos', status: true },
 ];
 
+const brands = [
+	{ name: 'Cemex', image: 'https://logo.clearbit.com/cemex.com', status: true },
+	{ name: 'Tecnolite', image: 'https://logo.clearbit.com/tecnolite.com', status: true },
+	{ name: 'Pretul', image: 'https://seeklogo.com/images/P/pretul-logo-48F6F3F3F3-seeklogo.com.png', status: true },
+	{ name: 'Urrea', image: 'https://logo.clearbit.com/urrea.com', status: true },
+	{ name: 'Calidra', image: 'https://logo.clearbit.com/calidra.com', status: true },
+	{ name: 'Truper', image: 'https://logo.clearbit.com/truper.com', status: true },
+	{ name: 'Stanley', image: 'https://static.cdnlogo.com/logos/s/25/stanley.svg', status: true },
+	{ name: 'Cuprum', image: 'https://logo.clearbit.com/escalerascuprum.com', status: true },
+	{ name: 'DeWalt', image: 'https://static.cdnlogo.com/logos/d/72/dewalt.svg', status: true },
+	{ name: 'Makita', image: 'https://static.cdnlogo.com/logos/m/96/makita.svg', status: true },
+	{ name: 'Generico', image: 'https://placehold.co/200x200.png?text=Generico', status: true },
+];
+
 const users: IUserInput[] = [
 	{
 		name: 'Robe',
@@ -789,6 +803,7 @@ const data: Data = {
 	reviews,
 	categories,
 	subCategories,
+	brands,
 }
 
 

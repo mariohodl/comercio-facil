@@ -2,6 +2,7 @@ import Link from 'next/link'
 import ProductForm from '../product-form'
 import { Metadata } from 'next'
 import { getActiveCategories } from '@/lib/actions/category.actions'
+import { getActiveBrands } from '@/lib/actions/brand.actions'
 
 export const metadata: Metadata = {
   title: 'Create Product',
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 
 const CreateProductPage = async () => {
   const categories = await getActiveCategories()
+  const brands = await getActiveBrands()
 
   return (
     <main className='max-w-6xl mx-auto p-4'>
@@ -19,7 +21,7 @@ const CreateProductPage = async () => {
       </div>
 
       <div className='my-8'>
-        <ProductForm type='Create' categories={categories} />
+        <ProductForm type='Create' categories={categories} brands={brands} />
       </div>
     </main>
   )

@@ -7,18 +7,27 @@ import { cwd } from 'process';
 import { loadEnvConfig } from '@next/env';
 import { IReviewInput } from '@/types'
 import Category from './models/category.model'
-
+import Brand from './models/brand.model'
 import SubCategory from './models/sub-category.model'
+import { toSlug } from '../utils'
 
 loadEnvConfig(cwd());
 
 const main = async () => {
   try {
-    const { products, reviews, users, categories, subCategories } = data;
+    const { products, reviews, users, categories, subCategories, brands } = data;
     await connectToDatabase(process.env.MONGODB_URI);
 
     await User.deleteMany();
     const createdUsers = await User.insertMany(users);
+
+    // Seed brands
+    await Brand.deleteMany();
+    const brandsToInsert = brands.map((brand) => ({
+      ...brand,
+      slug: toSlug(brand.name),
+    }));
+    const createdBrands = await Brand.insertMany(brandsToInsert);
 
     // Seed categories
     await Category.deleteMany();
@@ -68,6 +77,7 @@ const main = async () => {
 
     console.log({
       createdUsers,
+      createdBrands,
       createdCategories,
       createdSubCategories,
       createdProducts,
