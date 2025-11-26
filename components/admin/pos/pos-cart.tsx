@@ -36,7 +36,7 @@ export default function POSCart() {
                                     <div className="flex-1 space-y-1">
                                         <p className="font-medium leading-none">{item.name}</p>
                                         <p className="text-sm text-muted-foreground">
-                                            {formatCurrency(item.price)}
+                                            {formatCurrency(item.price)} / {item.unit}
                                         </p>
                                     </div>
                                     <div className="flex items-center space-x-2">

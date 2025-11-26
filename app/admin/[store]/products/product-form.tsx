@@ -44,7 +44,7 @@ const productDefaultValues: IProductInput =
       slug: 'sample-product',
       category: 'Materiales',
       sku: 'SAMPLE-SKU',
-      images: [{ imgUrl: '/images/p11-1.jpg', imgKey: 'sample-key' }],
+      images: [],
       brand: 'Generico',
       description: 'This is a sample description of the product.',
       price: 99.99,
@@ -55,7 +55,6 @@ const productDefaultValues: IProductInput =
       avgRating: 0,
       numSales: 0,
       isPublished: false,
-      isProductKg: false,
       productId: 0,
       tags: [],
       ratingDistribution: [],
@@ -63,7 +62,6 @@ const productDefaultValues: IProductInput =
       // New fields defaults
       store: '',
       warehouse: '',
-      sellingType: 'Unit',
       subCategory: '',
       unit: 'Piece',
       barcodeSymbology: 'Code 128',
@@ -91,14 +89,12 @@ const productDefaultValues: IProductInput =
       avgRating: 0,
       numSales: 0,
       isPublished: false,
-      isProductKg: false,
       productId: 0,
       tags: [],
       ratingDistribution: [],
       reviews: [],
       store: '',
       warehouse: '',
-      sellingType: '',
       subCategory: '',
       unit: '',
       barcodeSymbology: '',
@@ -117,12 +113,14 @@ const ProductForm = ({
   productId,
   categories = [],
   brands = [],
+  units = [],
 }: {
   type: 'Create' | 'Update'
   product?: IProduct
   productId?: string
   categories?: { _id: string; categoryName: string; categorySlug: string }[]
   brands?: { _id: string; name: string; slug: string }[]
+  units?: { _id: string; name: string; abbreviation: string }[]
 }) => {
   const router = useRouter()
 
@@ -343,27 +341,7 @@ const ProductForm = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name='sellingType'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Selling Type <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Unit">Unit</SelectItem>
-                          <SelectItem value="Weight">Weight</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
               </div>
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -480,9 +458,15 @@ const ProductForm = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Piece">Piece</SelectItem>
-                          <SelectItem value="Kg">Kg</SelectItem>
-                          <SelectItem value="M3">M3</SelectItem>
+                          {units.length > 0 ? (
+                            units.map((unit) => (
+                              <SelectItem key={unit._id} value={unit.name}>
+                                {unit.name} ({unit.abbreviation})
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="Piece">Piece</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />

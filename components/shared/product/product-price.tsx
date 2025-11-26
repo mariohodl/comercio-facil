@@ -7,6 +7,7 @@ const ProductPrice = ({
   listPrice = 0,
   isDeal = false,
   forListing = true,
+  unit,
   plain = false,
 }: {
   price: number
@@ -15,6 +16,7 @@ const ProductPrice = ({
   className?: string
   forListing?: boolean
   plain?: boolean
+  unit?: string
 }) => {
   // Ensure we don't show negative discounts if price > listPrice
   const discountPercent = Math.round(100 - (price / listPrice) * 100)
@@ -31,6 +33,7 @@ const ProductPrice = ({
       <span className='text-xs align-super'>$</span>
       {intValue}
       <span className='text-xs align-super'>{floatValue}</span>
+      {unit && <span className='text-sm text-muted-foreground ml-1'>/ {unit}</span>}
     </div>
   ) : isDeal ? (
     <div className='space-y-2'>
@@ -50,6 +53,7 @@ const ProductPrice = ({
           <span className='text-xs align-super'>$</span>
           {intValue}
           <span className='text-xs align-super'>{floatValue}</span>
+          {unit && <span className='text-sm text-muted-foreground ml-1'>/ {unit}</span>}
         </div>
         <div className='text-muted-foreground text-xs py-2'>
           Antes:{' '}
@@ -63,6 +67,7 @@ const ProductPrice = ({
         <span className='text-xs align-super'>$</span>
         {intValue}
         <span className='text-xs align-super'>{floatValue}</span>
+        {unit && <span className='text-sm text-muted-foreground ml-1'>/ {unit}</span>}
       </div>
       <div className='text-muted-foreground text-sm line-through'>
         {formatCurrency(listPrice)}

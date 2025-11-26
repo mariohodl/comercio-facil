@@ -26,11 +26,10 @@ import { IProduct } from '@/lib/db/models/product.model'
 
 type ProductPreAddedType = {
   name: string
-  productId: number
+  productId: string
   countInStock: number
   listPrice: number
   category: string
-  isProductKg: boolean
 }
 
 type FormFields = {
@@ -55,25 +54,24 @@ type FormFields = {
 //   productId: 2,
 //   quantity: 240,
 //   price: 155,
-//   category: 'Res',
-//   isProductKg: true}
+//   category: 'Res'}
 
 const OrderReceptionDetails = () => {
-    const { showSuccess, showError} = useToast()
-    const router = useRouter()
-    const [proveedoresData, setProveedoresData] = useState([])
-    const [productsData, setProductsData] = useState([])
-    const [productsPreAdded, setProductsPreAdded] = useState<Array<ProductPreAddedType>>([])
+  const { showSuccess, showError } = useToast()
+  const router = useRouter()
+  const [proveedoresData, setProveedoresData] = useState([])
+  const [productsData, setProductsData] = useState([])
+  const [productsPreAdded, setProductsPreAdded] = useState<Array<ProductPreAddedType>>([])
 
-    const [filteredProveedoresData, setFilteredProveedoresData] = useState([])
-    const [filteredProductsData, setFilteredProductsData] = useState([])
+  const [filteredProveedoresData, setFilteredProveedoresData] = useState([])
+  const [filteredProductsData, setFilteredProductsData] = useState([])
 
-    const [isPending, startTransition] = useTransition()
-    const [autosuggestProveedoresSelected, setAutosuggestProveedoresSelected] = useState()
-    const [idBasedOnSavedProducts, setIdBasedOnSavedProducts] = useState(0)
-    const [autosuggestProductSelected, setAutosuggestProductSelected] = useState()
+  const [isPending, startTransition] = useTransition()
+  const [autosuggestProveedoresSelected, setAutosuggestProveedoresSelected] = useState()
+  const [idBasedOnSavedProducts, setIdBasedOnSavedProducts] = useState(0)
+  const [autosuggestProductSelected, setAutosuggestProductSelected] = useState()
 
-  const { register, handleSubmit, watch , setValue} = useForm<FormFields>({
+  const { register, handleSubmit, watch, setValue } = useForm<FormFields>({
     defaultValues: {
       nameProvider: '',
       clave: uuidv4().toString().substring(0, 8),
@@ -105,7 +103,7 @@ const OrderReceptionDetails = () => {
   const productToAddQuantityWatcher = watch('productToAddQuantity');
   const productToAddIsProductKgWatcher = watch('productToAddIsProductKg');
 
-  const totalAmount  = calculateTotalPriceOfProducts(productsPreAdded, true, true);
+  const totalAmount = calculateTotalPriceOfProducts(productsPreAdded, true, true);
   const subTotalAmount = calculateTotalPriceOfProducts(productsPreAdded, false, true);
 
 
@@ -131,7 +129,7 @@ const OrderReceptionDetails = () => {
         setTimeout(() => {
           setFilteredProveedoresData(results)
         }
-        , 500)
+          , 500)
       } else {
         setFilteredProveedoresData([])
       }
@@ -154,7 +152,7 @@ const OrderReceptionDetails = () => {
         setTimeout(() => {
           setFilteredProductsData(results)
         }
-        , 500)
+          , 500)
       } else {
         setFilteredProductsData([])
       }
@@ -166,22 +164,22 @@ const OrderReceptionDetails = () => {
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     let isAtLeastOneError = false
-    if(nameProviderWatcher.length < 3){
+    if (nameProviderWatcher.length < 3) {
       showError('Ingresa un nombre de proveedor válido!')
       isAtLeastOneError = true
     }
 
-    if(RFCer.length < 8){
+    if (RFCWatcher.length < 8) {
       showError('Ingresa un RFC válido!')
       isAtLeastOneError = true
     }
 
-    if(facturaWatcher.length < 4){
+    if (facturaWatcher.length < 4) {
       showError('Ingresa un Número de factura válido!')
       isAtLeastOneError = true
     }
 
-    if(isAtLeastOneError){
+    if (isAtLeastOneError) {
       return
     }
 
@@ -205,39 +203,39 @@ const OrderReceptionDetails = () => {
           showError('Error al crear Recepcion de compra')
         }
       })
-      .catch((err) => { 
+      .catch((err) => {
         showError('Error al crear Recepcion de compra')
         console.log('err', err)
       })
 
   }
 
-    useEffect(() => {
-      startTransition(async () => {
-        const data = await getAllProveedoresForAdmin({ query: '' })
-        setProveedoresData(data?.proveedores)
-      })
-    }, [])
+  useEffect(() => {
+    startTransition(async () => {
+      const data = await getAllProveedoresForAdmin({ query: '' })
+      setProveedoresData(data?.proveedores)
+    })
+  }, [])
 
-    useEffect(() => {
-      startTransition(async () => {
-        const data = await getAllExistingProducts()
-        const idResult = getHighetsProductId(data.products)
-        setIdBasedOnSavedProducts(idResult);
-        const idSuggested = idResult + 1;
-        setValue('productToAddProductId', idSuggested)
-        console.log('PRODUCTOS',data.products)
-        setProductsData(data?.products) 
-      })
-    }, [])
+  useEffect(() => {
+    startTransition(async () => {
+      const data = await getAllExistingProducts()
+      const idResult = getHighetsProductId(data.products)
+      setIdBasedOnSavedProducts(idResult);
+      const idSuggested = idResult + 1;
+      setValue('productToAddProductId', idSuggested)
+      console.log('PRODUCTOS', data.products)
+      setProductsData(data?.products)
+    })
+  }, [])
 
-    useEffect(()=>{
-      if(idBasedOnSavedProducts){
-        const idSuggested = idBasedOnSavedProducts + (productsPreAdded.length + 1);
-        setValue('productToAddProductId', idSuggested)
-      }
-      console.log('se renderiza una ves')
-    },[productsPreAdded])
+  useEffect(() => {
+    if (idBasedOnSavedProducts) {
+      const idSuggested = idBasedOnSavedProducts + (productsPreAdded.length + 1);
+      setValue('productToAddProductId', idSuggested)
+    }
+    console.log('se renderiza una ves')
+  }, [productsPreAdded])
 
   const handleAutoCompleteProveedorSelected = (item: any) => {
     setAutosuggestProveedoresSelected(item)
@@ -255,7 +253,7 @@ const OrderReceptionDetails = () => {
     setValue('productToAddName', item?.name)
     setValue('productToAddCategory', item?.category)
     setValue('productToAddIsProductKg', item.isProdctKg)
-    setValue('productToAddProductId', item.productId) 
+    setValue('productToAddProductId', item.productId)
 
   }
 
@@ -264,57 +262,51 @@ const OrderReceptionDetails = () => {
     const productToAddPriceWatcherDDD = Number(productToAddPriceWatcher)
     const productToAddQuantityWatcherDDD = Number(productToAddQuantityWatcher)
 
-    if(productToAddNameWatcher.length < 5){
+    if (productToAddNameWatcher.length < 5) {
       showError('Ingresa un nombre de producto válido!')
       isAtLeastOneError = true
     }
 
-    if(productToAddCategoryWatcher.length === 0){
+    if (productToAddCategoryWatcher.length === 0) {
       showError('Selecciona una categoría de producto!')
       isAtLeastOneError = true
     }
 
-    if(productToAddPriceWatcherDDD <= 0 || typeof(productToAddPriceWatcherDDD) !== 'number'){
+    if (productToAddPriceWatcherDDD <= 0 || typeof (productToAddPriceWatcherDDD) !== 'number') {
       showError('Precio debe ser un valor numérico válido!')
       isAtLeastOneError = true
     }
 
-    if(productToAddQuantityWatcherDDD <= 0 || typeof(productToAddQuantityWatcherDDD) !== 'number'){
+    if (productToAddQuantityWatcherDDD <= 0 || typeof (productToAddQuantityWatcherDDD) !== 'number') {
       showError('Cantidad debe ser un valor numérico válido!')
       isAtLeastOneError = true
     }
 
     console.log(productToAddPriceWatcherDDD)
     console.log(productToAddQuantityWatcherDDD)
-    if(isAtLeastOneError){
+    if (isAtLeastOneError) {
       return
     }
 
     const baseProduct = {
       name: productToAddNameWatcher,
-      productId: productToAddProductIdWatcher,
-      category: productToAddCategoryWatcher,
+      productId: String(productToAddProductIdWatcher),
+      category: !!productToAddCategoryWatcher ? productToAddCategoryWatcher : '',
       price: productToAddPriceWatcherDDD, //adding the same price, if we need to compute here an incremented price, we'll do it later
       listPrice: productToAddPriceWatcherDDD,
       discountPrice: 0,
       countInStock: productToAddQuantityWatcherDDD,
-      isProductKg: !!productToAddIsProductKgWatcher ? productToAddIsProductKgWatcher : false,
+
       slug: '',
       images: [],
-      tags: ['new-arrival'],
+      tags: [],
       isPublished: false,
       brand: '',
       avgRating: 0,
       numReviews: 0,
-      ratingDistribution: [
-        { rating: 1, count: 0 },
-        { rating: 2, count: 0 },
-        { rating: 3, count: 0 },
-        { rating: 4, count: 0 },
-        { rating: 5, count: 0 },
-      ],
+      ratingDistribution: [],
       numSales: 0,
-      description:'',
+      description: '',
       reviews: [],
     }
     setProductsPreAdded([...productsPreAdded, baseProduct])
@@ -331,7 +323,7 @@ const OrderReceptionDetails = () => {
     // setValue('productToAddProductId', 435643) //agregar el numero consiguente dada la suma de pdps registratos y agregados en array
   }
 
-  const getHighetsProductId = (arr: IProduct[]) =>{
+  const getHighetsProductId = (arr: IProduct[]) => {
     if (!arr || arr.length === 0) return 0
 
     const isFound = Math.max(...arr.map(o => o.productId))
@@ -399,67 +391,67 @@ const OrderReceptionDetails = () => {
       <div className='mt-10'>
         <h3 className='text-2xl font-bold text-center'>Ingresar Productos</h3>
       </div>
-      
+
       <div className='flex flex-col'>
-          <div  className='border-2 border-gray-300 rounded-md py-2 m-3 relative'>
-            <div className='flex items-center mx-3'>
+        <div className='border-2 border-gray-300 rounded-md py-2 m-3 relative'>
+          <div className='flex items-center mx-3'>
             {/* <ItemValueDisplay index={index} control={control} /> */}
-              <div className='m-3 w-1/2'>
-                <MKInput
-                  label="Nombre del producto"
-                  field={`productToAddName`}
-                  register={register}
-                  placeholder="Ingresa el nombre del producto"
-                  autoCompleteData={filteredProductsData}
-                  showAutoComplete={autosuggestProductSelected}
-                  onAutoCompleteSelected={handleAutoCompleteProductSelected}
-                />
-              </div>
-              <div className='m-3 w-1/4'>
-                <MKInput
-                  label="ID del producto"
-                  field={`productToAddProductId`}
-                  register={register}
-                  placeholder="Id de producto"
-                  disabled
-                />
-              </div>
+            <div className='m-3 w-1/2'>
+              <MKInput
+                label="Nombre del producto"
+                field={`productToAddName`}
+                register={register}
+                placeholder="Ingresa el nombre del producto"
+                autoCompleteData={filteredProductsData}
+                showAutoComplete={autosuggestProductSelected}
+                onAutoCompleteSelected={handleAutoCompleteProductSelected}
+              />
+            </div>
+            <div className='m-3 w-1/4'>
+              <MKInput
+                label="ID del producto"
+                field={`productToAddProductId`}
+                register={register}
+                placeholder="Id de producto"
+                disabled
+              />
+            </div>
 
-              <div className='m-3 w-1/4'>
-                <p>Categoria</p>
-                <select
-                    {...register(`productToAddCategory`)}
-                    className="flex-1 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
-                  >
-                    <option value="">Agrega categoría</option>
-                    {AVAILABLE_CATEGORIES.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-              </div>
-              
-              <div className='m-3 w-1/5'>
-                <MKInput
-                  label="Precio"
-                  field={`productToAddPrice`}
-                  register={register}
-                  placeholder="Ingresa el precio"
-                  typeInput='number'
+            <div className='m-3 w-1/4'>
+              <p>Categoria</p>
+              <select
+                {...register(`productToAddCategory`)}
+                className="flex-1 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5"
+              >
+                <option value="">Agrega categoría</option>
+                {AVAILABLE_CATEGORIES.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                />
-              </div>
-              <div className='m-3 w-1/5'>
-                <MKInput
-                  label="Cantidad"
-                  field={`productToAddQuantity`}
-                  register={register}
-                  placeholder="Ingresa la cantidad"
-                  typeInput='number'
-                />
-              </div>
-              {/* {
+            <div className='m-3 w-1/5'>
+              <MKInput
+                label="Precio"
+                field={`productToAddPrice`}
+                register={register}
+                placeholder="Ingresa el precio"
+                typeInput='number'
+
+              />
+            </div>
+            <div className='m-3 w-1/5'>
+              <MKInput
+                label="Cantidad"
+                field={`productToAddQuantity`}
+                register={register}
+                placeholder="Ingresa la cantidad"
+                typeInput='number'
+              />
+            </div>
+            {/* {
                 index > 0 && (
                   <div className='w-6 h-6 bg-primary cursor-pointer flex flex-center flex-wrap items-center rounded-full absolute right-0 top-0'>
                     <span className='ml-2 text-white' onClick={() => onRemoveProduct(index)}>x</span>
@@ -467,29 +459,29 @@ const OrderReceptionDetails = () => {
                 )
               } */}
 
-            </div>
-            <div className='flex items-center mx-3'>
-              <div className='w-full flex justify-end'>
-
-                <div className='flex'>
-                  <p className='mr-2 text-center'>¿Es producto en kg? </p>
-                  <input type="checkbox" {...register(`productToAddIsProductKg`)} defaultChecked />
-                </div>
-              </div>
-            </div>
-            {
-              <div className='flex justify-center'>
-                <p className='underline cursor-pointer' onClick={handleOnAddProduct}>Agregar producto</p>
-              </div>
-            }
-            
           </div>
+          <div className='flex items-center mx-3'>
+            <div className='w-full flex justify-end'>
+
+              <div className='flex'>
+                <p className='mr-2 text-center'>¿Es producto en kg? </p>
+                <input type="checkbox" {...register(`productToAddIsProductKg`)} defaultChecked />
+              </div>
+            </div>
+          </div>
+          {
+            <div className='flex justify-center'>
+              <p className='underline cursor-pointer' onClick={handleOnAddProduct}>Agregar producto</p>
+            </div>
+          }
+
+        </div>
       </div>
       {
-         productsPreAdded.length > 0 && (
-            <div className='my-8'>
-              <h2 className='text-primary font-bold'>Productos PRE-ingresados</h2>
-              <div>
+        productsPreAdded.length > 0 && (
+          <div className='my-8'>
+            <h2 className='text-primary font-bold'>Productos PRE-ingresados</h2>
+            <div>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -508,14 +500,14 @@ const OrderReceptionDetails = () => {
                       <TableCell>{product.name}</TableCell>
                       <TableCell className='text-center'>{product.productId}</TableCell>
                       <TableCell className='text-center'>{product.category}</TableCell>
-                      <TableCell className='text-center'>{ product.price}</TableCell>
+                      <TableCell className='text-center'>{product.listPrice}</TableCell>
                       <TableCell className='text-center'>{product.countInStock}</TableCell>
-                      <TableCell className='text-center'>{product.isProductKg ? 'Si' : 'No'}</TableCell>
+                      <TableCell className='text-center'>{product.category}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              </div>
+            </div>
           </div>
         )
       }
@@ -526,7 +518,7 @@ const OrderReceptionDetails = () => {
           <p className='text-xl font-bold text-right'>IVA: {TAX_RATE}%</p>
           <p className='text-2xl font-bold text-right'>Total: {totalAmount}</p>
         </div>
-        
+
       </div>
 
       <div className='flex justify-center m-3 mt-10'>

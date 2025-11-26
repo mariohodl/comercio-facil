@@ -85,7 +85,7 @@ export default function ProductSearch() {
                                     </p>
                                 </CardContent>
                                 <CardFooter className="flex items-center justify-between p-3 pt-0">
-                                    <span className="font-bold">{formatCurrency(product.price)}</span>
+                                    <span className="font-bold">{formatCurrency(product.price)} / {product.unit}</span>
                                     <Button size="icon" variant="secondary" className="h-8 w-8">
                                         <ShoppingCart className="h-4 w-4" />
                                     </Button>

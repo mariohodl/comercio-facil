@@ -17,6 +17,7 @@ import {
 	CategoryUpdateSchema,
 	SubCategoryInputSchema,
 	BrandInputSchema,
+	UnitInputSchema,
 } from '@/lib/validator';
 import { z } from 'zod';
 
@@ -54,6 +55,7 @@ export type Data = {
 	categories: ICategoryInput[];
 	subCategories: ISubCategoryInput[];
 	brands: IBrandInput[];
+	units: IUnitInput[];
 };
 
 export type ProductImage = {
@@ -99,3 +101,6 @@ export type ICategoryInput = z.infer<typeof CategoryInputSchema>
 export type ISubCategoryInput = z.infer<typeof SubCategoryInputSchema>;
 // Brands
 export type IBrandInput = z.infer<typeof BrandInputSchema>;
+
+// Units
+export type IUnitInput = z.infer<typeof UnitInputSchema>;

@@ -13,6 +13,7 @@ export type POSCartItem = {
     countInStock: number;
     quantity: number;
     sku: string;
+    unit: string;
 };
 
 interface POSState {
@@ -52,6 +53,7 @@ export const usePOSStore = create<POSState>()(
                                 countInStock: product.countInStock,
                                 quantity: 1,
                                 sku: (product as any).sku || 'NO-SKU', // Fallback if SKU is missing in runtime
+                                unit: product.unit,
                             },
                         ],
                     });

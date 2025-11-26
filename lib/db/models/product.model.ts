@@ -90,11 +90,7 @@ const productSchema = new Schema<IProduct>(
 			required: true,
 			default: false,
 		},
-		isProductKg: {
-			type: Boolean,
-			required: true,
-			default: true,
-		},
+
 		reviews: [
 			{
 				type: Schema.Types.ObjectId,
@@ -105,7 +101,6 @@ const productSchema = new Schema<IProduct>(
 		// New fields
 		store: { type: String, required: true },
 		warehouse: { type: String, required: true },
-		sellingType: { type: String, required: true },
 		subCategory: { type: String, required: true },
 		unit: { type: String, required: true },
 		barcodeSymbology: { type: String, required: true },

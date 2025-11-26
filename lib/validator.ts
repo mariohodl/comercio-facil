@@ -39,7 +39,6 @@ export const ProductInputSchema = z.object({
 	brand: z.string().optional(),
 	description: z.string().optional(),
 	isPublished: z.boolean(),
-	isProductKg: z.boolean().default(false),
 	price: z.coerce
 		.number()
 		.nonnegative('Price must be a non-negative number'),
@@ -72,7 +71,6 @@ export const ProductInputSchema = z.object({
 	// New fields for Create Product View
 	store: z.string().min(1, 'Store is required'),
 	warehouse: z.string().min(1, 'Warehouse is required'),
-	sellingType: z.string().min(1, 'Selling type is required'),
 	subCategory: z.string().min(1, 'Sub category is required'),
 	unit: z.string().min(1, 'Unit is required'),
 	barcodeSymbology: z.string().min(1, 'Barcode symbology is required'),
@@ -251,7 +249,6 @@ export const IOrderReceptionProduct = z.object({
 			'Price must have exactly two decimal places (e.g., 49.99)'
 		),
 	category: z.string().min(1, 'Category is required'),
-	isProductKg: z.boolean(),
 })
 
 export const OrderReceptionSchema = z.object({
@@ -388,5 +385,15 @@ export const BrandInputSchema = z.object({
 })
 
 export const BrandUpdateSchema = BrandInputSchema.extend({
+	_id: MongoId,
+})
+
+export const UnitInputSchema = z.object({
+	name: z.string().min(1, 'Name is required'),
+	abbreviation: z.string().min(1, 'Abbreviation is required'),
+	status: z.boolean().default(true),
+})
+
+export const UnitUpdateSchema = UnitInputSchema.extend({
 	_id: MongoId,
 })

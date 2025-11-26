@@ -226,7 +226,7 @@ const ProductList = () => {
                     <TableCell>{product.category}</TableCell>
                     <TableCell>{product.brand}</TableCell>
                     <TableCell>{formatCurrency(product.price)}</TableCell>
-                    <TableCell>{product.isProductKg ? 'Kg' : 'Pc'}</TableCell>
+                    <TableCell>{product.unit}</TableCell>
                     <TableCell>{product.countInStock}</TableCell>
                     <TableCell className='text-right'>
                       <div className='flex justify-end gap-2'>

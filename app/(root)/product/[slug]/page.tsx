@@ -97,6 +97,7 @@ export default async function ProductDetails(props: {
                     isDeal={product.tags.includes('todays-deal')}
                     forListing={false}
                     className="text-orange"
+                    unit={product.unit}
                   />
                 </div>
               </div>
@@ -120,7 +121,7 @@ export default async function ProductDetails(props: {
             <Card className="border-neutral-200 shadow-sm rounded-lg overflow-hidden">
               <CardContent className='p-6 flex flex-col gap-6'>
                 <div className="flex flex-col gap-2">
-                  <ProductPrice price={product.price} className="text-3xl font-bold text-navy" />
+                  <ProductPrice price={product.price} className="text-3xl font-bold text-navy" unit={product.unit} />
                   {product.listPrice > product.price && (
                     <div className="text-sm text-neutral-500">
                       Precio de lista: <span className="line-through">${product.listPrice}</span>

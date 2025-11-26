@@ -85,6 +85,7 @@ const ProductCard = ({
         price={product.price}
         listPrice={product.listPrice}
         forListing
+        unit={product.unit}
       />
     </div>
   )

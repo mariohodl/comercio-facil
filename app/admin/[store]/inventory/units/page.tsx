@@ -1,10 +1,10 @@
-import React from 'react'
+import { Metadata } from 'next'
+import UnitList from './unit-list'
+
+export const metadata: Metadata = {
+    title: 'Units',
+}
 
 export default function UnitsPage() {
-    return (
-        <div className='p-6'>
-            <h1 className='text-2xl font-bold mb-4'>Units</h1>
-            <p className='text-gray-500'>This feature is coming soon.</p>
-        </div>
-    )
+    return <UnitList />
 }

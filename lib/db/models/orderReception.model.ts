@@ -24,7 +24,6 @@ const orderReceptionSchema = new Schema<IOrderReception>(
 				countInStock: { type: Number, required: true },
 				listPrice: { type: Number, required: true },
 				category: { type: String, required: true },
-				isProductKg: { type: Boolean, default: false },
 			},
 		],
 		subtotal: { type: Number, required: true },
