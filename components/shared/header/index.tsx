@@ -31,14 +31,14 @@ export default async function Header() {
                   <div className='w-full'>
                     <h3 className='ml-2 w-full text-lg'>{APP_NAME}</h3>
                   </div>
-                  
+
                 </Link>
 
                 <div className='hidden md:block  w-2/4'>
                   <Search />
                 </div>
               </div>
-              
+
             </section>
             <Menu />
           </div>
@@ -68,7 +68,7 @@ export default async function Header() {
         </div> */}
         {/* <Sidebar categories={categories} /> */}
       </Container>
-      
+
     </header>
   )
 }

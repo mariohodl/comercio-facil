@@ -30,9 +30,9 @@ export default async function SignUpPage(props: {
 
   return (
     <section className='flex w-full min-h-screen'>
-      <article className='w-1/2 px-28 py-20'> 
+      <article className='w-full lg:w-1/2 px-6 md:px-16 lg:px-28 py-10 lg:py-20 flex flex-col justify-center'>
         <div className=''>
-          <div className='flex justify-center'>
+          <div className='flex justify-center mb-6'>
             <AppLogo color="black" />
           </div>
           <div>
@@ -43,23 +43,22 @@ export default async function SignUpPage(props: {
             <SocialAuth />
           </div>
 
-          <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-            <Button className='w-full' variant='outline'>
-              Crea tu cuenta en {APP_NAME}
+          <Link href={`/sign-in?callbackUrl=${encodeURIComponent(callbackUrl || '/')}`}>
+            <Button className='w-full mt-4' variant='outline'>
+              Ya tienes cuenta? Inicia sesión
             </Button>
           </Link>
         </div>
       </article>
-      
-      <div className='w-1/2'>
-        <div className=' w-full h-full relative'>
-          <Image
-            src={'/images/register-img.jpg'}
-            alt={'register'}
-            className='h-auto'
-            fill
-          />
-        </div>
+
+      <div className='hidden lg:block w-1/2 relative'>
+        <Image
+          src={'/images/register-img.jpg'}
+          alt={'register'}
+          className='object-cover'
+          fill
+          priority
+        />
       </div>
     </section>
   )

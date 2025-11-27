@@ -91,12 +91,12 @@ export default function OverviewReport() {
 
   return (
     <div className='space-y-6'>
-      <div className='flex items-center justify-between mb-2 py-2'>
+      <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-2 py-2'>
         <div>
           <h1 className='h1-bold'>Welcome, Admin</h1>
           <p className='text-muted-foreground'>You have {data.ordersCount} Orders, Today</p>
         </div>
-        <CalendarDateRangePicker defaultDate={date} setDate={setDate} />
+        <CalendarDateRangePicker defaultDate={date} setDate={setDate} className="w-full md:w-auto" />
       </div>
 
       {/* Row 1: Main Summary Cards */}

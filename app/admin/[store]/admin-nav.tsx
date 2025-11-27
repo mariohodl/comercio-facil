@@ -29,6 +29,7 @@ import {
 
 export function AdminNav({
   storeId,
+  className,
 }: {
   storeId: string
   className?: string
@@ -171,7 +172,10 @@ export function AdminNav({
   ]
 
   return (
-    <nav className='fixed w-64 h-[calc(100vh-3rem)] left-0 top-12 shadow-md overflow-y-auto bg-white border-r border-gray-200 pb-10'>
+    <nav className={cn(
+      'fixed w-64 h-[calc(100vh-3rem)] left-0 top-12 shadow-md overflow-y-auto bg-white border-r border-gray-200 pb-10',
+      className
+    )}>
       <div className='p-4 space-y-6 mt-6'>
         {navSections.map((section, index) => (
           <div key={index}>
