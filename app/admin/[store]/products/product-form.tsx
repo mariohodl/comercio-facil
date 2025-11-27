@@ -4,8 +4,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { PlusCircle, Loader2, ScanBarcode, Trash, RefreshCw, ChevronLeft } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import BarcodeScannerDialog from '@/components/shared/barcode-scanner'
 import { getSubCategoriesByCategory } from '@/lib/actions/sub-category.actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -26,7 +28,6 @@ import { UploadButton } from '@/lib/uploadthing'
 import { ProductInputSchema, ProductUpdateSchema } from '@/lib/validator'
 import { toSlug } from '@/lib/utils'
 import { IProductInput, ProductImage } from '@/types'
-import { Trash, PlusCircle, RefreshCw, ChevronLeft } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -35,6 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Switch } from "@/components/ui/switch"
 import Link from 'next/link'
 
 const productDefaultValues: IProductInput =
@@ -72,6 +74,7 @@ const productDefaultValues: IProductInput =
       discountType: 'Percentage',
       discountValue: 0,
       quantityAlert: 5,
+      costPerUnit: 50,
     }
     : {
       name: '',
@@ -105,12 +108,14 @@ const productDefaultValues: IProductInput =
       discountType: '',
       discountValue: 0,
       quantityAlert: 0,
+      costPerUnit: 0,
     }
 
 const ProductForm = ({
   type,
   product,
   productId,
+  storeId,
   categories = [],
   brands = [],
   units = [],
@@ -118,6 +123,7 @@ const ProductForm = ({
   type: 'Create' | 'Update'
   product?: IProduct
   productId?: string
+  storeId: string
   categories?: { _id: string; categoryName: string; categorySlug: string }[]
   brands?: { _id: string; name: string; slug: string }[]
   units?: { _id: string; name: string; abbreviation: string }[]
@@ -126,6 +132,8 @@ const ProductForm = ({
 
 
   const [subCategories, setSubCategories] = useState<{ name: string; slug: string }[]>([])
+  const [isScannerOpen, setIsScannerOpen] = useState(false)
+  const [barcodeScanned, setBarcodeScanned] = useState(false)
 
 
   const form = useForm<any>({
@@ -160,7 +168,7 @@ const ProductForm = ({
 
         // Check if current subCategory is valid for the new category
         const currentSub = form.getValues('subCategory')
-        const isValid = subs.some(s => s.name === currentSub)
+        const isValid = subs.some(s => s.name === currentSub) || currentSub === 'None'
         if (currentSub && !isValid) {
           form.setValue('subCategory', '')
         }
@@ -173,6 +181,35 @@ const ProductForm = ({
     fetchSubCategories()
   }, [selectedCategory, categories, form])
 
+  // Watch pricing fields for automatic discount calculation
+  const listPrice = form.watch('listPrice')
+  const discountType = form.watch('discountType')
+  const discountValue = form.watch('discountValue')
+
+  useEffect(() => {
+    const listPriceNum = Number(listPrice) || 0
+    const discountValueNum = Number(discountValue) || 0
+
+    let calculatedDiscountPrice = 0
+    let calculatedSellingPrice = listPriceNum
+
+    if (discountType && discountValueNum > 0) {
+      if (discountType === 'Percentage') {
+        calculatedDiscountPrice = listPriceNum - (listPriceNum * discountValueNum / 100)
+      } else if (discountType === 'Fixed') {
+        calculatedDiscountPrice = listPriceNum - discountValueNum
+      }
+
+      // Ensure discount price is not negative
+      calculatedDiscountPrice = Math.max(0, calculatedDiscountPrice)
+      calculatedSellingPrice = calculatedDiscountPrice
+    }
+
+    // Update the form values
+    form.setValue('discountPrice', calculatedDiscountPrice)
+    form.setValue('price', calculatedSellingPrice)
+  }, [listPrice, discountType, discountValue, form])
+
   async function onSubmit(values: IProductInput) {
     if (type === 'Create') {
       const res = await createProduct(values)
@@ -180,12 +217,12 @@ const ProductForm = ({
         showError(res.message)
       } else {
         showSuccess(res.message)
-        router.push(`/admin/products`)
+        router.push(`/admin/${storeId}/products`)
       }
     }
     if (type === 'Update') {
       if (!productId) {
-        router.push(`/admin/products`)
+        router.push(`/admin/${storeId}/products`)
         return
       }
       const res = await updateProduct({ ...values, _id: productId })
@@ -193,7 +230,7 @@ const ProductForm = ({
         showError(res.message)
       } else {
         showSuccess(res.message)
-        router.push(`/admin/products`)
+        router.push(`/admin/${storeId}/products`)
       }
     }
   }
@@ -223,7 +260,7 @@ const ProductForm = ({
           <Button variant="outline" size="icon">
             <RefreshCw className="h-4 w-4" />
           </Button>
-          <Link href="/admin/products">
+          <Link href={`/admin/${storeId}/products`}>
             <Button className="bg-navy hover:bg-navy/90 text-white">
               <ChevronLeft className="mr-2 h-4 w-4" /> Back to Product
             </Button>
@@ -332,12 +369,66 @@ const ProductForm = ({
                       <div className="flex gap-2">
                         <div className="w-full flex-1">
                           <FormControl>
-                            <Input placeholder='Enter SKU' {...field} />
+                            <Input placeholder='Enter barcode' {...field} />
                           </FormControl>
                         </div>
-                        <Button type="button" className="bg-orange hover:bg-orange-dark text-white">Generate</Button>
+                        <Button
+                          type="button"
+                          className="bg-orange hover:bg-orange-dark text-white"
+                          onClick={() => {
+                            const name = form.getValues('name')
+                            if (!name) {
+                              showError('Please enter a product name first')
+                              return
+                            }
+                            const namePart = name.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(3, 'X')
+                            const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : 'STOR'
+                            const randomPart = Math.floor(10000 + Math.random() * 90000)
+                            const sku = `${namePart}-${storePart}-${randomPart}`
+                            form.setValue('sku', sku)
+                          }}
+                        >
+                          Generate
+                        </Button>
                       </div>
                       <FormMessage />
+
+
+                      {/* Reactive SKU Generation */}
+                      {type === 'Create' && (
+                        <div className="hidden">
+                          {(() => {
+                            // eslint-disable-next-line react-hooks/rules-of-hooks
+                            useEffect(() => {
+                              if (productName) {
+                                const currentSku = form.getValues('sku')
+                                const namePart = productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(3, 'X')
+                                const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : 'STOR'
+
+                                let randomPart = '00000'
+                                // Try to preserve existing random part if format matches
+                                if (currentSku && currentSku.includes(storePart)) {
+                                  const parts = currentSku.split('-')
+                                  const lastPart = parts[parts.length - 1]
+                                  if (/^\d{5}$/.test(lastPart)) {
+                                    randomPart = lastPart
+                                  } else {
+                                    randomPart = String(Math.floor(10000 + Math.random() * 90000))
+                                  }
+                                } else {
+                                  randomPart = String(Math.floor(10000 + Math.random() * 90000))
+                                }
+
+                                const sku = `${namePart}-${storePart}-${randomPart}`
+                                if (sku !== currentSku) {
+                                  form.setValue('sku', sku)
+                                }
+                              }
+                            }, [productName, storeId, form])
+                            return null
+                          })()}
+                        </div>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -507,10 +598,69 @@ const ProductForm = ({
                       <div className="flex gap-2">
                         <div className="w-full flex-1">
                           <FormControl>
-                            <Input placeholder='Enter Barcode' {...field} />
+                            <Input
+                              placeholder='Enter Barcode'
+                              {...field}
+                              readOnly={barcodeScanned}
+                              className={barcodeScanned ? 'bg-muted cursor-not-allowed' : ''}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
+                                field.onChange(value)
+                                setBarcodeScanned(false) // Allow editing if user types
+                              }}
+                            />
                           </FormControl>
                         </div>
-                        <Button type="button" className="bg-orange hover:bg-orange-dark text-white">Generate</Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setIsScannerOpen(true)}
+                          title="Scan Barcode"
+                        >
+                          <ScanBarcode className="h-4 w-4" />
+                        </Button>
+                        {barcodeScanned ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              form.setValue('itemBarcode', '')
+                              setBarcodeScanned(false)
+                            }}
+                            title="Clear scanned barcode"
+                          >
+                            <Trash className="h-4 w-4 mr-1" />
+                            Clear
+                          </Button>
+                        ) : (
+                          <Button
+                            type="button"
+                            className="bg-orange hover:bg-orange-dark text-white"
+                            onClick={() => {
+                              const symbology = form.getValues('barcodeSymbology')
+                              let barcode = ''
+                              if (symbology === 'EAN-13') {
+                                // Generate 12 digits, calculate checksum
+                                let sum = 0;
+                                for (let i = 0; i < 12; i++) {
+                                  const digit = Math.floor(Math.random() * 10);
+                                  barcode += digit;
+                                  sum += digit * (i % 2 === 0 ? 1 : 3);
+                                }
+                                const checksum = (10 - (sum % 10)) % 10;
+                                barcode += checksum;
+                              } else {
+                                // Simple random string for Code 128 and Code 39
+                                barcode = Math.random().toString(36).substring(2, 12).toUpperCase();
+                              }
+                              form.setValue('itemBarcode', barcode)
+                              setBarcodeScanned(false)
+                            }}
+                          >
+                            Generate
+                          </Button>
+                        )}
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -587,12 +737,45 @@ const ProductForm = ({
                 />
                 <FormField
                   control={form.control}
+                  name='costPerUnit'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cost per Unit <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input type='number' step='0.01' placeholder='Enter cost' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='listPrice'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>List Price (MSRP) <span className="text-red-500">*</span></FormLabel>
+                      <FormControl>
+                        <Input type='number' step='0.01' placeholder='Enter list price' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name='price'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>Selling Price <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input type='number' placeholder='Enter price' {...field} />
+                        <Input
+                          type='number'
+                          step='0.01'
+                          placeholder='Calculated price'
+                          {...field}
+                          disabled
+                          className="bg-gray-50"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -694,6 +877,27 @@ const ProductForm = ({
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name='isPublished'
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                    <div className="space-y-0">
+                      <FormLabel className="text-sm font-medium">Published</FormLabel>
+                      <div className="text-xs text-muted-foreground">
+                        Make product visible to customers
+                      </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </CardContent>
           </Card>
 
@@ -761,7 +965,7 @@ const ProductForm = ({
           </Card>
 
           <div className="flex justify-end gap-4">
-            <Button type="button" variant="outline" onClick={() => router.push('/admin/products')}>
+            <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)}>
               Cancel
             </Button>
             <Button
@@ -774,6 +978,15 @@ const ProductForm = ({
             </Button>
           </div>
         </form>
+        <BarcodeScannerDialog
+          open={isScannerOpen}
+          onOpenChange={setIsScannerOpen}
+          onScan={(result) => {
+            form.setValue('itemBarcode', result)
+            setBarcodeScanned(true)
+            showSuccess('Barcode scanned successfully')
+          }}
+        />
       </Form>
     </div>
   )

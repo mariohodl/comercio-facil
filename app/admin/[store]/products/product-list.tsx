@@ -51,7 +51,7 @@ type ProductListDataProps = {
   from: number
 }
 
-const ProductList = () => {
+const ProductList = ({ store }: { store: string }) => {
   const [page, setPage] = useState<number>(1)
   const [inputValue, setInputValue] = useState<string>('')
   const [category, setCategory] = useState<string>('all')
@@ -120,7 +120,7 @@ const ProductList = () => {
             <RefreshCw className='w-4 h-4' />
           </Button>
           <Button asChild className='bg-orange hover:bg-orange-dark text-white'>
-            <Link href='/admin/products/create'>
+            <Link href={`/admin/${store}/products/create`}>
               <Plus className='w-4 h-4 mr-2' /> Add Product
             </Link>
           </Button>
@@ -236,7 +236,7 @@ const ProductList = () => {
                           size='icon'
                           className='h-8 w-8 text-blue-500'
                         >
-                          <Link href={`/product/${product.slug}`} target='_blank'>
+                          <Link href={`/admin/${store}/products/${product._id}/details`}>
                             <Eye className='w-4 h-4' />
                           </Link>
                         </Button>
@@ -246,7 +246,7 @@ const ProductList = () => {
                           size='icon'
                           className='h-8 w-8 text-green-500'
                         >
-                          <Link href={`/admin/products/${product._id}`}>
+                          <Link href={`/admin/${store}/products/${product._id}`}>
                             <Edit className='w-4 h-4' />
                           </Link>
                         </Button>

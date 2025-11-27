@@ -34,7 +34,7 @@ export const ProductInputSchema = z.object({
 	name: z.string().min(3, 'Name must be at least 3 characters'),
 	slug: z.string().min(3, 'Slug must be at least 3 characters'),
 	category: z.string().min(1, 'Category is required'),
-	sku: z.string().min(1, 'SKU is required'),
+	sku: z.string().min(1, 'SKU is required').regex(/^[a-zA-Z0-9-_]+$/, 'SKU can only contain letters, numbers, hyphens, and underscores'),
 	images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })),
 	brand: z.string().optional(),
 	description: z.string().optional(),
@@ -68,19 +68,19 @@ export const ProductInputSchema = z.object({
 		.number()
 		.int()
 		.nonnegative('Number of sales must be a non-negative number'),
-	// New fields for Create Product View
 	store: z.string().min(1, 'Store is required'),
 	warehouse: z.string().min(1, 'Warehouse is required'),
 	subCategory: z.string().min(1, 'Sub category is required'),
 	unit: z.string().min(1, 'Unit is required'),
 	barcodeSymbology: z.string().min(1, 'Barcode symbology is required'),
-	itemBarcode: z.string().min(1, 'Item barcode is required'),
+	itemBarcode: z.string().min(1, 'Item barcode is required').regex(/^[a-zA-Z0-9]+$/, 'Item barcode can only contain letters and numbers'),
 	productType: z.string().min(1, 'Product type is required'),
 	taxType: z.string().min(1, 'Tax type is required'),
 	tax: z.coerce.number().nonnegative('Tax must be a non-negative number'),
 	discountType: z.string().optional(),
 	discountValue: z.coerce.number().optional(),
 	quantityAlert: z.coerce.number().int().nonnegative('Quantity alert must be a non-negative number'),
+	costPerUnit: z.coerce.number().nonnegative('Cost per unit must be a non-negative number'),
 })
 
 // Order Item

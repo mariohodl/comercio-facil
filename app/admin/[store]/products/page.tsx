@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: 'Admin Products',
 }
 
-export default async function AdminProduct() {
-  return <ProductList />
+export default async function AdminProduct(props: {
+  params: Promise<{ store: string }>
+}) {
+  const params = await props.params
+  return <ProductList store={params.store} />
 }

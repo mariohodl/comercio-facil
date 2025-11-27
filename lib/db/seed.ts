@@ -91,6 +91,11 @@ const main = async () => {
       message: 'Seeded database successfully',
     });
 
+    if (createdProducts.length > 0) {
+      console.log('First product itemBarcode:', createdProducts[0].itemBarcode);
+      console.log('First product full object:', JSON.stringify(createdProducts[0], null, 2));
+    }
+
     process.exit(0);
   } catch (error) {
     console.error(error);

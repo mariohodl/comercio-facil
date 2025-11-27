@@ -15,13 +15,14 @@ export const metadata: Metadata = {
 type UpdateProductProps = {
   params: Promise<{
     id: string
+    store: string
   }>
 }
 
 const UpdateProduct = async (props: UpdateProductProps) => {
   const params = await props.params
 
-  const { id } = params
+  const { id, store } = params
 
   const product = await getProductById(id)
   if (!product) notFound()
@@ -33,13 +34,13 @@ const UpdateProduct = async (props: UpdateProductProps) => {
   return (
     <main className='max-w-6xl mx-auto p-4'>
       <div className='flex mb-4'>
-        <Link href='/admin/products'>Products</Link>
+        <Link href={`/admin/${store}/products`}>Products</Link>
         <span className='mx-1'>›</span>
-        <Link href={`/admin/products/${product._id}`}>{product._id}</Link>
+        <Link href={`/admin/${store}/products/${product._id}`}>{product._id}</Link>
       </div>
 
       <div className='my-8'>
-        <ProductForm type='Update' product={product} productId={product._id} categories={categories} brands={brands} units={units} />
+        <ProductForm type='Update' product={product} productId={product._id} categories={categories} brands={brands} units={units} storeId={store} />
       </div>
     </main>
   )

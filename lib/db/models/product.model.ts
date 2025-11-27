@@ -110,7 +110,9 @@ const productSchema = new Schema<IProduct>(
 		tax: { type: Number, required: true },
 		discountType: { type: String, required: false },
 		discountValue: { type: Number, required: false },
+		discountValue: { type: Number, required: false },
 		quantityAlert: { type: Number, required: true },
+		costPerUnit: { type: Number, required: true, default: 0 },
 	},
 	{
 		timestamps: true,
