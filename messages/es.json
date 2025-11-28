@@ -233,6 +233,29 @@
             "total": "Total"
         }
     },
+    "printBarcode": {
+        "title": "Imprimir Código de Barras",
+        "subtitle": "Administra tus códigos de barras",
+        "warehouse": "Almacén",
+        "store": "Tienda",
+        "product": "Producto",
+        "searchPlaceholder": "Buscar Producto por Código o Nombre",
+        "sku": "SKU",
+        "code": "Código",
+        "qty": "Cant",
+        "paperSize": "Tamaño de Papel",
+        "showStoreName": "Mostrar Nombre de Tienda",
+        "showProductName": "Mostrar Nombre de Producto",
+        "showPrice": "Mostrar Precio",
+        "generateBarcode": "Generar Código de Barras",
+        "resetBarcode": "Reiniciar Código de Barras",
+        "printBarcode": "Imprimir Código de Barras",
+        "select": "Seleccionar",
+        "mainWarehouse": "Almacén Principal",
+        "mainStore": "Tienda Principal",
+        "barcode": "Código de Barras",
+        "price": "Precio"
+    },
     "inventory": {
         "brands": "Marcas",
         "brand": "Marca",

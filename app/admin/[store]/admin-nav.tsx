@@ -16,7 +16,6 @@ import {
   Settings2,
   ShieldCheck,
   Barcode,
-  QrCode,
   Package,
   ArrowLeftRight,
   ArrowUpRight,
@@ -102,21 +101,21 @@ export function AdminNav({
           href: `/admin/${storeId}/inventory/attributes`,
           icon: Settings2,
         },
-        {
-          title: t('warranties'),
-          href: `/admin/${storeId}/inventory/warranties`,
-          icon: ShieldCheck,
-        },
+        // {
+        //   title: t('warranties'),
+        //   href: `/admin/${storeId}/inventory/warranties`,
+        //   icon: ShieldCheck,
+        // },
         {
           title: t('printBarcode'),
-          href: `/admin/${storeId}/inventory/print-barcode`,
+          href: `/admin/${storeId}/products/print-barcodes`,
           icon: Barcode,
         },
-        {
-          title: t('printQRCode'),
-          href: `/admin/${storeId}/inventory/print-qrcode`,
-          icon: QrCode,
-        },
+        // {
+        //   title: t('printQRCode'),
+        //   href: `/admin/${storeId}/inventory/print-qrcode`,
+        //   icon: QrCode,
+        // },
       ],
     },
     {

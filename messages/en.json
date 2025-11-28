@@ -233,6 +233,29 @@
             "total": "Total"
         }
     },
+    "printBarcode": {
+        "title": "Print Barcode",
+        "subtitle": "Manage your barcodes",
+        "warehouse": "Warehouse",
+        "store": "Store",
+        "product": "Product",
+        "searchPlaceholder": "Search Product by Code or Name",
+        "sku": "SKU",
+        "code": "Code",
+        "qty": "Qty",
+        "paperSize": "Paper Size",
+        "showStoreName": "Show Store Name",
+        "showProductName": "Show Product Name",
+        "showPrice": "Show Price",
+        "generateBarcode": "Generate Barcode",
+        "resetBarcode": "Reset Barcode",
+        "printBarcode": "Print Barcode",
+        "select": "Select",
+        "mainWarehouse": "Main Warehouse",
+        "mainStore": "Main Store",
+        "barcode": "Barcode",
+        "price": "Price"
+    },
     "inventory": {
         "brands": "Brands",
         "brand": "Brand",
