@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { ISubCategory } from '@/lib/db/models/sub-category.model'
 import { getAllSubCategories, deleteSubCategory } from '@/lib/actions/sub-category.actions'
 import { SubCategoryModal } from '@/components/shared/sub-category-modal'
@@ -29,13 +29,12 @@ import { DeleteDialog } from '@/components/shared/delete-dialog'
 import Image from 'next/image'
 
 export default function SubCategoriesPage() {
-    const router = useRouter()
-    const searchParams = useSearchParams()
+    const t = useTranslations('inventory')
+    const tCommon = useTranslations('common')
     const { showSuccess, showError } = useToast()
 
     const [subCategories, setSubCategories] = useState<(ISubCategory & { parentCategory: { categoryName: string } })[]>([])
     const [totalPages, setTotalPages] = useState(0)
-    const [totalSubCategories, setTotalSubCategories] = useState(0)
     const [loading, setLoading] = useState(true)
 
     const [searchQuery, setSearchQuery] = useState('')
@@ -59,8 +58,7 @@ export default function SubCategoriesPage() {
             })
             setSubCategories(result.subCategories)
             setTotalPages(result.totalPages)
-            setTotalSubCategories(result.totalSubCategories)
-        } catch (error) {
+        } catch {
             showError('Failed to fetch sub categories')
         } finally {
             setLoading(false)
@@ -115,8 +113,8 @@ export default function SubCategoriesPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-navy">Sub Category</h1>
-                    <p className="text-muted-foreground">Manage your sub categories</p>
+                    <h1 className="text-2xl font-bold text-navy">{t('subCategories')}</h1>
+                    <p className="text-muted-foreground">{t('manageSubCategories')}</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" size="icon" className="text-red-500">
@@ -133,7 +131,7 @@ export default function SubCategoriesPage() {
                         className="bg-orange hover:bg-orange-dark text-white"
                     >
                         <Plus className="h-4 w-4 mr-2" />
-                        Add Sub Category
+                        {t('addSubCategory')}
                     </Button>
                 </div>
             </div>
@@ -143,7 +141,7 @@ export default function SubCategoriesPage() {
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Search"
+                        placeholder={tCommon('search')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10"
@@ -154,9 +152,9 @@ export default function SubCategoriesPage() {
                         <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="all">{t('allStatus')}</SelectItem>
+                        <SelectItem value="active">{t('active')}</SelectItem>
+                        <SelectItem value="inactive">{t('inactive')}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -166,26 +164,26 @@ export default function SubCategoriesPage() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Image</TableHead>
-                            <TableHead>Sub Category</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Category Code</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead>{t('image')}</TableHead>
+                            <TableHead>{t('subCategory')}</TableHead>
+                            <TableHead>{t('category')}</TableHead>
+                            <TableHead>{t('categoryCode')}</TableHead>
+                            <TableHead>{t('description')}</TableHead>
+                            <TableHead>{t('status')}</TableHead>
+                            <TableHead className="text-right">{t('action')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center py-8">
-                                    Loading...
+                                    {t('loading')}
                                 </TableCell>
                             </TableRow>
                         ) : subCategories.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center py-8">
-                                    No sub categories found
+                                    {t('noSubCategoriesFound')}
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -203,7 +201,7 @@ export default function SubCategoriesPage() {
                                             </div>
                                         ) : (
                                             <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-400">
-                                                No Img
+                                                {t('noImg')}
                                             </div>
                                         )}
                                     </TableCell>
@@ -219,7 +217,7 @@ export default function SubCategoriesPage() {
                                                     : 'bg-gray-100 text-gray-800 hover:bg-gray-100'
                                             }
                                         >
-                                            {subCategory.status ? 'Active' : 'Inactive'}
+                                            {subCategory.status ? t('active') : t('inactive')}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -250,7 +248,7 @@ export default function SubCategoriesPage() {
             {/* Pagination */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Row Per Page</span>
+                    <span className="text-sm text-muted-foreground">{tCommon('rowsPerPage')}</span>
                     <Select
                         value={String(rowsPerPage)}
                         onValueChange={(value) => setRowsPerPage(Number(value))}
@@ -265,7 +263,7 @@ export default function SubCategoriesPage() {
                             <SelectItem value="50">50</SelectItem>
                         </SelectContent>
                     </Select>
-                    <span className="text-sm text-muted-foreground">Entries</span>
+                    <span className="text-sm text-muted-foreground">{tCommon('entries')}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -275,7 +273,7 @@ export default function SubCategoriesPage() {
                         onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
                     >
-                        Previous
+                        {tCommon('previous')}
                     </Button>
                     <div className="flex items-center gap-1">
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -300,7 +298,7 @@ export default function SubCategoriesPage() {
                         onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
                     >
-                        Next
+                        {tCommon('next')}
                     </Button>
                 </div>
             </div>
@@ -318,8 +316,8 @@ export default function SubCategoriesPage() {
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
                 onConfirm={handleDeleteConfirm}
-                title="Delete Sub Category"
-                description="Are you sure you want to delete this sub category? This action cannot be undone."
+                title={t('deleteSubCategoryTitle')}
+                description={t('deleteSubCategoryDescription')}
             />
         </div>
     )

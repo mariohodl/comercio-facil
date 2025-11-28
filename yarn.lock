@@ -8034,7 +8034,7 @@ next-auth@^5.0.0-beta.25:
   dependencies:
     "@auth/core" "0.37.2"
 
-next-intl@^3.26.3:
+next-intl@^3.26.5:
   version "3.26.5"
   resolved "https://registry.npmjs.org/next-intl/-/next-intl-3.26.5.tgz"
   integrity sha512-EQlCIfY0jOhRldiFxwSXG+ImwkQtDEfQeSOEQp6ieAGSLWGlgjdb/Ck/O7wMfC430ZHGeUKVKax8KGusTPKCgg==

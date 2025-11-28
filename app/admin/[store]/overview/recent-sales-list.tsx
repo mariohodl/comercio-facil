@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { IOrderList } from '@/types'
+import { useTranslations } from 'next-intl'
 // Image removed
 
 interface RecentSalesListProps {
@@ -8,11 +9,12 @@ interface RecentSalesListProps {
 }
 
 export default function RecentSalesList({ data }: RecentSalesListProps) {
+    const t = useTranslations('admin.dashboard')
     return (
         <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
-                <CardTitle className='text-base'>Recent Sales</CardTitle>
-                <div className='text-sm text-muted-foreground'>Weekly</div>
+                <CardTitle className='text-base'>{t('recentSales')}</CardTitle>
+                <div className='text-sm text-muted-foreground'>{t('weekly')}</div>
             </CardHeader>
             <CardContent>
                 <div className='space-y-6'>
@@ -24,7 +26,7 @@ export default function RecentSalesList({ data }: RecentSalesListProps) {
                                     <span className='text-lg font-bold text-gray-500'>{order.user?.name?.charAt(0) || 'U'}</span>
                                 </div>
                                 <div>
-                                    <p className='font-medium line-clamp-1'>{order.user?.name || 'Deleted User'}</p>
+                                    <p className='font-medium line-clamp-1'>{order.user?.name || t('deletedUser')}</p>
                                     <p className='text-sm text-muted-foreground'>
                                         {formatDateTime(order.createdAt).dateOnly}
                                     </p>
@@ -38,7 +40,7 @@ export default function RecentSalesList({ data }: RecentSalesListProps) {
                                         ? 'bg-blue-100 text-blue-700'
                                         : 'bg-yellow-100 text-yellow-700'
                                     }`}>
-                                    {order.isDelivered ? 'Completed' : order.isPaid ? 'Processing' : 'Pending'}
+                                    {order.isDelivered ? t('completed') : order.isPaid ? t('processing') : t('pending')}
                                 </span>
                             </div>
                         </div>

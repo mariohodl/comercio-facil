@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 // Link removed
 
 interface TopSellingProductsProps {
@@ -13,11 +14,12 @@ interface TopSellingProductsProps {
 }
 
 export default function TopSellingProducts({ data }: TopSellingProductsProps) {
+    const t = useTranslations('admin.dashboard')
     return (
         <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
-                <CardTitle className='text-base'>Top Selling Products</CardTitle>
-                <div className='text-sm text-muted-foreground'>Today</div>
+                <CardTitle className='text-base'>{t('topSellingProducts')}</CardTitle>
+                <div className='text-sm text-muted-foreground'>{t('today')}</div>
             </CardHeader>
             <CardContent>
                 <div className='space-y-6'>
@@ -35,7 +37,7 @@ export default function TopSellingProducts({ data }: TopSellingProductsProps) {
                                 <div>
                                     <p className='font-medium line-clamp-1'>{product.label}</p>
                                     <p className='text-sm text-muted-foreground'>
-                                        {formatCurrency(product.value)} • Sales
+                                        {formatCurrency(product.value)} • {t('sales')}
                                     </p>
                                 </div>
                             </div>

@@ -9,6 +9,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 interface RecentTransactionsTableProps {
     data: {
@@ -22,12 +23,13 @@ interface RecentTransactionsTableProps {
 }
 
 export default function RecentTransactionsTable({ data }: RecentTransactionsTableProps) {
+    const t = useTranslations('admin.dashboard')
     return (
         <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
-                <CardTitle className='text-base'>Recent Transactions</CardTitle>
+                <CardTitle className='text-base'>{t('recentTransactions')}</CardTitle>
                 <Link href='/admin/orders' className='text-sm text-muted-foreground hover:underline'>
-                    View All
+                    {t('viewAll')}
                 </Link>
             </CardHeader>
             <CardContent>
@@ -35,10 +37,10 @@ export default function RecentTransactionsTable({ data }: RecentTransactionsTabl
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="whitespace-nowrap">Date</TableHead>
-                                <TableHead className="whitespace-nowrap">Customer/Supplier</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className='text-right'>Total</TableHead>
+                                <TableHead className="whitespace-nowrap">{t('date')}</TableHead>
+                                <TableHead className="whitespace-nowrap">{t('customerSupplier')}</TableHead>
+                                <TableHead>{t('status')}</TableHead>
+                                <TableHead className='text-right'>{t('total')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

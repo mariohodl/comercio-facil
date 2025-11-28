@@ -18,13 +18,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { calculatePastDate, formatCurrency, formatDateTime } from '@/lib/utils'
+import { calculatePastDate, formatCurrency } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 import React, { useEffect, useState, useTransition } from 'react'
 import { DateRange } from 'react-day-picker'
 import { getOrderSummary } from '@/lib/actions/order.actions'
 import { CalendarDateRangePicker } from './date-range-picker'
-import { IOrderList } from '@/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import SummaryCard from './summary-card'
 import SalesPurchaseChart from './sales-purchase-chart'
@@ -38,6 +38,7 @@ import TopCategoriesChart from './top-categories-chart'
 import OrderStatisticsChart from './order-statistics-chart'
 
 export default function OverviewReport() {
+  const t = useTranslations('admin.dashboard')
   const [date, setDate] = useState<DateRange | undefined>({
     from: calculatePastDate(30),
     to: new Date(),
@@ -46,7 +47,7 @@ export default function OverviewReport() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<{ [key: string]: any }>()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isPending, startTransition] = useTransition()
+  const [_, startTransition] = useTransition()
   useEffect(() => {
     if (date) {
       startTransition(async () => {
@@ -59,7 +60,7 @@ export default function OverviewReport() {
     return (
       <div className='space-y-4'>
         <div className='flex items-center justify-between'>
-          <h1 className='h1-bold'>Welcome, Admin</h1>
+          <h1 className='h1-bold'>{t('welcome')}</h1>
           <Skeleton className='h-10 w-[300px]' />
         </div>
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
@@ -80,8 +81,8 @@ export default function OverviewReport() {
     )
 
   // Prepare chart data combining sales and purchases for the first chart
-  const combinedChartData = data.salesChartData.map((saleItem: any) => {
-    const purchaseItem = data.purchaseChartData.find((p: any) => p.date === saleItem.date)
+  const combinedChartData = data.salesChartData.map((saleItem: { date: string; totalSales: number }) => {
+    const purchaseItem = data.purchaseChartData.find((p: { date: string; totalPurchases: number }) => p.date === saleItem.date)
     return {
       date: saleItem.date,
       totalSales: saleItem.totalSales,
@@ -93,8 +94,8 @@ export default function OverviewReport() {
     <div className='space-y-6'>
       <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-2 py-2'>
         <div>
-          <h1 className='h1-bold'>Welcome, Admin</h1>
-          <p className='text-muted-foreground'>You have {data.ordersCount} Orders, Today</p>
+          <h1 className='h1-bold'>{t('welcome')}</h1>
+          <p className='text-muted-foreground'>{t('ordersToday', { count: data.ordersCount })}</p>
         </div>
         <CalendarDateRangePicker defaultDate={date} setDate={setDate} className="w-full md:w-auto" />
       </div>
@@ -102,7 +103,7 @@ export default function OverviewReport() {
       {/* Row 1: Main Summary Cards */}
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <SummaryCard
-          title='Total Sales'
+          title={t('totalSales')}
           value={formatCurrency(data.totalSales)}
           icon={FileText}
           percentage={22}
@@ -110,7 +111,7 @@ export default function OverviewReport() {
           iconClassName='bg-orange-100 text-orange-600'
         />
         <SummaryCard
-          title='Total Sales Return'
+          title={t('totalSalesReturn')}
           value={formatCurrency(0)}
           icon={RefreshCw}
           percentage={-22}
@@ -118,7 +119,7 @@ export default function OverviewReport() {
           iconClassName='bg-navy-dark text-white'
         />
         <SummaryCard
-          title='Total Purchase'
+          title={t('totalPurchase')}
           value={formatCurrency(data.totalPurchases)}
           icon={Gift}
           percentage={22}
@@ -126,7 +127,7 @@ export default function OverviewReport() {
           iconClassName='bg-emerald-100 text-emerald-600'
         />
         <SummaryCard
-          title='Total Purchase Return'
+          title={t('totalPurchaseReturn')}
           value={formatCurrency(0)}
           icon={ShieldCheck}
           percentage={22}
@@ -141,8 +142,8 @@ export default function OverviewReport() {
           <CardContent className='p-6 flex items-center justify-between'>
             <div>
               <h3 className='text-xl font-bold'>{formatCurrency(data.totalSales - data.totalPurchases)}</h3>
-              <p className='text-sm text-muted-foreground'>Profit</p>
-              <p className='text-xs text-green-600 mt-1'>+35% vs Last Month</p>
+              <p className='text-sm text-muted-foreground'>{t('profit')}</p>
+              <p className='text-xs text-green-600 mt-1'>+35% {t('vsLastMonth')}</p>
             </div>
             <div className='p-2 bg-cyan-50 rounded-lg'>
               <Layers className='h-5 w-5 text-cyan-500' />
@@ -153,8 +154,8 @@ export default function OverviewReport() {
           <CardContent className='p-6 flex items-center justify-between'>
             <div>
               <h3 className='text-xl font-bold'>{formatCurrency(data.invoiceDue)}</h3>
-              <p className='text-sm text-muted-foreground'>Invoice Due</p>
-              <p className='text-xs text-green-600 mt-1'>+35% vs Last Month</p>
+              <p className='text-sm text-muted-foreground'>{t('invoiceDue')}</p>
+              <p className='text-xs text-green-600 mt-1'>+35% {t('vsLastMonth')}</p>
             </div>
             <div className='p-2 bg-teal-50 rounded-lg'>
               <Clock className='h-5 w-5 text-teal-500' />
@@ -165,8 +166,8 @@ export default function OverviewReport() {
           <CardContent className='p-6 flex items-center justify-between'>
             <div>
               <h3 className='text-xl font-bold'>{formatCurrency(data.totalPurchases)}</h3>
-              <p className='text-sm text-muted-foreground'>Total Expenses</p>
-              <p className='text-xs text-green-600 mt-1'>+41% vs Last Month</p>
+              <p className='text-sm text-muted-foreground'>{t('totalExpenses')}</p>
+              <p className='text-xs text-green-600 mt-1'>+41% {t('vsLastMonth')}</p>
             </div>
             <div className='p-2 bg-orange-50 rounded-lg'>
               <Wallet className='h-5 w-5 text-orange-500' />
@@ -177,8 +178,8 @@ export default function OverviewReport() {
           <CardContent className='p-6 flex items-center justify-between'>
             <div>
               <h3 className='text-xl font-bold'>{formatCurrency(0)}</h3>
-              <p className='text-sm text-muted-foreground'>Total Payment Returns</p>
-              <p className='text-xs text-red-600 mt-1'>-20% vs Last Month</p>
+              <p className='text-sm text-muted-foreground'>{t('totalPaymentReturns')}</p>
+              <p className='text-xs text-red-600 mt-1'>-20% {t('vsLastMonth')}</p>
             </div>
             <div className='p-2 bg-indigo-50 rounded-lg'>
               <Hash className='h-5 w-5 text-indigo-500' />
@@ -198,7 +199,7 @@ export default function OverviewReport() {
       <div className='grid gap-4 md:grid-cols-2'>
         <Card>
           <CardHeader className='flex flex-row items-center justify-between'>
-            <CardTitle className='text-base'>Sales Statics</CardTitle>
+            <CardTitle className='text-base'>{t('salesStatics')}</CardTitle>
             <div className='flex gap-2'>
               {/* Filter buttons */}
             </div>
@@ -207,11 +208,11 @@ export default function OverviewReport() {
             <div className='flex items-center gap-4 mb-4'>
               <div>
                 <p className='text-2xl font-bold text-emerald-500'>{formatCurrency(data.totalSales)}</p>
-                <p className='text-xs text-muted-foreground'>Revenue</p>
+                <p className='text-xs text-muted-foreground'>{t('revenue')}</p>
               </div>
               <div>
                 <p className='text-2xl font-bold text-red-500'>{formatCurrency(data.totalPurchases)}</p>
-                <p className='text-xs text-muted-foreground'>Expense</p>
+                <p className='text-xs text-muted-foreground'>{t('expense')}</p>
               </div>
             </div>
             <SalesStaticsChart data={combinedChartData} />
@@ -231,7 +232,7 @@ export default function OverviewReport() {
       <div className='grid gap-4 md:grid-cols-3'>
         <Card className='col-span-2'>
           <CardHeader className='flex flex-row items-center justify-between'>
-            <CardTitle className='text-base'>Sales & Purchase Overview</CardTitle>
+            <CardTitle className='text-base'>{t('salesPurchaseOverview')}</CardTitle>
           </CardHeader>
           <CardContent>
             <SalesPurchaseChart data={combinedChartData} />
@@ -241,7 +242,7 @@ export default function OverviewReport() {
         <div className='space-y-4'>
           <Card>
             <CardHeader>
-              <CardTitle className='text-base'>Overall Information</CardTitle>
+              <CardTitle className='text-base'>{t('overallInformation')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className='grid grid-cols-3 gap-4 text-center'>
@@ -249,21 +250,21 @@ export default function OverviewReport() {
                   <div className='mb-2 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600'>
                     <Users className='h-5 w-5' />
                   </div>
-                  <p className='text-xs text-muted-foreground'>Suppliers</p>
+                  <p className='text-xs text-muted-foreground'>{t('suppliers')}</p>
                   <p className='font-bold'>{data.suppliersCount}</p>
                 </div>
                 <div>
                   <div className='mb-2 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 text-orange-600'>
                     <Users className='h-5 w-5' />
                   </div>
-                  <p className='text-xs text-muted-foreground'>Customer</p>
+                  <p className='text-xs text-muted-foreground'>{t('customer')}</p>
                   <p className='font-bold'>{data.usersCount}</p>
                 </div>
                 <div>
                   <div className='mb-2 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-600'>
                     <ShoppingCart className='h-5 w-5' />
                   </div>
-                  <p className='text-xs text-muted-foreground'>Orders</p>
+                  <p className='text-xs text-muted-foreground'>{t('orders')}</p>
                   <p className='font-bold'>{data.ordersCount}</p>
                 </div>
               </div>

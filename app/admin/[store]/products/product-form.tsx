@@ -4,9 +4,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { PlusCircle, Loader2, ScanBarcode, Trash, RefreshCw, ChevronLeft } from 'lucide-react'
+import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslations } from 'next-intl'
 import BarcodeScannerDialog from '@/components/shared/barcode-scanner'
 import { getSubCategoriesByCategory } from '@/lib/actions/sub-category.actions'
 import { Button } from '@/components/ui/button'
@@ -129,6 +130,8 @@ const ProductForm = ({
   units?: { _id: string; name: string; abbreviation: string }[]
 }) => {
   const router = useRouter()
+  const t = useTranslations('products')
+  const tCommon = useTranslations('common')
 
 
   const [subCategories, setSubCategories] = useState<{ name: string; slug: string }[]>([])
@@ -152,6 +155,33 @@ const ProductForm = ({
       form.setValue('slug', toSlug(productName))
     }
   }, [productName, type, form])
+
+  useEffect(() => {
+    if (type === 'Create' && productName) {
+      const currentSku = form.getValues('sku')
+      const namePart = productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(3, 'X')
+      const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : 'STOR'
+
+      let randomPart = '00000'
+      // Try to preserve existing random part if format matches
+      if (currentSku && currentSku.includes(storePart)) {
+        const parts = currentSku.split('-')
+        const lastPart = parts[parts.length - 1]
+        if (/^\d{5}$/.test(lastPart)) {
+          randomPart = lastPart
+        } else {
+          randomPart = String(Math.floor(10000 + Math.random() * 90000))
+        }
+      } else {
+        randomPart = String(Math.floor(10000 + Math.random() * 90000))
+      }
+
+      const sku = `${namePart}-${storePart}-${randomPart}`
+      if (sku !== currentSku) {
+        form.setValue('sku', sku)
+      }
+    }
+  }, [productName, type, storeId, form])
 
   useEffect(() => {
     const fetchSubCategories = async () => {
@@ -238,23 +268,23 @@ const ProductForm = ({
 
   const handleRemoveImage = async (image: ProductImage) => {
     if (!productId) {
-      showError('Product ID is required to delete images')
+      showError(t('productIdRequired'))
       return
     }
     const res = await deleteProductImg(productId, image.imgKey)
     if (res.success) {
-      showSuccess('Image deleted successfully')
+      showSuccess(t('imageDeletedSuccessfully'))
       form.setValue('images', images.filter((img) => img.imgKey !== image.imgKey))
     } else {
-      showError(res.errorMessage || 'Failed to delete image')
+      showError(res.errorMessage || t('failedToDeleteImage'))
     }
   }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-navy">{type} Product</h1>
-          <p className="text-muted-foreground">Create new product</p>
+          <h1 className="text-2xl font-bold text-navy">{type === 'Create' ? t('createProduct') : t('updateProduct')}</h1>
+          <p className="text-muted-foreground">{t('createNewProduct')}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="icon">
@@ -262,7 +292,7 @@ const ProductForm = ({
           </Button>
           <Link href={`/admin/${storeId}/products`}>
             <Button className="bg-navy hover:bg-navy/90 text-white">
-              <ChevronLeft className="mr-2 h-4 w-4" /> Back to Product
+              <ChevronLeft className="mr-2 h-4 w-4" /> {t('backToProduct')}
             </Button>
           </Link>
         </div>
@@ -272,7 +302,7 @@ const ProductForm = ({
         <form
           method='post'
           onSubmit={form.handleSubmit(onSubmit, (errors) => {
-            showError('Please check the form for errors. Required fields are marked with *.')
+            showError(t('checkFormErrors'))
             console.log(errors)
           })}
           className='space-y-8'
@@ -281,7 +311,7 @@ const ProductForm = ({
           <Card className="border-neutral-200 shadow-sm">
             <CardHeader>
               <CardTitle className="text-navy flex items-center gap-2">
-                <span className="text-orange">ⓘ</span> Product Information
+                <span className="text-orange">ⓘ</span> {t('productInformation')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -291,15 +321,15 @@ const ProductForm = ({
                   name='store'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Store <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('store')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="store1">Main Store</SelectItem>
+                          <SelectItem value="store1">{t('mainStore')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -311,15 +341,15 @@ const ProductForm = ({
                   name='warehouse'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Warehouse <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('warehouse')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="warehouse1">Main Warehouse</SelectItem>
+                          <SelectItem value="warehouse1">{t('mainWarehouse')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -334,9 +364,9 @@ const ProductForm = ({
                   name='name'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Product Name <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('productName')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder='Enter product name' {...field} />
+                        <Input placeholder={t('enterProductName')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -347,10 +377,10 @@ const ProductForm = ({
                   name='slug'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Slug <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('slug')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <div className='relative'>
-                          <Input placeholder='Enter product slug' {...field} disabled />
+                          <Input placeholder={t('enterProductSlug')} {...field} disabled />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -365,11 +395,11 @@ const ProductForm = ({
                   name='sku'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>SKU <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('sku')} <span className="text-red-500">*</span></FormLabel>
                       <div className="flex gap-2">
                         <div className="w-full flex-1">
                           <FormControl>
-                            <Input placeholder='Enter barcode' {...field} />
+                            <Input placeholder={t('enterBarcode')} {...field} />
                           </FormControl>
                         </div>
                         <Button
@@ -378,7 +408,7 @@ const ProductForm = ({
                           onClick={() => {
                             const name = form.getValues('name')
                             if (!name) {
-                              showError('Please enter a product name first')
+                              showError(t('enterProductNameFirst'))
                               return
                             }
                             const namePart = name.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(3, 'X')
@@ -388,47 +418,13 @@ const ProductForm = ({
                             form.setValue('sku', sku)
                           }}
                         >
-                          Generate
+                          {t('generate')}
                         </Button>
                       </div>
                       <FormMessage />
 
 
                       {/* Reactive SKU Generation */}
-                      {type === 'Create' && (
-                        <div className="hidden">
-                          {(() => {
-                            // eslint-disable-next-line react-hooks/rules-of-hooks
-                            useEffect(() => {
-                              if (productName) {
-                                const currentSku = form.getValues('sku')
-                                const namePart = productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(3, 'X')
-                                const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : 'STOR'
-
-                                let randomPart = '00000'
-                                // Try to preserve existing random part if format matches
-                                if (currentSku && currentSku.includes(storePart)) {
-                                  const parts = currentSku.split('-')
-                                  const lastPart = parts[parts.length - 1]
-                                  if (/^\d{5}$/.test(lastPart)) {
-                                    randomPart = lastPart
-                                  } else {
-                                    randomPart = String(Math.floor(10000 + Math.random() * 90000))
-                                  }
-                                } else {
-                                  randomPart = String(Math.floor(10000 + Math.random() * 90000))
-                                }
-
-                                const sku = `${namePart}-${storePart}-${randomPart}`
-                                if (sku !== currentSku) {
-                                  form.setValue('sku', sku)
-                                }
-                              }
-                            }, [productName, storeId, form])
-                            return null
-                          })()}
-                        </div>
-                      )}
                     </FormItem>
                   )}
                 />
@@ -441,7 +437,7 @@ const ProductForm = ({
                   name='category'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('category')} <span className="text-red-500">*</span></FormLabel>
                       <div className="flex gap-2 items-center">
                         <div className="w-full flex-1">
                           <Select
@@ -454,7 +450,7 @@ const ProductForm = ({
                           >
                             <FormControl>
                               <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select" />
+                                <SelectValue placeholder={t('select')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -466,14 +462,14 @@ const ProductForm = ({
                                 ))
                               ) : (
                                 <SelectItem value="no-categories" disabled>
-                                  No categories available
+                                  {t('noCategoriesAvailable')}
                                 </SelectItem>
                               )}
                             </SelectContent>
                           </Select>
                         </div>
                         <Button type="button" variant="ghost" className="text-orange hover:text-orange-dark whitespace-nowrap px-2">
-                          <PlusCircle className="w-4 h-4 mr-1" /> Add New
+                          <PlusCircle className="w-4 h-4 mr-1" /> {t('addNew')}
                         </Button>
                       </div>
                       <FormMessage />
@@ -485,15 +481,15 @@ const ProductForm = ({
                   name='subCategory'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Sub Category <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('subCategory')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="None">None</SelectItem>
+                          <SelectItem value="None">{t('none')}</SelectItem>
                           {subCategories.map((sub) => (
                             <SelectItem key={sub.slug} value={sub.name}>
                               {sub.name}
@@ -513,11 +509,11 @@ const ProductForm = ({
                   name='brand'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Brand <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('brand')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -528,7 +524,7 @@ const ProductForm = ({
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem value="Generico">Generico</SelectItem>
+                            <SelectItem value="Generico">{t('generic')}</SelectItem>
                           )}
                         </SelectContent>
                       </Select>
@@ -541,11 +537,11 @@ const ProductForm = ({
                   name='unit'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Unit <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('unit')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -556,7 +552,7 @@ const ProductForm = ({
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem value="Piece">Piece</SelectItem>
+                            <SelectItem value="Piece">{t('piece')}</SelectItem>
                           )}
                         </SelectContent>
                       </Select>
@@ -572,11 +568,11 @@ const ProductForm = ({
                   name='barcodeSymbology'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Barcode Symbology <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('barcodeSymbology')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -594,12 +590,12 @@ const ProductForm = ({
                   name='itemBarcode'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Item Barcode <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('itemBarcode')} <span className="text-red-500">*</span></FormLabel>
                       <div className="flex gap-2">
                         <div className="w-full flex-1">
                           <FormControl>
                             <Input
-                              placeholder='Enter Barcode'
+                              placeholder={t('enterBarcode')}
                               {...field}
                               readOnly={barcodeScanned}
                               className={barcodeScanned ? 'bg-muted cursor-not-allowed' : ''}
@@ -616,7 +612,7 @@ const ProductForm = ({
                           variant="outline"
                           size="icon"
                           onClick={() => setIsScannerOpen(true)}
-                          title="Scan Barcode"
+                          title={t('scanBarcode')}
                         >
                           <ScanBarcode className="h-4 w-4" />
                         </Button>
@@ -628,10 +624,10 @@ const ProductForm = ({
                               form.setValue('itemBarcode', '')
                               setBarcodeScanned(false)
                             }}
-                            title="Clear scanned barcode"
+                            title={t('clearScannedBarcode')}
                           >
                             <Trash className="h-4 w-4 mr-1" />
-                            Clear
+                            {t('clear')}
                           </Button>
                         ) : (
                           <Button
@@ -658,7 +654,7 @@ const ProductForm = ({
                               setBarcodeScanned(false)
                             }}
                           >
-                            Generate
+                            {t('generate')}
                           </Button>
                         )}
                       </div>
@@ -673,10 +669,10 @@ const ProductForm = ({
                 name='description'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('description')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder='Enter product description'
+                        placeholder={t('enterProductDescription')}
                         className='resize-none min-h-[100px]'
                         {...field}
                       />
@@ -692,7 +688,7 @@ const ProductForm = ({
           <Card className="border-neutral-200 shadow-sm">
             <CardHeader>
               <CardTitle className="text-navy flex items-center gap-2">
-                <span className="text-orange">ⓘ</span> Pricing & Stocks
+                <span className="text-orange">ⓘ</span> {t('pricingAndStocks')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -701,7 +697,7 @@ const ProductForm = ({
                 name='productType'
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel>Product Type <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>{t('productType')} <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -710,9 +706,9 @@ const ProductForm = ({
                       >
                         <div className="flex items-center space-x-3 space-y-0">
                           <RadioGroupItem value="Single Product" id="single" className="text-orange border-orange" />
-                          <FormLabel htmlFor="single" className="font-normal">Single Product</FormLabel>
+                          <FormLabel htmlFor="single" className="font-normal">{t('singleProduct')}</FormLabel>
                           <RadioGroupItem value="Variable Product" id="variable" className="text-orange border-orange ml-4" />
-                          <FormLabel htmlFor="variable" className="font-normal">Variable Product</FormLabel>
+                          <FormLabel htmlFor="variable" className="font-normal">{t('variableProduct')}</FormLabel>
                         </div>
                       </RadioGroup>
                     </FormControl>
@@ -727,9 +723,9 @@ const ProductForm = ({
                   name='countInStock'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Quantity <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('quantity')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input type='number' placeholder='Enter quantity' {...field} />
+                        <Input type='number' placeholder={t('enterQuantity')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -740,9 +736,9 @@ const ProductForm = ({
                   name='costPerUnit'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cost per Unit <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('costPerUnit')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input type='number' step='0.01' placeholder='Enter cost' {...field} />
+                        <Input type='number' step='0.01' placeholder={t('enterCost')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -753,9 +749,9 @@ const ProductForm = ({
                   name='listPrice'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>List Price (MSRP) <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('listPrice')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input type='number' step='0.01' placeholder='Enter list price' {...field} />
+                        <Input type='number' step='0.01' placeholder={t('enterListPrice')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -766,12 +762,12 @@ const ProductForm = ({
                   name='price'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Selling Price <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('sellingPrice')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input
                           type='number'
                           step='0.01'
-                          placeholder='Calculated price'
+                          placeholder={t('calculatedPrice')}
                           {...field}
                           disabled
                           className="bg-gray-50"
@@ -786,16 +782,16 @@ const ProductForm = ({
                   name='taxType'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tax Type <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('taxType')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Exclusive">Exclusive</SelectItem>
-                          <SelectItem value="Inclusive">Inclusive</SelectItem>
+                          <SelectItem value="Exclusive">{t('exclusive')}</SelectItem>
+                          <SelectItem value="Inclusive">{t('inclusive')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -810,11 +806,11 @@ const ProductForm = ({
                   name='tax'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tax <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('tax')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={String(field.value)}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -831,16 +827,16 @@ const ProductForm = ({
                   name='discountType'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Discount Type <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('discountType')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Percentage">Percentage</SelectItem>
-                          <SelectItem value="Fixed">Fixed</SelectItem>
+                          <SelectItem value="Percentage">{t('percentage')}</SelectItem>
+                          <SelectItem value="Fixed">{t('fixed')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -852,9 +848,9 @@ const ProductForm = ({
                   name='discountValue'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Discount Value <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('discountValue')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input type='number' placeholder='Enter discount' {...field} />
+                        <Input type='number' placeholder={t('enterDiscount')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -868,9 +864,9 @@ const ProductForm = ({
                   name='quantityAlert'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Quantity Alert <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('quantityAlert')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input type='number' placeholder='Enter quantity alert' {...field} />
+                        <Input type='number' placeholder={t('enterQuantityAlert')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -884,9 +880,9 @@ const ProductForm = ({
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                     <div className="space-y-0">
-                      <FormLabel className="text-sm font-medium">Published</FormLabel>
+                      <FormLabel className="text-sm font-medium">{t('published')}</FormLabel>
                       <div className="text-xs text-muted-foreground">
-                        Make product visible to customers
+                        {t('makeProductVisible')}
                       </div>
                     </div>
                     <FormControl>
@@ -905,7 +901,7 @@ const ProductForm = ({
           <Card className="border-neutral-200 shadow-sm">
             <CardHeader>
               <CardTitle className="text-navy flex items-center gap-2">
-                <span className="text-orange">📷</span> Images
+                <span className="text-orange">📷</span> {t('images')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -914,7 +910,7 @@ const ProductForm = ({
                 name='images'
                 render={() => (
                   <FormItem className='w-full'>
-                    <FormLabel>Images</FormLabel>
+                    <FormLabel>{t('images')}</FormLabel>
                     <div className='space-y-2 mt-2 min-h-48 border-2 border-dashed border-neutral-200 rounded-lg p-4 flex flex-col items-center justify-center'>
                       <div className='flex justify-start items-center space-x-2 w-full flex-wrap gap-4'>
                         {images.map((image: ProductImage) => (
@@ -953,7 +949,7 @@ const ProductForm = ({
                               }}
                             />
                           </FormControl>
-                          <p className="text-sm text-neutral-500 mt-2">Add Images</p>
+                          <p className="text-sm text-neutral-500 mt-2">{t('addImages')}</p>
                         </div>
                       </div>
                     </div>
@@ -966,7 +962,7 @@ const ProductForm = ({
 
           <div className="flex justify-end gap-4">
             <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)}>
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               type='submit'
@@ -974,7 +970,7 @@ const ProductForm = ({
               disabled={form.formState.isSubmitting}
               className='bg-orange hover:bg-orange-dark text-white'
             >
-              {form.formState.isSubmitting ? 'Submitting...' : type === 'Create' ? 'Add Product' : 'Update Product'}
+              {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
             </Button>
           </div>
         </form>
@@ -984,7 +980,7 @@ const ProductForm = ({
           onScan={(result) => {
             form.setValue('itemBarcode', result)
             setBarcodeScanned(true)
-            showSuccess('Barcode scanned successfully')
+            showSuccess(t('barcodeScannedSuccessfully'))
           }}
         />
       </Form>

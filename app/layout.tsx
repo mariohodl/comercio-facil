@@ -3,9 +3,10 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import ClientProviders from '@/components/shared/client-providers';
 import { Toaster } from "sonner";
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 import "./globals.css";
 import "../config/index";
-
 
 
 
@@ -24,18 +25,23 @@ export const metadata: Metadata = {
   },
   description: APP_DESCRIPTION,
 }
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang='es' suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`${NunitoFont.className}`}
       >
         <Toaster />
-        <ClientProviders>{children}</ClientProviders>
+        <NextIntlClientProvider messages={messages}>
+          <ClientProviders>{children}</ClientProviders>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

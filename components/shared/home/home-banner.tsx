@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslations } from 'next-intl'
 // import { CustomH1 } from '../CustomH1'
 import { CustomH2 } from '../CustomH2'
 import { CustomH3 } from '../CustomH3';
@@ -7,6 +8,7 @@ import { MKButton } from '../MKButton';
 import Image from 'next/image';
 
 export const HomeBanner = () => {
+  const t = useTranslations('landing')
   return (
     <section className="bg-[#fef8ef] ">
       <article className="bg-[url('/images/meats-bg.png')] w-full bg-cover bg-center lg:pt-20">
@@ -14,19 +16,19 @@ export const HomeBanner = () => {
           <div className='text-center lg:text-left pt-10 mb-12 lg:w-1/2 lg:mr-10 px-4 lg:px-16'>
             <div className='w-full md:w-9/12 mx-auto lg:w-auto lg:mx-0'>
               <CustomH3 classNames="uppercase text-red-800 font-semibold font-sans mb-3 text-lg lg:text-xl">
-                Donde cada corte es una pieza de arte
+                {t('tagline')}
               </CustomH3>
               <CustomH2 classNames="my-3 text-4xl lg:text-[60px] leading-tight">
-                Mejor carne, mejor vida.
+                {t('headline')}
               </CustomH2>
             </div>
             <div className='p-3 lg:px-0 lg:py-3'>
               <CustomP classNames="font-sans text-base lg:text-lg">
-                Ya sea que tienes un emprendimiento, ó quizas carnicería o solo buscando algo para cocinar para su familia, lo tenemos cubierto.
+                {t('description')}
               </CustomP>
             </div>
             <div className='mt-5'>
-              <MKButton>Descubrir más</MKButton>
+              <MKButton>{t('discoverMore')}</MKButton>
             </div>
           </div>
 

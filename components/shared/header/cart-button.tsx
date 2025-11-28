@@ -2,12 +2,14 @@
 
 import { ShoppingCartIcon } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import useIsMounted from '@/hooks/use-is-mounted'
 import { cn } from '@/lib/utils'
 import useCartStore from '@/hooks/use-cart-store'
 import useCartSidebar from '@/hooks/use-cart-sidebar'
 
 export default function CartButton() {
+  const t = useTranslations('common')
   const isMounted = useIsMounted()
   const isCartSidebarOpen = useCartSidebar()
 
@@ -30,14 +32,14 @@ export default function CartButton() {
             <span className='text-[12px] '>{cartItemsCount}</span>
           </span>
         )}
-        <span className='font-bold'>Carrito</span>
+        <span className='font-bold'>{t('cart')}</span>
         {
-        isCartSidebarOpen && (
-          <div
-            className={`absolute top-[20px] right-[-16px] rotate-[-90deg] z-10 w-0 h-0 border-l-[7px] border-r-[7px] border-b-[8px] border-transparent border-b-background`}
-          ></div>
-        )
-      }
+          isCartSidebarOpen && (
+            <div
+              className={`absolute top-[20px] right-[-16px] rotate-[-90deg] z-10 w-0 h-0 border-l-[7px] border-r-[7px] border-b-[8px] border-transparent border-b-background`}
+            ></div>
+          )
+        }
       </div>
     </Link>
   )

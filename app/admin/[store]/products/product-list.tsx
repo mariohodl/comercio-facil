@@ -1,5 +1,6 @@
 // eslint-disable removed
 'use client'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import {
     ChevronLeft,
@@ -38,7 +39,7 @@ import {
     getAllBrands,
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
-import React, { useEffect, useState, useTransition } from 'react'
+import { useState, useEffect, useTransition, useCallback } from 'react'
 import { formatCurrency } from '@/lib/utils'
 import DeleteDialog from '@/components/shared/delete-dialog'
 import Image from 'next/image'
@@ -52,6 +53,8 @@ type ProductListDataProps = {
 }
 
 const ProductList = ({ store }: { store: string }) => {
+    const t = useTranslations('products')
+    const tCommon = useTranslations('common')
     const [page, setPage] = useState<number>(1)
     const [inputValue, setInputValue] = useState<string>('')
     const [category, setCategory] = useState<string>('all')
@@ -61,17 +64,18 @@ const ProductList = ({ store }: { store: string }) => {
     const [brands, setBrands] = useState<string[]>([])
     const [isPending, startTransition] = useTransition()
 
-    const fetchData = (newPage?: number) => {
-        startTransition(async () => {
-            const result = await getAllProductsForAdmin({
+    const fetchData = useCallback((newPage?: number) => {
+        startTransition(() => {
+            getAllProductsForAdmin({
                 query: inputValue,
                 page: newPage || page,
                 category,
                 brand,
+            }).then((result) => {
+                setData(result)
             })
-            setData(result)
         })
-    }
+    }, [inputValue, page, category, brand])
 
     useEffect(() => {
         const init = async () => {
@@ -81,15 +85,16 @@ const ProductList = ({ store }: { store: string }) => {
             ])
             setCategories(cats)
             setBrands(brds)
+            setBrands(brds)
             fetchData()
         }
         init()
-    }, [])
+    }, [fetchData])
 
     useEffect(() => {
         fetchData(1)
         setPage(1)
-    }, [inputValue, category, brand])
+    }, [fetchData])
 
     const handlePageChange = (changeType: 'next' | 'prev') => {
         const newPage = changeType === 'next' ? page + 1 : page - 1
@@ -106,8 +111,8 @@ const ProductList = ({ store }: { store: string }) => {
         <div className='space-y-4'>
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
                 <div>
-                    <h1 className='font-bold text-2xl'>Product List</h1>
-                    <p className='text-muted-foreground text-sm'>Manage your products</p>
+                    <h1 className='font-bold text-2xl'>{t('productList')}</h1>
+                    <p className='text-muted-foreground text-sm'>{t('manageProducts')}</p>
                 </div>
                 <div className='flex flex-wrap gap-2'>
                     <Button variant='outline' size='icon'>
@@ -121,11 +126,11 @@ const ProductList = ({ store }: { store: string }) => {
                     </Button>
                     <Button asChild className='bg-orange hover:bg-orange-dark text-white'>
                         <Link href={`/admin/${store}/products/create`}>
-                            <Plus className='w-4 h-4 mr-2' /> Add Product
+                            <Plus className='w-4 h-4 mr-2' /> {t('addProduct')}
                         </Link>
                     </Button>
                     <Button variant='default' className='bg-navy hover:bg-navy-dark text-white'>
-                        <Import className='w-4 h-4 mr-2' /> Import Product
+                        <Import className='w-4 h-4 mr-2' /> {t('importProduct')}
                     </Button>
                 </div>
             </div>
@@ -135,7 +140,7 @@ const ProductList = ({ store }: { store: string }) => {
                     <div className='relative w-full md:w-72'>
                         <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
                         <Input
-                            placeholder='Search...'
+                            placeholder={tCommon('search')}
                             value={inputValue}
                             onChange={handleInputChange}
                             className='pl-8'
@@ -144,10 +149,10 @@ const ProductList = ({ store }: { store: string }) => {
                     <div className='flex gap-2'>
                         <Select value={category} onValueChange={setCategory}>
                             <SelectTrigger className='w-[150px]'>
-                                <SelectValue placeholder='Category' />
+                                <SelectValue placeholder={t('category')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value='all'>All Categories</SelectItem>
+                                <SelectItem value='all'>{t('allCategories')}</SelectItem>
                                 {categories.map((c) => (
                                     <SelectItem key={c} value={c}>
                                         {c}
@@ -157,10 +162,10 @@ const ProductList = ({ store }: { store: string }) => {
                         </Select>
                         <Select value={brand} onValueChange={setBrand}>
                             <SelectTrigger className='w-[150px]'>
-                                <SelectValue placeholder='Brand' />
+                                <SelectValue placeholder={t('brand')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value='all'>All Brands</SelectItem>
+                                <SelectItem value='all'>{t('allBrands')}</SelectItem>
                                 {brands.map((b) => (
                                     <SelectItem key={b} value={b}>
                                         {b}
@@ -178,27 +183,27 @@ const ProductList = ({ store }: { store: string }) => {
                                 <TableHead className='w-12'>
                                     <Checkbox />
                                 </TableHead>
-                                <TableHead className='whitespace-nowrap'>SKU</TableHead>
-                                <TableHead className='min-w-[200px]'>Product Name</TableHead>
-                                <TableHead className='whitespace-nowrap'>Category</TableHead>
-                                <TableHead className='whitespace-nowrap'>Brand</TableHead>
-                                <TableHead className='whitespace-nowrap'>Price</TableHead>
-                                <TableHead className='whitespace-nowrap'>Unit</TableHead>
-                                <TableHead className='whitespace-nowrap'>Qty</TableHead>
-                                <TableHead className='text-right whitespace-nowrap'>Action</TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('sku')}</TableHead>
+                                <TableHead className='min-w-[200px]'>{t('productName')}</TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('category')}</TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('brand')}</TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('price')}</TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('unit')}</TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('quantity')}</TableHead>
+                                <TableHead className='text-right whitespace-nowrap'>{tCommon('actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isPending ? (
                                 <TableRow>
                                     <TableCell colSpan={9} className='text-center h-24'>
-                                        Loading...
+                                        {tCommon('loading')}
                                     </TableCell>
                                 </TableRow>
                             ) : data?.products.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={9} className='text-center h-24'>
-                                        No products found.
+                                        {tCommon('noResults')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -266,7 +271,7 @@ const ProductList = ({ store }: { store: string }) => {
 
                 <div className='flex items-center justify-between'>
                     <div className='text-sm text-muted-foreground'>
-                        Row Per Page
+                        {tCommon('rowsPerPage')}
                         <Select defaultValue='10'>
                             <SelectTrigger className='w-[70px] inline-flex ml-2 h-8'>
                                 <SelectValue placeholder='10' />
@@ -278,7 +283,7 @@ const ProductList = ({ store }: { store: string }) => {
                                 <SelectItem value='50'>50</SelectItem>
                             </SelectContent>
                         </Select>
-                        <span className='ml-2'>Entries</span>
+                        <span className='ml-2'>{tCommon('entries')}</span>
                     </div>
 
                     {(data?.totalPages ?? 0) > 1 && (

@@ -1,7 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { ICategory } from '@/lib/db/models/category.model'
 import { getAllCategories, deleteCategory } from '@/lib/actions/category.actions'
 import { CategoryModal } from '@/components/shared/category-modal'
@@ -28,13 +28,12 @@ import { Search, Plus, Edit, Trash2, FileDown, FileUp, RefreshCw } from 'lucide-
 import { DeleteDialog } from '@/components/shared/delete-dialog'
 
 export default function CategoriesPage() {
-    const router = useRouter()
-    const searchParams = useSearchParams()
+    const t = useTranslations('inventory')
+    const tCommon = useTranslations('common')
     const { showSuccess, showError } = useToast()
 
     const [categories, setCategories] = useState<ICategory[]>([])
     const [totalPages, setTotalPages] = useState(0)
-    const [totalCategories, setTotalCategories] = useState(0)
     const [loading, setLoading] = useState(true)
 
     const [searchQuery, setSearchQuery] = useState('')
@@ -58,8 +57,7 @@ export default function CategoriesPage() {
             })
             setCategories(result.categories)
             setTotalPages(result.totalPages)
-            setTotalCategories(result.totalCategories)
-        } catch (error) {
+        } catch {
             showError('Failed to fetch categories')
         } finally {
             setLoading(false)
@@ -114,8 +112,8 @@ export default function CategoriesPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-navy">Category</h1>
-                    <p className="text-muted-foreground">Manage your categories</p>
+                    <h1 className="text-2xl font-bold text-navy">{t('categories')}</h1>
+                    <p className="text-muted-foreground">{t('manageCategories')}</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" size="icon" className="text-red-500">
@@ -132,7 +130,7 @@ export default function CategoriesPage() {
                         className="bg-orange hover:bg-orange-dark text-white"
                     >
                         <Plus className="h-4 w-4 mr-2" />
-                        Add Category
+                        {t('addCategory')}
                     </Button>
                 </div>
             </div>
@@ -142,7 +140,7 @@ export default function CategoriesPage() {
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Search"
+                        placeholder={tCommon('search')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10"
@@ -150,12 +148,12 @@ export default function CategoriesPage() {
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Status" />
+                        <SelectValue placeholder={t('status')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="all">{t('allStatus')}</SelectItem>
+                        <SelectItem value="active">{t('active')}</SelectItem>
+                        <SelectItem value="inactive">{t('inactive')}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -165,24 +163,24 @@ export default function CategoriesPage() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Category slug</TableHead>
-                            <TableHead>Created On</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead>{t('category')}</TableHead>
+                            <TableHead>{t('categorySlug')}</TableHead>
+                            <TableHead>{tCommon('createdDate')}</TableHead>
+                            <TableHead>{t('status')}</TableHead>
+                            <TableHead className="text-right">{t('action')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading ? (
                             <TableRow>
                                 <TableCell colSpan={5} className="text-center py-8">
-                                    Loading...
+                                    {t('loading')}
                                 </TableCell>
                             </TableRow>
                         ) : categories.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={5} className="text-center py-8">
-                                    No categories found
+                                    {t('noCategoriesFound')}
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -207,7 +205,7 @@ export default function CategoriesPage() {
                                                     : 'bg-gray-100 text-gray-800 hover:bg-gray-100'
                                             }
                                         >
-                                            {category.status ? 'Active' : 'Inactive'}
+                                            {category.status ? t('active') : t('inactive')}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -238,7 +236,7 @@ export default function CategoriesPage() {
             {/* Pagination */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Row Per Page</span>
+                    <span className="text-sm text-muted-foreground">{tCommon('rowsPerPage')}</span>
                     <Select
                         value={String(rowsPerPage)}
                         onValueChange={(value) => setRowsPerPage(Number(value))}
@@ -253,7 +251,7 @@ export default function CategoriesPage() {
                             <SelectItem value="50">50</SelectItem>
                         </SelectContent>
                     </Select>
-                    <span className="text-sm text-muted-foreground">Entries</span>
+                    <span className="text-sm text-muted-foreground">{tCommon('entries')}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -263,7 +261,7 @@ export default function CategoriesPage() {
                         onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
                     >
-                        Previous
+                        {tCommon('previous')}
                     </Button>
                     <div className="flex items-center gap-1">
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -288,7 +286,7 @@ export default function CategoriesPage() {
                         onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
                     >
-                        Next
+                        {tCommon('next')}
                     </Button>
                 </div>
             </div>
@@ -307,8 +305,8 @@ export default function CategoriesPage() {
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
                 onConfirm={handleDeleteConfirm}
-                title="Delete Category"
-                description="Are you sure you want to delete this category? This action cannot be undone."
+                title={t('deleteCategoryTitle')}
+                description={t('deleteCategoryDescription')}
             />
         </div>
     )

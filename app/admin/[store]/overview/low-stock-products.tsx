@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 interface LowStockProductsProps {
     data: {
@@ -12,12 +13,13 @@ interface LowStockProductsProps {
 }
 
 export default function LowStockProducts({ data }: LowStockProductsProps) {
+    const t = useTranslations('admin.dashboard')
     return (
         <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
-                <CardTitle className='text-base'>Low Stock Products</CardTitle>
+                <CardTitle className='text-base'>{t('lowStockProducts')}</CardTitle>
                 <Link href='/admin/products' className='text-sm text-blue-600 hover:underline'>
-                    View All
+                    {t('viewAll')}
                 </Link>
             </CardHeader>
             <CardContent>
@@ -39,7 +41,7 @@ export default function LowStockProducts({ data }: LowStockProductsProps) {
                                 </div>
                             </div>
                             <div className='text-right'>
-                                <p className='text-sm text-muted-foreground'>Instock</p>
+                                <p className='text-sm text-muted-foreground'>{t('instock')}</p>
                                 <p className='font-bold text-red-500'>{product.countInStock}</p>
                             </div>
                         </div>

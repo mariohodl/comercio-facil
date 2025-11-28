@@ -1,5 +1,6 @@
 'use client'
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 
 import {
   AlertDialog,
@@ -25,23 +26,24 @@ export default function DeleteDialogWithAction({
 }) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const t = useTranslations('common')
   //   const { toast } = useToast()
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button size='sm' className='w-20' variant='outline'>
-          Eliminar
+          {t('delete')}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{'¿Estás absolutamente seguro de eliminar?'}</AlertDialogTitle>
+          <AlertDialogTitle>{t('confirmDeleteTitle')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción no se podrá deshacer.
+            {t('confirmDeleteDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
 
           <Button
             variant='destructive'
@@ -65,7 +67,7 @@ export default function DeleteDialogWithAction({
               })
             }
           >
-            {isPending ? 'Eliminando...' : 'Eliminar'}
+            {isPending ? t('deleting') : t('delete')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -78,8 +80,8 @@ export function DeleteDialog({
   open,
   onOpenChange,
   onConfirm,
-  title = 'Delete Item',
-  description = 'Are you sure you want to delete this item? This action cannot be undone.',
+  title,
+  description,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -87,17 +89,18 @@ export function DeleteDialog({
   title?: string
   description?: string
 }) {
+  const t = useTranslations('common')
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle>{title || t('confirmDeleteTitle')}</AlertDialogTitle>
+          <AlertDialogDescription>{description || t('confirmDeleteDescription')}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
           <Button variant="destructive" onClick={onConfirm}>
-            Delete
+            {t('delete')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

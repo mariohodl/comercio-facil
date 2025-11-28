@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 interface TopCustomersProps {
     data: {
@@ -14,12 +15,13 @@ interface TopCustomersProps {
 }
 
 export default function TopCustomers({ data }: TopCustomersProps) {
+    const t = useTranslations('admin.dashboard')
     return (
         <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
-                <CardTitle className='text-base'>Top Customers</CardTitle>
+                <CardTitle className='text-base'>{t('topCustomers')}</CardTitle>
                 <Link href='/admin/users' className='text-sm text-muted-foreground hover:underline'>
-                    View All
+                    {t('viewAll')}
                 </Link>
             </CardHeader>
             <CardContent>
@@ -37,7 +39,7 @@ export default function TopCustomers({ data }: TopCustomersProps) {
                                 <div>
                                     <p className='font-medium line-clamp-1'>{customer.name}</p>
                                     <p className='text-xs text-muted-foreground'>
-                                        {customer.orderCount} Orders
+                                        {t('ordersCount', { count: customer.orderCount })}
                                     </p>
                                 </div>
                             </div>

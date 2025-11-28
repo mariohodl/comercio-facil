@@ -1,5 +1,5 @@
 import { auth } from '@/auth'
-
+import { getTranslations } from 'next-intl/server'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -16,14 +16,15 @@ import Link from 'next/link'
 
 export default async function UserButton() {
   const session = await auth()
+  const t = await getTranslations()
   return (
     <div className='flex gap-2 items-center'>
       <DropdownMenu>
         <DropdownMenuTrigger className='header-button' asChild>
           <div className='flex items-center'>
             <div className='flex flex-col text-sm text-left'>
-              <span>Hola, {session ? session.user.name : 'Ingresa'}</span>
-              <span className='font-bold'>Cuenta y Pedidos</span>
+              <span>{t('header.hello', { name: session ? session.user.name : t('common.signIn') })}</span>
+              <span className='font-bold'>{t('header.account')}</span>
             </div>
             <ChevronDown />
           </div>
@@ -42,10 +43,10 @@ export default async function UserButton() {
             </DropdownMenuLabel>
             <DropdownMenuGroup>
               <Link className='w-full' href='/account'>
-                <DropdownMenuItem>Mi Cuenta</DropdownMenuItem>
+                <DropdownMenuItem>{t('common.myAccount')}</DropdownMenuItem>
               </Link>
               <Link className='w-full' href='/account/orders'>
-                <DropdownMenuItem>Mis Ordenes</DropdownMenuItem>
+                <DropdownMenuItem>{t('common.myOrders')}</DropdownMenuItem>
               </Link>
 
               {session.user.role === 'Admin' && (
@@ -60,7 +61,7 @@ export default async function UserButton() {
                   className='w-full py-4 px-2 h-4 justify-start'
                   variant='ghost'
                 >
-                  Salir
+                  {t('common.signOut')}
                 </Button>
               </form>
             </DropdownMenuItem>
@@ -73,13 +74,13 @@ export default async function UserButton() {
                   className={cn(buttonVariants(), 'w-full')}
                   href='/sign-in'
                 >
-                  Ingresar
+                  {t('common.signIn')}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuLabel>
               <div className='font-normal'>
-                ¿Cliente Nuevo? <Link href='/sign-up'><span className='underline'>Regístrate</span></Link>
+                {t('auth.noAccount')} <Link href='/sign-up'><span className='underline'>{t('common.signUp')}</span></Link>
               </div>
             </DropdownMenuLabel>
           </DropdownMenuContent>

@@ -1,5 +1,6 @@
 import CartButton from './cart-button'
 import UserButton from './user-button'
+import { LanguageSwitcher } from '../language-switcher'
 
 // import { EllipsisVertical } from 'lucide-react'
 import { AlignRight } from 'lucide-react'
@@ -19,6 +20,7 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
     <div className='flex justify-end'>
       <nav className='md:flex gap-3 hidden w-full'>
         {/* <ThemeSwitcher /> */}
+        <LanguageSwitcher />
         <UserButton />
         {forAdmin ? null : <CartButton />}
       </nav>
@@ -36,6 +38,7 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
               </div>
             </SheetHeader>
             {/* <ThemeSwitcher /> */}
+            <LanguageSwitcher />
             <UserButton />
             <CartButton />
           </SheetContent>

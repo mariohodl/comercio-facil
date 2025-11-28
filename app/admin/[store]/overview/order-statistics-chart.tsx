@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useTranslations } from 'next-intl'
 
 interface OrderStatisticsChartProps {
     data: {
@@ -10,8 +11,9 @@ interface OrderStatisticsChartProps {
 }
 
 export default function OrderStatisticsChart({ data }: OrderStatisticsChartProps) {
+    const t = useTranslations('admin.dashboard')
     // Days: Sun (1) to Sat (7)
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    const days = [t('mon'), t('tue'), t('wed'), t('thu'), t('fri'), t('sat'), t('sun')]
     // Hours: 2-hour blocks (2am, 4am, ..., 6pm, 8pm) - Simplified for visual
     // We'll map 24h to these blocks.
     const timeBlocks = ['2 Am', '4 Am', '6 Am', '8 Am', '10 Am', '12 Am', '2 Pm', '4 Pm', '6 Pm']
@@ -42,8 +44,8 @@ export default function OrderStatisticsChart({ data }: OrderStatisticsChartProps
     return (
         <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
-                <CardTitle className='text-base'>Order Statistics</CardTitle>
-                <div className='text-sm text-muted-foreground'>Weekly</div>
+                <CardTitle className='text-base'>{t('orderStatistics')}</CardTitle>
+                <div className='text-sm text-muted-foreground'>{t('weekly')}</div>
             </CardHeader>
             <CardContent>
                 <div className='flex'>

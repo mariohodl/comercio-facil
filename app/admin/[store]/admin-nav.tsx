@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import React from 'react'
 import { cn } from '@/lib/utils'
 import {
@@ -35,134 +36,135 @@ export function AdminNav({
   className?: string
 }) {
   const pathname = usePathname()
+  const t = useTranslations('admin.nav')
 
   const navSections = [
     {
-      title: 'General',
+      title: t('general'),
       items: [
         {
-          title: 'Overview',
+          title: t('overview'),
           href: `/admin/${storeId}/overview`,
           icon: Monitor,
         },
         {
-          title: 'Super Admin',
+          title: t('superAdmin'),
           href: `/admin/${storeId}/superadmin`,
           icon: ShieldCheck,
         },
       ],
     },
     {
-      title: 'Inventory',
+      title: t('inventory'),
       items: [
         {
-          title: 'Products',
+          title: t('products'),
           href: `/admin/${storeId}/products`,
           icon: Box,
         },
         {
-          title: 'Create Product',
+          title: t('createProduct'),
           href: `/admin/${storeId}/products/create`,
           icon: PlusSquare,
         },
         {
-          title: 'Expired Products',
+          title: t('expiredProducts'),
           href: `/admin/${storeId}/inventory/expired-products`,
           icon: AlertCircle,
         },
         {
-          title: 'Low Stocks',
+          title: t('lowStocks'),
           href: `/admin/${storeId}/inventory/low-stocks`,
           icon: TrendingDown,
         },
         {
-          title: 'Category',
+          title: t('category'),
           href: `/admin/${storeId}/inventory/categories`,
           icon: List,
         },
         {
-          title: 'Sub Category',
+          title: t('subCategory'),
           href: `/admin/${storeId}/inventory/sub-categories`,
           icon: Layers,
         },
         {
-          title: 'Brands',
+          title: t('brands'),
           href: `/admin/${storeId}/inventory/brands`,
           icon: Tag,
         },
         {
-          title: 'Units',
+          title: t('units'),
           href: `/admin/${storeId}/inventory/units`,
           icon: Ruler,
         },
         {
-          title: 'Variant Attributes',
+          title: t('variantAttributes'),
           href: `/admin/${storeId}/inventory/attributes`,
           icon: Settings2,
         },
         {
-          title: 'Warranties',
+          title: t('warranties'),
           href: `/admin/${storeId}/inventory/warranties`,
           icon: ShieldCheck,
         },
         {
-          title: 'Print Barcode',
+          title: t('printBarcode'),
           href: `/admin/${storeId}/inventory/print-barcode`,
           icon: Barcode,
         },
         {
-          title: 'Print QR Code',
+          title: t('printQRCode'),
           href: `/admin/${storeId}/inventory/print-qrcode`,
           icon: QrCode,
         },
       ],
     },
     {
-      title: 'Stock',
+      title: t('stock'),
       items: [
         {
-          title: 'Manage Stock',
+          title: t('manageStock'),
           href: `/admin/${storeId}/stock/manage`,
           icon: Package,
         },
         {
-          title: 'Stock Adjustment',
+          title: t('stockAdjustment'),
           href: `/admin/${storeId}/stock/adjustment`,
           icon: ArrowUpRight,
         },
         {
-          title: 'Stock Transfer',
+          title: t('stockTransfer'),
           href: `/admin/${storeId}/stock/transfer`,
           icon: ArrowLeftRight,
         },
       ],
     },
     {
-      title: 'Sales',
+      title: t('sales'),
       items: [
         {
-          title: 'Sales',
+          title: t('sales'),
           href: `/admin/${storeId}/sales`,
           icon: ShoppingCart,
           hasSubmenu: true,
         },
         {
-          title: 'Invoices',
+          title: t('invoices'),
           href: `/admin/${storeId}/sales/invoices`,
           icon: FileText,
         },
         {
-          title: 'Sales Return',
+          title: t('salesReturn'),
           href: `/admin/${storeId}/sales/returns`,
           icon: RotateCcw,
         },
         {
-          title: 'Quotation',
+          title: t('quotation'),
           href: `/admin/${storeId}/sales/quotations`,
           icon: FileOutput,
         },
         {
-          title: 'POS',
+          title: t('pos'),
           href: `/admin/${storeId}/pos`,
           icon: Monitor,
           hasSubmenu: true,
