@@ -4,7 +4,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft } from 'lucide-react'
+import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft, ChevronDown, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
@@ -120,6 +120,7 @@ const ProductForm = ({
   categories = [],
   brands = [],
   units = [],
+  attributes = [],
 }: {
   type: 'Create' | 'Update'
   product?: IProduct
@@ -128,25 +129,41 @@ const ProductForm = ({
   categories?: { _id: string; categoryName: string; categorySlug: string }[]
   brands?: { _id: string; name: string; slug: string }[]
   units?: { _id: string; name: string; abbreviation: string }[]
+  attributes?: { _id: string; name: string; values: string[] }[]
 }) => {
   const router = useRouter()
   const t = useTranslations('products')
   const tCommon = useTranslations('common')
 
 
-  const [subCategories, setSubCategories] = useState<{ name: string; slug: string }[]>([])
+  const [subCategories, setSubCategories] = useState<any[]>([])
   const [isScannerOpen, setIsScannerOpen] = useState(false)
   const [barcodeScanned, setBarcodeScanned] = useState(false)
 
+  // State for the new variant builder
+  const [builderAttributes, setBuilderAttributes] = useState<Record<string, string[]>>({})
+  const [newVariantData, setNewVariantData] = useState({
+    price: 0,
+    listPrice: 0,
+    countInStock: 0,
+    costPerUnit: 0,
+    sku: '',
+    barcode: '',
+    taxType: 'Exclusive',
+    tax: 0,
+    images: [] as ProductImage[]
+  })
 
-  const form = useForm<any>({
+  const { showSuccess, showError } = useToast()
+
+  const form = useForm<IProductInput>({
     resolver: type === 'Update' ? zodResolver(ProductUpdateSchema) : zodResolver(ProductInputSchema),
     defaultValues:
       product && type === 'Update' ? product : productDefaultValues,
   })
 
-  const { showSuccess, showError } = useToast()
-
+  // Watch for changes in product type to reset fields if needed
+  const productType = form.watch('productType')
   const selectedCategory = form.watch('category')
   const productName = form.watch('name')
 
@@ -155,6 +172,20 @@ const ProductForm = ({
       form.setValue('slug', toSlug(productName))
     }
   }, [productName, type, form])
+
+  // Generate initial SKU for the builder when product name changes or storeId loads
+  useEffect(() => {
+    if (productType === 'Variable Product') {
+      const namePart = productName ? productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(6, 'X') : 'PROD'
+      const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase().padEnd(8, 'X') : 'STOREID'
+      const mainSku = form.getValues('sku') || 'SKU'
+      const mainSkuLast5 = mainSku.replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase().padStart(5, '0')
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000)
+      const generatedSku = `${namePart}-${storePart}-${mainSkuLast5}-${randomSuffix}`
+
+      setNewVariantData(prev => ({ ...prev, sku: generatedSku }))
+    }
+  }, [productName, storeId, productType, form])
 
   useEffect(() => {
     if (type === 'Create' && productName) {
@@ -240,9 +271,55 @@ const ProductForm = ({
     form.setValue('price', calculatedSellingPrice)
   }, [listPrice, discountType, discountValue, form])
 
+  // Calculate variant selling price based on list price (currently no discounts for variants)
+  useEffect(() => {
+    setNewVariantData(prev => ({
+      ...prev,
+      price: prev.listPrice
+    }))
+  }, [newVariantData.listPrice])
+
+
   async function onSubmit(values: IProductInput) {
+    let finalValues = { ...values }
+
+    // If Variable Product, calculate aggregates from variants
+    if (values.productType === 'Variable Product' && values.variants && values.variants.length > 0) {
+      const totalStock = values.variants.reduce((acc: number, curr: any) => acc + (Number(curr.countInStock) || 0), 0)
+      const minPrice = Math.min(...values.variants.map((v: any) => Number(v.price) || 0))
+      const maxListPrice = Math.max(...values.variants.map((v: any) => Number(v.listPrice) || 0))
+      const maxCost = Math.max(...values.variants.map((v: any) => Number(v.costPerUnit) || 0))
+
+      // Calculate attributes summary from variants
+      const attributesSummary: Record<string, Set<string>> = {}
+      values.variants.forEach((variant: any) => {
+        variant.attributes.forEach((attr: any) => {
+          if (!attributesSummary[attr.name]) {
+            attributesSummary[attr.name] = new Set()
+          }
+          attributesSummary[attr.name].add(attr.value)
+        })
+      })
+
+      const attributes = Object.entries(attributesSummary).map(([name, valuesSet]) => ({
+        name,
+        values: Array.from(valuesSet) as string[]
+      }))
+
+      finalValues = {
+        ...finalValues,
+        countInStock: totalStock,
+        price: minPrice,
+        listPrice: maxListPrice,
+        costPerUnit: maxCost,
+        attributes: attributes,
+        // Ensure discountPrice is also handled if needed, but for now let's leave it as is or set to 0
+        discountPrice: 0
+      }
+    }
+
     if (type === 'Create') {
-      const res = await createProduct(values)
+      const res = await createProduct(finalValues)
       if (!res.success) {
         showError(res.message)
       } else {
@@ -255,7 +332,7 @@ const ProductForm = ({
         router.push(`/admin/${storeId}/products`)
         return
       }
-      const res = await updateProduct({ ...values, _id: productId })
+      const res = await updateProduct({ ...finalValues, _id: productId })
       if (!res.success) {
         showError(res.message)
       } else {
@@ -278,7 +355,8 @@ const ProductForm = ({
     } else {
       showError(res.errorMessage || t('failedToDeleteImage'))
     }
-  }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -700,7 +778,12 @@ const ProductForm = ({
                     <FormLabel>{t('productType')} <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <RadioGroup
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          if (value === 'Single Product') {
+                            form.setValue('attributes', [])
+                          }
+                        }}
                         defaultValue={field.value}
                         className="flex flex-col space-y-1"
                       >
@@ -717,25 +800,425 @@ const ProductForm = ({
                 )}
               />
 
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                <FormField
-                  control={form.control}
-                  name='countInStock'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('quantity')} <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input type='number' placeholder={t('enterQuantity')} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+              {form.watch('productType') === 'Variable Product' && (
+                <div className="space-y-4 border p-4 rounded-md bg-gray-50">
+                  <h3 className="font-medium text-navy">{t('variantAttributes')}</h3>
+                  {attributes && attributes.length > 0 ? (
+                    <div className="space-y-4">
+                      <div className="flex flex-col gap-4 p-4 border rounded-md bg-gray-50">
+                        <h3 className="font-medium">{t('addVariant')}</h3>
+
+                        {/* Attribute Selection in Builder */}
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
+                          {attributes.map((attr) => (
+                            <div key={attr._id} className="space-y-2">
+                              <label className="text-sm font-medium">{attr.name}</label>
+                              <Select
+                                value={builderAttributes[attr.name]?.[0] || ''}
+                                onValueChange={(value) => {
+                                  if (value === '__clear__') {
+                                    // Remove this attribute from builderAttributes
+                                    const newAttrs = { ...builderAttributes }
+                                    delete newAttrs[attr.name]
+                                    setBuilderAttributes(newAttrs)
+                                  } else {
+                                    setBuilderAttributes(prev => ({
+                                      ...prev,
+                                      [attr.name]: [value]
+                                    }))
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className={builderAttributes[attr.name]?.[0] ? 'bg-white border-yellow-500 border-2' : ''}>
+                                  <SelectValue placeholder={t('select')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__clear__">
+                                    <span className="text-muted-foreground italic">{t('select')}</span>
+                                  </SelectItem>
+                                  {attr.values.map((val) => (
+                                    <SelectItem key={val} value={val}>
+                                      {val}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Variant Details Inputs */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">{t('quantity')} <span className="text-red-500">*</span></label>
+                            <Input
+                              type="number"
+                              value={newVariantData.countInStock}
+                              onChange={(e) => setNewVariantData(prev => ({ ...prev, countInStock: Number(e.target.value) }))}
+                              placeholder={t('enterQuantity')}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">{t('costPerUnit')} <span className="text-red-500">*</span></label>
+                            <Input
+                              type="number"
+                              value={newVariantData.costPerUnit}
+                              onChange={(e) => setNewVariantData(prev => ({ ...prev, costPerUnit: Number(e.target.value) }))}
+                              placeholder={t('enterCost')}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">{t('listPrice')} <span className="text-red-500">*</span></label>
+                            <Input
+                              type="number"
+                              value={newVariantData.listPrice}
+                              onChange={(e) => setNewVariantData(prev => ({ ...prev, listPrice: Number(e.target.value) }))}
+                              placeholder={t('enterListPrice')}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">{t('sellingPrice')}</label>
+                            <Input
+                              type="number"
+                              value={newVariantData.price}
+                              readOnly
+                              className="bg-gray-100 cursor-not-allowed"
+                              placeholder={t('calculatedPrice')}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">{t('taxType')} <span className="text-red-500">*</span></label>
+                            <Select
+                              value={newVariantData.taxType}
+                              onValueChange={(value) => setNewVariantData(prev => ({ ...prev, taxType: value }))}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder={t('select')} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Exclusive">{t('exclusive')}</SelectItem>
+                                <SelectItem value="Inclusive">{t('inclusive')}</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">{t('sku')} <span className="text-red-500">*</span></label>
+                          <div className="flex gap-2">
+                            <Input
+                              value={newVariantData.sku}
+                              readOnly
+                              className="bg-gray-100"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => {
+                                const namePart = productName ? productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(6, 'X') : 'PROD'
+                                const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase().padEnd(8, 'X') : 'STOREID'
+                                const mainSku = form.getValues('sku') || 'SKU'
+                                const mainSkuLast5 = mainSku.replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase().padStart(5, '0')
+                                const randomSuffix = Math.floor(1000 + Math.random() * 9000)
+                                const generatedSku = `${namePart}-${storePart}-${mainSkuLast5}-${randomSuffix}`
+                                setNewVariantData(prev => ({ ...prev, sku: generatedSku }))
+                              }}
+                            >
+                              <RefreshCw className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="space-y-2 col-span-2">
+                          <label className="text-sm font-medium">{t('barcode')} <span className="text-red-500">*</span></label>
+                          <div className="flex gap-2">
+                            <Input
+                              value={newVariantData.barcode}
+                              onChange={(e) => setNewVariantData(prev => ({ ...prev, barcode: e.target.value }))}
+                              placeholder={t('enterBarcode')}
+                              className={`flex-1 ${newVariantData.barcode ? 'bg-gray-100' : ''}`}
+                              readOnly={!!newVariantData.barcode}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => setIsScannerOpen(true)}
+                            >
+                              <ScanBarcode className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              className="bg-orange text-white hover:bg-orange/90"
+                              onClick={() => {
+                                const randomBarcode = Math.floor(100000000000 + Math.random() * 900000000000).toString()
+                                setNewVariantData(prev => ({ ...prev, barcode: randomBarcode }))
+                              }}
+                            >
+                              {t('generate')}
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Variant Images Upload */}
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">{t('variantImages')} (Max 2) <span className="text-red-500">*</span></label>
+                          <div className="space-y-2">
+                            {newVariantData.images.length < 2 && (
+                              <UploadButton
+                                endpoint="imageUploader"
+                                onClientUploadComplete={(res) => {
+                                  if (res) {
+                                    const newImages = res.map(file => ({
+                                      imgUrl: file.url,
+                                      imgKey: file.key
+                                    }))
+                                    setNewVariantData(prev => ({
+                                      ...prev,
+                                      images: [...prev.images, ...newImages].slice(0, 2)
+                                    }))
+                                    showSuccess(t('imageUploadedSuccessfully'))
+                                  }
+                                }}
+                                onUploadError={(error: Error) => {
+                                  showError(`Upload failed: ${error.message}`)
+                                }}
+                                className="ut-button:bg-orange ut-button:ut-readying:bg-orange/50"
+                              />
+                            )}
+                            {newVariantData.images.length > 0 && (
+                              <div className="flex gap-2 flex-wrap">
+                                {newVariantData.images.map((image, idx) => (
+                                  <div key={idx} className="relative w-20 h-20 border rounded">
+                                    <Image
+                                      src={image.imgUrl}
+                                      alt={`Variant image ${idx + 1}`}
+                                      fill
+                                      className="object-cover rounded"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="icon"
+                                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                                      onClick={() => {
+                                        setNewVariantData(prev => ({
+                                          ...prev,
+                                          images: prev.images.filter((_, i) => i !== idx)
+                                        }))
+                                      }}
+                                    >
+                                      <X className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          // Validate that all attributes have a selection
+                          const selectedAttrNames = Object.keys(builderAttributes)
+                          if (selectedAttrNames.length === 0) {
+                            showError(t('selectAtLeastOneAttribute'))
+                            return
+                          }
+
+                          // Validate quantity is greater than 0
+                          if (!newVariantData.countInStock || newVariantData.countInStock <= 0) {
+                            showError(t('quantityRequired'))
+                            return
+                          }
+
+                          // Validate cost per unit is greater than 0
+                          if (!newVariantData.costPerUnit || newVariantData.costPerUnit <= 0) {
+                            showError(t('costPerUnitRequired'))
+                            return
+                          }
+
+                          // Validate list price is greater than 0
+                          if (!newVariantData.listPrice || newVariantData.listPrice <= 0) {
+                            showError(t('listPriceRequired'))
+                            return
+                          }
+
+                          // Validate SKU is present
+                          if (!newVariantData.sku || newVariantData.sku.trim() === '') {
+                            showError(t('skuRequired'))
+                            return
+                          }
+
+                          // Validate barcode is present
+                          if (!newVariantData.barcode || newVariantData.barcode.trim() === '') {
+                            showError(t('barcodeRequired'))
+                            return
+                          }
+
+                          // Validate at least one image
+                          if (!newVariantData.images || newVariantData.images.length === 0) {
+                            showError(t('atLeastOneImageRequired'))
+                            return
+                          }
+
+                          const newVariant = {
+                            attributes: selectedAttrNames.map(name => ({
+                              name,
+                              value: builderAttributes[name][0]
+                            })),
+                            price: newVariantData.price,
+                            listPrice: newVariantData.listPrice,
+                            countInStock: newVariantData.countInStock,
+                            costPerUnit: newVariantData.costPerUnit,
+                            sku: newVariantData.sku,
+                            barcode: newVariantData.barcode,
+                            taxType: newVariantData.taxType,
+                            tax: newVariantData.tax,
+                            images: newVariantData.images
+                          }
+
+                          const currentVariants = form.getValues('variants') || []
+                          form.setValue('variants', [...currentVariants, newVariant])
+
+                          // Regenerate SKU for next variant
+                          const namePart = productName ? productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(6, 'X') : 'PROD'
+                          const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase().padEnd(8, 'X') : 'STOREID'
+                          const mainSku = form.getValues('sku') || 'SKU'
+                          const mainSkuLast5 = mainSku.replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase().padStart(5, '0')
+                          const randomSuffix = Math.floor(1000 + Math.random() * 9000)
+                          const generatedSku = `${namePart}-${storePart}-${mainSkuLast5}-${randomSuffix}`
+
+                          setNewVariantData(prev => ({
+                            ...prev,
+                            sku: generatedSku,
+                            barcode: '', // Reset barcode
+                            images: [] // Reset images
+                          }))
+                        }}
+                        className="w-full md:w-auto self-end"
+                      >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        {t('addVariant')}
+                      </Button>
+                    </div>
+
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t('noAttributesFound')} <Link href={`/admin/${storeId}/inventory/attributes`} className="text-orange hover:underline">{t('createAttributes')}</Link>
+                    </p>
                   )}
-                />
+                </div>
+              )}
+
+              {/* Generated Variants Table */}
+              {form.watch('productType') === 'Variable Product' && (
+                <div className="space-y-4 border p-4 rounded-md bg-gray-50 mt-4">
+                  <h3 className="font-medium text-navy">{t('generatedVariants')}</h3>
+                  {form.watch('variants') && form.watch('variants').length > 0 && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-left">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-100">
+                          <tr>
+                            <th className="px-4 py-2">{t('variant')}</th>
+                            <th className="px-4 py-2">{t('images')}</th>
+                            <th className="px-4 py-2">{t('sku')}</th>
+                            <th className="px-4 py-2">{t('barcode')}</th>
+                            <th className="px-4 py-2">{t('cost')}</th>
+                            <th className="px-4 py-2">{t('price')}</th>
+                            <th className="px-4 py-2">{t('stock')}</th>
+                            <th className="px-4 py-2">{t('actions')}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(form.watch('variants') || []).map((variant: any, index: number) => {
+                            return (
+                              <tr key={index} className="bg-white border-b hover:bg-gray-50">
+                                <td className="px-4 py-2 font-medium">
+                                  <div className="flex flex-col gap-1">
+                                    {variant.attributes.map((variantAttr: any, attrIndex: number) => (
+                                      <div key={attrIndex} className="flex items-center gap-2 text-sm">
+                                        <span className="text-muted-foreground w-16">{variantAttr.name}:</span>
+                                        <span className="font-medium">{variantAttr.value}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-2">
+                                  {variant.images && variant.images.length > 0 ? (
+                                    <div className="flex gap-1">
+                                      {variant.images.map((img: ProductImage, imgIdx: number) => (
+                                        <div key={imgIdx} className="relative w-10 h-10 border rounded">
+                                          <Image
+                                            src={img.imgUrl}
+                                            alt={`Variant ${index + 1} image ${imgIdx + 1}`}
+                                            fill
+                                            className="object-cover rounded"
+                                          />
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground text-sm">-</span>
+                                  )}
+                                </td>
+                                <td className="px-4 py-2 text-sm">{variant.sku}</td>
+                                <td className="px-4 py-2 text-sm">{variant.barcode || '-'}</td>
+                                <td className="px-4 py-2 text-sm">${variant.costPerUnit}</td>
+                                <td className="px-4 py-2 text-sm">${variant.price}</td>
+                                <td className="px-4 py-2 text-sm">{variant.countInStock}</td>
+                                <td className="px-4 py-2">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-muted-foreground hover:text-red-500"
+                                    onClick={() => {
+                                      const newVariants = [...(form.getValues('variants') || [])]
+                                      newVariants.splice(index, 1)
+                                      form.setValue('variants', newVariants)
+                                    }}
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                {form.watch('productType') === 'Single Product' && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='countInStock'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('quantity')} <span className="text-red-500">*</span></FormLabel>
+                          <FormControl>
+                            <Input type='number' placeholder={t('enterQuantity')} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
                 <FormField
                   control={form.control}
                   name='costPerUnit'
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className={form.watch('productType') === 'Variable Product' ? 'hidden' : ''}>
                       <FormLabel>{t('costPerUnit')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input type='number' step='0.01' placeholder={t('enterCost')} {...field} />
@@ -744,39 +1227,43 @@ const ProductForm = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name='listPrice'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('listPrice')} <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input type='number' step='0.01' placeholder={t('enterListPrice')} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='price'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('sellingPrice')} <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          step='0.01'
-                          placeholder={t('calculatedPrice')}
-                          {...field}
-                          disabled
-                          className="bg-gray-50"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {form.watch('productType') === 'Single Product' && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='listPrice'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('listPrice')} <span className="text-red-500">*</span></FormLabel>
+                          <FormControl>
+                            <Input type='number' step='0.01' placeholder={t('enterListPrice')} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='price'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('sellingPrice')} <span className="text-red-500">*</span></FormLabel>
+                          <FormControl>
+                            <Input
+                              type='number'
+                              step='0.01'
+                              placeholder={t('calculatedPrice')}
+                              {...field}
+                              disabled
+                              className="bg-gray-50"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
                 <FormField
                   control={form.control}
                   name='taxType'
@@ -984,7 +1471,7 @@ const ProductForm = ({
           }}
         />
       </Form>
-    </div>
+    </div >
   )
 }
 

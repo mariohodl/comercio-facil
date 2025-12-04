@@ -285,6 +285,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 200.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 2,
@@ -325,6 +327,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 60.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 3,
@@ -365,6 +369,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 120.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 4,
@@ -405,6 +411,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 900.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 5,
@@ -445,6 +453,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 50.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 6,
@@ -485,6 +495,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 150.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 7,
@@ -525,6 +537,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 1300.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 8,
@@ -565,6 +579,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 80.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 9,
@@ -605,6 +621,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 1000.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 10,
@@ -645,6 +663,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 750.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 11,
@@ -685,6 +705,8 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 400.00,
+		attributes: [],
+		variants: [],
 	},
 	{
 		productId: 12,
@@ -725,12 +747,91 @@ const products: IProductInput[] = [
 		discountType: 'Percentage',
 		discountValue: 0,
 		costPerUnit: 80.00,
+		attributes: [],
+		variants: [],
+	},
+	{
+		productId: 13,
+		name: 'Chaleco de Seguridad',
+		slug: toSlug('Chaleco de Seguridad'),
+		category: 'Equipo',
+		sku: `CHA-${uniqueStoreId.toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
+		images: [{ imgUrl: 'https://placehold.co/600x400.png?text=Chaleco', imgKey: 'placeholder' }],
+		tags: ['new-arrival'],
+		isPublished: true,
+		price: 150.00,
+		listPrice: 180.00,
+		discountPrice: 0,
+		brand: 'Generico',
+		avgRating: 0,
+		numReviews: 0,
+		ratingDistribution: [],
+		numSales: 0,
+		countInStock: 100,
+		description: 'Chaleco de seguridad con cintas reflejantes, disponible en varios colores y tallas.',
+		reviews: [],
+		store: uniqueStoreId,
+		warehouse: 'Warehouse 1',
+		subCategory: 'None',
+		unit: 'Piece',
+		barcodeSymbology: 'Code 128',
+		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
+		productType: 'Variable Product',
+		taxType: 'Exclusive',
+		tax: 16,
+		quantityAlert: 10,
+		discountType: 'Percentage',
+		discountValue: 0,
+		costPerUnit: 100.00,
+		attributes: [
+			{ name: 'Color', values: ['Naranja', 'Amarillo'] },
+			{ name: 'Talla', values: ['M', 'L', 'XL'] }
+		],
+		variants: [
+			{
+				sku: `CHA-NAR-M-${Math.floor(1000 + Math.random() * 9000)}`,
+				price: 150.00,
+				listPrice: 180.00,
+				countInStock: 20,
+				attributes: [{ name: 'Color', value: 'Naranja' }, { name: 'Talla', value: 'M' }]
+			},
+			{
+				sku: `CHA-NAR-L-${Math.floor(1000 + Math.random() * 9000)}`,
+				price: 150.00,
+				listPrice: 180.00,
+				countInStock: 30,
+				attributes: [{ name: 'Color', value: 'Naranja' }, { name: 'Talla', value: 'L' }]
+			},
+			{
+				sku: `CHA-AMA-M-${Math.floor(1000 + Math.random() * 9000)}`,
+				price: 150.00,
+				listPrice: 180.00,
+				countInStock: 15,
+				attributes: [{ name: 'Color', value: 'Amarillo' }, { name: 'Talla', value: 'M' }]
+			},
+			{
+				sku: `CHA-AMA-L-${Math.floor(1000 + Math.random() * 9000)}`,
+				price: 150.00,
+				listPrice: 180.00,
+				countInStock: 35,
+				attributes: [{ name: 'Color', value: 'Amarillo' }, { name: 'Talla', value: 'L' }]
+			}
+		]
 	},
 ]
 
-// crear lista de proveedores 
-
-// crear recepccion de ordenes
+const attributes = [
+	{ name: 'Color', values: ['Rojo', 'Azul', 'Verde'], store: uniqueStoreId, status: true },
+	{ name: 'Talla', values: ['S', 'M', 'L', 'XL'], store: uniqueStoreId, status: true },
+	{ name: 'Material', values: ['Algodón', 'Poliéster', 'Lana'], store: uniqueStoreId, status: true },
+	{ name: 'Temporada', values: ['Verano', 'Invierno', 'Otoño', 'Primavera'], store: uniqueStoreId, status: true },
+	{ name: 'Género', values: ['Hombre', 'Mujer', 'Unisex'], store: uniqueStoreId, status: true },
+	{ name: 'Peso', values: ['Ligero', 'Medio', 'Pesado'], store: uniqueStoreId, status: true },
+	{ name: 'Dimensiones', values: ['Pequeño', 'Mediano', 'Grande'], store: uniqueStoreId, status: true },
+	{ name: 'Voltaje', values: ['110V', '220V'], store: uniqueStoreId, status: true },
+	{ name: 'Potencia', values: ['100W', '200W', '500W'], store: uniqueStoreId, status: true },
+	{ name: 'Capacidad', values: ['1L', '2L', '5L'], store: uniqueStoreId, status: true },
+]
 
 
 const data: Data = {
@@ -804,6 +905,7 @@ const data: Data = {
 	subCategories,
 	brands,
 	units,
+	attributes,
 }
 
 

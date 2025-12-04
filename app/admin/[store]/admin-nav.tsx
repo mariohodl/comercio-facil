@@ -66,11 +66,11 @@ export function AdminNav({
           href: `/admin/${storeId}/products/create`,
           icon: PlusSquare,
         },
-        {
-          title: t('expiredProducts'),
-          href: `/admin/${storeId}/inventory/expired-products`,
-          icon: AlertCircle,
-        },
+        // {
+        //   title: t('expiredProducts'),
+        //   href: `/admin/${storeId}/inventory/expired-products`,
+        //   icon: AlertCircle,
+        // },
         {
           title: t('lowStocks'),
           href: `/admin/${storeId}/inventory/low-stocks`,

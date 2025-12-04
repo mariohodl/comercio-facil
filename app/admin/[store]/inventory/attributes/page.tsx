@@ -1,13 +1,15 @@
-import React from 'react'
-import { useTranslations } from 'next-intl'
+import { getAttributesByStore } from '@/lib/actions/attribute.actions'
+import { AttributeClient } from './client'
 
-export default function VariantAttributesPage() {
-    const t = useTranslations('inventory')
-    const tCommon = useTranslations('common')
+export default async function AttributesPage(props: {
+    params: Promise<{ store: string }>
+}) {
+    const params = await props.params
+    const attributes = await getAttributesByStore(params.store)
+
     return (
-        <div className='p-6'>
-            <h1 className='text-2xl font-bold mb-4'>{t('variantAttributes')}</h1>
-            <p className='text-gray-500'>{tCommon('comingSoon')}</p>
+        <div className="flex-1 space-y-4 p-8 pt-6">
+            <AttributeClient data={attributes} storeId={params.store} />
         </div>
     )
 }

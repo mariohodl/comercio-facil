@@ -1,80 +1,62 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { IProduct } from '@/lib/db/models/product.model'
-import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function SelectVariant({
   product,
-  size,
-  color,
 }: {
   product: IProduct
-  color: string
-  size: string
 }) {
-  const selectedColor = color || product.colors[0]
-  const selectedSize = size || product.sizes[0]
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const handleSelect = (key: string, value: string) => {
+    const newParams = new URLSearchParams(searchParams.toString())
+
+    // If clicking the already selected value, maybe we want to deselect?
+    if (searchParams.get(key) === value) {
+      newParams.delete(key)
+    } else {
+      newParams.set(key, value)
+    }
+
+    router.push(`?${newParams.toString()}`, { scroll: false })
+  }
+
+  if (!product.attributes || product.attributes.length === 0) {
+    return null
+  }
 
   return (
-    <>
-      {product.colors.length > 0 && (
-        <div className='space-x-2 space-y-2'>
-          <div>Color:</div>
-          {product.colors.map((x: string) => (
-            <Button
-              asChild
-              variant='outline'
-              className={
-                selectedColor === x ? 'border-2 border-primary' : 'border-2'
-              }
-              key={x}
-            >
-              <Link
-                replace
-                scroll={false}
-                href={`?${new URLSearchParams({
-                  color: x,
-                  size: selectedSize,
-                })}`}
-                key={x}
-              >
-                <div
-                  style={{ backgroundColor: x }}
-                  className='h-4 w-4 rounded-full border border-muted-foreground'
-                ></div>
-                {x}
-              </Link>
-            </Button>
-          ))}
+    <div className='flex flex-col gap-4'>
+      {product.attributes.map((attr) => (
+        <div key={attr.name}>
+          <div className='font-bold mb-2 text-navy'>{attr.name}</div>
+          <div className='flex flex-wrap gap-2'>
+            {attr.values.map((val) => {
+              const paramKey = attr.name.toLowerCase()
+              const isSelected = searchParams.get(paramKey) === val
+
+              return (
+                <Button
+                  key={val}
+                  variant='outline'
+                  className={cn(
+                    'border-neutral-300',
+                    isSelected && 'border-orange text-orange bg-orange-50 hover:bg-orange-100 hover:text-orange'
+                  )}
+                  onClick={() => handleSelect(paramKey, val)}
+                >
+                  {val}
+                </Button>
+              )
+            })}
+          </div>
         </div>
-      )}
-      {product.sizes.length > 0 && (
-        <div className='mt-2 space-x-2 space-y-2'>
-          <div>Size:</div>
-          {product.sizes.map((x: string) => (
-            <Button
-              asChild
-              variant='outline'
-              className={
-                selectedSize === x
-                  ? 'border-2  border-primary'
-                  : 'border-2  '
-              }
-              key={x}
-            >
-              <Link
-                replace
-                scroll={false}
-                href={`?${new URLSearchParams({
-                  color: selectedColor,
-                  size: x,
-                })}`}
-              >
-                {x}
-              </Link>
-            </Button>
-          ))}
-        </div>
-      )}
-    </>
+      ))}
+    </div>
   )
 }

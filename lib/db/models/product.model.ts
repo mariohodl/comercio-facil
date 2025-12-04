@@ -7,6 +7,14 @@ export interface IProduct extends Document, IProductInput {
 	updatedAt: Date
 }
 
+const variantImageSchema = new Schema(
+	{
+		imgUrl: { type: String, required: false },
+		imgKey: { type: String, required: false }
+	},
+	{ _id: false }
+)
+
 const productSchema = new Schema<IProduct>(
 	{
 		productId: {
@@ -110,14 +118,39 @@ const productSchema = new Schema<IProduct>(
 		tax: { type: Number, required: true },
 		discountType: { type: String, required: false },
 		discountValue: { type: Number, required: false },
-		discountValue: { type: Number, required: false },
 		quantityAlert: { type: Number, required: true },
 		costPerUnit: { type: Number, required: true, default: 0 },
+		attributes: [
+			{
+				name: { type: String },
+				values: { type: [String] }
+			}
+		],
+		variants: [
+			{
+				sku: { type: String, required: true },
+				price: { type: Number, required: true },
+				listPrice: { type: Number, required: true },
+				countInStock: { type: Number, required: true },
+				attributes: [
+					{
+						name: { type: String, required: true },
+						value: { type: String, required: true }
+					}
+				],
+				images: [variantImageSchema],
+				barcode: { type: String, required: false },
+				costPerUnit: { type: Number, required: false },
+				taxType: { type: String, required: false },
+				tax: { type: Number, required: false },
+			}
+		]
 	},
 	{
 		timestamps: true,
 	}
 )
+
 
 const Product =
 	(models.Product as Model<IProduct>) ||

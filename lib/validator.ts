@@ -27,6 +27,7 @@ export const ReviewInputSchema = z.object({
 		.max(5, 'Rating must be at most 5'),
 })
 export const ProductInputSchema = z.object({
+	_id: z.string().optional(),
 	productId: z.coerce
 		.number()
 		.int()
@@ -81,6 +82,25 @@ export const ProductInputSchema = z.object({
 	discountValue: z.coerce.number().optional(),
 	quantityAlert: z.coerce.number().int().nonnegative('Quantity alert must be a non-negative number'),
 	costPerUnit: z.coerce.number().nonnegative('Cost per unit must be a non-negative number'),
+	attributes: z.array(z.object({
+		name: z.string(),
+		values: z.array(z.string())
+	})).optional(),
+	variants: z.array(z.object({
+		sku: z.string(),
+		price: z.number(),
+		listPrice: z.number(),
+		countInStock: z.number(),
+		attributes: z.array(z.object({
+			name: z.string(),
+			value: z.string()
+		})),
+		images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })).max(2).optional(),
+		barcode: z.string().optional(),
+		costPerUnit: z.number().optional(),
+		taxType: z.string().optional(),
+		tax: z.number().optional(),
+	})).optional(),
 })
 
 // Order Item
@@ -225,7 +245,7 @@ export const UserNameSchema = z.object({
 })
 
 export const ProductUpdateSchema = ProductInputSchema.extend({
-	_id: z.string(),
+	_id: z.string().optional(),
 })
 
 export const UserUpdateSchema = z.object({
@@ -395,5 +415,16 @@ export const UnitInputSchema = z.object({
 })
 
 export const UnitUpdateSchema = UnitInputSchema.extend({
+	_id: MongoId,
+})
+
+export const AttributeInputSchema = z.object({
+	name: z.string().min(1, 'Name is required'),
+	values: z.array(z.string()).min(1, 'At least one value is required'),
+	store: z.string().min(1, 'Store is required'),
+	status: z.boolean().default(true),
+})
+
+export const AttributeUpdateSchema = AttributeInputSchema.extend({
 	_id: MongoId,
 })

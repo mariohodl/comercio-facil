@@ -11,12 +11,13 @@ import Brand from './models/brand.model'
 import Unit from './models/unit.model'
 import SubCategory from './models/sub-category.model'
 import { toSlug } from '../utils'
+import Attribute from './models/attribute.model'
 
 loadEnvConfig(cwd());
 
 const main = async () => {
   try {
-    const { products, reviews, users, categories, subCategories, brands, units } = data;
+    const { products, reviews, users, categories, subCategories, brands, units, attributes } = data;
     await connectToDatabase(process.env.MONGODB_URI);
 
     await User.deleteMany();
@@ -33,6 +34,10 @@ const main = async () => {
     // Seed units
     await Unit.deleteMany();
     const createdUnits = await Unit.insertMany(units);
+
+    // Seed attributes
+    await Attribute.deleteMany();
+    const createdAttributes = await Attribute.insertMany(attributes);
 
     // Seed categories
     await Category.deleteMany();
@@ -84,6 +89,7 @@ const main = async () => {
       createdUsers,
       createdBrands,
       createdUnits,
+      createdAttributes,
       createdCategories,
       createdSubCategories,
       createdProducts,

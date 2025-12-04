@@ -194,6 +194,54 @@ export default async function ProductDetailsPage(props: {
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* Variants Section */}
+                    {product.variants && product.variants.length > 0 && (
+                        <Card>
+                            <CardContent className="p-6">
+                                <h3 className="font-semibold text-navy mb-4 flex items-center gap-2">
+                                    <span className="w-1 h-6 bg-purple-500 rounded-full"></span>
+                                    Product Variants
+                                </h3>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="text-xs text-gray-500 uppercase bg-gray-50">
+                                            <tr>
+                                                <th className="px-4 py-3 rounded-l-md">Variant</th>
+                                                <th className="px-4 py-3">SKU</th>
+                                                <th className="px-4 py-3">Barcode</th>
+                                                <th className="px-4 py-3">Price</th>
+                                                <th className="px-4 py-3 rounded-r-md">Stock</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Array.from(new Map(product.variants.map((v: any) => [v.sku, v])).values()).map((variant: any, index: number) => (
+                                                <tr key={index} className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+                                                    <td className="px-4 py-3 font-medium text-navy">
+                                                        {variant.attributes.map((a: any) => `${a.name}: ${a.value}`).join(', ')}
+                                                    </td>
+                                                    <td className="px-4 py-3 font-mono text-xs bg-gray-50 rounded px-2 py-1 inline-block mt-1">
+                                                        {variant.sku}
+                                                    </td>
+                                                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                                                        {variant.barcode || '-'}
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        {formatCurrency(variant.price)}
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${variant.countInStock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                            {variant.countInStock}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
             </div>
         </main>

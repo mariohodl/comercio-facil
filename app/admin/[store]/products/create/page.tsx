@@ -4,6 +4,7 @@ import { Metadata } from 'next'
 import { getActiveCategories } from '@/lib/actions/category.actions'
 import { getActiveBrands } from '@/lib/actions/brand.actions'
 import { getActiveUnits } from '@/lib/actions/unit.actions'
+import { getAttributesByStore } from '@/lib/actions/attribute.actions'
 
 export const metadata: Metadata = {
   title: 'Create Product',
@@ -17,9 +18,10 @@ const CreateProductPage = async (props: {
   const categories = await getActiveCategories()
   const brands = await getActiveBrands()
   const units = await getActiveUnits()
+  const attributes = await getAttributesByStore(store)
 
   return (
-    <main className='max-w-6xl mx-auto p-4'>
+    <main className='p-4'>
       <div className='flex mb-4'>
         <Link href={`/admin/${store}/products`}>Products</Link>
         <span className='mx-1'>›</span>
@@ -27,7 +29,7 @@ const CreateProductPage = async (props: {
       </div>
 
       <div className='my-8'>
-        <ProductForm type='Create' categories={categories} brands={brands} units={units} storeId={store} />
+        <ProductForm type='Create' categories={categories} brands={brands} units={units} attributes={attributes} storeId={store} />
       </div>
     </main>
   )
