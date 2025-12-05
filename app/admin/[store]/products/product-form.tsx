@@ -801,586 +801,761 @@ const ProductForm = ({
               />
 
               {form.watch('productType') === 'Variable Product' && (
-                <div className="space-y-4 border p-4 rounded-md bg-gray-50">
-                  <h3 className="font-medium text-navy">{t('variantAttributes')}</h3>
-                  {attributes && attributes.length > 0 ? (
-                    <div className="space-y-4">
-                      <div className="flex flex-col gap-4 p-4 border rounded-md bg-gray-50">
-                        <h3 className="font-medium">{t('addVariant')}</h3>
-
-                        {/* Attribute Selection in Builder */}
-                        <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
-                          {attributes.map((attr) => (
-                            <div key={attr._id} className="space-y-2">
-                              <label className="text-sm font-medium">{attr.name}</label>
-                              <Select
-                                value={builderAttributes[attr.name]?.[0] || ''}
-                                onValueChange={(value) => {
-                                  if (value === '__clear__') {
-                                    // Remove this attribute from builderAttributes
-                                    const newAttrs = { ...builderAttributes }
-                                    delete newAttrs[attr.name]
-                                    setBuilderAttributes(newAttrs)
-                                  } else {
-                                    setBuilderAttributes(prev => ({
-                                      ...prev,
-                                      [attr.name]: [value]
-                                    }))
-                                  }
-                                }}
-                              >
-                                <SelectTrigger className={builderAttributes[attr.name]?.[0] ? 'bg-white border-yellow-500 border-2' : ''}>
-                                  <SelectValue placeholder={t('select')} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="__clear__">
-                                    <span className="text-muted-foreground italic">{t('select')}</span>
-                                  </SelectItem>
-                                  {attr.values.map((val) => (
-                                    <SelectItem key={val} value={val}>
-                                      {val}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                <div className="space-y-6 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
+                    <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <CardTitle className="text-lg font-semibold text-navy flex items-center gap-2">
+                            <span className="text-orange">✨</span> {t('variantBuilder')}
+                          </CardTitle>
+                          <p className="text-sm text-muted-foreground">{t('variantBuilderDescription')}</p>
+                        </div>
+                        {attributes && attributes.length > 0 && (
+                          <span className="text-xs font-medium px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-100">
+                            {attributes.length} {t('attributesAvailable')}
+                          </span>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-8">
+                      {attributes && attributes.length > 0 ? (
+                        <div className="space-y-8">
+                          {/* Step 1: Attributes */}
+                          <div className="space-y-4">
+                            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-xs">1</span>
+                              {t('selectAttributes')}
+                            </h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                              {attributes.map((attr) => (
+                                <div key={attr._id} className="space-y-2">
+                                  <label className="text-xs font-medium text-gray-500 uppercase">{attr.name}</label>
+                                  <Select
+                                    value={builderAttributes[attr.name]?.[0] || ''}
+                                    onValueChange={(value) => {
+                                      if (value === '__clear__') {
+                                        const newAttrs = { ...builderAttributes }
+                                        delete newAttrs[attr.name]
+                                        setBuilderAttributes(newAttrs)
+                                      } else {
+                                        setBuilderAttributes(prev => ({
+                                          ...prev,
+                                          [attr.name]: [value]
+                                        }))
+                                      }
+                                    }}
+                                  >
+                                    <SelectTrigger className={`h-10 transition-all ${builderAttributes[attr.name]?.[0] ? 'bg-orange/5 border-orange text-orange ring-1 ring-orange/20' : 'bg-gray-50/50 hover:bg-gray-50 hover:border-gray-300'}`}>
+                                      <SelectValue placeholder={t('select')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="__clear__" className="text-red-500 focus:text-red-500 focus:bg-red-50">
+                                        <span className="italic text-xs">{t('clearSelection')}</span>
+                                      </SelectItem>
+                                      {attr.values.map((val) => (
+                                        <SelectItem key={val} value={val}>
+                                          {val}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
+                          </div>
 
-                        {/* Variant Details Inputs */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">{t('quantity')} <span className="text-red-500">*</span></label>
-                            <Input
-                              type="number"
-                              value={newVariantData.countInStock}
-                              onChange={(e) => setNewVariantData(prev => ({ ...prev, countInStock: Number(e.target.value) }))}
-                              placeholder={t('enterQuantity')}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">{t('costPerUnit')} <span className="text-red-500">*</span></label>
-                            <Input
-                              type="number"
-                              value={newVariantData.costPerUnit}
-                              onChange={(e) => setNewVariantData(prev => ({ ...prev, costPerUnit: Number(e.target.value) }))}
-                              placeholder={t('enterCost')}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">{t('listPrice')} <span className="text-red-500">*</span></label>
-                            <Input
-                              type="number"
-                              value={newVariantData.listPrice}
-                              onChange={(e) => setNewVariantData(prev => ({ ...prev, listPrice: Number(e.target.value) }))}
-                              placeholder={t('enterListPrice')}
-                            />
-                          </div>
-                        </div>
+                          <div className="border-t border-gray-100"></div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">{t('sellingPrice')}</label>
-                            <Input
-                              type="number"
-                              value={newVariantData.price}
-                              readOnly
-                              className="bg-gray-100 cursor-not-allowed"
-                              placeholder={t('calculatedPrice')}
-                            />
+                          {/* Step 2 & 3: Details */}
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* Left Column: Pricing & Inventory */}
+                            <div className="space-y-5">
+                              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-xs">2</span>
+                                {t('pricingAndInventory')}
+                              </h3>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <label className="text-xs font-medium text-gray-500 uppercase">{t('quantity')} <span className="text-red-500">*</span></label>
+                                  <Input
+                                    type="number"
+                                    value={newVariantData.countInStock}
+                                    onChange={(e) => setNewVariantData(prev => ({ ...prev, countInStock: Number(e.target.value) }))}
+                                    placeholder="0"
+                                    className="h-10 font-medium"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-xs font-medium text-gray-500 uppercase">{t('costPerUnit')} <span className="text-red-500">*</span></label>
+                                  <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                                    <Input
+                                      type="number"
+                                      value={newVariantData.costPerUnit}
+                                      onChange={(e) => setNewVariantData(prev => ({ ...prev, costPerUnit: Number(e.target.value) }))}
+                                      placeholder="0.00"
+                                      className="pl-7 h-10 font-medium"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <label className="text-xs font-medium text-gray-500 uppercase">{t('listPrice')} <span className="text-red-500">*</span></label>
+                                  <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                                    <Input
+                                      type="number"
+                                      value={newVariantData.listPrice}
+                                      onChange={(e) => setNewVariantData(prev => ({ ...prev, listPrice: Number(e.target.value) }))}
+                                      placeholder="0.00"
+                                      className="pl-7 h-10 font-medium"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-xs font-medium text-gray-500 uppercase">{t('sellingPrice')}</label>
+                                  <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                                    <Input
+                                      type="number"
+                                      value={newVariantData.price}
+                                      readOnly
+                                      className="pl-7 h-10 bg-gray-50 text-gray-500 cursor-not-allowed"
+                                      placeholder="0.00"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-xs font-medium text-gray-500 uppercase">{t('taxType')} <span className="text-red-500">*</span></label>
+                                <Select
+                                  value={newVariantData.taxType}
+                                  onValueChange={(value) => setNewVariantData(prev => ({ ...prev, taxType: value }))}
+                                >
+                                  <SelectTrigger className="h-10">
+                                    <SelectValue placeholder={t('select')} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Exclusive">{t('exclusive')}</SelectItem>
+                                    <SelectItem value="Inclusive">{t('inclusive')}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+
+                            {/* Right Column: Identifiers & Media */}
+                            <div className="space-y-5">
+                              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-xs">3</span>
+                                {t('identifiersAndMedia')}
+                              </h3>
+
+                              <div className="space-y-2">
+                                <label className="text-xs font-medium text-gray-500 uppercase">{t('sku')} <span className="text-red-500">*</span></label>
+                                <div className="flex gap-2">
+                                  <Input
+                                    value={newVariantData.sku}
+                                    readOnly
+                                    className="h-10 bg-gray-50 font-mono text-sm"
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-10 w-10 shrink-0"
+                                    onClick={() => {
+                                      const namePart = productName ? productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(6, 'X') : 'PROD'
+                                      const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase().padEnd(8, 'X') : 'STOREID'
+                                      const mainSku = form.getValues('sku') || 'SKU'
+                                      const mainSkuLast5 = mainSku.replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase().padStart(5, '0')
+                                      const randomSuffix = Math.floor(1000 + Math.random() * 9000)
+                                      const generatedSku = `${namePart}-${storePart}-${mainSkuLast5}-${randomSuffix}`
+                                      setNewVariantData(prev => ({ ...prev, sku: generatedSku }))
+                                    }}
+                                    title={t('regenerateSku')}
+                                  >
+                                    <RefreshCw className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-xs font-medium text-gray-500 uppercase">{t('barcode')} <span className="text-red-500">*</span></label>
+                                <div className="flex gap-2">
+                                  <div className="relative flex-1">
+                                    <ScanBarcode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <Input
+                                      value={newVariantData.barcode}
+                                      onChange={(e) => setNewVariantData(prev => ({ ...prev, barcode: e.target.value }))}
+                                      placeholder={t('scanOrEnterBarcode')}
+                                      className={`pl-9 h-10 ${newVariantData.barcode ? 'bg-green-50 border-green-200 text-green-700' : ''}`}
+                                      readOnly={!!newVariantData.barcode}
+                                    />
+                                    {newVariantData.barcode && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setNewVariantData(prev => ({ ...prev, barcode: '' }))}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    )}
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-10 w-10 shrink-0"
+                                    onClick={() => setIsScannerOpen(true)}
+                                    title={t('scanBarcode')}
+                                  >
+                                    <ScanBarcode className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    className="h-10 bg-orange text-white hover:bg-orange/90 shrink-0"
+                                    onClick={() => {
+                                      const randomBarcode = Math.floor(100000000000 + Math.random() * 900000000000).toString()
+                                      setNewVariantData(prev => ({ ...prev, barcode: randomBarcode }))
+                                    }}
+                                  >
+                                    {t('generate')}
+                                  </Button>
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-xs font-medium text-gray-500 uppercase">{t('variantImages')} <span className="text-red-500">*</span></label>
+                                <div className="p-4 border border-dashed border-gray-200 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                                  {newVariantData.images.length < 2 && (
+                                    <div className="flex justify-center mb-4">
+                                      <UploadButton
+                                        endpoint="imageUploader"
+                                        onClientUploadComplete={(res) => {
+                                          if (res) {
+                                            const newImages = res.map(file => ({
+                                              imgUrl: file.url,
+                                              imgKey: file.key
+                                            }))
+                                            setNewVariantData(prev => ({
+                                              ...prev,
+                                              images: [...prev.images, ...newImages].slice(0, 2)
+                                            }))
+                                            showSuccess(t('imageUploadedSuccessfully'))
+                                          }
+                                        }}
+                                        onUploadError={(error: Error) => {
+                                          showError(`Upload failed: ${error.message}`)
+                                        }}
+                                        className="ut-button:bg-white ut-button:text-orange ut-button:border-orange ut-button:border ut-button:hover:bg-orange/5 ut-allowed-content:hidden"
+                                        content={{
+                                          button({ ready }) {
+                                            if (ready) return <div className="flex items-center gap-2 text-sm"><PlusCircle className="w-4 h-4" /> {t('uploadImage')}</div>
+                                            return "Loading..."
+                                          }
+                                        }}
+                                      />
+                                    </div>
+                                  )}
+
+                                  {newVariantData.images.length > 0 ? (
+                                    <div className="flex gap-3 justify-center">
+                                      {newVariantData.images.map((image, idx) => (
+                                        <div key={idx} className="relative w-20 h-20 border rounded-md overflow-hidden shadow-sm group">
+                                          <Image
+                                            src={image.imgUrl}
+                                            alt={`Variant image ${idx + 1}`}
+                                            fill
+                                            className="object-cover"
+                                          />
+                                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Button
+                                              type="button"
+                                              variant="destructive"
+                                              size="icon"
+                                              className="h-8 w-8 rounded-full"
+                                              onClick={() => {
+                                                setNewVariantData(prev => ({
+                                                  ...prev,
+                                                  images: prev.images.filter((_, i) => i !== idx)
+                                                }))
+                                              }}
+                                            >
+                                              <Trash className="h-4 w-4" />
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <div className="text-center text-xs text-muted-foreground">
+                                      {t('noImagesUploaded')}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">{t('taxType')} <span className="text-red-500">*</span></label>
-                            <Select
-                              value={newVariantData.taxType}
-                              onValueChange={(value) => setNewVariantData(prev => ({ ...prev, taxType: value }))}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder={t('select')} />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Exclusive">{t('exclusive')}</SelectItem>
-                                <SelectItem value="Inclusive">{t('inclusive')}</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">{t('sku')} <span className="text-red-500">*</span></label>
-                          <div className="flex gap-2">
-                            <Input
-                              value={newVariantData.sku}
-                              readOnly
-                              className="bg-gray-100"
-                            />
+
+                          <div className="flex justify-end pt-6 border-t border-gray-100">
                             <Button
                               type="button"
-                              variant="outline"
-                              size="icon"
+                              size="lg"
                               onClick={() => {
+                                // Validate that all attributes have a selection
+                                const selectedAttrNames = Object.keys(builderAttributes)
+                                if (selectedAttrNames.length === 0) {
+                                  showError(t('selectAtLeastOneAttribute'))
+                                  return
+                                }
+
+                                // Validate quantity is greater than 0
+                                if (!newVariantData.countInStock || newVariantData.countInStock <= 0) {
+                                  showError(t('quantityRequired'))
+                                  return
+                                }
+
+                                // Validate cost per unit is greater than 0
+                                if (!newVariantData.costPerUnit || newVariantData.costPerUnit <= 0) {
+                                  showError(t('costPerUnitRequired'))
+                                  return
+                                }
+
+                                // Validate list price is greater than 0
+                                if (!newVariantData.listPrice || newVariantData.listPrice <= 0) {
+                                  showError(t('listPriceRequired'))
+                                  return
+                                }
+
+                                // Validate SKU is present
+                                if (!newVariantData.sku || newVariantData.sku.trim() === '') {
+                                  showError(t('skuRequired'))
+                                  return
+                                }
+
+                                // Validate barcode is present
+                                if (!newVariantData.barcode || newVariantData.barcode.trim() === '') {
+                                  showError(t('barcodeRequired'))
+                                  return
+                                }
+
+                                // Validate at least one image
+                                if (!newVariantData.images || newVariantData.images.length === 0) {
+                                  showError(t('atLeastOneImageRequired'))
+                                  return
+                                }
+
+                                const newVariant = {
+                                  attributes: selectedAttrNames.map(name => ({
+                                    name,
+                                    value: builderAttributes[name][0]
+                                  })),
+                                  price: newVariantData.price,
+                                  listPrice: newVariantData.listPrice,
+                                  countInStock: newVariantData.countInStock,
+                                  costPerUnit: newVariantData.costPerUnit,
+                                  sku: newVariantData.sku,
+                                  barcode: newVariantData.barcode,
+                                  taxType: newVariantData.taxType,
+                                  tax: newVariantData.tax,
+                                  images: newVariantData.images
+                                }
+
+                                const currentVariants = form.getValues('variants') || []
+                                form.setValue('variants', [...currentVariants, newVariant])
+
+                                // Regenerate SKU for next variant
                                 const namePart = productName ? productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(6, 'X') : 'PROD'
                                 const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase().padEnd(8, 'X') : 'STOREID'
                                 const mainSku = form.getValues('sku') || 'SKU'
                                 const mainSkuLast5 = mainSku.replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase().padStart(5, '0')
                                 const randomSuffix = Math.floor(1000 + Math.random() * 9000)
                                 const generatedSku = `${namePart}-${storePart}-${mainSkuLast5}-${randomSuffix}`
-                                setNewVariantData(prev => ({ ...prev, sku: generatedSku }))
-                              }}
-                            >
-                              <RefreshCw className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="space-y-2 col-span-2">
-                          <label className="text-sm font-medium">{t('barcode')} <span className="text-red-500">*</span></label>
-                          <div className="flex gap-2">
-                            <Input
-                              value={newVariantData.barcode}
-                              onChange={(e) => setNewVariantData(prev => ({ ...prev, barcode: e.target.value }))}
-                              placeholder={t('enterBarcode')}
-                              className={`flex-1 ${newVariantData.barcode ? 'bg-gray-100' : ''}`}
-                              readOnly={!!newVariantData.barcode}
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              onClick={() => setIsScannerOpen(true)}
-                            >
-                              <ScanBarcode className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              type="button"
-                              className="bg-orange text-white hover:bg-orange/90"
-                              onClick={() => {
-                                const randomBarcode = Math.floor(100000000000 + Math.random() * 900000000000).toString()
-                                setNewVariantData(prev => ({ ...prev, barcode: randomBarcode }))
-                              }}
-                            >
-                              {t('generate')}
-                            </Button>
-                          </div>
-                        </div>
 
-                        {/* Variant Images Upload */}
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">{t('variantImages')} (Max 2) <span className="text-red-500">*</span></label>
+                                setNewVariantData(prev => ({
+                                  ...prev,
+                                  sku: generatedSku,
+                                  barcode: '', // Reset barcode
+                                  images: [] // Reset images
+                                }))
+                                showSuccess(t('variantAddedSuccessfully'))
+                              }}
+                              className="bg-navy hover:bg-navy/90 text-white min-w-[200px]"
+                            >
+                              <PlusCircle className="mr-2 h-5 w-5" />
+                              {t('addVariantToProduct')}
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+                          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                            <span className="text-2xl">🏷️</span>
+                          </div>
                           <div className="space-y-2">
-                            {newVariantData.images.length < 2 && (
-                              <UploadButton
-                                endpoint="imageUploader"
-                                onClientUploadComplete={(res) => {
-                                  if (res) {
-                                    const newImages = res.map(file => ({
-                                      imgUrl: file.url,
-                                      imgKey: file.key
-                                    }))
-                                    setNewVariantData(prev => ({
-                                      ...prev,
-                                      images: [...prev.images, ...newImages].slice(0, 2)
-                                    }))
-                                    showSuccess(t('imageUploadedSuccessfully'))
-                                  }
-                                }}
-                                onUploadError={(error: Error) => {
-                                  showError(`Upload failed: ${error.message}`)
-                                }}
-                                className="ut-button:bg-orange ut-button:ut-readying:bg-orange/50"
-                              />
-                            )}
-                            {newVariantData.images.length > 0 && (
-                              <div className="flex gap-2 flex-wrap">
-                                {newVariantData.images.map((image, idx) => (
-                                  <div key={idx} className="relative w-20 h-20 border rounded">
-                                    <Image
-                                      src={image.imgUrl}
-                                      alt={`Variant image ${idx + 1}`}
-                                      fill
-                                      className="object-cover rounded"
-                                    />
-                                    <Button
-                                      type="button"
-                                      variant="destructive"
-                                      size="icon"
-                                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                                      onClick={() => {
-                                        setNewVariantData(prev => ({
-                                          ...prev,
-                                          images: prev.images.filter((_, i) => i !== idx)
-                                        }))
-                                      }}
-                                    >
-                                      <X className="h-3 w-3" />
-                                    </Button>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
+                            <h3 className="text-lg font-medium text-gray-900">{t('noAttributesFound')}</h3>
+                            <p className="text-muted-foreground max-w-sm mx-auto">{t('createAttributesDescription')}</p>
                           </div>
+                          <Link href={`/admin/${storeId}/inventory/attributes`}>
+                            <Button variant="outline" className="mt-2 text-orange border-orange hover:bg-orange/5">
+                              {t('createAttributes')}
+                            </Button>
+                          </Link>
                         </div>
-                      </div>
+                      )}
+                    </CardContent>
+                  </Card>
 
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          // Validate that all attributes have a selection
-                          const selectedAttrNames = Object.keys(builderAttributes)
-                          if (selectedAttrNames.length === 0) {
-                            showError(t('selectAtLeastOneAttribute'))
-                            return
-                          }
-
-                          // Validate quantity is greater than 0
-                          if (!newVariantData.countInStock || newVariantData.countInStock <= 0) {
-                            showError(t('quantityRequired'))
-                            return
-                          }
-
-                          // Validate cost per unit is greater than 0
-                          if (!newVariantData.costPerUnit || newVariantData.costPerUnit <= 0) {
-                            showError(t('costPerUnitRequired'))
-                            return
-                          }
-
-                          // Validate list price is greater than 0
-                          if (!newVariantData.listPrice || newVariantData.listPrice <= 0) {
-                            showError(t('listPriceRequired'))
-                            return
-                          }
-
-                          // Validate SKU is present
-                          if (!newVariantData.sku || newVariantData.sku.trim() === '') {
-                            showError(t('skuRequired'))
-                            return
-                          }
-
-                          // Validate barcode is present
-                          if (!newVariantData.barcode || newVariantData.barcode.trim() === '') {
-                            showError(t('barcodeRequired'))
-                            return
-                          }
-
-                          // Validate at least one image
-                          if (!newVariantData.images || newVariantData.images.length === 0) {
-                            showError(t('atLeastOneImageRequired'))
-                            return
-                          }
-
-                          const newVariant = {
-                            attributes: selectedAttrNames.map(name => ({
-                              name,
-                              value: builderAttributes[name][0]
-                            })),
-                            price: newVariantData.price,
-                            listPrice: newVariantData.listPrice,
-                            countInStock: newVariantData.countInStock,
-                            costPerUnit: newVariantData.costPerUnit,
-                            sku: newVariantData.sku,
-                            barcode: newVariantData.barcode,
-                            taxType: newVariantData.taxType,
-                            tax: newVariantData.tax,
-                            images: newVariantData.images
-                          }
-
-                          const currentVariants = form.getValues('variants') || []
-                          form.setValue('variants', [...currentVariants, newVariant])
-
-                          // Regenerate SKU for next variant
-                          const namePart = productName ? productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(6, 'X') : 'PROD'
-                          const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase().padEnd(8, 'X') : 'STOREID'
-                          const mainSku = form.getValues('sku') || 'SKU'
-                          const mainSkuLast5 = mainSku.replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase().padStart(5, '0')
-                          const randomSuffix = Math.floor(1000 + Math.random() * 9000)
-                          const generatedSku = `${namePart}-${storePart}-${mainSkuLast5}-${randomSuffix}`
-
-                          setNewVariantData(prev => ({
-                            ...prev,
-                            sku: generatedSku,
-                            barcode: '', // Reset barcode
-                            images: [] // Reset images
-                          }))
-                        }}
-                        className="w-full md:w-auto self-end"
-                      >
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        {t('addVariant')}
-                      </Button>
-                    </div>
-
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      {t('noAttributesFound')} <Link href={`/admin/${storeId}/inventory/attributes`} className="text-orange hover:underline">{t('createAttributes')}</Link>
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Generated Variants Table */}
-              {form.watch('productType') === 'Variable Product' && (
-                <div className="space-y-4 border p-4 rounded-md bg-gray-50 mt-4">
-                  <h3 className="font-medium text-navy">{t('generatedVariants')}</h3>
+                  {/* Generated Variants Table */}
                   {form.watch('variants') && form.watch('variants').length > 0 && (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-100">
-                          <tr>
-                            <th className="px-4 py-2">{t('variant')}</th>
-                            <th className="px-4 py-2">{t('images')}</th>
-                            <th className="px-4 py-2">{t('sku')}</th>
-                            <th className="px-4 py-2">{t('barcode')}</th>
-                            <th className="px-4 py-2">{t('cost')}</th>
-                            <th className="px-4 py-2">{t('price')}</th>
-                            <th className="px-4 py-2">{t('stock')}</th>
-                            <th className="px-4 py-2">{t('actions')}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(form.watch('variants') || []).map((variant: any, index: number) => {
-                            return (
-                              <tr key={index} className="bg-white border-b hover:bg-gray-50">
-                                <td className="px-4 py-2 font-medium">
-                                  <div className="flex flex-col gap-1">
-                                    {variant.attributes.map((variantAttr: any, attrIndex: number) => (
-                                      <div key={attrIndex} className="flex items-center gap-2 text-sm">
-                                        <span className="text-muted-foreground w-16">{variantAttr.name}:</span>
-                                        <span className="font-medium">{variantAttr.value}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-2">
-                                  {variant.images && variant.images.length > 0 ? (
-                                    <div className="flex gap-1">
-                                      {variant.images.map((img: ProductImage, imgIdx: number) => (
-                                        <div key={imgIdx} className="relative w-10 h-10 border rounded">
+                    <Card className="border-neutral-200 shadow-sm overflow-hidden">
+                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-4">
+                        <CardTitle className="text-base font-semibold text-navy flex items-center justify-between">
+                          <span>{t('generatedVariants')}</span>
+                          <span className="text-xs font-normal text-muted-foreground bg-white px-2 py-1 rounded border">
+                            {form.watch('variants').length} {t('variants')}
+                          </span>
+                        </CardTitle>
+                      </CardHeader>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                          <thead className="text-xs text-gray-500 uppercase bg-gray-50/50 border-b border-gray-100">
+                            <tr>
+                              <th className="px-6 py-3 font-medium">{t('variant')}</th>
+                              <th className="px-6 py-3 font-medium">{t('sku')} / {t('barcode')}</th>
+                              <th className="px-6 py-3 font-medium text-right">{t('cost')}</th>
+                              <th className="px-6 py-3 font-medium text-right">{t('price')}</th>
+                              <th className="px-6 py-3 font-medium text-center">{t('stock')}</th>
+                              <th className="px-6 py-3 font-medium text-right">{t('actions')}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100">
+                            {(form.watch('variants') || []).map((variant: any, index: number) => {
+                              return (
+                                <tr key={index} className="bg-white hover:bg-gray-50/50 transition-colors">
+                                  <td className="px-6 py-4">
+                                    <div className="flex items-start gap-4">
+                                      {variant.images && variant.images.length > 0 ? (
+                                        <div className="relative w-12 h-12 border rounded-md overflow-hidden shrink-0">
                                           <Image
-                                            src={img.imgUrl}
-                                            alt={`Variant ${index + 1} image ${imgIdx + 1}`}
+                                            src={variant.images[0].imgUrl}
+                                            alt="Variant thumbnail"
                                             fill
-                                            className="object-cover rounded"
+                                            className="object-cover"
                                           />
                                         </div>
-                                      ))}
+                                      ) : (
+                                        <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center shrink-0 text-gray-400">
+                                          <span className="text-xs">No Img</span>
+                                        </div>
+                                      )}
+                                      <div className="space-y-1">
+                                        {variant.attributes.map((variantAttr: any, attrIndex: number) => (
+                                          <div key={attrIndex} className="flex items-center gap-2 text-xs">
+                                            <span className="text-gray-500 font-medium">{variantAttr.name}:</span>
+                                            <span className="text-gray-900 bg-gray-100 px-1.5 py-0.5 rounded">{variantAttr.value}</span>
+                                          </div>
+                                        ))}
+                                      </div>
                                     </div>
-                                  ) : (
-                                    <span className="text-muted-foreground text-sm">-</span>
-                                  )}
-                                </td>
-                                <td className="px-4 py-2 text-sm">{variant.sku}</td>
-                                <td className="px-4 py-2 text-sm">{variant.barcode || '-'}</td>
-                                <td className="px-4 py-2 text-sm">${variant.costPerUnit}</td>
-                                <td className="px-4 py-2 text-sm">${variant.price}</td>
-                                <td className="px-4 py-2 text-sm">{variant.countInStock}</td>
-                                <td className="px-4 py-2">
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-muted-foreground hover:text-red-500"
-                                    onClick={() => {
-                                      const newVariants = [...(form.getValues('variants') || [])]
-                                      newVariants.splice(index, 1)
-                                      form.setValue('variants', newVariants)
-                                    }}
-                                  >
-                                    <Trash className="h-4 w-4" />
-                                  </Button>
-                                </td>
-                              </tr>
-                            )
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
+                                  </td>
+                                  <td className="px-6 py-4">
+                                    <div className="flex flex-col gap-1">
+                                      <span className="font-mono text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded w-fit">{variant.sku}</span>
+                                      {variant.barcode && (
+                                        <span className="font-mono text-xs text-gray-400 flex items-center gap-1">
+                                          <ScanBarcode className="w-3 h-3" /> {variant.barcode}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="px-6 py-4 text-right font-medium text-gray-600">
+                                    ${Number(variant.costPerUnit).toFixed(2)}
+                                  </td>
+                                  <td className="px-6 py-4 text-right font-medium text-navy">
+                                    ${Number(variant.price).toFixed(2)}
+                                  </td>
+                                  <td className="px-6 py-4 text-center">
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variant.countInStock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                      {variant.countInStock}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-right">
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50"
+                                      onClick={() => {
+                                        const newVariants = [...(form.getValues('variants') || [])]
+                                        newVariants.splice(index, 1)
+                                        form.setValue('variants', newVariants)
+                                      }}
+                                    >
+                                      <Trash className="h-4 w-4" />
+                                    </Button>
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </Card>
                   )}
                 </div>
               )}
 
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                {form.watch('productType') === 'Single Product' && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name='countInStock'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('quantity')} <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input type='number' placeholder={t('enterQuantity')} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
-                <FormField
-                  control={form.control}
-                  name='costPerUnit'
-                  render={({ field }) => (
-                    <FormItem className={form.watch('productType') === 'Variable Product' ? 'hidden' : ''}>
-                      <FormLabel>{t('costPerUnit')} <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input type='number' step='0.01' placeholder={t('enterCost')} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {form.watch('productType') === 'Single Product' && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name='listPrice'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('listPrice')} <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input type='number' step='0.01' placeholder={t('enterListPrice')} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name='price'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('sellingPrice')} <span className="text-red-500">*</span></FormLabel>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              step='0.01'
-                              placeholder={t('calculatedPrice')}
-                              {...field}
-                              disabled
-                              className="bg-gray-50"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
-                <FormField
-                  control={form.control}
-                  name='taxType'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('taxType')} <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('select')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Exclusive">{t('exclusive')}</SelectItem>
-                          <SelectItem value="Inclusive">{t('inclusive')}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {form.watch('productType') === 'Single Product' && (
+                <div className="space-y-6 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                <FormField
-                  control={form.control}
-                  name='tax'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('tax')} <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={String(field.value)}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('select')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="0">0%</SelectItem>
-                          <SelectItem value="16">16%</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='discountType'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('discountType')} <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('select')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Percentage">{t('percentage')}</SelectItem>
-                          <SelectItem value="Fixed">{t('fixed')}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='discountValue'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('discountValue')} <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input type='number' placeholder={t('enterDiscount')} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                    {/* Inventory Section */}
+                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
+                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+                        <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
+                          <span className="text-orange">📦</span> {t('inventory')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-6 space-y-4">
+                        <FormField
+                          control={form.control}
+                          name='countInStock'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('quantity')} <span className="text-red-500">*</span></FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Input type='number' placeholder={t('enterQuantity')} {...field} className="pl-9" />
+                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 text-sm">#</span>
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name='quantityAlert'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('quantityAlert')} <span className="text-red-500">*</span></FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Input type='number' placeholder={t('enterQuantityAlert')} {...field} className="pl-9" />
+                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 text-sm">⚠️</span>
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </CardContent>
+                    </Card>
 
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                <FormField
-                  control={form.control}
-                  name='quantityAlert'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('quantityAlert')} <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input type='number' placeholder={t('enterQuantityAlert')} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                    {/* Pricing Section */}
+                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
+                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+                        <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
+                          <span className="text-orange">💰</span> {t('pricing')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-6 space-y-4">
+                        <div className="flex flex-row gap-4">
+                          <FormField
+                            control={form.control}
+                            name='costPerUnit'
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel className="text-sm whitespace-nowrap">{t('costPerUnit')} <span className="text-red-500">*</span></FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input type='number' step='0.01' placeholder={t('enterCost')} {...field} className="pl-9" />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                      <span className="text-gray-500 text-sm">$</span>
+                                    </div>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name='listPrice'
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel className="text-sm whitespace-nowrap">{t('listPrice')} <span className="text-red-500">*</span></FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input type='number' step='0.01' placeholder={t('enterListPrice')} {...field} className="pl-9" />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                      <span className="text-gray-500 text-sm">$</span>
+                                    </div>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name='price'
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel className="text-sm whitespace-nowrap">{t('sellingPrice')} <span className="text-red-500">*</span></FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input
+                                      type='number'
+                                      step='0.01'
+                                      placeholder={t('calculatedPrice')}
+                                      {...field}
+                                      disabled
+                                      className="bg-gray-50 pl-9"
+                                    />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                      <span className="text-gray-500 text-sm">$</span>
+                                    </div>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name='taxType'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('taxType')} <span className="text-red-500">*</span></FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder={t('select')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Exclusive">{t('exclusive')}</SelectItem>
+                                    <SelectItem value="Inclusive">{t('inclusive')}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name='tax'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('tax')} <span className="text-red-500">*</span></FormLabel>
+                                <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={String(field.value)}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder={t('select')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="0">0%</SelectItem>
+                                    <SelectItem value="16">16%</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
 
-              <FormField
-                control={form.control}
-                name='isPublished'
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                    <div className="space-y-0">
-                      <FormLabel className="text-sm font-medium">{t('published')}</FormLabel>
-                      <div className="text-xs text-muted-foreground">
-                        {t('makeProductVisible')}
-                      </div>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                    {/* Discount Section */}
+                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
+                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+                        <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
+                          <span className="text-orange">🏷️</span> {t('discount')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-6 space-y-4">
+                        <FormField
+                          control={form.control}
+                          name='discountType'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('discountType')} <span className="text-red-500">*</span></FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={t('select')} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Percentage">{t('percentage')}</SelectItem>
+                                  <SelectItem value="Fixed">{t('fixed')}</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name='discountValue'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('discountValue')} <span className="text-red-500">*</span></FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Input type='number' placeholder={t('enterDiscount')} {...field} className="pl-9" />
+                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 text-sm">%</span>
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Settings Section */}
+                  <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
+                    <CardContent className="p-6">
+                      <FormField
+                        control={form.control}
+                        name='isPublished'
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-gray-50/50">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-base font-medium text-navy">{t('published')}</FormLabel>
+                              <div className="text-sm text-muted-foreground">
+                                {t('makeProductVisible')}
+                              </div>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                className="data-[state=checked]:bg-orange"
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </CardContent>
           </Card>
 
