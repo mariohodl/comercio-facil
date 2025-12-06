@@ -58,6 +58,9 @@ export type Data = {
 	brands: IBrandInput[];
 	units: IUnitInput[];
 	attributes: IAttributeInput[];
+	companies: any[];
+	stores: any[];
+	warehouses: any[];
 };
 
 export type ProductImage = {

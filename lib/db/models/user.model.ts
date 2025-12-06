@@ -11,6 +11,12 @@ import {
 
 export interface IUser extends Document, IUserInput {
 	_id: string;
+	business?: {
+		companyId: string;
+		stores: string[];
+		warehouses: string[];
+		defaultStoreId: string;
+	};
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -24,8 +30,12 @@ const userSchema = new Schema<IUser>(
 		image: { type: String },
 		emailVerified: { type: Boolean, default: false },
 		isStore: { type: Boolean, default: false },
-		storeName: { type: String, required: false },
-		storeId: { type: String, required: false },
+		business: {
+			companyId: { type: Schema.Types.ObjectId as any, ref: 'Company' },
+			stores: [{ type: Schema.Types.ObjectId as any, ref: 'Store' }],
+			warehouses: [{ type: Schema.Types.ObjectId as any, ref: 'Warehouse' }],
+			defaultStoreId: { type: Schema.Types.ObjectId as any, ref: 'Store' }
+		}
 	},
 	{
 		timestamps: true,

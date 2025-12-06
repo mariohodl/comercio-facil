@@ -60,6 +60,7 @@ export function AdminNav({
           title: t('products'),
           href: `/admin/${storeId}/products`,
           icon: Box,
+          excludes: [`/admin/${storeId}/products/create`],
         },
         {
           title: t('createProduct'),
@@ -185,7 +186,10 @@ export function AdminNav({
             </h4>
             <div className='space-y-1'>
               {section.items.map((item, itemIndex) => {
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+                // @ts-ignore
+                const isActive = (pathname === item.href || pathname.startsWith(`${item.href}/`)) &&
+                  // @ts-ignore
+                  (!item.excludes || !item.excludes.some(path => pathname.startsWith(path)))
                 const Icon = item.icon
 
                 return (

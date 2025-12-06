@@ -8,6 +8,7 @@ import { APP_NAME } from '@/lib/constants'
 import { auth } from '@/auth'
 import { Menu as MenuIcon } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import CompanySettingsModal from '@/components/shared/company-settings-modal'
 
 export default async function AdminLayout({
     children,
@@ -72,6 +73,10 @@ export default async function AdminLayout({
                         {children}
                     </main>
                 </div>
+                <CompanySettingsModal
+                    isOpen={!session?.user?.storeName || !session?.user?.storeId}
+                    userId={session?.user?.id || ''}
+                />
             </div>
         </>
     )

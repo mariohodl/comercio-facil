@@ -229,15 +229,20 @@ export const UserSignInSchema = z.object({
 })
 
 export const UserSignUpSchema = UserSignInSchema.extend({
-	isStore: IsStore,
-	storeName: StoreName,
-	storeId: StoreId,
-	role: UserRole,
 	name: UserName,
 	confirmPassword: Password,
 }).refine((data) => data.password === data.confirmPassword, {
 	message: "Passwords don't match",
 	path: ['confirmPassword'],
+})
+
+export const StoreSettingsSchema = z.object({
+	companyName: z.string().min(3, 'Company name must be at least 3 characters'),
+	storeName: z.string().min(3, 'Store name must be at least 3 characters'),
+	storeLocation: z.string().min(3, 'Store location must be at least 3 characters'),
+	warehouseName: z.string().min(3, 'Warehouse name must be at least 3 characters'),
+	warehouseLocation: z.string().min(3, 'Warehouse location must be at least 3 characters'),
+	storeId: StoreId,
 })
 
 export const UserNameSchema = z.object({

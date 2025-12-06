@@ -17,6 +17,7 @@ declare module 'next-auth' {
 			storeId: string;
 			isStore: boolean;
 			storeName: string;
+			companyId: string;
 		} & DefaultSession['user'];
 	}
 }
@@ -48,7 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				await connectToDatabase();
 				if (credentials == null) return null;
 
-				const DBuser = await User.findOne({ email: credentials.email });
+				const DBuser = await User.findOne({ email: credentials.email }).populate('business.defaultStoreId');
 
 				if (DBuser && DBuser.password) {
 					const isMatch = await bcrypt.compare(
@@ -56,14 +57,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 						DBuser.password
 					);
 					if (isMatch) {
+						const defaultStore = DBuser.business?.defaultStoreId as any;
 						const user = {
 							id: DBuser._id,
 							name: DBuser.name,
 							email: DBuser.email,
 							role: DBuser.role,
-							storeId: DBuser.storeId,
+							storeId: defaultStore?.slug || '',
 							isStore: DBuser.isStore,
-							storeName: DBuser.storeName
+							storeName: defaultStore?.name || '',
+							companyId: DBuser.business?.companyId || ''
 						};
 						return user
 					}
@@ -87,10 +90,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				token.storeId = (user as { storeId: string }).storeId;
 				token.storeName = (user as { storeName: string }).storeName;
 				token.isStore = (user as { isStore: boolean }).isStore;
+				token.companyId = (user as { companyId: string }).companyId;
 			}
 
 			if (session?.user?.name && trigger === 'update') {
 				token.name = session.user.name;
+			}
+			if (session?.user?.storeId && trigger === 'update') {
+				token.storeId = session.user.storeId;
+			}
+			if (session?.user?.storeName && trigger === 'update') {
+				token.storeName = session.user.storeName;
+			}
+			if (session?.user?.isStore !== undefined && trigger === 'update') {
+				token.isStore = session.user.isStore;
+			}
+			if (session?.user?.companyId && trigger === 'update') {
+				token.companyId = session.user.companyId;
 			}
 			return token;
 		},
@@ -101,10 +117,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 			session.user.storeId = token.storeId as string;
 			session.user.isStore = token.isStore as boolean;
-			session.user.storeName = token.storeId as string;
+			session.user.storeName = token.storeName as string;
+			session.user.companyId = token.companyId as string;
 
 			if (trigger === 'update') {
 				session.user.name = user.name;
+				session.user.storeId = token.storeId as string;
+				session.user.storeName = token.storeName as string;
+				session.user.isStore = token.isStore as boolean;
+				session.user.companyId = token.companyId as string;
 			}
 			return session;
 		},

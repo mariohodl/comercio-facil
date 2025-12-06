@@ -833,6 +833,18 @@ const attributes = [
 	{ name: 'Capacidad', values: ['1L', '2L', '5L'], store: uniqueStoreId, status: true },
 ]
 
+const companies = [
+	{ name: 'Mi Empresa S.A. de C.V.', ownerEmail: 'mario@example.com' }
+]
+
+const stores = [
+	{ name: uniqueStoreName, slug: uniqueStoreId, companyName: 'Mi Empresa S.A. de C.V.', location: 'Sucursal Centro' }
+]
+
+const warehouses = [
+	{ name: 'Almacén General', slug: 'almacen-general', companyName: 'Mi Empresa S.A. de C.V.', location: 'Calle Industrial 456' }
+]
+
 
 const data: Data = {
 	headerMenus: [
@@ -906,6 +918,9 @@ const data: Data = {
 	brands,
 	units,
 	attributes,
+	companies,
+	stores,
+	warehouses,
 }
 
 

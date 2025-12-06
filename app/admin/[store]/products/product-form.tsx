@@ -112,6 +112,22 @@ const productDefaultValues: IProductInput =
       costPerUnit: 0,
     }
 
+import { IStore } from '@/lib/db/models/store.model'
+import { IWarehouse } from '@/lib/db/models/warehouse.model'
+
+type ProductFormProps = {
+  type: 'Create' | 'Update'
+  product?: IProduct
+  productId?: string
+  storeId: string
+  categories?: { _id: string; categoryName: string; categorySlug: string }[]
+  brands?: { _id: string; name: string; slug: string }[]
+  units?: { _id: string; name: string; abbreviation: string }[]
+  attributes?: { _id: string; name: string; values: string[] }[]
+  stores?: IStore[]
+  warehouses?: IWarehouse[]
+}
+
 const ProductForm = ({
   type,
   product,
@@ -121,16 +137,10 @@ const ProductForm = ({
   brands = [],
   units = [],
   attributes = [],
-}: {
-  type: 'Create' | 'Update'
-  product?: IProduct
-  productId?: string
-  storeId: string
-  categories?: { _id: string; categoryName: string; categorySlug: string }[]
-  brands?: { _id: string; name: string; slug: string }[]
-  units?: { _id: string; name: string; abbreviation: string }[]
-  attributes?: { _id: string; name: string; values: string[] }[]
-}) => {
+  stores = [],
+  warehouses = [],
+}: ProductFormProps) => {
+  console.log('ProductForm warehouses:', warehouses)
   const router = useRouter()
   const t = useTranslations('products')
   const tCommon = useTranslations('common')
@@ -172,6 +182,18 @@ const ProductForm = ({
       form.setValue('slug', toSlug(productName))
     }
   }, [productName, type, form])
+
+  useEffect(() => {
+    if (stores && stores.length === 1 && !form.getValues('store')) {
+      form.setValue('store', stores[0].slug, { shouldValidate: true })
+    }
+  }, [stores, form])
+
+  useEffect(() => {
+    if (warehouses && warehouses.length === 1 && !form.getValues('warehouse')) {
+      form.setValue('warehouse', warehouses[0].slug, { shouldValidate: true })
+    }
+  }, [warehouses, form])
 
   // Generate initial SKU for the builder when product name changes or storeId loads
   useEffect(() => {
@@ -400,14 +422,24 @@ const ProductForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t('store')} <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select key={field.value} onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="store1">{t('mainStore')}</SelectItem>
+                          {stores.length > 0 ? (
+                            stores.map((store) => (
+                              <SelectItem key={store._id} value={store.slug}>
+                                {store.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-stores" disabled>
+                              No stores available
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -420,14 +452,24 @@ const ProductForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t('warehouse')} <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select key={field.value} onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="warehouse1">{t('mainWarehouse')}</SelectItem>
+                          {warehouses.length > 0 ? (
+                            warehouses.map((warehouse) => (
+                              <SelectItem key={warehouse._id} value={warehouse.slug}>
+                                {warehouse.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-warehouses" disabled>
+                              {t('noWarehousesAvailable') || 'No warehouses available'}
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />

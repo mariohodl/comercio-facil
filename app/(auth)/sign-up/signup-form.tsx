@@ -4,7 +4,6 @@ import { CustomH2 } from '@/components/shared/CustomH2'
 import { CustomP } from '@/components/shared/CustomP'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
 import Link from 'next/link'
 import {
   Form,
@@ -27,38 +26,33 @@ import { APP_NAME } from '@/lib/constants'
 const signUpDefaultValues =
   process.env.NODE_ENV === 'development'
     ? {
-        name: 'john doe',
-        email: 'john@me.com',
-        password: '123456',
-        confirmPassword: '123456',
-        isStore: true,
-        storeName: 'Mi tienda de la esquina',
-      }
+      name: 'john doe',
+      email: 'john@me.com',
+      password: '123456',
+      confirmPassword: '123456',
+    }
     : {
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        isStore: false,
-        storeName: '',
-      }
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    }
 
 export default function SignUpForm() {
   const form = useForm<IUserSignUp>({
     resolver: zodResolver(UserSignUpSchema),
     defaultValues: signUpDefaultValues,
   })
-  const { control, handleSubmit, watch , formState: { errors }} = form
-  console.log({errors})
-  const isStoreCheckbox = watch('isStore')
+  const { control, handleSubmit, formState: { errors } } = form
+  console.log({ errors })
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
-  
+
 
 
   const onSubmit = async (data: IUserSignUp) => {
-    console.log({data})
+    console.log({ data })
     try {
       const res = await registerUser(data)
       if (!res.success) {
@@ -73,18 +67,18 @@ export default function SignUpForm() {
         email: data.email,
         password: data.password,
       })
-      console.log({res})
+      console.log({ res })
       const redirectTo = res.redirectUrl || callbackUrl
       redirect(redirectTo)
     } catch (error) {
       if (isRedirectError(error)) {
         throw error
       }
-    //   toast({
-    //     title: 'Error',
-    //     description: 'Invalid email or password',
-    //     variant: 'destructive',
-    //   })
+      //   toast({
+      //     title: 'Error',
+      //     description: 'Invalid email or password',
+      //     variant: 'destructive',
+      //   })
     }
   }
 
@@ -162,47 +156,6 @@ export default function SignUpForm() {
                 )}
               />
             </div>
-            
-            <div className='flex align-middle'>
-              <FormField
-                control={control}
-                name='isStore'
-                render={({ field }) => (
-                  <FormItem className=''>
-                    <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <CustomP>Eres una Tienda?</CustomP>
-            </div>
-
-           {
-            isStoreCheckbox && (
-              <FormField
-                control={control}
-                name='storeName'
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Nombre de tu Tienda/Negocio</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='text'
-                        placeholder='Ingresa el nombre de tu tienda ó negocio'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )
-           }
 
             <div>
               <Button type='submit'>Crear Cuenta</Button>
@@ -217,7 +170,7 @@ export default function SignUpForm() {
             <div className='text-sm'>
               Ya tienes una cuenta?{' '}
               <Link className='link' href={`/sign-in?callbackUrl=${callbackUrl}`}>
-              Inicia sesión
+                Inicia sesión
               </Link>
             </div>
           </div>
