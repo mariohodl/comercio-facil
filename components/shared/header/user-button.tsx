@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SignOut } from '@/lib/actions/user.actions'
 import { cn } from '@/lib/utils'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, User as UserIcon } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function UserButton() {
@@ -20,14 +20,17 @@ export default async function UserButton() {
   return (
     <div className='flex gap-2 items-center'>
       <DropdownMenu>
-        <DropdownMenuTrigger className='header-button' asChild>
-          <div className='flex items-center'>
-            <div className='flex flex-col text-sm text-left'>
-              <span>{t('header.hello', { name: session ? session.user.name : t('common.signIn') })}</span>
-              <span className='font-bold'>{t('header.account')}</span>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="flex items-center gap-2 h-auto py-1 px-2 hover:bg-gray-100 transition-colors rounded-full">
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">
+              {session ? session.user.name?.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
             </div>
-            <ChevronDown />
-          </div>
+            <div className="hidden md:flex md:flex-col text-left pl-1 gap-0.5">
+              <span className="text-[11px] text-gray-500 leading-tight whitespace-nowrap">{t('header.hello', { name: session?.user?.name ? session.user.name.split(' ')[0] : t('common.signIn') })}</span>
+              <span className="text-sm font-bold leading-tight whitespace-nowrap">{t('header.account')}</span>
+            </div>
+            <ChevronDown className="w-4 h-4 text-gray-400 hidden md:block" />
+          </Button>
         </DropdownMenuTrigger>
         {session ? (
           <DropdownMenuContent className='w-56' align='end' forceMount>

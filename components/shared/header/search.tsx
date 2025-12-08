@@ -16,32 +16,21 @@ export default async function Search() {
     <form
       action='/search'
       method='GET'
-      className='flex  items-stretch h-10 '
+      className='flex items-center w-full relative group'
     >
-      {/* <Select name='category'>
-        <SelectTrigger className='w-auto h-full dark:border-gray-200 bg-gray-100 text-black border-r  rounded-r-none rounded-l-sm'>
-          <SelectValue placeholder='Todo' />
-        </SelectTrigger>
-        <SelectContent position='popper'>
-          <SelectItem value='all'>Todo</SelectItem>
-          {categories.map((category) => (
-            <SelectItem key={category} value={category}>
-              {category}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select> */}
-      <Input
-        className='flex-1 rounded-none dark:border-gray-200 bg-gray-100 text-black text-base h-full'
-        placeholder={`Buscar en ${APP_NAME}`}
-        name='q'
-        type='search'
-      />
+      <div className="relative flex-1">
+        <Input
+          className='w-full rounded-l-full border-gray-200 bg-gray-50 text-black text-sm h-11 pl-5 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all'
+          placeholder={`Buscar en ${APP_NAME}...`}
+          name='q'
+          type='search'
+        />
+      </div>
       <button
         type='submit'
-        className='bg-primary text-primary-foreground text-black  h-full px-3 py-2 '
+        className='bg-[#FF9800] hover:bg-[#F57C00] text-white h-11 px-6 rounded-r-full transition-colors flex items-center justify-center shadow-sm'
       >
-        <SearchIcon className='w-6 h-6' />
+        <SearchIcon className='w-5 h-5' />
       </button>
     </form>
   )

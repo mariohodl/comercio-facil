@@ -36,13 +36,12 @@ export function LanguageSwitcher() {
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="ghost"
-                    size="sm"
-                    className="gap-2"
+                    size="icon"
+                    className="rounded-full w-10 h-10 hover:bg-gray-100 transition-colors"
                     disabled={isPending}
                 >
-                    <Globe className="h-4 w-4" />
-                    <span className="hidden md:inline">{languages[locale].name}</span>
-                    <span className="text-lg">{languages[locale].flag}</span>
+                    <span className="text-xl leading-none">{languages[locale].flag}</span>
+                    <span className="sr-only">{languages[locale].name}</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

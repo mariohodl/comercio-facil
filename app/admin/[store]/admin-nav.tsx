@@ -26,6 +26,7 @@ import {
   Monitor,
   ChevronRight
 } from 'lucide-react'
+import Logo from '@/components/shared/header/logo'
 
 export function AdminNav({
   storeId,
@@ -179,6 +180,9 @@ export function AdminNav({
       className
     )}>
       <div className='p-4 space-y-6 mt-6'>
+        <div className='px-2 mb-6'>
+          <Logo />
+        </div>
         {navSections.map((section, index) => (
           <div key={index}>
             <h4 className='text-navy font-bold mb-2 px-2 text-sm uppercase tracking-wider'>

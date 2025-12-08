@@ -45,7 +45,16 @@
         "siteMenu": "Menu",
         "navigation": "Navigation",
         "categories": "Categories",
-        "viewAllCategories": "View all categories"
+        "viewAllCategories": "View all categories",
+        "todaysDeal": "Today's Deal",
+        "newArrivals": "New Arrivals",
+        "featuredProducts": "Featured Products",
+        "bestSellers": "Best Sellers",
+        "browsingHistory": "Browsing History",
+        "customerService": "Customer Service",
+        "aboutUs": "About Us",
+        "help": "Help",
+        "language": "Language"
     },
     "products": {
         "title": "Products",

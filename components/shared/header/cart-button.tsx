@@ -18,29 +18,17 @@ export default function CartButton() {
   } = useCartStore()
   const cartItemsCount = items.reduce((a, c) => a + c.quantity, 0)
   return (
-    <Link href='/cart' className='px-1 header-button relative top-1'>
-      <div className='flex items-end text-xs relative'>
-        <ShoppingCartIcon className='h-8 w-8' />
+    <Link href='/cart' className='relative group flex items-center gap-2 p-2 hover:bg-gray-50 rounded-full transition-colors'>
+      <div className='relative flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full group-hover:bg-gray-200 transition-colors'>
+        <ShoppingCartIcon className='h-5 w-5 text-gray-700' />
 
-        {isMounted && (
-          <span
-            className={cn(
-              `bg-primary  w-5 h-5 rounded-full text-white text-base  absolute right-[30px] top-[-6px] z-10 flex items-center justify-center`,
-              cartItemsCount >= 10 && 'text-sm'
-            )}
-          >
-            <span className='text-[12px] '>{cartItemsCount}</span>
+        {isMounted && cartItemsCount > 0 && (
+          <span className='absolute -top-1 -right-1 bg-[#FF9800] text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-sm border-2 border-white'>
+            {cartItemsCount > 9 ? '9+' : cartItemsCount}
           </span>
         )}
-        <span className='font-bold'>{t('cart')}</span>
-        {
-          isCartSidebarOpen && (
-            <div
-              className={`absolute top-[20px] right-[-16px] rotate-[-90deg] z-10 w-0 h-0 border-l-[7px] border-r-[7px] border-b-[8px] border-transparent border-b-background`}
-            ></div>
-          )
-        }
       </div>
+      <span className="font-semibold text-sm hidden md:block">{t('cart')}</span>
     </Link>
   )
 }

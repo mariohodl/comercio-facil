@@ -18,6 +18,7 @@ import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { useTranslations } from 'next-intl'
 
+
 export const getColumns = (t: any, tCommon: any): ColumnDef<IAttribute>[] => [
     {
         accessorKey: 'name',

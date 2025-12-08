@@ -45,7 +45,16 @@
         "siteMenu": "Menú",
         "navigation": "Navegación",
         "categories": "Categorías",
-        "viewAllCategories": "Ver todas las categorías"
+        "viewAllCategories": "Ver todas las categorías",
+        "todaysDeal": "Oferta del Día",
+        "newArrivals": "Nuevos Productos",
+        "featuredProducts": "Productos Destacados",
+        "bestSellers": "Más Vendidos",
+        "browsingHistory": "Historial de Navegación",
+        "customerService": "Servicio al Cliente",
+        "aboutUs": "Sobre Nosotros",
+        "help": "Ayuda",
+        "language": "Idioma"
     },
     "products": {
         "title": "Productos",
