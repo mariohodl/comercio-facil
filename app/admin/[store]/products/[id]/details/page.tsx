@@ -73,7 +73,6 @@ export default async function ProductDetailsPage(props: {
                 {/* Right Column: Details */}
                 <div className="lg:col-span-2 space-y-6">
 
-                    {/* General Info */}
                     <Card>
                         <CardContent className="p-6">
                             <h3 className="font-semibold text-navy mb-4 flex items-center gap-2">
@@ -123,7 +122,7 @@ export default async function ProductDetailsPage(props: {
                                 </div>
                                 <div>
                                     <p className="text-xs text-muted-foreground uppercase tracking-wider">Selling Price</p>
-                                    <p className="font-bold text-xl text-green-600 mt-1">{formatCurrency(product.price)}</p>
+                                    <p className="font-bold text-xl text-green-600 mt-1">{formatCurrency(product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.listPrice)}</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-muted-foreground uppercase tracking-wider">Cost Per Unit</p>
@@ -146,7 +145,7 @@ export default async function ProductDetailsPage(props: {
                                     <div className="h-8 w-px bg-gray-200"></div>
                                     <div>
                                         <p className="text-xs text-muted-foreground uppercase">Discount Price</p>
-                                        <p className="font-medium text-navy">{product.discountPrice ? formatCurrency(product.discountPrice) : 'N/A'}</p>
+                                        <p className="font-medium text-navy">{product.discountPrice && product.discountPrice > 0 ? formatCurrency(product.discountPrice) : formatCurrency(product.listPrice)}</p>
                                     </div>
                                 </div>
                             </div>
@@ -227,7 +226,7 @@ export default async function ProductDetailsPage(props: {
                                                         {variant.barcode || '-'}
                                                     </td>
                                                     <td className="px-4 py-3">
-                                                        {formatCurrency(variant.price)}
+                                                        {formatCurrency(variant.listPrice)}
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         <span className={`px-2 py-1 rounded text-xs font-medium ${variant.countInStock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>

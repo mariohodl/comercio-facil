@@ -24,7 +24,6 @@ interface BarcodeModalProps {
     }
 }
 
-// Dedicated Barcode Component to handle generation reliably
 const Barcode = ({ value, className }: { value: string, className?: string }) => {
     const svgRef = useRef<SVGSVGElement>(null)
 
@@ -106,7 +105,6 @@ export default function BarcodeModal({
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="w-full max-w-[800px] sm:max-w-[800px] max-h-[90vh] overflow-y-auto p-0">
-                {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b">
                     <h2 className="text-xl font-semibold">Barcode</h2>
                     <button
@@ -117,7 +115,6 @@ export default function BarcodeModal({
                     </button>
                 </div>
 
-                {/* Print Button */}
                 <div className="px-6 py-3 flex justify-end">
                     <Button onClick={handlePrint} className="bg-red-600 hover:bg-red-700 text-white">
                         <Printer className="mr-2 h-4 w-4" />
@@ -150,7 +147,7 @@ export default function BarcodeModal({
                                         )}
                                         {config.showPrice && (
                                             <div className="text-sm mb-2 text-gray-900 price">
-                                                Price: {formatCurrency(product.price)}
+                                                Price: {formatCurrency(product.listPrice)}
                                             </div>
                                         )}
                                         <Barcode

@@ -39,6 +39,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Switch } from "@/components/ui/switch"
 import Link from 'next/link'
+import { IStore } from '@/lib/db/models/store.model'
+import { IWarehouse } from '@/lib/db/models/warehouse.model'
 
 const productDefaultValues: IProductInput =
   process.env.NODE_ENV === 'development'
@@ -50,8 +52,7 @@ const productDefaultValues: IProductInput =
       images: [],
       brand: 'Generico',
       description: 'This is a sample description of the product.',
-      price: 99.99,
-      listPrice: 0,
+      listPrice: 99.99,
       discountPrice: 0,
       countInStock: 15,
       numReviews: 0,
@@ -62,7 +63,6 @@ const productDefaultValues: IProductInput =
       tags: [],
       ratingDistribution: [],
       reviews: [],
-      // New fields defaults
       store: '',
       warehouse: '',
       subCategory: '',
@@ -85,7 +85,6 @@ const productDefaultValues: IProductInput =
       images: [],
       brand: '',
       description: '',
-      price: 0,
       listPrice: 0,
       discountPrice: 0,
       countInStock: 0,
@@ -111,9 +110,6 @@ const productDefaultValues: IProductInput =
       quantityAlert: 0,
       costPerUnit: 0,
     }
-
-import { IStore } from '@/lib/db/models/store.model'
-import { IWarehouse } from '@/lib/db/models/warehouse.model'
 
 type ProductFormProps = {
   type: 'Create' | 'Update'
@@ -155,6 +151,9 @@ const ProductForm = ({
   const [newVariantData, setNewVariantData] = useState({
     price: 0,
     listPrice: 0,
+    discountPrice: 0,
+    discountType: 'Percentage',
+    discountValue: 0,
     countInStock: 0,
     costPerUnit: 0,
     sku: '',
@@ -182,6 +181,32 @@ const ProductForm = ({
       form.setValue('slug', toSlug(productName))
     }
   }, [productName, type, form])
+
+  // Calculate variant discount price automatically
+  useEffect(() => {
+    const listPrice = Number(newVariantData.listPrice) || 0
+    const discountValue = Number(newVariantData.discountValue) || 0
+    const discountType = newVariantData.discountType
+
+    let calculatedDiscountPrice = 0
+
+    if (discountType && discountValue > 0 && listPrice > 0) {
+      if (discountType === 'Percentage') {
+        calculatedDiscountPrice = listPrice - (listPrice * discountValue / 100)
+      } else if (discountType === 'Fixed') {
+        calculatedDiscountPrice = listPrice - discountValue
+      }
+      calculatedDiscountPrice = Math.max(0, calculatedDiscountPrice)
+    }
+
+    setNewVariantData(prev => {
+      // Only update if value changed to avoid infinite loops
+      if (prev.discountPrice !== calculatedDiscountPrice) {
+        return { ...prev, discountPrice: calculatedDiscountPrice }
+      }
+      return prev
+    })
+  }, [newVariantData.listPrice, newVariantData.discountValue, newVariantData.discountType])
 
   useEffect(() => {
     if (stores && stores.length === 1 && !form.getValues('store')) {
@@ -265,8 +290,8 @@ const ProductForm = ({
   }, [selectedCategory, categories, form])
 
   // Watch pricing fields for automatic discount calculation
-  const listPrice = form.watch('listPrice')
   const discountType = form.watch('discountType')
+  const listPrice = form.watch('listPrice')
   const discountValue = form.watch('discountValue')
 
   useEffect(() => {
@@ -274,32 +299,24 @@ const ProductForm = ({
     const discountValueNum = Number(discountValue) || 0
 
     let calculatedDiscountPrice = 0
-    let calculatedSellingPrice = listPriceNum
 
-    if (discountType && discountValueNum > 0) {
+    if (discountType && discountValueNum > 0 && listPriceNum > 0) {
       if (discountType === 'Percentage') {
         calculatedDiscountPrice = listPriceNum - (listPriceNum * discountValueNum / 100)
       } else if (discountType === 'Fixed') {
         calculatedDiscountPrice = listPriceNum - discountValueNum
       }
 
-      // Ensure discount price is not negative
+      // Ensure discount price is not negative and is a valid number
       calculatedDiscountPrice = Math.max(0, calculatedDiscountPrice)
-      calculatedSellingPrice = calculatedDiscountPrice
     }
 
-    // Update the form values
-    form.setValue('discountPrice', calculatedDiscountPrice)
-    form.setValue('price', calculatedSellingPrice)
+    // Only update if the value is a valid number
+    if (!isNaN(calculatedDiscountPrice)) {
+      form.setValue('discountPrice', calculatedDiscountPrice)
+    }
   }, [listPrice, discountType, discountValue, form])
 
-  // Calculate variant selling price based on list price (currently no discounts for variants)
-  useEffect(() => {
-    setNewVariantData(prev => ({
-      ...prev,
-      price: prev.listPrice
-    }))
-  }, [newVariantData.listPrice])
 
 
   async function onSubmit(values: IProductInput) {
@@ -308,8 +325,7 @@ const ProductForm = ({
     // If Variable Product, calculate aggregates from variants
     if (values.productType === 'Variable Product' && values.variants && values.variants.length > 0) {
       const totalStock = values.variants.reduce((acc: number, curr: any) => acc + (Number(curr.countInStock) || 0), 0)
-      const minPrice = Math.min(...values.variants.map((v: any) => Number(v.price) || 0))
-      const maxListPrice = Math.max(...values.variants.map((v: any) => Number(v.listPrice) || 0))
+      const minListPrice = Math.min(...values.variants.map((v: any) => Number(v.listPrice) || 0))
       const maxCost = Math.max(...values.variants.map((v: any) => Number(v.costPerUnit) || 0))
 
       // Calculate attributes summary from variants
@@ -331,11 +347,9 @@ const ProductForm = ({
       finalValues = {
         ...finalValues,
         countInStock: totalStock,
-        price: minPrice,
-        listPrice: maxListPrice,
+        listPrice: minListPrice,
         costPerUnit: maxCost,
         attributes: attributes,
-        // Ensure discountPrice is also handled if needed, but for now let's leave it as is or set to 0
         discountPrice: 0
       }
     }
@@ -363,6 +377,7 @@ const ProductForm = ({
       }
     }
   }
+
   const images = form.watch('images')
 
   const handleRemoveImage = async (image: ProductImage) => {
@@ -377,7 +392,7 @@ const ProductForm = ({
     } else {
       showError(res.errorMessage || t('failedToDeleteImage'))
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -544,7 +559,6 @@ const ProductForm = ({
                       <FormMessage />
 
 
-                      {/* Reactive SKU Generation */}
                     </FormItem>
                   )}
                 />
@@ -917,17 +931,19 @@ const ProductForm = ({
                                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-xs">2</span>
                                 {t('pricingAndInventory')}
                               </h3>
-                              <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <label className="text-xs font-medium text-gray-500 uppercase">{t('quantity')} <span className="text-red-500">*</span></label>
-                                  <Input
-                                    type="number"
-                                    value={newVariantData.countInStock}
-                                    onChange={(e) => setNewVariantData(prev => ({ ...prev, countInStock: Number(e.target.value) }))}
-                                    placeholder="0"
-                                    className="h-10 font-medium"
-                                  />
-                                </div>
+                              {/* Quantity - Smaller standalone field */}
+                              <div className="space-y-2 max-w-xs">
+                                <label className="text-xs font-medium text-gray-500 uppercase">{t('quantity')} <span className="text-red-500">*</span></label>
+                                <Input
+                                  type="number"
+                                  value={newVariantData.countInStock}
+                                  onChange={(e) => setNewVariantData(prev => ({ ...prev, countInStock: Number(e.target.value) }))}
+                                  placeholder="0"
+                                  className="h-10 font-medium"
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="space-y-2">
                                   <label className="text-xs font-medium text-gray-500 uppercase">{t('costPerUnit')} <span className="text-red-500">*</span></label>
                                   <div className="relative">
@@ -941,8 +957,6 @@ const ProductForm = ({
                                     />
                                   </div>
                                 </div>
-                              </div>
-                              <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                   <label className="text-xs font-medium text-gray-500 uppercase">{t('listPrice')} <span className="text-red-500">*</span></label>
                                   <div className="relative">
@@ -957,12 +971,12 @@ const ProductForm = ({
                                   </div>
                                 </div>
                                 <div className="space-y-2">
-                                  <label className="text-xs font-medium text-gray-500 uppercase">{t('sellingPrice')}</label>
+                                  <label className="text-xs font-medium text-gray-500 uppercase">{t('discountPrice')}</label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                                     <Input
                                       type="number"
-                                      value={newVariantData.price}
+                                      value={newVariantData.discountPrice}
                                       readOnly
                                       className="pl-7 h-10 bg-gray-50 text-gray-500 cursor-not-allowed"
                                       placeholder="0.00"
@@ -970,6 +984,35 @@ const ProductForm = ({
                                   </div>
                                 </div>
                               </div>
+
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <label className="text-xs font-medium text-gray-500 uppercase">{t('discountType')}</label>
+                                  <Select
+                                    value={newVariantData.discountType || 'Percentage'}
+                                    onValueChange={(value) => setNewVariantData(prev => ({ ...prev, discountType: value }))}
+                                  >
+                                    <SelectTrigger className="h-10">
+                                      <SelectValue placeholder={t('select')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="Percentage">{t('percentage')}</SelectItem>
+                                      <SelectItem value="Fixed">{t('fixed')}</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-xs font-medium text-gray-500 uppercase">{t('discountValue')}</label>
+                                  <Input
+                                    type="number"
+                                    value={newVariantData.discountValue}
+                                    onChange={(e) => setNewVariantData(prev => ({ ...prev, discountValue: Number(e.target.value) }))}
+                                    placeholder="0"
+                                    className="h-10"
+                                  />
+                                </div>
+                              </div>
+
                               <div className="space-y-2">
                                 <label className="text-xs font-medium text-gray-500 uppercase">{t('taxType')} <span className="text-red-500">*</span></label>
                                 <Select
@@ -987,7 +1030,6 @@ const ProductForm = ({
                               </div>
                             </div>
 
-                            {/* Right Column: Identifiers & Media */}
                             <div className="space-y-5">
                               <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
                                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-xs">3</span>
@@ -1198,6 +1240,9 @@ const ProductForm = ({
                                   listPrice: newVariantData.listPrice,
                                   countInStock: newVariantData.countInStock,
                                   costPerUnit: newVariantData.costPerUnit,
+                                  discountPrice: newVariantData.discountPrice,
+                                  discountType: newVariantData.discountType,
+                                  discountValue: newVariantData.discountValue,
                                   sku: newVariantData.sku,
                                   barcode: newVariantData.barcode,
                                   taxType: newVariantData.taxType,
@@ -1448,10 +1493,10 @@ const ProductForm = ({
                           />
                           <FormField
                             control={form.control}
-                            name='price'
+                            name='discountPrice'
                             render={({ field }) => (
                               <FormItem className="flex-1">
-                                <FormLabel className="text-sm whitespace-nowrap">{t('sellingPrice')} <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel className="text-sm whitespace-nowrap">{t('discountPrice')}</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input

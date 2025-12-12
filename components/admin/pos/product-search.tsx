@@ -1,31 +1,43 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { usePOSStore } from '@/hooks/use-pos-store'
 import { getAllProductsForAdmin } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
-import { Loader2, Search, ShoppingCart } from 'lucide-react'
+import { Loader2, Search, Plus, Minus, Package, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
 import { formatCurrency } from '@/lib/utils'
 import { useDebounce } from '@/hooks/use-debounce'
+import ProductCard from './product-card'
 
-export default function ProductSearch() {
+interface ProductSearchProps {
+    storeId: string
+    selectedCategory: string
+    onCategoryChange: (category: string) => void
+}
+
+export default function ProductSearch({ storeId, selectedCategory, onCategoryChange }: ProductSearchProps) {
     const [query, setQuery] = useState('')
     const [products, setProducts] = useState<IProduct[]>([])
     const [loading, setLoading] = useState(false)
-    const { addToCart } = usePOSStore()
+    const { addToCart, cart, updateQuantity, removeFromCart } = usePOSStore()
     const debouncedQuery = useDebounce(query, 500)
+    const t = useTranslations('pos')
 
-    const fetchProducts = useCallback(async (searchQuery: string) => {
+    const fetchProducts = useCallback(async (searchQuery: string, category: string = 'all') => {
         setLoading(true)
         try {
             const res = await getAllProductsForAdmin({
                 query: searchQuery,
                 page: 1,
-                limit: 20,
+                limit: 50,
+                store: storeId,
+                category: category !== 'all' ? category : undefined,
             })
             setProducts(res.products)
         } catch (error) {
@@ -33,64 +45,107 @@ export default function ProductSearch() {
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [storeId])
 
     useEffect(() => {
-        fetchProducts(debouncedQuery)
-    }, [debouncedQuery, fetchProducts])
+        fetchProducts(debouncedQuery, selectedCategory)
+    }, [debouncedQuery, selectedCategory, fetchProducts])
+
+    const getCartQuantity = (productId: string) => {
+        const item = cart.find(i => i.product === productId)
+        return item?.quantity || 0
+    }
+
+    const filteredProducts = products
+
+    // Get current date
+    const currentDate = new Date().toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    })
 
     return (
-        <div className="flex h-full flex-col space-y-4">
-            <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                    placeholder="Search products..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    className="pl-8"
-                />
+        <div className="flex h-full flex-col space-y-3">
+            {/* Welcome Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-lg font-bold text-gray-900">
+                        {t('welcome')}, User
+                    </h2>
+                    <p className="text-xs text-gray-500">{currentDate}</p>
+                </div>
+
+                <div className="relative w-2/3">
+                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                    <Input
+                        autoFocus
+                        placeholder={t('searchPlaceholder')}
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        className="pl-9 h-9 bg-white border-gray-200 rounded-lg shadow-sm text-sm"
+                    />
+                </div>
+                {/* <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs gap-1.5 border-gray-300"
+                        onClick={() => onCategoryChange('all')}
+                    >
+                        <Package className="h-3.5 w-3.5" />
+                        {t('viewAllBrands')}
+                    </Button>
+                    <Button
+                        variant="default"
+                        size="sm"
+                        className="h-8 text-xs gap-1.5 bg-orange-500 hover:bg-orange-600"
+                    >
+                        ⭐ {t('featured')}
+                    </Button>
+                </div> */}
             </div>
 
+            {/* Search */}
+            <div className="space-y-2">
+                {/* <div className="relative">
+                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                    <Input
+                        autoFocus
+                        placeholder={t('searchPlaceholder')}
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        className="pl-9 h-9 bg-white border-gray-200 rounded-lg shadow-sm text-sm"
+                    />
+                </div> */}
+
+                {/* Results Count */}
+                <div className="flex items-center justify-between text-xs text-gray-600">
+                    {cart.length > 0 && (
+                        <Badge variant="secondary" className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5">
+                            {cart.length} {t('itemsInCart')}
+                        </Badge>
+                    )}
+                    <span>{filteredProducts.length} {t('productsFound')}</span>
+                </div>
+            </div>
+
+            {/* Products Grid */}
             <div className="flex-1 overflow-y-auto">
                 {loading ? (
                     <div className="flex h-full items-center justify-center">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
-                ) : products.length === 0 ? (
-                    <div className="flex h-full items-center justify-center text-muted-foreground">
-                        No products found
+                ) : filteredProducts.length === 0 ? (
+                    <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
+                        <Package className="h-16 w-16 mb-4 text-gray-300" />
+                        <p className="text-gray-500 font-medium">{t('noProductsFound')}</p>
+                        <p className="text-sm text-gray-400 mt-1">{t('tryAdjusting')}</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                        {products.map((product) => (
-                            <Card
-                                key={product._id}
-                                className="cursor-pointer transition-shadow hover:shadow-md"
-                                onClick={() => addToCart(product)}
-                            >
-                                <CardHeader className="p-0">
-                                    <div className="relative aspect-square w-full overflow-hidden rounded-t-lg bg-muted">
-                                        <Image
-                                            src={product.images[0]?.imgUrl || '/placeholder.png'}
-                                            alt={product.name}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="p-3">
-                                    <h3 className="line-clamp-2 text-sm font-medium">{product.name}</h3>
-                                    <p className="mt-1 text-sm text-muted-foreground">
-                                        Stock: {product.countInStock}
-                                    </p>
-                                </CardContent>
-                                <CardFooter className="flex items-center justify-between p-3 pt-0">
-                                    <span className="font-bold">{formatCurrency(product.price)} / {product.unit}</span>
-                                    <Button size="icon" variant="secondary" className="h-8 w-8">
-                                        <ShoppingCart className="h-4 w-4" />
-                                    </Button>
-                                </CardFooter>
-                            </Card>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 pb-4">
+                        {filteredProducts.map((product) => (
+                            <ProductCard key={product._id} product={product} />
                         ))}
                     </div>
                 )}

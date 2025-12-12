@@ -60,6 +60,8 @@ const orderSchema = new Schema<IOrder>(
 		paidAt: { type: Date },
 		isDelivered: { type: Boolean, required: true, default: false },
 		deliveredAt: { type: Date },
+		isRounded: { type: Boolean, default: false },
+		amountRounded: { type: Number, default: 0 },
 		createdAt: { type: Date, default: Date.now },
 	},
 	{

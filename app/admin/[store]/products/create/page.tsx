@@ -26,15 +26,7 @@ const CreateProductPage = async (props: {
 
   return (
     <main className='p-4'>
-      <div className='flex mb-4'>
-        <Link href={`/admin/${store}/products`}>Products</Link>
-        <span className='mx-1'>›</span>
-        <Link href={`/admin/${store}/products/create`}>Create</Link>
-      </div>
-
-      <div className='my-8'>
-        <ProductForm type='Create' categories={categories} brands={brands} units={units} attributes={attributes} storeId={store} stores={stores} warehouses={warehouses} />
-      </div>
+      <ProductForm type='Create' categories={categories} brands={brands} units={units} attributes={attributes} storeId={store} stores={stores} warehouses={warehouses} />
     </main>
   )
 }

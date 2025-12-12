@@ -15,12 +15,13 @@ import Attribute from './models/attribute.model'
 import Company from './models/company.model'
 import Store from './models/store.model'
 import Warehouse from './models/warehouse.model'
+import Customer from './models/customer.model'
 
 loadEnvConfig(cwd());
 
 const main = async () => {
   try {
-    const { products, reviews, users, categories, subCategories, brands, units, attributes } = data;
+    const { products, reviews, users, categories, subCategories, brands, units, attributes, customers } = data;
     await connectToDatabase(process.env.MONGODB_URI);
 
     await User.deleteMany();
@@ -142,6 +143,11 @@ const main = async () => {
     await Product.deleteMany();
     const createdProducts = await Product.insertMany(products);
 
+    // Seed customers
+    await Customer.deleteMany();
+
+    const createdCustomers = await Customer.insertMany(customers);
+
     await Review.deleteMany()
     const rws: IReviewInput[] = []
     for (let i = 0; i < createdProducts.length; i++) {
@@ -165,6 +171,7 @@ const main = async () => {
 
     console.log({
       createdUsers,
+      createdCustomers,
       createdCompanies,
       createdStores,
       createdWarehouses,

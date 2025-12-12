@@ -26,7 +26,20 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat('es-MX', {
 	minimumFractionDigits: 2,
 })
 export function formatCurrency(amount: number) {
+	// Handle NaN, undefined, and null values
+	if (typeof amount !== 'number' || isNaN(amount)) {
+		return '$0.00'
+	}
 	return CURRENCY_FORMATTER.format(amount)
+}
+
+export function formatPrice(amount: number) {
+	// Handle NaN, undefined, and null values
+	if (typeof amount !== 'number' || isNaN(amount)) {
+		return '$0'
+	}
+	const formatted = CURRENCY_FORMATTER.format(amount)
+	return formatted.replace(/\.00$/, '')
 }
 
 const NUMBER_FORMATTER = new Intl.NumberFormat('es-MX')
@@ -42,7 +55,6 @@ export const calculateTotalPriceOfProducts = (
 	includeTax: boolean = false,
 	formatPrice: boolean = false
 ): number | string => {
-	// Calculate the subtotal by summing the price * countInStock for each product
 	const subtotal = products.reduce((total, product) => {
 		return total + product.listPrice * product.countInStock
 	}, 0)
@@ -127,23 +139,23 @@ export function timeUntilMidnight(): { hours: number; minutes: number } {
 
 export const formatDateTime = (dateString: Date) => {
 	const dateTimeOptions: Intl.DateTimeFormatOptions = {
-		month: 'short', // abbreviated month name (e.g., 'Oct')
-		year: 'numeric', // abbreviated month name (e.g., 'Oct')
-		day: 'numeric', // numeric day of the month (e.g., '25')
-		hour: 'numeric', // numeric hour (e.g., '8')
-		minute: 'numeric', // numeric minute (e.g., '30')
-		hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
+		month: 'short',
+		year: 'numeric',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+		hour12: true,
 	}
 	const dateOptions: Intl.DateTimeFormatOptions = {
-		// weekday: 'short', // abbreviated weekday name (e.g., 'Mon')
-		month: 'short', // abbreviated month name (e.g., 'Oct')
-		year: 'numeric', // numeric year (e.g., '2023')
-		day: 'numeric', // numeric day of the month (e.g., '25')
+		// weekday: 'short',
+		month: 'short',
+		year: 'numeric',
+		day: 'numeric',
 	}
 	const timeOptions: Intl.DateTimeFormatOptions = {
-		hour: 'numeric', // numeric hour (e.g., '8')
-		minute: 'numeric', // numeric minute (e.g., '30')
-		hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
+		hour: 'numeric',
+		minute: 'numeric',
+		hour12: true,
 	}
 	const formattedDateTime: string = new Date(dateString).toLocaleString(
 		'en-US',
@@ -228,8 +240,8 @@ export const getFilterUrl = ({
 
 export const formatDateWithHours = (date: Date) => {
 
-	const datestring = ("0" + date.getDate()).slice(-2) + "/" + ("0"+(date.getMonth()+1)).slice(-2) + "/" +
-    date.getFullYear();
+	const datestring = ("0" + date.getDate()).slice(-2) + "/" + ("0" + (date.getMonth() + 1)).slice(-2) + "/" +
+		date.getFullYear();
 
 	return datestring;
 	//will return something like 16-05-2020 09:50

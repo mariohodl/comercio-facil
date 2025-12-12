@@ -64,18 +64,18 @@ const ProductList = ({ store }: { store: string }) => {
     const [brands, setBrands] = useState<string[]>([])
     const [isPending, startTransition] = useTransition()
 
-    const fetchData = useCallback((newPage?: number) => {
+    const fetchData = useCallback((pageToFetch: number) => {
         startTransition(() => {
             getAllProductsForAdmin({
                 query: inputValue,
-                page: newPage || page,
+                page: pageToFetch,
                 category,
                 brand,
             }).then((result) => {
                 setData(result)
             })
         })
-    }, [inputValue, page, category, brand])
+    }, [inputValue, category, brand])
 
     useEffect(() => {
         const init = async () => {
@@ -86,7 +86,7 @@ const ProductList = ({ store }: { store: string }) => {
             setCategories(cats)
             setBrands(brds)
             setBrands(brds)
-            fetchData()
+            fetchData(1)
         }
         init()
     }, [fetchData])
@@ -121,7 +121,7 @@ const ProductList = ({ store }: { store: string }) => {
                     <Button variant='outline' size='icon'>
                         <FileSpreadsheet className='w-4 h-4 text-green-500' />
                     </Button>
-                    <Button variant='outline' size='icon' onClick={() => fetchData()}>
+                    <Button variant='outline' size='icon' onClick={() => fetchData(page)}>
                         <RefreshCw className='w-4 h-4' />
                     </Button>
                     <Button asChild className='bg-orange hover:bg-orange-dark text-white'>
@@ -230,7 +230,7 @@ const ProductList = ({ store }: { store: string }) => {
                                         </TableCell>
                                         <TableCell className='whitespace-nowrap'>{product.category}</TableCell>
                                         <TableCell className='whitespace-nowrap'>{product.brand}</TableCell>
-                                        <TableCell className='whitespace-nowrap'>{formatCurrency(product.price)}</TableCell>
+                                        <TableCell className='whitespace-nowrap'>{formatCurrency(product.listPrice)}</TableCell>
                                         <TableCell className='whitespace-nowrap'>{product.unit}</TableCell>
                                         <TableCell className='whitespace-nowrap'>{product.countInStock}</TableCell>
                                         <TableCell className='text-right whitespace-nowrap'>
@@ -258,7 +258,7 @@ const ProductList = ({ store }: { store: string }) => {
                                                 <DeleteDialog
                                                     id={product._id}
                                                     action={deleteProduct}
-                                                    callbackAction={() => fetchData()}
+                                                    callbackAction={() => fetchData(page)}
                                                 />
                                             </div>
                                         </TableCell>

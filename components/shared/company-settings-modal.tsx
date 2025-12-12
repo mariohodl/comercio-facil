@@ -41,9 +41,14 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
     const router = useRouter()
     const { update } = useSession()
 
-    // Generate random 12-digit store ID
+    // Generate random 8-character alphanumeric store ID
     const generateStoreId = () => {
-        return Math.floor(100000000000 + Math.random() * 900000000000).toString()
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        let result = ''
+        for (let i = 0; i < 8; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length))
+        }
+        return result
     }
 
     const form = useForm<z.infer<typeof StoreSettingsSchema>>({

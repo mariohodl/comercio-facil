@@ -69,8 +69,8 @@ export default async function ProductDetails(props: {
     }
   }
 
-  const currentPrice = selectedVariant ? selectedVariant.price : product.price
-  const currentListPrice = selectedVariant ? selectedVariant.listPrice : product.listPrice
+  const currentPrice = selectedVariant ? selectedVariant.listPrice : (product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.listPrice)
+  const currentListPrice = selectedVariant ? 0 : (product.discountPrice && product.discountPrice > 0 ? product.listPrice : 0)
   const currentStock = selectedVariant ? selectedVariant.countInStock : product.countInStock
   const currentSku = selectedVariant ? selectedVariant.sku : product.sku
 
@@ -200,12 +200,6 @@ export default async function ProductDetails(props: {
                         price: round2(currentPrice),
                         quantity: 1,
                         image: product.images?.[0]?.imgUrl || `/images/${product.category.toLocaleLowerCase()}-category-product.jpg`,
-                        // Pass selected attributes as separate props if needed, or update AddToCart to accept them differently
-                        // For now, let's pass them as 'color' and 'size' if they exist, or maybe we need a generic 'attributes' prop in AddToCart?
-                        // The CartItem schema has color and size optional. 
-                        // Let's try to map them if possible, or just leave them empty for now if not color/size.
-                        // Actually, we should probably update AddToCart/CartItem to support generic attributes, but that's out of scope.
-                        // For now, let's map 'Color' and 'Size' / 'Talla' if they exist.
                         size: searchParams['size'] || searchParams['talla'] || '',
                         color: searchParams['color'] || '',
                       }}

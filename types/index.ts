@@ -21,6 +21,7 @@ import {
 	AttributeInputSchema,
 } from '@/lib/validator';
 import { z } from 'zod';
+import { ICustomer } from '@/lib/db/models/customer.model'
 
 export type IReviewInput = z.infer<typeof ReviewInputSchema>
 export type IReviewDetails = IReviewInput & {
@@ -41,6 +42,7 @@ export type Data = {
 		rating: number
 		comment: string
 	}[];
+	customers?: ICustomer[];
 	headerMenus: {
 		name: string;
 		href: string;

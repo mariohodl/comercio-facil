@@ -40,15 +40,13 @@ export const ProductInputSchema = z.object({
 	brand: z.string().optional(),
 	description: z.string().optional(),
 	isPublished: z.boolean(),
-	price: z.coerce
-		.number()
-		.nonnegative('Price must be a non-negative number'),
 	listPrice: z.coerce
 		.number()
 		.nonnegative('List price must be a non-negative number'),
 	discountPrice: z.coerce
 		.number()
-		.nonnegative('Discount price must be a non-negative number'),
+		.nonnegative('Discount price must be a non-negative number')
+		.optional(),
 	countInStock: z.coerce
 		.number()
 		.int()
@@ -88,8 +86,11 @@ export const ProductInputSchema = z.object({
 	})).optional(),
 	variants: z.array(z.object({
 		sku: z.string(),
-		price: z.number(),
+		costPerUnit: z.number(),
 		listPrice: z.number(),
+		discountPrice: z.number().optional(),
+		discountType: z.string().optional(),
+		discountValue: z.number().optional(),
 		countInStock: z.number(),
 		attributes: z.array(z.object({
 			name: z.string(),
@@ -97,7 +98,6 @@ export const ProductInputSchema = z.object({
 		})),
 		images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })).max(2).optional(),
 		barcode: z.string().optional(),
-		costPerUnit: z.number().optional(),
 		taxType: z.string().optional(),
 		tax: z.number().optional(),
 	})).optional(),
@@ -173,6 +173,8 @@ export const OrderInputSchema = z.object({
 	deliveredAt: z.date().optional(),
 	isPaid: z.boolean().default(false),
 	paidAt: z.date().optional(),
+	isRounded: z.boolean().optional(),
+	amountRounded: z.number().optional(),
 })
 
 export const CartSchema = z.object({
@@ -377,6 +379,8 @@ export const POSOrderSchema = z.object({
 			})
 		)
 		.optional(),
+	isRounded: z.boolean().optional(),
+	amountRounded: z.number().optional(),
 })
 
 export const CategoryInputSchema = z.object({
@@ -432,4 +436,19 @@ export const AttributeInputSchema = z.object({
 
 export const AttributeUpdateSchema = AttributeInputSchema.extend({
 	_id: MongoId,
+})
+
+// Cash Register
+export const OpenRegisterSchema = z.object({
+	openingAmount: z.coerce.number().nonnegative('Opening amount must be non-negative'),
+})
+
+export const RegisterMovementSchema = z.object({
+	type: z.enum(['withdrawal', 'deposit']),
+	amount: z.coerce.number().positive('Amount must be positive'),
+	notes: z.string().min(1, 'Notes are required'),
+})
+
+export const CloseRegisterSchema = z.object({
+	closingAmount: z.coerce.number().nonnegative('Closing amount must be non-negative'),
 })

@@ -49,10 +49,6 @@ const productSchema = new Schema<IProduct>(
 			type: String,
 			trim: true,
 		},
-		price: {
-			type: Number,
-			required: true,
-		},
 		listPrice: {
 			type: Number,
 			required: true,
@@ -106,7 +102,6 @@ const productSchema = new Schema<IProduct>(
 				default: [],
 			},
 		],
-		// New fields
 		store: { type: String, required: true },
 		warehouse: { type: String, required: true },
 		subCategory: { type: String, required: true },
@@ -129,8 +124,11 @@ const productSchema = new Schema<IProduct>(
 		variants: [
 			{
 				sku: { type: String, required: true },
-				price: { type: Number, required: true },
+				costPerUnit: { type: Number, required: true },
 				listPrice: { type: Number, required: true },
+				discountPrice: { type: Number, required: false },
+				discountType: { type: String, required: false },
+				discountValue: { type: Number, required: false },
 				countInStock: { type: Number, required: true },
 				attributes: [
 					{
@@ -140,7 +138,6 @@ const productSchema = new Schema<IProduct>(
 				],
 				images: [variantImageSchema],
 				barcode: { type: String, required: false },
-				costPerUnit: { type: Number, required: false },
 				taxType: { type: String, required: false },
 				tax: { type: Number, required: false },
 			}

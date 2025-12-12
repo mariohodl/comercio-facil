@@ -2,6 +2,7 @@ import { auth } from '@/auth'
 import { connectToDatabase } from '@/lib/db'
 import Order from '@/lib/db/models/order.model'
 import Product from '@/lib/db/models/product.model'
+import CashRegisterSession from '@/lib/db/models/cash-register.model'
 import { POSOrderSchema } from '@/lib/validator'
 import { NextResponse } from 'next/server'
 
@@ -76,6 +77,8 @@ export async function POST(req: Request) {
             isDelivered: true,
             deliveredAt: new Date(),
             expectedDeliveryDate: new Date(),
+            isRounded: validation.data.isRounded,
+            amountRounded: validation.data.amountRounded,
         })
 
         const createdOrder = await newOrder.save()
@@ -86,6 +89,29 @@ export async function POST(req: Request) {
                 $inc: { countInStock: -item.quantity, numSales: item.quantity },
             })
         }
+
+        // Validated that stock update happens before this
+
+        // --- CASH REGISTER LOGIC ---
+        // Find active session
+        const cashRegisterSession = await CashRegisterSession.findOne({
+            storeId: session.user.role === 'admin' ? body.storeId : undefined, // Assuming storeId passed in body for admins or derived
+            userId: session.user.id,
+            status: 'open'
+        })
+
+        if (cashRegisterSession) {
+            cashRegisterSession.movements.push({
+                type: 'sale',
+                amount: totalPrice, // Using total price including tax/rounding
+                paymentMethod: paymentMethod, // 'Cash' or 'Card' usually
+                orderId: createdOrder._id,
+                notes: 'POS Sale',
+                createdAt: new Date()
+            })
+            await cashRegisterSession.save()
+        }
+        // ---------------------------
 
         return NextResponse.json(
             { message: 'Order created successfully', order: createdOrder },

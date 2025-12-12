@@ -9,6 +9,38 @@ import { IProductInput } from '@/types'
 import { z } from 'zod'
 import { utapi } from '@/app/api/uploadthing/core'
 
+/**
+ * Calculate discount price based on price, discount type, and discount value
+ * @param price - The base selling price
+ * @param discountType - Type of discount: 'percentage' or 'fixed'
+ * @param discountValue - The discount amount (percentage or fixed value)
+ * @returns The calculated discount price, or undefined if no discount
+ */
+function calculateDiscountPrice(
+	listPrice: number,
+	discountType?: string,
+	discountValue?: number
+): number | undefined {
+	if (!discountType || discountValue === undefined || discountValue === 0) {
+		return undefined
+	}
+
+	let discountPrice: number
+
+	if (discountType === 'Percentage') {
+		// Calculate percentage discount
+		discountPrice = listPrice * (1 - discountValue / 100)
+	} else if (discountType === 'Fixed') {
+		// Calculate fixed discount
+		discountPrice = listPrice - discountValue
+	} else {
+		return undefined
+	}
+
+	// Ensure discount price is not negative
+	return Math.max(0, Number(discountPrice.toFixed(2)))
+}
+
 export async function getProductsByTag({
 	tag,
 	limit = 10,
@@ -142,7 +174,7 @@ export async function getAllProducts({
 	const priceFilter =
 		price && price !== 'all'
 			? {
-				price: {
+				listPrice: {
 					$gte: Number(price.split('-')[0]),
 					$lte: Number(price.split('-')[1]),
 				},
@@ -152,9 +184,9 @@ export async function getAllProducts({
 		sort === 'best-selling'
 			? { numSales: -1 }
 			: sort === 'price-low-to-high'
-				? { price: 1 }
+				? { listPrice: 1 }
 				: sort === 'price-high-to-low'
-					? { price: -1 }
+					? { listPrice: -1 }
 					: sort === 'avg-customer-review'
 						? { avgRating: -1 }
 						: { _id: -1 }
@@ -236,6 +268,7 @@ export async function getAllProductsForAdmin({
 	limit,
 	category,
 	brand,
+	store,
 }: {
 	query: string
 	page?: number
@@ -243,6 +276,7 @@ export async function getAllProductsForAdmin({
 	limit?: number
 	category?: string
 	brand?: string
+	store?: string
 }) {
 	await connectToDatabase()
 
@@ -258,14 +292,15 @@ export async function getAllProductsForAdmin({
 			: {}
 	const categoryFilter = category && category !== 'all' ? { category } : {}
 	const brandFilter = brand && brand !== 'all' ? { brand } : {}
+	const storeFilter = store && store !== 'all' ? { store } : {}
 
 	const order: Record<string, 1 | -1> =
 		sort === 'best-selling'
 			? { numSales: -1 }
 			: sort === 'price-low-to-high'
-				? { price: 1 }
+				? { listPrice: 1 }
 				: sort === 'price-high-to-low'
-					? { price: -1 }
+					? { listPrice: -1 }
 					: sort === 'avg-customer-review'
 						? { avgRating: -1 }
 						: { _id: -1 }
@@ -273,6 +308,8 @@ export async function getAllProductsForAdmin({
 		...queryFilter,
 		...categoryFilter,
 		...brandFilter,
+		...storeFilter,
+		isPublished: true,
 	})
 		.sort(order)
 		.skip(pageSize * (Number(page) - 1))
@@ -283,6 +320,8 @@ export async function getAllProductsForAdmin({
 		...queryFilter,
 		...categoryFilter,
 		...brandFilter,
+		...storeFilter,
+		isPublished: true,
 	})
 	return {
 		products: JSON.parse(JSON.stringify(products)) as IProduct[],
@@ -300,13 +339,27 @@ export async function getAllExistingProducts() {
 		products: JSON.parse(JSON.stringify(products)) as IProduct[],
 	}
 }
-// CREATE
+
 // CREATE
 export async function createProduct(data: IProductInput) {
 	try {
-		const product = ProductInputSchema.parse(data)
 		await connectToDatabase()
-		await Product.create(product)
+		const product = ProductInputSchema.parse(data)
+
+		// Calculate discount price if discount is provided
+		const discountPrice = calculateDiscountPrice(
+			product.listPrice,
+			product.discountType,
+			product.discountValue
+		)
+		console.log('discountPrice', discountPrice)
+
+		const newProduct = new Product({
+			...product,
+			discountPrice, // Set calculated discount price
+		})
+
+		await newProduct.save()
 		revalidatePath('/admin/products')
 		return {
 			success: true,
@@ -322,7 +375,18 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
 	try {
 		const product = ProductUpdateSchema.parse(data)
 		await connectToDatabase()
-		await Product.findByIdAndUpdate(product._id, product)
+
+		// Calculate discount price if discount is provided
+		const discountPrice = calculateDiscountPrice(
+			product.listPrice,
+			product.discountType,
+			product.discountValue
+		)
+
+		await Product.findByIdAndUpdate(product._id, {
+			...product,
+			discountPrice, // Set calculated discount price
+		})
 		revalidatePath('/admin/products')
 		return {
 			success: true,

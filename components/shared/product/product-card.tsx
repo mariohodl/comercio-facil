@@ -82,8 +82,8 @@ const ProductCard = ({
 
       <ProductPrice
         isDeal={product.tags.includes('todays-deal')}
-        price={product.price}
-        listPrice={product.listPrice}
+        price={product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.listPrice}
+        listPrice={product.discountPrice && product.discountPrice > 0 ? product.listPrice : 0}
         forListing
         unit={product.unit}
       />
@@ -102,7 +102,7 @@ const ProductCard = ({
           slug: product.slug,
           category: product.category,
           sku: product.sku || 'NO-SKU',
-          price: round2(product.price),
+          price: round2(product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.listPrice),
           quantity: 1,
           image: product.images?.[0]?.imgUrl || `/images/${product.category.toLocaleLowerCase()}-category-product.jpg`,
         }}

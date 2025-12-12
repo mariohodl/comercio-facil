@@ -37,10 +37,21 @@ type PaymentSplit = {
     amount: number
 }
 
-export default function PaymentModal() {
+interface PaymentModalProps {
+    totalAmount?: number
+    groupRounding?: {
+        isRounded: boolean
+        amountRounded: number
+    }
+}
+
+export default function PaymentModal({ totalAmount, groupRounding }: PaymentModalProps) {
     const [open, setOpen] = useState(false)
     const { cart, totalPrice, clearCart } = usePOSStore()
-    const total = totalPrice()
+    const storeTotal = totalPrice()
+
+    // Use passed total amount if available (includes tax/rounding), otherwise fall back to store total
+    const total = totalAmount !== undefined ? totalAmount : storeTotal
 
     const [splits, setSplits] = useState<PaymentSplit[]>([])
     const [remaining, setRemaining] = useState(total)
@@ -123,6 +134,8 @@ export default function PaymentModal() {
                     totalPrice: total,
                     receivedAmount: data.paymentMethod === 'Cash' ? receivedAmount : undefined,
                     change: data.paymentMethod === 'Cash' ? change : undefined,
+                    isRounded: groupRounding?.isRounded,
+                    amountRounded: groupRounding?.amountRounded,
                 }),
             })
 
