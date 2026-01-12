@@ -381,6 +381,7 @@ export const POSOrderSchema = z.object({
 		.optional(),
 	isRounded: z.boolean().optional(),
 	amountRounded: z.number().optional(),
+	isPaid: z.boolean().optional(),
 })
 
 export const CategoryInputSchema = z.object({

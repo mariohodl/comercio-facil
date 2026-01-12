@@ -33,8 +33,14 @@ export type POSCartItem = {
     variantDetails?: string;
 };
 
+// Helper function to generate a unique order number
+const generateOrderNumber = (): string => {
+    return String(Date.now()).slice(-6);
+};
+
 interface POSState {
     cart: POSCartItem[];
+    orderNumber: string;
     addToCart: (product: IProduct, variant?: IVariant) => void;
     removeFromCart: (productId: string, variantSku?: string) => void;
     updateQuantity: (productId: string, quantity: number, variantSku?: string) => void;
@@ -46,6 +52,7 @@ export const usePOSStore = create<POSState>()(
     persist(
         (set, get) => ({
             cart: [],
+            orderNumber: generateOrderNumber(),
             addToCart: (product: IProduct, variant?: IVariant) => {
                 const { cart } = get();
                 // Determine unique item key by product ID and variant SKU (if present)
@@ -113,7 +120,7 @@ export const usePOSStore = create<POSState>()(
                     ),
                 });
             },
-            clearCart: () => set({ cart: [] }),
+            clearCart: () => set({ cart: [], orderNumber: generateOrderNumber() }),
             totalPrice: () => get().cart.reduce((total, item) => total + item.price * item.quantity, 0),
         }),
         { name: 'pos-cart-storage' },

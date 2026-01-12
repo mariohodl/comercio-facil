@@ -748,3 +748,72 @@ export async function deliverOrder(orderId: string) {
 		return { success: false, message: formatError(err) }
 	}
 }
+
+export async function getPOSOrders({
+	storeId,
+	limit = 10,
+	page = 1,
+	query = '',
+	status = 'all',
+}: {
+	storeId: string
+	limit?: number
+	page?: number
+	query?: string
+	status?: string
+}) {
+	await connectToDatabase()
+	const session = await auth()
+	if (!session) throw new Error('User not authenticated')
+
+	const skipAmount = (Number(page) - 1) * limit
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let filter: any = { storeId }
+
+	// Role-based filtering
+	if (session.user.role !== 'admin' && session.user.role !== 'SuperAdmin') {
+		// Sellers only see their own orders
+		filter.user = session.user.id
+	}
+
+	// Status filtering
+	if (status === 'paid') {
+		filter.isPaid = true
+	} else if (status === 'unpaid') {
+		filter.isPaid = false
+	}
+
+	// Search query
+	if (query) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const queryFilter: any[] = []
+		if (mongoose.Types.ObjectId.isValid(query)) {
+			queryFilter.push({ _id: query })
+		}
+		// Add more search criteria if needed, e.g. customer name if we saved it
+		// For now searching by ID is safest
+		if (queryFilter.length > 0) {
+			filter = { ...filter, $or: queryFilter }
+		}
+	}
+
+	console.log('[getPOSOrders] storeId:', storeId)
+	console.log('[getPOSOrders] role:', session.user.role)
+	console.log('[getPOSOrders] filter:', JSON.stringify(filter, null, 2))
+
+	const orders = await Order.find(filter)
+		.populate('user', 'name')
+		.sort({ createdAt: 'desc' })
+		.skip(skipAmount)
+		.limit(limit)
+
+	console.log('[getPOSOrders] found:', orders.length)
+
+	const ordersCount = await Order.countDocuments(filter)
+
+	return {
+		data: JSON.parse(JSON.stringify(orders)),
+		totalPages: Math.ceil(ordersCount / limit),
+	}
+}

@@ -164,11 +164,11 @@ export default function ProductCard({ product }: ProductCardProps) {
                                     ) : null}
                                     {formatCurrency(displayPrice)}
                                 </span>
-                                {product.discountPrice && product.discountPrice > 0 && (
+                                {product.discountPrice && product.discountPrice > 0 ? (
                                     <span className="text-xs text-gray-400 line-through mt-0.5">
                                         {formatCurrency(originalPrice)}
                                     </span>
-                                )}
+                                ) : null}
                             </div>
 
                             {/* Cart Controls for Simple Products */}

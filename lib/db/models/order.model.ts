@@ -6,6 +6,7 @@ export interface IOrder extends Document, IOrderInput {
 	_id: string;
 	createdAt: Date;
 	updatedAt: Date;
+	storeId?: string;
 }
 
 const orderSchema = new Schema<IOrder>(
@@ -62,6 +63,7 @@ const orderSchema = new Schema<IOrder>(
 		deliveredAt: { type: Date },
 		isRounded: { type: Boolean, default: false },
 		amountRounded: { type: Number, default: 0 },
+		storeId: { type: String },
 		createdAt: { type: Date, default: Date.now },
 	},
 	{

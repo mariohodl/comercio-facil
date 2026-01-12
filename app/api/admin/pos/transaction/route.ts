@@ -5,11 +5,12 @@ import Product from '@/lib/db/models/product.model'
 import CashRegisterSession from '@/lib/db/models/cash-register.model'
 import { POSOrderSchema } from '@/lib/validator'
 import { NextResponse } from 'next/server'
+import { ROL_SELLER, ROL_SUPER_ADMIN } from '@/lib/constants'
 
 export async function POST(req: Request) {
     try {
         const session = await auth()
-        if (!session || session.user.role !== 'admin') {
+        if (!session || (session.user.role !== 'admin' && session.user.role !== ROL_SELLER && session.user.role !== ROL_SUPER_ADMIN)) {
             return NextResponse.json(
                 { message: 'Unauthorized' },
                 { status: 401 }
@@ -72,13 +73,14 @@ export async function POST(req: Request) {
             shippingPrice: 0,
             taxPrice: 0, // Simplified for POS, or calculate if needed
             totalPrice,
-            isPaid: true,
-            paidAt: new Date(),
+            isPaid: validation.data.isPaid !== undefined ? validation.data.isPaid : true,
+            paidAt: validation.data.isPaid !== false ? new Date() : undefined,
             isDelivered: true,
             deliveredAt: new Date(),
             expectedDeliveryDate: new Date(),
             isRounded: validation.data.isRounded,
             amountRounded: validation.data.amountRounded,
+            storeId: body.storeId,
         })
 
         const createdOrder = await newOrder.save()
@@ -93,23 +95,26 @@ export async function POST(req: Request) {
         // Validated that stock update happens before this
 
         // --- CASH REGISTER LOGIC ---
-        // Find active session
-        const cashRegisterSession = await CashRegisterSession.findOne({
-            storeId: session.user.role === 'admin' ? body.storeId : undefined, // Assuming storeId passed in body for admins or derived
-            userId: session.user.id,
-            status: 'open'
-        })
-
-        if (cashRegisterSession) {
-            cashRegisterSession.movements.push({
-                type: 'sale',
-                amount: totalPrice, // Using total price including tax/rounding
-                paymentMethod: paymentMethod, // 'Cash' or 'Card' usually
-                orderId: createdOrder._id,
-                notes: 'POS Sale',
-                createdAt: new Date()
+        // Only log if order is paid
+        if (createdOrder.isPaid) {
+            // Find active session
+            const cashRegisterSession = await CashRegisterSession.findOne({
+                storeId: body.storeId, // Now passed from frontend for all roles
+                userId: session.user.id,
+                status: 'open'
             })
-            await cashRegisterSession.save()
+
+            if (cashRegisterSession) {
+                cashRegisterSession.movements.push({
+                    type: 'sale',
+                    amount: totalPrice, // Using total price including tax/rounding
+                    paymentMethod: paymentMethod, // 'Cash' or 'Card' usually
+                    orderId: createdOrder._id,
+                    notes: 'POS Sale',
+                    createdAt: new Date()
+                })
+                await cashRegisterSession.save()
+            }
         }
         // ---------------------------
 

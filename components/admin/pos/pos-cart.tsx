@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { formatCurrency } from '@/lib/utils'
-import { Minus, Plus, Trash2, ShoppingBag, User, Percent, FileText, Printer, ScanLine, Check, ChevronsUpDown, Search } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ShoppingCart, User, Percent, FileText, Printer, ScanLine, Check, ChevronsUpDown, Search } from 'lucide-react'
 import { Switch } from "@/components/ui/switch"
 import {
     Popover,
@@ -22,8 +22,11 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import PaymentModal from './payment-modal'
+import OrderSuccessModal from './order-success-modal'
 import POSBarcodeScanner from './pos-barcode-scanner'
 import CreateCustomerModal from './create-customer-modal'
+import OrdersModal from './orders-modal'
+
 import { getCustomersByStore } from '@/lib/actions/customer.actions'
 import { ICustomer } from '@/lib/db/models/customer.model'
 
@@ -32,7 +35,7 @@ interface POSCartProps {
 }
 
 export default function POSCart({ storeId }: POSCartProps) {
-    const { cart, updateQuantity, removeFromCart, totalPrice, clearCart } = usePOSStore()
+    const { cart, orderNumber, updateQuantity, removeFromCart, totalPrice, clearCart } = usePOSStore()
     const [selectedCustomer, setSelectedCustomer] = useState<string>('walk-in')
     const [customers, setCustomers] = useState<ICustomer[]>([])
     const [discountPercent, setDiscountPercent] = useState<number>(0)
@@ -41,6 +44,14 @@ export default function POSCart({ storeId }: POSCartProps) {
     const [openCombobox, setOpenCombobox] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [roundOff, setRoundOff] = useState(false)
+    const [successModalOpen, setSuccessModalOpen] = useState(false)
+    const [ordersModalOpen, setOrdersModalOpen] = useState(false)
+    const [lastOrderDetails, setLastOrderDetails] = useState<{
+        orderId: string
+        totalAmount: number
+        changeGiven: number
+        isPaid: boolean
+    } | null>(null)
     const t = useTranslations('pos')
 
     const total = totalPrice()
@@ -76,9 +87,20 @@ export default function POSCart({ storeId }: POSCartProps) {
                         <ShoppingBag className="h-4 w-4" />
                         <CardTitle className="text-base">{t('orderList')}</CardTitle>
                     </div>
-                    <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs px-2 py-0.5">
-                        #{String(Date.now()).slice(-6)}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="bg-white/20 hover:bg-white/30 text-white border-0 h-7 text-xs"
+                            onClick={() => setOrdersModalOpen(true)}
+                        >
+                            <ShoppingCart className="h-3 w-3 mr-1.5" />
+                            Pedidos
+                        </Button>
+                        <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs px-2 py-0.5">
+                            #{orderNumber}
+                        </Badge>
+                    </div>
                 </div>
             </CardHeader>
 
@@ -375,8 +397,30 @@ export default function POSCart({ storeId }: POSCartProps) {
                 <PaymentModal
                     totalAmount={roundedTotal}
                     groupRounding={{ isRounded: roundOff, amountRounded: roundingDifference }}
+                    onSuccess={(details) => {
+                        setLastOrderDetails(details)
+                        setSuccessModalOpen(true)
+                        clearCart()
+                    }}
+                    storeId={storeId}
                 />
             </CardFooter>
-        </Card>
+
+            <OrderSuccessModal
+                open={successModalOpen}
+                onOpenChange={setSuccessModalOpen}
+                orderDetails={lastOrderDetails}
+                onNewOrder={() => {
+                    setSuccessModalOpen(false)
+                    setLastOrderDetails(null)
+                }}
+            />
+
+            <OrdersModal
+                open={ordersModalOpen}
+                onOpenChange={setOrdersModalOpen}
+                storeId={storeId}
+            />
+        </Card >
     )
 }

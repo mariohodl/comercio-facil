@@ -27,15 +27,15 @@ import { formatCurrency } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Loader2, Trash2, CreditCard, Banknote } from 'lucide-react'
 
+// ... imports
+
+// Updated to remove Card/Split from validation logic if strictly enforcing Cash Only UI
 const PaymentSchema = z.object({
-    paymentMethod: z.enum(['Cash', 'Card', 'Split']),
+    paymentMethod: z.enum(['Cash', 'Card', 'Split', 'Unpaid']), // Added Unpaid
     receivedAmount: z.coerce.number().optional(),
 })
 
-type PaymentSplit = {
-    method: 'Cash' | 'Card'
-    amount: number
-}
+// ... types
 
 interface PaymentModalProps {
     totalAmount?: number
@@ -43,18 +43,15 @@ interface PaymentModalProps {
         isRounded: boolean
         amountRounded: number
     }
+    onSuccess?: (details: any) => void // Callback for success
+    storeId: string
 }
 
-export default function PaymentModal({ totalAmount, groupRounding }: PaymentModalProps) {
+export default function PaymentModal({ totalAmount, groupRounding, onSuccess, storeId }: PaymentModalProps) {
     const [open, setOpen] = useState(false)
     const { cart, totalPrice, clearCart } = usePOSStore()
     const storeTotal = totalPrice()
-
-    // Use passed total amount if available (includes tax/rounding), otherwise fall back to store total
     const total = totalAmount !== undefined ? totalAmount : storeTotal
-
-    const [splits, setSplits] = useState<PaymentSplit[]>([])
-    const [remaining, setRemaining] = useState(total)
 
     const form = useForm<z.infer<typeof PaymentSchema>>({
         resolver: zodResolver(PaymentSchema),
@@ -68,11 +65,8 @@ export default function PaymentModal({ totalAmount, groupRounding }: PaymentModa
     const receivedAmount = form.watch('receivedAmount') || 0
     const change = paymentMethod === 'Cash' ? receivedAmount - total : 0
 
-    // Reset state when modal opens/closes or total changes
     useEffect(() => {
         if (open) {
-            setRemaining(total)
-            setSplits([])
             form.reset({
                 paymentMethod: 'Cash',
                 receivedAmount: 0,
@@ -80,47 +74,20 @@ export default function PaymentModal({ totalAmount, groupRounding }: PaymentModa
         }
     }, [open, total, form])
 
-    const addSplit = (method: 'Cash' | 'Card', amount: number) => {
-        if (amount <= 0) return
-        const newSplits = [...splits, { method, amount }]
-        setSplits(newSplits)
-
-        const newTotalPaid = newSplits.reduce((acc, curr) => acc + curr.amount, 0)
-        setRemaining(Math.max(0, total - newTotalPaid))
-    }
-
-    const removeSplit = (index: number) => {
-        const newSplits = splits.filter((_, i) => i !== index)
-        setSplits(newSplits)
-
-        const newTotalPaid = newSplits.reduce((acc, curr) => acc + curr.amount, 0)
-        setRemaining(Math.max(0, total - newTotalPaid))
-    }
-
     const handleQuickCash = (amount: number) => {
         form.setValue('receivedAmount', amount)
     }
 
     const onSubmit = async (data: z.infer<typeof PaymentSchema>) => {
-        let finalSplits: PaymentSplit[] = []
-        const finalPaymentMethod = data.paymentMethod
+        const isUnpaid = data.paymentMethod === 'Unpaid'
 
-        if (data.paymentMethod === 'Split') {
-            if (remaining > 0.01) { // Tolerance for float errors
-                toast.error(`Remaining amount ${formatCurrency(remaining)} must be paid`)
-                return
-            }
-            finalSplits = splits
-        } else if (data.paymentMethod === 'Cash') {
+        if (data.paymentMethod === 'Cash') {
             if (receivedAmount < total) {
                 form.setError('receivedAmount', {
                     message: 'Amount must be greater than or equal to total',
                 })
                 return
             }
-            finalSplits = [{ method: 'Cash', amount: total }]
-        } else {
-            finalSplits = [{ method: 'Card', amount: total }]
         }
 
         try {
@@ -129,13 +96,15 @@ export default function PaymentModal({ totalAmount, groupRounding }: PaymentModa
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     items: cart,
-                    paymentMethod: finalPaymentMethod,
-                    paymentSplits: finalSplits,
+                    paymentMethod: isUnpaid ? 'Cash' : data.paymentMethod,
+                    paymentSplits: isUnpaid ? [] : [{ method: 'Cash', amount: total }],
                     totalPrice: total,
-                    receivedAmount: data.paymentMethod === 'Cash' ? receivedAmount : undefined,
-                    change: data.paymentMethod === 'Cash' ? change : undefined,
+                    receivedAmount: isUnpaid ? 0 : (data.receivedAmount || 0),
+                    change: isUnpaid ? 0 : ((data.receivedAmount || 0) - total),
                     isRounded: groupRounding?.isRounded,
                     amountRounded: groupRounding?.amountRounded,
+                    isPaid: !isUnpaid,
+                    storeId
                 }),
             })
 
@@ -147,8 +116,20 @@ export default function PaymentModal({ totalAmount, groupRounding }: PaymentModa
             }
 
             toast.success('Transaction completed successfully')
-            clearCart()
             setOpen(false)
+
+            // Trigger parent success handler instead of clearing directly
+            if (onSuccess) {
+                onSuccess({
+                    orderId: result.order._id, // Assuming API returns order object
+                    totalAmount: total,
+                    changeGiven: isUnpaid ? 0 : change,
+                    isPaid: !isUnpaid
+                })
+            } else {
+                clearCart() // Fallback
+            }
+
         } catch (error) {
             console.error(error)
             toast.error('Something went wrong')
@@ -168,185 +149,95 @@ export default function PaymentModal({ totalAmount, groupRounding }: PaymentModa
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <FormField
-                            control={form.control}
-                            name="paymentMethod"
-                            render={({ field }) => (
-                                <FormItem className="space-y-3">
-                                    <FormLabel>Payment Method</FormLabel>
-                                    <FormControl>
-                                        <RadioGroup
-                                            onValueChange={(val) => {
-                                                field.onChange(val)
-                                                if (val === 'Split') {
-                                                    setRemaining(total)
-                                                    setSplits([])
-                                                }
-                                            }}
-                                            defaultValue={field.value}
-                                            className="grid grid-cols-3 gap-4"
-                                        >
-                                            <FormItem>
-                                                <FormControl>
-                                                    <RadioGroupItem value="Cash" className="peer sr-only" />
-                                                </FormControl>
-                                                <FormLabel className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">
-                                                    <Banknote className="mb-3 h-6 w-6" />
-                                                    Cash
-                                                </FormLabel>
-                                            </FormItem>
-                                            <FormItem>
-                                                <FormControl>
-                                                    <RadioGroupItem value="Card" className="peer sr-only" />
-                                                </FormControl>
-                                                <FormLabel className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">
-                                                    <CreditCard className="mb-3 h-6 w-6" />
-                                                    Card
-                                                </FormLabel>
-                                            </FormItem>
-                                            <FormItem>
-                                                <FormControl>
-                                                    <RadioGroupItem value="Split" className="peer sr-only" />
-                                                </FormControl>
-                                                <FormLabel className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">
-                                                    <div className="mb-3 flex">
-                                                        <Banknote className="mr-1 h-6 w-6" />
-                                                        <CreditCard className="h-6 w-6" />
-                                                    </div>
-                                                    Split
-                                                </FormLabel>
-                                            </FormItem>
-                                        </RadioGroup>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {/* Hidden Payment Method Selection - For now defaulting to Cash UI but supporting Unpaid via button */}
+                        <div className="hidden">
+                            <FormField
+                                control={form.control}
+                                name="paymentMethod"
+                                render={({ field }) => (
+                                    <Input {...field} value="Cash" />
+                                )}
+                            />
+                        </div>
 
-                        {paymentMethod === 'Cash' && (
-                            <div className="space-y-4">
-                                <FormField
-                                    control={form.control}
-                                    name="receivedAmount"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Amount Received</FormLabel>
-                                            <FormControl>
-                                                <Input type="number" step="0.01" {...field} className="text-lg font-bold" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <div className="grid grid-cols-4 gap-2">
-                                    {[10, 20, 50, 100].map((amount) => (
-                                        <Button
-                                            key={amount}
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleQuickCash(amount)}
-                                        >
-                                            ${amount}
-                                        </Button>
-                                    ))}
+                        <div className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="receivedAmount"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Amount Received (Cash)</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" step="0.01" {...field} className="text-lg font-bold" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <div className="grid grid-cols-4 gap-2">
+                                {[10, 20, 50, 100].map((amount) => (
                                     <Button
+                                        key={amount}
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleQuickCash(total)}
-                                        className="col-span-2"
+                                        onClick={() => handleQuickCash(amount)}
                                     >
-                                        Exact ({formatCurrency(total)})
+                                        ${amount}
                                     </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleQuickCash(Math.ceil(total))}
-                                        className="col-span-2"
-                                    >
-                                        Round Up ({formatCurrency(Math.ceil(total))})
-                                    </Button>
-                                </div>
-                                <div className="rounded-lg bg-muted p-4 text-center">
-                                    <p className="text-sm text-muted-foreground">Change</p>
-                                    <p className={`text-2xl font-bold ${change < 0 ? 'text-destructive' : 'text-green-600'}`}>
-                                        {formatCurrency(change)}
-                                    </p>
-                                </div>
+                                ))}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleQuickCash(total)}
+                                    className="col-span-2"
+                                >
+                                    Exact ({formatCurrency(total)})
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleQuickCash(Math.ceil(total))}
+                                    className="col-span-2"
+                                >
+                                    Round Up ({formatCurrency(Math.ceil(total))})
+                                </Button>
                             </div>
-                        )}
-
-                        {paymentMethod === 'Split' && (
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between rounded-lg bg-muted p-4">
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">Remaining</p>
-                                        <p className="text-2xl font-bold">{formatCurrency(remaining)}</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() => addSplit('Cash', remaining)}
-                                            disabled={remaining <= 0}
-                                        >
-                                            <Banknote className="mr-2 h-4 w-4" />
-                                            Cash
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() => addSplit('Card', remaining)}
-                                            disabled={remaining <= 0}
-                                        >
-                                            <CreditCard className="mr-2 h-4 w-4" />
-                                            Card
-                                        </Button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    {splits.map((split, index) => (
-                                        <div key={index} className="flex items-center justify-between rounded-md border p-3">
-                                            <div className="flex items-center">
-                                                {split.method === 'Cash' ? (
-                                                    <Banknote className="mr-2 h-4 w-4 text-muted-foreground" />
-                                                ) : (
-                                                    <CreditCard className="mr-2 h-4 w-4 text-muted-foreground" />
-                                                )}
-                                                <span className="font-medium">{split.method}</span>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <span className="font-mono">{formatCurrency(split.amount)}</span>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-6 w-6 text-destructive"
-                                                    onClick={() => removeSplit(index)}
-                                                >
-                                                    <Trash2 className="h-3 w-3" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="rounded-lg bg-muted p-4 text-center">
+                                <p className="text-sm text-muted-foreground">Change</p>
+                                <p className={`text-2xl font-bold ${change < 0 ? 'text-destructive' : 'text-green-600'}`}>
+                                    {formatCurrency(change)}
+                                </p>
                             </div>
-                        )}
+                        </div>
 
-                        <div className="flex justify-end space-x-2 pt-4">
-                            <Button variant="outline" onClick={() => setOpen(false)} type="button">
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={form.formState.isSubmitting || (paymentMethod === 'Split' && remaining > 0.01)}>
+                        <div className="flex flex-col gap-3 pt-4">
+                            <Button type="submit" size="lg" className="w-full text-lg" disabled={form.formState.isSubmitting}>
                                 {form.formState.isSubmitting && (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 )}
-                                Complete Payment
+                                Complete Cash Payment
+                            </Button>
+
+                            <div className="relative flex py-2 items-center">
+                                <div className="flex-grow border-t border-gray-300"></div>
+                                <span className="flex-shrink mx-4 text-gray-400 text-sm">Or</span>
+                                <div className="flex-grow border-t border-gray-300"></div>
+                            </div>
+
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                className="w-full"
+                                disabled={form.formState.isSubmitting}
+                                onClick={() => {
+                                    form.setValue('paymentMethod', 'Unpaid')
+                                    form.handleSubmit(onSubmit)()
+                                }}
+                            >
+                                Place Unpaid Order
                             </Button>
                         </div>
                     </form>
