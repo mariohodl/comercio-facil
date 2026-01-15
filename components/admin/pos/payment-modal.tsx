@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useTranslations } from 'next-intl'
 import {
     Dialog,
     DialogContent,
@@ -23,16 +24,21 @@ import {
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { usePOSStore } from '@/hooks/use-pos-store'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import { formatCurrency } from '@/lib/utils'
 import { toast } from 'sonner'
-import { Loader2, Trash2, CreditCard, Banknote } from 'lucide-react'
+import { Loader2, Trash2, CreditCard, Banknote, ShoppingBag, Truck, Clock } from 'lucide-react'
 
-// ... imports
-
-// Updated to remove Card/Split from validation logic if strictly enforcing Cash Only UI
 const PaymentSchema = z.object({
-    paymentMethod: z.enum(['Cash', 'Card', 'Split', 'Unpaid']), // Added Unpaid
+    paymentMethod: z.enum(['Cash', 'Card', 'Split', 'Unpaid']),
     receivedAmount: z.coerce.number().optional(),
+    fulfillmentType: z.enum(['IN_STORE', 'PICKUP_LATER', 'DELIVERY']).default('IN_STORE'),
 })
 
 // ... types
@@ -45,9 +51,11 @@ interface PaymentModalProps {
     }
     onSuccess?: (details: any) => void // Callback for success
     storeId: string
+    customerId: string
 }
 
-export default function PaymentModal({ totalAmount, groupRounding, onSuccess, storeId }: PaymentModalProps) {
+export default function PaymentModal({ totalAmount, groupRounding, onSuccess, storeId, customerId }: PaymentModalProps) {
+    const tPOS = useTranslations('pos')
     const [open, setOpen] = useState(false)
     const { cart, totalPrice, clearCart } = usePOSStore()
     const storeTotal = totalPrice()
@@ -58,6 +66,7 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
         defaultValues: {
             paymentMethod: 'Cash',
             receivedAmount: 0,
+            fulfillmentType: 'IN_STORE',
         },
     })
 
@@ -70,6 +79,7 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
             form.reset({
                 paymentMethod: 'Cash',
                 receivedAmount: 0,
+                fulfillmentType: 'IN_STORE',
             })
         }
     }, [open, total, form])
@@ -104,7 +114,9 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                     isRounded: groupRounding?.isRounded,
                     amountRounded: groupRounding?.amountRounded,
                     isPaid: !isUnpaid,
-                    storeId
+                    storeId,
+                    customerId,
+                    fulfillmentType: data.fulfillmentType
                 }),
             })
 
@@ -140,12 +152,12 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button size="lg" className="w-full text-lg" disabled={cart.length === 0}>
-                    Pay {formatCurrency(total)}
+                    {tPOS('add')} {formatCurrency(total)}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>Complete Payment</DialogTitle>
+                    <DialogTitle>{tPOS('paymentModal.title')}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -163,10 +175,48 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                         <div className="space-y-4">
                             <FormField
                                 control={form.control}
+                                name="fulfillmentType"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{tPOS('paymentModal.fulfillmentType')}</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder={tPOS('paymentModal.selectFulfillmentPlaceholder')} />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="IN_STORE">
+                                                    <div className="flex items-center gap-2">
+                                                        <ShoppingBag className="h-4 w-4" />
+                                                        <span>{tPOS('paymentModal.inStore') || 'In Store'}</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="PICKUP_LATER">
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="h-4 w-4" />
+                                                        <span>{tPOS('paymentModal.pickupLater') || 'Pickup Later'}</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="DELIVERY">
+                                                    <div className="flex items-center gap-2">
+                                                        <Truck className="h-4 w-4" />
+                                                        <span>{tPOS('paymentModal.delivery') || 'Delivery'}</span>
+                                                    </div>
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
                                 name="receivedAmount"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Amount Received (Cash)</FormLabel>
+                                        <FormLabel>{tPOS('paymentModal.amountReceived')}</FormLabel>
                                         <FormControl>
                                             <Input type="number" step="0.01" {...field} className="text-lg font-bold" />
                                         </FormControl>
@@ -193,7 +243,7 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                                     onClick={() => handleQuickCash(total)}
                                     className="col-span-2"
                                 >
-                                    Exact ({formatCurrency(total)})
+                                    {tPOS('paymentModal.exact')} ({formatCurrency(total)})
                                 </Button>
                                 <Button
                                     type="button"
@@ -202,11 +252,11 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                                     onClick={() => handleQuickCash(Math.ceil(total))}
                                     className="col-span-2"
                                 >
-                                    Round Up ({formatCurrency(Math.ceil(total))})
+                                    {tPOS('paymentModal.roundUp')} ({formatCurrency(Math.ceil(total))})
                                 </Button>
                             </div>
                             <div className="rounded-lg bg-muted p-4 text-center">
-                                <p className="text-sm text-muted-foreground">Change</p>
+                                <p className="text-sm text-muted-foreground">{tPOS('paymentModal.change')}</p>
                                 <p className={`text-2xl font-bold ${change < 0 ? 'text-destructive' : 'text-green-600'}`}>
                                     {formatCurrency(change)}
                                 </p>
@@ -218,12 +268,12 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                                 {form.formState.isSubmitting && (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 )}
-                                Complete Cash Payment
+                                {tPOS('paymentModal.completePayment')}
                             </Button>
 
                             <div className="relative flex py-2 items-center">
                                 <div className="flex-grow border-t border-gray-300"></div>
-                                <span className="flex-shrink mx-4 text-gray-400 text-sm">Or</span>
+                                <span className="flex-shrink mx-4 text-gray-400 text-sm">{tPOS('paymentModal.or')}</span>
                                 <div className="flex-grow border-t border-gray-300"></div>
                             </div>
 
@@ -237,7 +287,7 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                                     form.handleSubmit(onSubmit)()
                                 }}
                             >
-                                Place Unpaid Order
+                                {tPOS('paymentModal.placeUnpaidOrder')}
                             </Button>
                         </div>
                     </form>

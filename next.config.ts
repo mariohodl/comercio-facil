@@ -67,7 +67,13 @@ const nextConfig: NextConfig = {
         hostname: 'ix562c9hvv.ufs.sh',
         port: '',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        port: '',
+      },
     ],
+    dangerouslyAllowSVG: true,
   },
 };
 

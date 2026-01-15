@@ -1,10 +1,20 @@
 import React from 'react'
+import SalesList from './sales-list'
+import { Metadata } from 'next'
 
-export default function SalesPage() {
+export const metadata: Metadata = {
+    title: 'Admin Sales',
+}
+
+
+export default async function SalesPage(props: {
+    params: Promise<{ store: string }>
+}) {
+    const params = await props.params
+
     return (
         <div className='p-6'>
-            <h1 className='text-2xl font-bold mb-4'>Sales</h1>
-            <p className='text-gray-500'>This feature is coming soon.</p>
+            <SalesList store={params.store} />
         </div>
     )
 }

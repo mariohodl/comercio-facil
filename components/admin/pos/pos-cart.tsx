@@ -403,6 +403,7 @@ export default function POSCart({ storeId }: POSCartProps) {
                         clearCart()
                     }}
                     storeId={storeId}
+                    customerId={selectedCustomer}
                 />
             </CardFooter>
 

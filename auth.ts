@@ -59,7 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					if (isMatch) {
 						const defaultStore = DBuser.business?.defaultStoreId as any;
 						const user = {
-							id: DBuser._id,
+							id: DBuser._id.toString(),
 							name: DBuser.name,
 							email: DBuser.email,
 							role: DBuser.role,
@@ -91,6 +91,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				token.storeName = (user as { storeName: string }).storeName;
 				token.isStore = (user as { isStore: boolean }).isStore;
 				token.companyId = (user as { companyId: string }).companyId;
+				token.sub = user.id;
 			}
 
 			if (session?.user?.name && trigger === 'update') {

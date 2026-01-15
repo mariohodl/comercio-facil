@@ -16,6 +16,7 @@ import Company from './models/company.model'
 import Store from './models/store.model'
 import Warehouse from './models/warehouse.model'
 import Customer from './models/customer.model'
+import Order from './models/order.model'
 
 loadEnvConfig(cwd());
 
@@ -184,6 +185,51 @@ const main = async () => {
       createdReviews,
       message: 'Seeded database successfully',
     });
+
+    // Seed orders
+    if (data.orders && data.orders.length > 0) {
+      await Order.deleteMany();
+      const ordersToInsert = data.orders.map((o: any) => {
+        const user = createdUsers.find(u => u.email === o.userEmail);
+        const product = createdProducts.find(p => p.slug === o.items[0].slug);
+
+        return {
+          user: user?._id || createdUsers[0]._id,
+          storeId: o.storeId,
+          items: o.items.map((item: any) => ({
+            ...item,
+            product: product?._id || createdProducts[0]._id,
+            countInStock: product?.countInStock || 100,
+            name: item.productName
+          })),
+          shippingAddress: {
+            fullName: 'POS Customer',
+            street: 'Store Pickup',
+            city: 'Local',
+            postalCode: '00000',
+            country: 'Local',
+            province: 'Local',
+            phone: '0000000000',
+          },
+          fulfillmentType: 'IN_STORE',
+          fulfillmentStatus: 'DELIVERED',
+          paymentMethod: o.paymentMethod,
+          itemsPrice: o.totalPrice,
+          shippingPrice: 0,
+          taxPrice: 0,
+          totalPrice: o.totalPrice,
+          isPaid: o.isPaid,
+          paidAt: o.isPaid ? o.createdAt : undefined,
+          isDelivered: o.isDelivered,
+          deliveredAt: o.isDelivered ? o.createdAt : undefined,
+          expectedDeliveryDate: o.createdAt,
+          createdAt: o.createdAt,
+          updatedAt: o.createdAt
+        };
+      });
+      await Order.insertMany(ordersToInsert);
+      console.log('Seeded orders successfully');
+    }
 
     if (createdProducts.length > 0) {
       console.log('First product itemBarcode:', createdProducts[0].itemBarcode);

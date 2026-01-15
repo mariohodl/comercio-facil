@@ -2,7 +2,10 @@ import { IOrderInput } from '@/types';
 import { Document, Model, model, models, Schema } from 'mongoose';
 
 export interface IOrder extends Document, IOrderInput {
+	fulfillmentType: 'IN_STORE' | 'PICKUP_LATER' | 'DELIVERY';
+	fulfillmentStatus: 'PENDING' | 'READY' | 'OUT_FOR_DELIVERY' | 'DELIVERED';
 	paymentSplits?: { method: string; amount: number }[];
+	customer?: string;
 	_id: string;
 	createdAt: Date;
 	updatedAt: Date;
@@ -12,9 +15,23 @@ export interface IOrder extends Document, IOrderInput {
 const orderSchema = new Schema<IOrder>(
 	{
 		user: {
-			type: Schema.Types.ObjectId as unknown as typeof String,
+			type: Schema.Types.ObjectId,
 			ref: 'User',
 			required: true,
+		},
+		customer: {
+			type: Schema.Types.ObjectId,
+			ref: 'Customer',
+		},
+		fulfillmentType: {
+			type: String,
+			enum: ['IN_STORE', 'PICKUP_LATER', 'DELIVERY'],
+			default: 'IN_STORE',
+		},
+		fulfillmentStatus: {
+			type: String,
+			enum: ['PENDING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED'],
+			default: 'PENDING',
 		},
 		items: [
 			{
@@ -70,6 +87,10 @@ const orderSchema = new Schema<IOrder>(
 		timestamps: true,
 	}
 );
+
+if (models.Order && !models.Order.schema.path('customer')) {
+	delete (models as any).Order;
+}
 
 const Order =
 	(models.Order as Model<IOrder>) || model<IOrder>('Order', orderSchema);

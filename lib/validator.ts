@@ -142,6 +142,9 @@ export const OrderInputSchema = z.object({
 			email: z.string().email(),
 		}),
 	]),
+	customer: MongoId.optional(),
+	fulfillmentType: z.enum(['IN_STORE', 'PICKUP_LATER', 'DELIVERY']).default('IN_STORE'),
+	fulfillmentStatus: z.enum(['PENDING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED']).default('PENDING'),
 	items: z
 		.array(OrderItemSchema)
 		.min(1, 'Order must contain at least one item'),
@@ -382,6 +385,9 @@ export const POSOrderSchema = z.object({
 	isRounded: z.boolean().optional(),
 	amountRounded: z.number().optional(),
 	isPaid: z.boolean().optional(),
+	customerId: z.string().optional(),
+	fulfillmentType: z.enum(['IN_STORE', 'PICKUP_LATER', 'DELIVERY']).default('IN_STORE'),
+	fulfillmentStatus: z.enum(['PENDING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED']).optional(),
 })
 
 export const CategoryInputSchema = z.object({

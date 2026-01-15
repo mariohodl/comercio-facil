@@ -942,7 +942,72 @@ const data: Data = {
 	companies,
 	stores,
 	warehouses,
-	customers
+	customers,
+	orders: [
+		{
+			userEmail: 'mario@example.com',
+			storeId: uniqueStoreId,
+			items: [
+				{
+					clientId: 'POS',
+					productName: 'Cemento Portland Gris 50kg',
+					quantity: 2,
+					price: 260.00,
+					category: 'Materiales',
+					sku: 'CEM-POS-001',
+					image: 'https://placehold.co/600x400.png?text=Cemento+Portland',
+					slug: 'cemento-portland-gris-50kg'
+				}
+			],
+			paymentMethod: 'Cash',
+			totalPrice: 520.00,
+			isPaid: true,
+			isDelivered: true,
+			createdAt: new Date('2024-12-24T10:00:00Z')
+		},
+		{
+			userEmail: 'jack@example.com',
+			storeId: uniqueStoreId,
+			items: [
+				{
+					clientId: 'POS',
+					productName: 'Pala Cuadrada Puño Y',
+					quantity: 1,
+					price: 180.00,
+					category: 'Herramientas',
+					sku: 'PAL-POS-001',
+					image: 'https://placehold.co/600x400.png?text=Pala+Cuadrada',
+					slug: 'pala-cuadrada-puno-y'
+				}
+			],
+			paymentMethod: 'Card',
+			totalPrice: 180.00,
+			isPaid: true,
+			isDelivered: true,
+			createdAt: new Date('2024-12-25T14:30:00Z')
+		},
+		{
+			userEmail: 'mario@example.com',
+			storeId: uniqueStoreId,
+			items: [
+				{
+					clientId: 'POS',
+					productName: 'Taladro Rotomartillo 1/2"',
+					quantity: 1,
+					price: 1450.00,
+					category: 'Herramientas Eléctricas',
+					sku: 'TAL-POS-001',
+					image: 'https://placehold.co/600x400.png?text=Taladro',
+					slug: 'taladro-rotomartillo-1-2'
+				}
+			],
+			paymentMethod: 'Cash',
+			totalPrice: 1450.00,
+			isPaid: false,
+			isDelivered: false,
+			createdAt: new Date('2025-01-10T09:15:00Z')
+		}
+	]
 }
 
 

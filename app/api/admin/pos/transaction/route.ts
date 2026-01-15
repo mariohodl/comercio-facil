@@ -2,6 +2,7 @@ import { auth } from '@/auth'
 import { connectToDatabase } from '@/lib/db'
 import Order from '@/lib/db/models/order.model'
 import Product from '@/lib/db/models/product.model'
+import User from '@/lib/db/models/user.model'
 import CashRegisterSession from '@/lib/db/models/cash-register.model'
 import { POSOrderSchema } from '@/lib/validator'
 import { NextResponse } from 'next/server'
@@ -13,6 +14,24 @@ export async function POST(req: Request) {
         if (!session || (session.user.role !== 'admin' && session.user.role !== ROL_SELLER && session.user.role !== ROL_SUPER_ADMIN)) {
             return NextResponse.json(
                 { message: 'Unauthorized' },
+                { status: 401 }
+            )
+        }
+
+        if (!session.user.id) {
+            return NextResponse.json(
+                { message: 'User ID is missing from session' },
+                { status: 400 }
+            )
+        }
+
+        await connectToDatabase()
+
+        // Verify the user exists in the database
+        const dbUser = await User.findById(session.user.id)
+        if (!dbUser) {
+            return NextResponse.json(
+                { message: 'Authenticated user not found in database. Please log out and log back in.' },
                 { status: 401 }
             )
         }
@@ -29,7 +48,7 @@ export async function POST(req: Request) {
 
         const { items, paymentMethod, totalPrice } = validation.data
 
-        await connectToDatabase()
+        // Database connection already established for user check
 
         // Verify stock for all items first
         for (const item of items) {
@@ -75,12 +94,15 @@ export async function POST(req: Request) {
             totalPrice,
             isPaid: validation.data.isPaid !== undefined ? validation.data.isPaid : true,
             paidAt: validation.data.isPaid !== false ? new Date() : undefined,
-            isDelivered: true,
-            deliveredAt: new Date(),
+            isDelivered: validation.data.fulfillmentType === 'IN_STORE' || validation.data.fulfillmentType === undefined,
+            deliveredAt: (validation.data.fulfillmentType === 'IN_STORE' || validation.data.fulfillmentType === undefined) ? new Date() : undefined,
             expectedDeliveryDate: new Date(),
             isRounded: validation.data.isRounded,
             amountRounded: validation.data.amountRounded,
             storeId: body.storeId,
+            customer: validation.data.customerId === 'walk-in' ? undefined : validation.data.customerId,
+            fulfillmentType: validation.data.fulfillmentType || 'IN_STORE',
+            fulfillmentStatus: (validation.data.fulfillmentType === 'IN_STORE' || validation.data.fulfillmentType === undefined) ? 'DELIVERED' : 'PENDING',
         })
 
         const createdOrder = await newOrder.save()
@@ -116,7 +138,6 @@ export async function POST(req: Request) {
                 await cashRegisterSession.save()
             }
         }
-        // ---------------------------
 
         return NextResponse.json(
             { message: 'Order created successfully', order: createdOrder },

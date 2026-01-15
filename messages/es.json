@@ -33,13 +33,19 @@
         "createdDate": "Fecha de Creación",
         "actions": "Acciones",
         "confirmDeleteTitle": "Confirmar Eliminación",
-        "confirmDeleteDescription": "¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.",
+        "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente el pedido de nuestros servidores.",
         "deleting": "Eliminando...",
         "comingSoon": "Esta función estará disponible pronto.",
         "active": "Activo",
         "inactive": "Inactivo",
         "goToPOS": "Ir a Punto de Venta (POS)",
-        "submit": "Enviar"
+        "submit": "Enviar",
+        "success": "Éxito",
+        "error": "Error",
+        "areYouSure": "¿Estás seguro?",
+        "subtotal": "Subtotal",
+        "tax": "Impuesto",
+        "close": "Cerrar"
     },
     "pos": {
         "title": "Punto de Venta",
@@ -129,6 +135,27 @@
             "startNewOrder": "Iniciar Nuevo Pedido",
             "printReceipt": "Imprimir Recibo",
             "close": "Cerrar"
+        },
+        "paymentModal": {
+            "title": "Completar Pago",
+            "fulfillmentType": "Tipo de Entrega",
+            "amountReceived": "Monto Recibido (Efectivo)",
+            "exact": "Exacto",
+            "roundUp": "Redondear",
+            "change": "Cambio",
+            "completePayment": "Completar Pago Efectivo",
+            "or": "O",
+            "placeUnpaidOrder": "Realizar Pedido Sin Pago",
+            "selectFulfillmentPlaceholder": "Seleccionar tipo de entrega",
+            "inStore": "En tienda",
+            "pickupLater": "Recoger después",
+            "delivery": "A domicilio",
+            "status": {
+                "pending": "Pendiente",
+                "ready": "Listo",
+                "outForDelivery": "En camino",
+                "delivered": "Entregado"
+            }
         }
     },
     "header": {
@@ -502,5 +529,48 @@
         "perfectCuts": "Cortes Perfectos",
         "whatWeDo": "Lo que hacemos",
         "experienceTheDifference": "Experimenta la diferencia de carne realmente excepcional"
+    },
+    "sales": {
+        "title": "Ventas",
+        "orderId": "ID de Pedido",
+        "total": "Total",
+        "subtotal": "Subtotal",
+        "shippingAddress": "Dirección de Envío",
+        "details": {
+            "title": "Detalles de Venta",
+            "orderSummary": "Resumen del Pedido"
+        },
+        "manageSales": "Gestiona tus ventas",
+        "addSale": "Agregar Venta",
+        "customer": "Cliente",
+        "reference": "Referencia",
+        "date": "Fecha",
+        "status": "Estado",
+        "grandTotal": "Total",
+        "paid": "Pagado",
+        "due": "Pendiente",
+        "paymentStatus": "Estado de Pago",
+        "biller": "Facturador",
+        "allStatus": "Todos los estados",
+        "completed": "Completado",
+        "pending": "Pendiente",
+        "unpaid": "No pagado",
+        "overdue": "Vencido",
+        "walkInCustomer": "Cliente general",
+        "last7Days": "Últimos 7 días",
+        "last30Days": "Últimos 30 días",
+        "allTime": "Todo el tiempo",
+        "fulfillment": {
+            "title": "Entrega",
+            "inStore": "En Tienda",
+            "pickupLater": "Recoger Luego",
+            "delivery": "A Domicilio",
+            "method": "Método",
+            "pickupPoint": "Punto de Recogida",
+            "statusPending": "Pendiente",
+            "statusReady": "Listo",
+            "statusOutForDelivery": "En camino",
+            "statusDelivered": "Entregado"
+        }
     }
 }

@@ -1,9 +1,10 @@
 'use server';
 import { auth } from '@/auth';
 import { round2, formatError } from '../utils';
-import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
+import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE, ROL_ADMIN, ROL_SUPER_ADMIN } from '../constants'
 import { OrderInputSchema } from '../validator';
 import Order, { IOrder } from '../db/models/order.model';
+import Customer from '../db/models/customer.model';
 import { connectToDatabase } from '../db';
 import { revalidatePath } from 'next/cache';
 import { sendAskReviewOrderItems, sendPurchaseReceipt } from '@/emails'
@@ -644,6 +645,7 @@ export async function deleteOrder(id: string) {
 		const res = await Order.findByIdAndDelete(id)
 		if (!res) throw new Error('Order not found')
 		revalidatePath('/admin/orders')
+		revalidatePath('/admin/sales')
 		return {
 			success: true,
 			message: 'Order deleted successfully',
@@ -740,11 +742,49 @@ export async function deliverOrder(orderId: string) {
 		if (!order.isPaid) throw new Error('Order is not paid')
 		order.isDelivered = true
 		order.deliveredAt = new Date()
+		order.fulfillmentStatus = 'DELIVERED'
 		await order.save()
 		if (order.user.email) await sendAskReviewOrderItems({ order })
 		revalidatePath(`/account/orders/${orderId}`)
+		revalidatePath(`/admin/sales`)
 		return { success: true, message: 'Order delivered successfully' }
 	} catch (err) {
+		return { success: false, message: formatError(err) }
+	}
+}
+
+export async function updateOrderFulfillmentStatus(orderId: string, status: string) {
+	try {
+		await connectToDatabase()
+		const order = await Order.findById(orderId)
+		if (!order) {
+			console.error(`Order not found: ${orderId}`)
+			throw new Error('Order not found')
+		}
+
+		console.log(`Updating order ${orderId} fulfillment status from ${order.fulfillmentStatus} to ${status}`)
+		order.fulfillmentStatus = status as any
+
+		if (status === 'DELIVERED') {
+			order.isDelivered = true
+			order.deliveredAt = new Date()
+		} else {
+			// Optional: reset delivery status if moving back from DELIVERED
+			order.isDelivered = false
+			order.deliveredAt = undefined
+		}
+
+		await order.save()
+
+		// Revalidate both the general sales path and the specific store path
+		revalidatePath('/admin/sales')
+		if (order.storeId) {
+			revalidatePath(`/admin/${order.storeId}/sales`)
+		}
+
+		return { success: true, message: 'Fulfillment status updated successfully' }
+	} catch (err) {
+		console.error('Error updating fulfillment status:', err)
 		return { success: false, message: formatError(err) }
 	}
 }
@@ -772,7 +812,7 @@ export async function getPOSOrders({
 	let filter: any = { storeId }
 
 	// Role-based filtering
-	if (session.user.role !== 'admin' && session.user.role !== 'SuperAdmin') {
+	if (session.user.role !== ROL_ADMIN && session.user.role !== ROL_SUPER_ADMIN) {
 		// Sellers only see their own orders
 		filter.user = session.user.id
 	}
@@ -803,12 +843,11 @@ export async function getPOSOrders({
 	console.log('[getPOSOrders] filter:', JSON.stringify(filter, null, 2))
 
 	const orders = await Order.find(filter)
-		.populate('user', 'name')
+		.populate({ path: 'user', select: 'name', model: User })
+		.populate({ path: 'customer', select: 'name email', model: Customer })
 		.sort({ createdAt: 'desc' })
 		.skip(skipAmount)
 		.limit(limit)
-
-	console.log('[getPOSOrders] found:', orders.length)
 
 	const ordersCount = await Order.countDocuments(filter)
 

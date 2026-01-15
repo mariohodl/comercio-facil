@@ -43,6 +43,7 @@ export type Data = {
 		comment: string
 	}[];
 	customers?: ICustomer[];
+	orders?: any[];
 	headerMenus: {
 		name: string;
 		href: string;
