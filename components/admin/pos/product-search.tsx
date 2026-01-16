@@ -3,15 +3,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { usePOSStore } from '@/hooks/use-pos-store'
 import { getAllProductsForAdmin } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
-import { Loader2, Search, Plus, Minus, Package, AlertCircle } from 'lucide-react'
-import Image from 'next/image'
-import { formatCurrency } from '@/lib/utils'
+import { Loader2, Search, Package } from 'lucide-react'
 import { useDebounce } from '@/hooks/use-debounce'
 import ProductCard from './product-card'
 
@@ -21,11 +17,11 @@ interface ProductSearchProps {
     onCategoryChange: (category: string) => void
 }
 
-export default function ProductSearch({ storeId, selectedCategory, onCategoryChange }: ProductSearchProps) {
+export default function ProductSearch({ storeId, selectedCategory, onCategoryChange: _onCategoryChange }: ProductSearchProps) {
     const [query, setQuery] = useState('')
     const [products, setProducts] = useState<IProduct[]>([])
     const [loading, setLoading] = useState(false)
-    const { addToCart, cart, updateQuantity, removeFromCart } = usePOSStore()
+    const { cart } = usePOSStore()
     const debouncedQuery = useDebounce(query, 500)
     const t = useTranslations('pos')
 
@@ -51,10 +47,7 @@ export default function ProductSearch({ storeId, selectedCategory, onCategoryCha
         fetchProducts(debouncedQuery, selectedCategory)
     }, [debouncedQuery, selectedCategory, fetchProducts])
 
-    const getCartQuantity = (productId: string) => {
-        const item = cart.find(i => i.product === productId)
-        return item?.quantity || 0
-    }
+
 
     const filteredProducts = products
 

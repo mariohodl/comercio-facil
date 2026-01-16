@@ -33,7 +33,7 @@ export default function CashRegisterModal({ open, onOpenChange, storeId }: CashR
     const { showSuccess, showError } = useToast()
 
     // Translation hook (assuming we might adding keys later, using hardcoded for now based on request)
-    const t = useTranslations('pos')
+    // const t = useTranslations('pos')
 
     useEffect(() => {
         if (open) {
@@ -57,7 +57,7 @@ export default function CashRegisterModal({ open, onOpenChange, storeId }: CashR
             } else {
                 showError(data.message)
             }
-        } catch (error) {
+        } catch {
             showError('Failed to fetch status')
         } finally {
             setLoading(false)
@@ -82,7 +82,7 @@ export default function CashRegisterModal({ open, onOpenChange, storeId }: CashR
             } else {
                 showError(data.message)
             }
-        } catch (error) {
+        } catch {
             showError('Failed to open register')
         } finally {
             setLoading(false)
@@ -108,7 +108,7 @@ export default function CashRegisterModal({ open, onOpenChange, storeId }: CashR
             } else {
                 showError(data.message)
             }
-        } catch (error) {
+        } catch {
             showError('Failed to close register')
         } finally {
             setLoading(false)
@@ -134,7 +134,7 @@ export default function CashRegisterModal({ open, onOpenChange, storeId }: CashR
             } else {
                 showError(data.message)
             }
-        } catch (error) {
+        } catch {
             showError('Failed to record movement')
         } finally {
             setLoading(false)

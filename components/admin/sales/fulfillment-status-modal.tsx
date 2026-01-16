@@ -58,7 +58,7 @@ export default function FulfillmentStatusModal({
             } else {
                 showError(res.message)
             }
-        } catch (error) {
+        } catch (_error) {
             showError('Something went wrong')
         } finally {
             setIsPending(false)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { usePOSStore } from '@/hooks/use-pos-store'
 import { Button } from '@/components/ui/button'
@@ -10,10 +10,8 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { formatCurrency } from '@/lib/utils'
-import { Minus, Plus, Trash2, ShoppingBag, ShoppingCart, User, Percent, FileText, Printer, ScanLine, Check, ChevronsUpDown, Search } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ShoppingCart, Printer, ScanLine, Check, ChevronsUpDown, Search } from 'lucide-react'
 import { Switch } from "@/components/ui/switch"
 import {
     Popover,
@@ -38,8 +36,6 @@ export default function POSCart({ storeId }: POSCartProps) {
     const { cart, orderNumber, updateQuantity, removeFromCart, totalPrice, clearCart } = usePOSStore()
     const [selectedCustomer, setSelectedCustomer] = useState<string>('walk-in')
     const [customers, setCustomers] = useState<ICustomer[]>([])
-    const [discountPercent, setDiscountPercent] = useState<number>(0)
-    const [notes, setNotes] = useState<string>('')
     const [scannerOpen, setScannerOpen] = useState(false)
     const [openCombobox, setOpenCombobox] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
@@ -56,23 +52,24 @@ export default function POSCart({ storeId }: POSCartProps) {
 
     const total = totalPrice()
     const subtotal = total
-    const discount = (subtotal * discountPercent) / 100
+    // Discount logic removed/unused
+    const discount = 0
     const finalTotal = subtotal - discount
 
     // Rounding logic - always round up to next integer
     const roundedTotal = roundOff ? Math.ceil(finalTotal) : finalTotal
     const roundingDifference = roundOff ? roundedTotal - finalTotal : 0
 
-    const fetchCustomers = async () => {
+    const fetchCustomers = useCallback(async () => {
         const result = await getCustomersByStore(storeId)
         if (result.success && result.data) {
             setCustomers(result.data)
         }
-    }
+    }, [storeId])
 
     useEffect(() => {
         fetchCustomers()
-    }, [storeId])
+    }, [fetchCustomers])
 
     const handleCustomerCreated = (newCustomer: ICustomer) => {
         setCustomers((prev) => [...prev, newCustomer].sort((a, b) => a.name.localeCompare(b.name)))
@@ -219,7 +216,7 @@ export default function POSCart({ storeId }: POSCartProps) {
                     ) : (
                         <div className="p-3 space-y-2">
 
-                            {cart.map((item, index) => (
+                            {cart.map((item) => (
                                 <div
                                     key={`${item.product}-${item.variantSku || 'base'}`}
                                     className="flex items-start gap-2 p-2 bg-white rounded-lg border border-gray-100 hover:border-blue-200 transition-colors"
@@ -299,56 +296,11 @@ export default function POSCart({ storeId }: POSCartProps) {
             <Separator />
 
             <CardFooter className="flex flex-col space-y-3 p-3 bg-gray-50">
-                {/* Discount Input - Commented for space optimization */}
-                {/* {cart.length > 0 && (
-                    <div className="w-full space-y-2">
-                        <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                            <Percent className="h-4 w-4" />
-                            Discount
-                        </Label>
-                        <div className="flex gap-2">
-                            <Input
-                                type="number"
-                                min="0"
-                                max="100"
-                                value={discountPercent}
-                                onChange={(e) => setDiscountPercent(Math.min(100, Math.max(0, Number(e.target.value))))}
-                                className="flex-1"
-                                placeholder="0"
-                            />
-                            <span className="flex items-center text-sm text-gray-600">%</span>
-                        </div>
-                    </div>
-                )} */}
-
-                {/* Notes - Commented for space optimization */}
-                {/* {cart.length > 0 && (
-                    <div className="w-full space-y-2">
-                        <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                            <FileText className="h-4 w-4" />
-                            Notes
-                        </Label>
-                        <Textarea
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
-                            placeholder="Add order notes..."
-                            className="resize-none h-16"
-                        />
-                    </div>
-                )} */}
-
-                {/* Payment Summary */}
                 <div className="w-full space-y-1.5">
                     <div className="flex justify-between text-sm">
                         <span className="text-gray-600">{t('subtotal')}</span>
                         <span className="font-medium text-gray-900">{formatCurrency(subtotal)}</span>
                     </div>
-                    {discount > 0 && (
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">{t('discount')} ({discountPercent}%)</span>
-                            <span className="font-medium text-green-600">-{formatCurrency(discount)}</span>
-                        </div>
-                    )}
                     {/* Tax removed as per requirement */}
 
                     <div className="flex items-center justify-between py-1">

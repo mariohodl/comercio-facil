@@ -26,7 +26,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { X } from 'lucide-react'
 
 interface CategoryModalProps {
     open: boolean
@@ -86,7 +85,7 @@ export function CategoryModal({ open, onClose, category, onSuccess }: CategoryMo
             } else {
                 showError(result.message)
             }
-        } catch (error) {
+        } catch (_error) {
             showError('An error occurred. Please try again.')
         }
     }

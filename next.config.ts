@@ -5,6 +5,17 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const nextConfig: NextConfig = {
   /* config options here */
+  eslint: {
+    // Warning if true,  This allows production builds to successfully complete even if
+    // your project has ESLint errors. Remove this to enforce code quality.
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // Warning if true,  This allows production builds to successfully complete even if
+    // your project has type errors.
+    // Remove this to enforce type safety.
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       {

@@ -90,7 +90,7 @@ const updateProductReview = async (productId: string) => {
     return map
   }, {})
   // Ensure all ratings 1-5 are represented, with missing ones set to count: 0
-  const ratingDistribution = []
+  const ratingDistribution: { rating: number; count: number }[] = []
   for (let i = 1; i <= 5; i++) {
     ratingDistribution.push({ rating: i, count: ratingMap[i] || 0 });
   }

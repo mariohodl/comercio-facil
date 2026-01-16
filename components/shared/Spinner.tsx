@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+// @ts-expect-error -- Library has some  missing types
 import { Ring } from 'react-css-spinners'
 
 const Spinner = () => {
@@ -14,7 +15,7 @@ const Spinner = () => {
         />
       </section>
     </div>
-                          
+
   )
 }
 

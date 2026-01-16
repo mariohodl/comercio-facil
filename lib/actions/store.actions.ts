@@ -4,7 +4,6 @@ import { auth } from '@/auth'
 import { connectToDatabase } from '../db'
 import Store from '../db/models/store.model'
 import User from '../db/models/user.model'
-import { formatError } from '../utils'
 
 export async function getUserStores() {
     try {

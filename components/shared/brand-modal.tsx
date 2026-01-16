@@ -82,7 +82,7 @@ export function BrandModal({ open, onClose, brand, onSuccess }: BrandModalProps)
             } else {
                 showError(result.message)
             }
-        } catch (error) {
+        } catch (_error) {
             showError('An error occurred. Please try again.')
         }
     }

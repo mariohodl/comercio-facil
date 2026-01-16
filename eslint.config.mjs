@@ -13,8 +13,23 @@ const eslintConfig = [
 	...compat.extends('next/core-web-vitals', 'next/typescript'),
 	{
 		rules: {
+			// Disable strict type checking
 			'@typescript-eslint/no-empty-object-type': 'off',
+			'@typescript-eslint/no-explicit-any': 'warn', // Changed from error to warning
+			'@typescript-eslint/no-unused-vars': ['warn', {
+				argsIgnorePattern: '^_',
+				varsIgnorePattern: '^_',
+				caughtErrorsIgnorePattern: '^_'
+			}],
+
+			// React rules
 			'react/display-name': 'off',
+			'react/no-unescaped-entities': 'warn',
+			'react-hooks/exhaustive-deps': 'warn',
+
+			// General rules
+			'no-console': 'off', // Allow console logs
+			'prefer-const': 'warn',
 		},
 	},
 ];

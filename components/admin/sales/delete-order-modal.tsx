@@ -44,7 +44,7 @@ export default function DeleteOrderModal({
             } else {
                 showError(res.message)
             }
-        } catch (error) {
+        } catch (_error) {
             showError('Something went wrong')
         } finally {
             setIsPending(false)

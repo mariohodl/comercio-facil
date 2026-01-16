@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+// import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,9 +21,8 @@ export default function VariantSelectorDialog({ open, onOpenChange, product }: V
     const t = useTranslations('pos')
     const { addToCart } = usePOSStore()
 
-    const handleAddVariant = (variant: any) => {
-        // Cast to IVariant or any compatible type
-        addToCart(product, variant as IVariant)
+    const handleAddVariant = (variant: IVariant) => {
+        addToCart(product, variant)
         onOpenChange(false)
     }
 
@@ -64,7 +63,7 @@ export default function VariantSelectorDialog({ open, onOpenChange, product }: V
                                 {/* Details */}
                                 <div className="flex-1 min-w-0">
                                     <div className="flex flex-wrap gap-2 mb-1">
-                                        {variant.attributes.map((attr: any, idx: number) => (
+                                        {variant.attributes.map((attr: { name: string; value: string }, idx: number) => (
                                             <Badge key={idx} variant="secondary" className="text-xs px-2 py-0">
                                                 {attr.name}: {attr.value}
                                             </Badge>

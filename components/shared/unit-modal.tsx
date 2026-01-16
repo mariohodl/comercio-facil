@@ -79,7 +79,7 @@ export function UnitModal({ open, onClose, unit, onSuccess }: UnitModalProps) {
             } else {
                 showError(result.message)
             }
-        } catch (error) {
+        } catch (_error) {
             showError('An error occurred. Please try again.')
         }
     }

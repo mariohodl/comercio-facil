@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Printer, FileText, Loader2, X } from 'lucide-react'
+import { Search, Loader2 } from 'lucide-react'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { getPOSOrders } from '@/lib/actions/order.actions'
 import { IOrder } from '@/lib/db/models/order.model'
@@ -27,7 +27,6 @@ interface OrdersModalProps {
 
 export default function OrdersModal({ open, onOpenChange, storeId }: OrdersModalProps) {
     const t = useTranslations('pos.ordersModal')
-    const tCommon = useTranslations('common')
     const [orders, setOrders] = useState<IOrder[]>([])
     const [loading, setLoading] = useState(false)
     const [status, setStatus] = useState<'all' | 'paid' | 'unpaid'>('all')

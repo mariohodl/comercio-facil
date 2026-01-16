@@ -6,7 +6,6 @@ import ProductSearch from '@/components/admin/pos/product-search'
 import POSCart from '@/components/admin/pos/pos-cart'
 import CategorySidebar from '@/components/admin/pos/category-sidebar'
 import CalculatorModal from '@/components/admin/pos/calculator-modal'
-import CashRegisterModal from '@/components/admin/pos/cash-register-modal'
 import { Clock, LayoutDashboard, ShoppingCart, Calculator } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,7 +14,6 @@ import Link from 'next/link'
 export default function POSPageClient({ storeId }: { storeId: string }) {
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
     const [calculatorOpen, setCalculatorOpen] = useState(false)
-    const [cashRegisterOpen, setCashRegisterOpen] = useState(false)
     const t = useTranslations('pos')
 
     return (
@@ -48,16 +46,6 @@ export default function POSPageClient({ storeId }: { storeId: string }) {
                             >
                                 <Calculator className="h-5 w-5" />
                             </Button>
-                            <Button
-                                disabled
-                                variant="ghost"
-                                size="sm"
-                                className="h-10 px-3 rounded-xl bg-green-600 hover:bg-green-700 text-white gap-2"
-                                onClick={() => setCashRegisterOpen(true)}
-                            >
-                                <span className="text-lg">💵</span>
-                                <span className="hidden md:inline font-medium">Cash Register</span>
-                            </Button>
                             <Badge variant="outline" className="px-2 py-1 text-xs font-medium">
                                 <Clock className="h-3.5 w-3.5 mr-1.5" />
                                 <span className="font-mono">{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -69,13 +57,6 @@ export default function POSPageClient({ storeId }: { storeId: string }) {
 
             {/* Calculator Modal */}
             <CalculatorModal open={calculatorOpen} onOpenChange={setCalculatorOpen} />
-
-            {/* Cash Register Modal */}
-            {/* <CashRegisterModal
-                open={cashRegisterOpen}
-                onOpenChange={setCashRegisterOpen}
-                storeId={storeId}
-            /> */}
 
             {/* Main Content */}
             <div className='p-4 h-[calc(100vh-65px)] max-h-[calc(100vh-65px)] overflow-hidden'>

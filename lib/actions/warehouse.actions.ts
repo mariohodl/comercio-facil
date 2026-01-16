@@ -4,7 +4,6 @@ import { auth } from '@/auth'
 import { connectToDatabase } from '../db'
 import Warehouse from '../db/models/warehouse.model'
 import User from '../db/models/user.model'
-import { formatError } from '../utils'
 
 export async function getUserWarehouses() {
     try {

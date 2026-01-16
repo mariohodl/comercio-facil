@@ -22,7 +22,6 @@ import {
     FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { usePOSStore } from '@/hooks/use-pos-store'
 import {
     Select,
@@ -33,7 +32,7 @@ import {
 } from '@/components/ui/select'
 import { formatCurrency } from '@/lib/utils'
 import { toast } from 'sonner'
-import { Loader2, Trash2, CreditCard, Banknote, ShoppingBag, Truck, Clock } from 'lucide-react'
+import { Loader2, ShoppingBag, Truck, Clock } from 'lucide-react'
 
 const PaymentSchema = z.object({
     paymentMethod: z.enum(['Cash', 'Card', 'Split', 'Unpaid']),

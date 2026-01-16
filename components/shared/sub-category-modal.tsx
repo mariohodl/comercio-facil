@@ -118,7 +118,7 @@ export function SubCategoryModal({ open, onClose, subCategory, onSuccess }: SubC
             } else {
                 showError(result.message)
             }
-        } catch (error) {
+        } catch (_error) {
             showError('An error occurred. Please try again.')
         }
     }
