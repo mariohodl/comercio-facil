@@ -41,7 +41,7 @@ import { UnitModal } from '@/components/shared/unit-modal'
 import { DeleteDialog } from '@/components/shared/delete-dialog'
 import { useToast } from '@/hooks/use-toast'
 
-export default function UnitList() {
+export default function UnitList({ store }: { store: string }) {
     const t = useTranslations('inventory')
     const tCommon = useTranslations('common')
     const { showSuccess, showError } = useToast()
@@ -69,6 +69,7 @@ export default function UnitList() {
                 limit: rowsPerPage,
                 status: statusFilter,
                 sort: sortBy,
+                storeId: store,
             })
             setUnits(result.units)
             setTotalPages(result.totalPages)
@@ -79,7 +80,7 @@ export default function UnitList() {
             setLoading(false)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchTerm, page, rowsPerPage, statusFilter, sortBy])
+    }, [searchTerm, page, rowsPerPage, statusFilter, sortBy, store])
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -319,6 +320,7 @@ export default function UnitList() {
                 onClose={handleModalClose}
                 unit={selectedUnit}
                 onSuccess={handleModalSuccess}
+                storeId={store}
             />
 
             <DeleteDialog

@@ -17,12 +17,14 @@ export async function getAllBrands({
     limit = PAGE_SIZE,
     status,
     sort = 'latest',
+    storeId,
 }: {
     query?: string
     page?: number
     limit?: number
     status?: string
     sort?: string
+    storeId?: string
 }) {
     await connectToDatabase()
 
@@ -44,6 +46,7 @@ export async function getAllBrands({
     const brands = await Brand.find({
         ...queryFilter,
         ...statusFilter,
+        ...(storeId ? { storeId } : {}),
     })
         .sort(sortOrder)
         .skip(limit * (Number(page) - 1))
@@ -53,6 +56,7 @@ export async function getAllBrands({
     const countBrands = await Brand.countDocuments({
         ...queryFilter,
         ...statusFilter,
+        ...(storeId ? { storeId } : {}),
     })
 
     return {
@@ -77,8 +81,11 @@ export async function createBrand(data: IBrandInput) {
 
         const slug = toSlug(brand.name)
 
-        // Check if slug already exists
-        const existingBrand = await Brand.findOne({ slug })
+        // Check if slug already exists for this store
+        const existingBrand = await Brand.findOne({
+            slug,
+            storeId: brand.storeId
+        })
         if (existingBrand) {
             return {
                 success: false,
@@ -108,6 +115,7 @@ export async function updateBrand(data: z.infer<typeof BrandUpdateSchema>) {
         // Check if slug already exists (excluding current brand)
         const existingBrand = await Brand.findOne({
             slug,
+            storeId: brand.storeId,
             _id: { $ne: brand._id }
         })
         if (existingBrand) {
@@ -145,9 +153,12 @@ export async function deleteBrand(id: string) {
 }
 
 // GET ACTIVE BRANDS (for dropdowns/selects)
-export async function getActiveBrands() {
+export async function getActiveBrands(storeId?: string) {
     await connectToDatabase()
-    const brands = await Brand.find({ status: true })
+    const brands = await Brand.find({
+        status: true,
+        ...(storeId ? { storeId } : {})
+    })
         .select('name slug image')
         .sort({ name: 1 })
         .lean()

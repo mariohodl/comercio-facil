@@ -23,9 +23,11 @@ export const metadata: Metadata = {
   title: 'Admin Orders',
 }
 export default async function OrdersPage(props: {
+  params: Promise<{ store: string }>
   searchParams: Promise<{ page: string }>
 }) {
   const searchParams = await props.searchParams
+  const params = await props.params
 
   const { page = '1' } = searchParams
 
@@ -35,6 +37,7 @@ export default async function OrdersPage(props: {
 
   const orders = await getAllOrders({
     page: Number(page),
+    storeId: params.store,
   })
 
   const t = await getTranslations('orders')

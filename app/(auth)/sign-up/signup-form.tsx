@@ -30,12 +30,14 @@ const signUpDefaultValues =
       email: 'john@me.com',
       password: '123456',
       confirmPassword: '123456',
+      phone: '1234567890',
     }
     : {
       name: '',
       email: '',
       password: '',
       confirmPassword: '',
+      phone: '',
     }
 
 export default function SignUpForm() {
@@ -114,6 +116,20 @@ export default function SignUpForm() {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input placeholder='Ingresar email' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={control}
+              name='phone'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel>Teléfono</FormLabel>
+                  <FormControl>
+                    <Input placeholder='Ingresar teléfono' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

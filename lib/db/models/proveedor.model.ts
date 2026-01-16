@@ -9,6 +9,7 @@ import {
 
 export interface IProveedor extends Document, IProveedorInput {
     _id: string;
+    storeId?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -19,6 +20,7 @@ const proveedorSchema = new Schema<IProveedor>(
         clave: { type: String, required: true },
         createdAt: { type: Date, default: Date.now },
         rfc: { type: String, required: true },
+        storeId: { type: String },
     },
     {
         timestamps: true,

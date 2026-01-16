@@ -4,6 +4,7 @@ export interface ICategory extends Document {
     _id: string
     categoryName: string
     categorySlug: string
+    storeId: string
     status: boolean
     createdAt: Date
     updatedAt: Date
@@ -19,9 +20,12 @@ const categorySchema = new Schema<ICategory>(
         categorySlug: {
             type: String,
             required: true,
-            unique: true,
             lowercase: true,
             trim: true,
+        },
+        storeId: {
+            type: String,
+            required: true,
         },
         status: {
             type: Boolean,

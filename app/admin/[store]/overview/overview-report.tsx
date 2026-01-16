@@ -21,6 +21,7 @@ import {
 import { calculatePastDate, formatCurrency } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
+import { useParams } from 'next/navigation'
 import React, { useEffect, useState, useTransition } from 'react'
 import { DateRange } from 'react-day-picker'
 import { getOrderSummary } from '@/lib/actions/order.actions'
@@ -38,6 +39,7 @@ import TopCategoriesChart from './top-categories-chart'
 import OrderStatisticsChart from './order-statistics-chart'
 
 export default function OverviewReport() {
+  const { store } = useParams()
   const t = useTranslations('admin.dashboard')
   const [date, setDate] = useState<DateRange | undefined>({
     from: calculatePastDate(30),
@@ -49,12 +51,12 @@ export default function OverviewReport() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, startTransition] = useTransition()
   useEffect(() => {
-    if (date) {
+    if (date && store) {
       startTransition(async () => {
-        setData(await getOrderSummary(date))
+        setData(await getOrderSummary(date, store as string))
       })
     }
-  }, [date])
+  }, [date, store])
 
   if (!data)
     return (

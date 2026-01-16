@@ -28,10 +28,13 @@ import { Search, Plus, Edit, Trash2, FileDown, FileUp, RefreshCw } from 'lucide-
 import { DeleteDialog } from '@/components/shared/delete-dialog'
 import Image from 'next/image'
 
+import { useParams } from 'next/navigation'
+
 export default function SubCategoriesPage() {
     const t = useTranslations('inventory')
     const tCommon = useTranslations('common')
     const { showSuccess, showError } = useToast()
+    const { store } = useParams<{ store: string }>()
 
     const [subCategories, setSubCategories] = useState<(ISubCategory & { parentCategory: { categoryName: string } })[]>([])
     const [totalPages, setTotalPages] = useState(0)
@@ -55,6 +58,7 @@ export default function SubCategoriesPage() {
                 page: currentPage,
                 limit: rowsPerPage,
                 status: statusFilter,
+                storeId: store,
             })
             setSubCategories(result.subCategories)
             setTotalPages(result.totalPages)
@@ -309,6 +313,7 @@ export default function SubCategoriesPage() {
                 onClose={() => setModalOpen(false)}
                 subCategory={selectedSubCategory}
                 onSuccess={handleModalSuccess}
+                storeId={store}
             />
 
             {/* Delete Dialog */}

@@ -3,6 +3,7 @@ import { Document, Model, model, models, Schema } from 'mongoose'
 
 export interface IOrderReception extends Document, IOrderReceptionInput {
 	_id: string
+	storeId?: string
 	createdAt: Date
 	updatedAt: Date
 }
@@ -29,6 +30,7 @@ const orderReceptionSchema = new Schema<IOrderReception>(
 		subtotal: { type: Number, required: true },
 		total: { type: Number, required: true },
 		iva: { type: Number, required: true },
+		storeId: { type: String },
 	},
 	{
 		timestamps: true,

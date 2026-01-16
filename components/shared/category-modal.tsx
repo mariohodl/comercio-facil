@@ -32,9 +32,10 @@ interface CategoryModalProps {
     onClose: () => void
     category?: ICategory | null
     onSuccess?: () => void
+    storeId: string
 }
 
-export function CategoryModal({ open, onClose, category, onSuccess }: CategoryModalProps) {
+export function CategoryModal({ open, onClose, category, onSuccess, storeId }: CategoryModalProps) {
     const { showSuccess, showError } = useToast()
     const isEditMode = !!category
 
@@ -44,6 +45,7 @@ export function CategoryModal({ open, onClose, category, onSuccess }: CategoryMo
             categoryName: '',
             categorySlug: '',
             status: true,
+            storeId,
         },
     })
 
@@ -59,9 +61,10 @@ export function CategoryModal({ open, onClose, category, onSuccess }: CategoryMo
                 categoryName: '',
                 categorySlug: '',
                 status: true,
+                storeId,
             })
         }
-    }, [category, form])
+    }, [category, form, storeId])
 
     const handleNameChange = (value: string) => {
         const slug = toSlug(value)

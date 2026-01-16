@@ -28,7 +28,7 @@ import { USER_ROLES } from '@/lib/constants'
 import { IUser } from '@/lib/db/models/user.model'
 import { UserUpdateSchema } from '@/lib/validator'
 
-const UserEditForm = ({ user }: { user: IUser }) => {
+const UserEditForm = ({ user, storeId }: { user: IUser; storeId: string }) => {
   const router = useRouter()
 
   const form = useForm<z.infer<typeof UserUpdateSchema>>({
@@ -44,14 +44,14 @@ const UserEditForm = ({ user }: { user: IUser }) => {
         _id: user._id,
       })
       if (!res.success)
-        return showError(res.message, {duration: 3000, position: 'top-center', important: true})
+        return showError(res.message, { duration: 3000, position: 'top-center', important: true })
 
-      showSuccess(res.message, {duration: 3000, position: 'top-center', important: true})
+      showSuccess(res.message, { duration: 3000, position: 'top-center', important: true })
       form.reset()
-      router.push(`/admin/users`)
+      router.push(`/admin/${storeId}/users`)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-        showError(error?.message, {duration: 3000, position: 'top-center', important: true})
+      showError(error?.message, { duration: 3000, position: 'top-center', important: true })
     }
   }
 
@@ -99,7 +99,7 @@ const UserEditForm = ({ user }: { user: IUser }) => {
                 <FormLabel>Role</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  value={field.value.toString()}
+                  value={field.value?.toString()}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -127,7 +127,7 @@ const UserEditForm = ({ user }: { user: IUser }) => {
           <Button
             variant='outline'
             type='button'
-            onClick={() => router.push(`/admin/users`)}
+            onClick={() => router.push(`/admin/${storeId}/users`)}
           >
             Back
           </Button>

@@ -71,6 +71,7 @@ const ProductList = ({ store }: { store: string }) => {
                 page: pageToFetch,
                 category,
                 brand,
+                store,
             }).then((result) => {
                 setData(result)
             })

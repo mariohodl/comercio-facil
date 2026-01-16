@@ -5,6 +5,7 @@ export interface IBrand extends Document {
     name: string
     slug: string
     image: string
+    storeId: string
     status: boolean
     createdAt: Date
     updatedAt: Date
@@ -20,11 +21,14 @@ const brandSchema = new Schema<IBrand>(
         slug: {
             type: String,
             required: true,
-            unique: true,
             lowercase: true,
             trim: true,
         },
         image: {
+            type: String,
+            required: true,
+        },
+        storeId: {
             type: String,
             required: true,
         },

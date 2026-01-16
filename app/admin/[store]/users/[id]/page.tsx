@@ -13,24 +13,25 @@ export const metadata: Metadata = {
 export default async function UserEditPage(props: {
   params: Promise<{
     id: string
+    store: string
   }>
 }) {
   const params = await props.params
 
-  const { id } = params
+  const { id, store } = params
 
   const user = await getUserById(id)
   if (!user) notFound()
   return (
     <main className='max-w-6xl mx-auto p-4'>
       <div className='flex mb-4'>
-        <Link href='/admin/users'>Users</Link>
+        <Link href={`/admin/${store}/users`}>Users</Link>
         <span className='mx-1'>›</span>
-        <Link href={`/admin/users/${user._id}`}>{user._id}</Link>
+        <Link href={`/admin/${store}/users/${user._id}`}>{user._id}</Link>
       </div>
 
       <div className='my-8'>
-        <UserEditForm user={user} />
+        <UserEditForm user={user} storeId={store} />
       </div>
     </main>
   )

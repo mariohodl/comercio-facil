@@ -63,11 +63,14 @@ export const AVAILABLE_DELIVERY_DATES = [
 	},
 ]
 
-export const USER_ROLES = ['Admin', 'Customer', 'Seller']
 export const ROL_ADMIN = 'Admin'
 export const ROL_CUSTOMER = 'Customer'
 export const ROL_SELLER = 'Seller'
+export const ROL_MANAGER = 'Manager'
+export const ROL_SUPERVISOR = 'Supervisor'
 export const ROL_SUPER_ADMIN = 'SuperAdmin'
+
+export const USER_ROLES = ['Admin', 'Customer', 'Seller', 'Manager', 'Supervisor', 'SuperAdmin']
 
 export const AVAILABLE_CATEGORIES = [
 	{

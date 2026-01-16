@@ -10,13 +10,16 @@ import Product, { IProduct } from '@/lib/db/models/product.model'
 
 import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '@/lib/constants'
-import {  sendOrderReceptionSavedEmail } from '@/emails'
+import { sendOrderReceptionSavedEmail } from '@/emails'
 
 // CREATE
 export async function createOrderReception(data: IOrderReceptionInput) {
-	const orderReceptionToSave = await JSON.parse(JSON.stringify(data));
 	const session = await auth()
 	if (!session) throw new Error('User not authenticated')
+	const orderReceptionToSave = {
+		...data,
+		storeId: session.user.storeId
+	}
 	try {
 		await connectToDatabase()
 		const productBulk = Product.collection.initializeUnorderedBulkOp()
@@ -24,12 +27,12 @@ export async function createOrderReception(data: IOrderReceptionInput) {
 		for (const singleProduct of data.products) {
 			// findSingleProduct
 			let productFound = await Product.findOne({ productId: singleProduct.productId });
-			const parsedProduct  = await JSON.parse(JSON.stringify(productFound)) as IProduct;
-			if(productFound){
+			const parsedProduct = await JSON.parse(JSON.stringify(productFound)) as IProduct;
+			if (productFound) {
 				singleProduct.listPrice = (Number(parsedProduct.listPrice) + Number(singleProduct.listPrice)) / 2;
-				singleProduct.countInStock= Number(parsedProduct.countInStock) + Number(singleProduct.countInStock);
+				singleProduct.countInStock = Number(parsedProduct.countInStock) + Number(singleProduct.countInStock);
 			}
-			
+
 			productBulk
 				.find({ productId: singleProduct.productId })
 				.upsert()
@@ -53,7 +56,7 @@ export async function createOrderReception(data: IOrderReceptionInput) {
 			})
 
 		const orderReception = await OrderReception.create(orderReceptionToSave)
-		await sendOrderReceptionSavedEmail({order: orderReception});
+		await sendOrderReceptionSavedEmail({ order: orderReception });
 		revalidatePath('/admin/recepcion-de-compra')
 		return {
 			success: true,
@@ -88,24 +91,24 @@ export async function getAllOrdersReceivedForAdmin({
 	page = 1,
 	// sort = 'latest',
 	limit,
+	storeId,
 }: {
 	query: string
 	page?: number
 	sort?: string
 	limit?: number
+	storeId?: string
 }) {
 	await connectToDatabase()
 
 	const pageSize = limit || PAGE_SIZE
-	const queryFilter =
-		query && query !== 'all'
-			? {
-					nameProvider: {
-						$regex: query,
-						$options: 'i',
-					},
-				}
-			: {}
+	const filter: any = {}
+	if (query && query !== 'all') {
+		filter.nameProvider = { $regex: query, $options: 'i' }
+	}
+	if (storeId) {
+		filter.storeId = storeId
+	}
 
 	// const order: Record<string, 1 | -1> =
 	// 	sort === 'best-selling'
@@ -118,7 +121,7 @@ export async function getAllOrdersReceivedForAdmin({
 	// 					? { avgRating: -1 }
 	// 					: { _id: -1 }
 	const orders = await OrderReception.find({
-		...queryFilter,
+		...filter,
 	})
 		// .sort(order)
 		.skip(pageSize * (Number(page) - 1))
@@ -126,7 +129,7 @@ export async function getAllOrdersReceivedForAdmin({
 		.lean()
 
 	const countOrders = await OrderReception.countDocuments({
-		...queryFilter,
+		...filter,
 	})
 	orders.reverse()
 	return {
@@ -146,21 +149,21 @@ export async function getOrderById(orderId: string) {
 }
 
 
-  export async function updateOrderReceptionToPaid(orderId: string) {
+export async function updateOrderReceptionToPaid(orderId: string) {
 	try {
-	  await connectToDatabase()
-	  const order = await OrderReception.findById(orderId)
-	  if (!order) throw new Error('OrderReception not found')
-	  if (order.isPaid) throw new Error('OrderReception is already paid')
-	  order.isPaid = true
-	  order.paidAt = new Date()
-	  await order.save()
-	//   if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
+		await connectToDatabase()
+		const order = await OrderReception.findById(orderId)
+		if (!order) throw new Error('OrderReception not found')
+		if (order.isPaid) throw new Error('OrderReception is already paid')
+		order.isPaid = true
+		order.paidAt = new Date()
+		await order.save()
+		//   if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
 		// await updateProductStock(order._id)
-	//   if (order.user.email) await sendOrderReceptionSavedEmail({ order })
-	  revalidatePath(`/admin/ordenes-de-compra`)
-	  return { success: true, message: 'OrderReception paid successfully' }
+		//   if (order.user.email) await sendOrderReceptionSavedEmail({ order })
+		revalidatePath(`/admin/ordenes-de-compra`)
+		return { success: true, message: 'OrderReception paid successfully' }
 	} catch (err) {
-	  return { success: false, message: formatError(err) }
+		return { success: false, message: formatError(err) }
 	}
-  }
+}

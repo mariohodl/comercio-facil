@@ -5,6 +5,9 @@ export const metadata: Metadata = {
     title: 'Brands',
 }
 
-export default function BrandsPage() {
-    return <BrandList />
+export default async function BrandsPage(props: {
+    params: Promise<{ store: string }>
+}) {
+    const params = await props.params
+    return <BrandList store={params.store} />
 }

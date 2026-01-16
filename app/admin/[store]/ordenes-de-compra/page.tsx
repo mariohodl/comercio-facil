@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: 'Admin Ordenes de compra',
 }
 
-export default async function AdminOrderReceived() {
-  return <OrdersRecievedList />
+export default async function AdminOrderReceived(props: {
+  params: Promise<{ store: string }>
+}) {
+  const params = await props.params
+  return <OrdersRecievedList store={params.store} />
 }

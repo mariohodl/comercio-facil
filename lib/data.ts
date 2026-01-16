@@ -90,6 +90,7 @@ const users: IUserInput[] = [
 		},
 		paymentMethod: 'Stripe',
 		emailVerified: false,
+		phone: '123-456-7890',
 	},
 	{
 		name: 'Mario SuperAdmin',
@@ -110,6 +111,7 @@ const users: IUserInput[] = [
 		},
 		paymentMethod: 'Cash On Delivery',
 		emailVerified: false,
+		phone: '123-456-7890',
 	},
 	{
 		name: 'Mario',
@@ -130,6 +132,7 @@ const users: IUserInput[] = [
 		},
 		paymentMethod: 'Cash On Delivery',
 		emailVerified: false,
+		phone: '123-456-7890',
 	},
 	{
 		name: 'Jack',
@@ -150,6 +153,7 @@ const users: IUserInput[] = [
 		},
 		paymentMethod: 'PayPal',
 		emailVerified: false,
+		phone: '123-456-7890',
 	}
 ]
 

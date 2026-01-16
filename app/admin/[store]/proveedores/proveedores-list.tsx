@@ -31,7 +31,7 @@ type ProveedoresListDataProps = {
   to: number
   from: number
 }
-const ProveedoresList = () => {
+const ProveedoresList = ({ store }: { store: string }) => {
   const [page, setPage] = useState<number>(1)
   const [inputValue, setInputValue] = useState<string>('')
   const [data, setData] = useState<ProveedoresListDataProps>()
@@ -48,6 +48,7 @@ const ProveedoresList = () => {
       const data = await getAllProveedoresForAdmin({
         query: inputValue,
         page: newPage,
+        storeId: store,
       })
       setData(data)
     })
@@ -58,25 +59,25 @@ const ProveedoresList = () => {
     setInputValue(value)
     if (value) {
       clearTimeout((window as any).debounce)
-      ;(window as any).debounce = setTimeout(() => {
-        startTransition(async () => {
-          const data = await getAllProveedoresForAdmin({ query: value, page: 1 })
-          setData(data)
-        })
-      }, 500)
+        ; (window as any).debounce = setTimeout(() => {
+          startTransition(async () => {
+            const data = await getAllProveedoresForAdmin({ query: value, page: 1, storeId: store })
+            setData(data)
+          })
+        }, 500)
     } else {
       startTransition(async () => {
-        const data = await getAllProveedoresForAdmin({ query: '', page })
+        const data = await getAllProveedoresForAdmin({ query: '', page, storeId: store })
         setData(data)
       })
     }
   }
   useEffect(() => {
     startTransition(async () => {
-      const data = await getAllProveedoresForAdmin({ query: '' })
+      const data = await getAllProveedoresForAdmin({ query: '', storeId: store })
       setData(data)
     })
-  }, [])
+  }, [store])
 
   return (
     <div>
@@ -131,7 +132,7 @@ const ProveedoresList = () => {
                     </Link>
                   </TableCell>
                   <TableCell>
-                      {proveedor.clave}
+                    {proveedor.clave}
                   </TableCell>
                   <TableCell>
                     {formatDateTime(proveedor.updatedAt).dateTime}

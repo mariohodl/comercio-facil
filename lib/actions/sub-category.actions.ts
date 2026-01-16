@@ -17,11 +17,13 @@ export async function getAllSubCategories({
     page = 1,
     limit = PAGE_SIZE,
     status,
+    storeId,
 }: {
     query?: string
     page?: number
     limit?: number
     status?: string
+    storeId?: string
 }) {
     await connectToDatabase()
 
@@ -41,6 +43,7 @@ export async function getAllSubCategories({
     const subCategories = await SubCategory.find({
         ...queryFilter,
         ...statusFilter,
+        ...(storeId ? { storeId } : {}),
     })
         .populate('parentCategory', 'categoryName')
         .sort({ createdAt: -1 })
@@ -51,6 +54,7 @@ export async function getAllSubCategories({
     const countSubCategories = await SubCategory.countDocuments({
         ...queryFilter,
         ...statusFilter,
+        ...(storeId ? { storeId } : {}),
     })
 
     return {
@@ -73,8 +77,11 @@ export async function createSubCategory(data: ISubCategoryInput) {
         const subCategory = SubCategoryInputSchema.parse(data)
         await connectToDatabase()
 
-        // Check if slug already exists
-        const existingSubCategory = await SubCategory.findOne({ slug: subCategory.slug })
+        // Check if slug already exists for this store
+        const existingSubCategory = await SubCategory.findOne({
+            slug: subCategory.slug,
+            storeId: subCategory.storeId
+        })
         if (existingSubCategory) {
             return {
                 success: false,
@@ -102,6 +109,7 @@ export async function updateSubCategory(data: z.infer<typeof SubCategoryUpdateSc
         // Check if slug already exists (excluding current sub category)
         const existingSubCategory = await SubCategory.findOne({
             slug: subCategory.slug,
+            storeId: subCategory.storeId,
             _id: { $ne: subCategory._id }
         })
         if (existingSubCategory) {
@@ -139,9 +147,11 @@ export async function deleteSubCategory(id: string) {
 }
 
 // GET SUB CATEGORIES BY CATEGORY ID (for dropdowns/selects)
-export async function getSubCategoriesByCategory(categoryId: string) {
+export async function getSubCategoriesByCategory(categoryId: string, storeId?: string) {
     await connectToDatabase()
-    const subCategories = await SubCategory.find({ parentCategory: categoryId, status: true })
+    const filter: any = { parentCategory: categoryId, status: true }
+    if (storeId) filter.storeId = storeId
+    const subCategories = await SubCategory.find(filter)
         .select('name slug code')
         .sort({ name: 1 })
         .lean()

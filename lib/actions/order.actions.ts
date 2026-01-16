@@ -16,6 +16,7 @@ import Product from '../db/models/product.model'
 import User from '../db/models/user.model'
 import OrderReception from '../db/models/orderReception.model'
 import Proveedor from '../db/models/proveedor.model'
+import Store from '../db/models/store.model'
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
 	try {
@@ -63,6 +64,7 @@ export const createOrderFromCart = async (
 		taxPrice: calculatedPrices.taxPrice,
 		totalPrice: calculatedPrices.totalPrice,
 		expectedDeliveryDate: clientSideCart.expectedDeliveryDate,
+		storeId: clientSideCart.storeId || undefined,
 	});
 	return await Order.create(order);
 };
@@ -213,28 +215,36 @@ export const calcDeliveryDateAndPrice = async ({
 
 
 // GET ORDERS BY USER
-export async function getOrderSummary(date: DateRange) {
+export async function getOrderSummary(date: DateRange, storeId: string) {
 	await connectToDatabase()
 
+	const store = await Store.findOne({ slug: storeId })
+
 	const ordersCount = await Order.countDocuments({
+		storeId,
 		createdAt: {
 			$gte: date.from,
 			$lte: date.to,
 		},
 	})
 	const productsCount = await Product.countDocuments({
+		store: storeId,
 		createdAt: {
 			$gte: date.from,
 			$lte: date.to,
 		},
 	})
-	const usersCount = await User.countDocuments({
+	const usersCount = store ? await User.countDocuments({
+		'business.stores': store._id,
 		createdAt: {
 			$gte: date.from,
 			$lte: date.to,
 		},
-	})
+	}) : 0
+
+	// Now we can filter by storeId
 	const suppliersCount = await Proveedor.countDocuments({
+		storeId,
 		createdAt: {
 			$gte: date.from,
 			$lte: date.to,
@@ -244,6 +254,7 @@ export async function getOrderSummary(date: DateRange) {
 	const totalPurchasesResult = await OrderReception.aggregate([
 		{
 			$match: {
+				storeId,
 				createdAt: {
 					$gte: date.from,
 					$lte: date.to,
@@ -263,6 +274,7 @@ export async function getOrderSummary(date: DateRange) {
 	const invoiceDueResult = await OrderReception.aggregate([
 		{
 			$match: {
+				storeId,
 				isPaid: false,
 			},
 		},
@@ -279,6 +291,7 @@ export async function getOrderSummary(date: DateRange) {
 	const totalSalesResult = await Order.aggregate([
 		{
 			$match: {
+				storeId,
 				createdAt: {
 					$gte: date.from,
 					$lte: date.to,
@@ -304,6 +317,7 @@ export async function getOrderSummary(date: DateRange) {
 	const monthlySales = await Order.aggregate([
 		{
 			$match: {
+				storeId,
 				createdAt: {
 					$gte: sixMonthEarlierDate,
 				},
@@ -325,10 +339,10 @@ export async function getOrderSummary(date: DateRange) {
 
 		{ $sort: { label: -1 } },
 	])
-	const topSalesCategories = await getTopSalesCategories(date)
-	const topSalesProducts = await getTopSalesProducts(date)
+	const topSalesCategories = await getTopSalesCategories(date, storeId)
+	const topSalesProducts = await getTopSalesProducts(date, storeId)
 
-	const latestOrders = await Order.find()
+	const latestOrders = await Order.find({ storeId })
 		.populate('user', 'name')
 		.sort({ createdAt: 'desc' })
 		.limit(PAGE_SIZE)
@@ -338,25 +352,26 @@ export async function getOrderSummary(date: DateRange) {
 		usersCount,
 		totalSales,
 		monthlySales: JSON.parse(JSON.stringify(monthlySales)),
-		salesChartData: JSON.parse(JSON.stringify(await getSalesChartData(date))),
+		salesChartData: JSON.parse(JSON.stringify(await getSalesChartData(date, storeId))),
 		topSalesCategories: JSON.parse(JSON.stringify(topSalesCategories)),
 		topSalesProducts: JSON.parse(JSON.stringify(topSalesProducts)),
 		latestOrders: JSON.parse(JSON.stringify(latestOrders)) as IOrderList[],
 		totalPurchases,
 		invoiceDue,
 		suppliersCount,
-		purchaseChartData: JSON.parse(JSON.stringify(await getPurchaseChartData(date))),
-		lowStockProducts: JSON.parse(JSON.stringify(await getLowStockProducts())),
-		recentTransactions: JSON.parse(JSON.stringify(await getRecentTransactions(date))),
-		topCustomers: JSON.parse(JSON.stringify(await getTopCustomers(date))),
-		orderStats: JSON.parse(JSON.stringify(await getOrderStatistics(date))),
+		purchaseChartData: JSON.parse(JSON.stringify(await getPurchaseChartData(date, storeId))),
+		lowStockProducts: JSON.parse(JSON.stringify(await getLowStockProducts(storeId))),
+		recentTransactions: JSON.parse(JSON.stringify(await getRecentTransactions(date, storeId))),
+		topCustomers: JSON.parse(JSON.stringify(await getTopCustomers(date, storeId))),
+		orderStats: JSON.parse(JSON.stringify(await getOrderStatistics(date, storeId))),
 	}
 }
 
-async function getTopCustomers(date: DateRange) {
+async function getTopCustomers(date: DateRange, storeId: string) {
 	const result = await Order.aggregate([
 		{
 			$match: {
+				storeId,
 				createdAt: {
 					$gte: date.from,
 					$lte: date.to,
@@ -395,10 +410,11 @@ async function getTopCustomers(date: DateRange) {
 	return result
 }
 
-async function getOrderStatistics(date: DateRange) {
+async function getOrderStatistics(date: DateRange, storeId: string) {
 	const result = await Order.aggregate([
 		{
 			$match: {
+				storeId,
 				createdAt: {
 					$gte: date.from,
 					$lte: date.to,
@@ -421,17 +437,18 @@ async function getOrderStatistics(date: DateRange) {
 	return result
 }
 
-async function getLowStockProducts() {
-	const products = await Product.find({ countInStock: { $lte: 10 } })
+async function getLowStockProducts(store: string) {
+	const products = await Product.find({ store, countInStock: { $lte: 10 } })
 		.select('name countInStock images _id category price')
 		.limit(5)
 		.sort({ countInStock: 1 })
 	return products
 }
 
-async function getRecentTransactions(date: DateRange) {
+async function getRecentTransactions(date: DateRange, storeId: string) {
 	// Fetch recent sales (Orders)
 	const sales = await Order.find({
+		storeId,
 		createdAt: {
 			$gte: date.from,
 			$lte: date.to,
@@ -444,6 +461,7 @@ async function getRecentTransactions(date: DateRange) {
 
 	// Fetch recent purchases (OrderReception)
 	const purchases = await OrderReception.find({
+		storeId,
 		createdAt: {
 			$gte: date.from,
 			$lte: date.to,
@@ -477,10 +495,11 @@ async function getRecentTransactions(date: DateRange) {
 	return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10)
 }
 
-async function getPurchaseChartData(date: DateRange) {
+async function getPurchaseChartData(date: DateRange, storeId?: string) {
 	const result = await OrderReception.aggregate([
 		{
 			$match: {
+				...(storeId ? { storeId } : {}),
 				createdAt: {
 					$gte: date.from,
 					$lte: date.to,
@@ -518,10 +537,11 @@ async function getPurchaseChartData(date: DateRange) {
 	return result
 }
 
-async function getSalesChartData(date: DateRange) {
+async function getSalesChartData(date: DateRange, storeId: string) {
 	const result = await Order.aggregate([
 		{
 			$match: {
+				storeId,
 				createdAt: {
 					$gte: date.from,
 					$lte: date.to,
@@ -559,10 +579,11 @@ async function getSalesChartData(date: DateRange) {
 	return result
 }
 
-async function getTopSalesProducts(date: DateRange) {
+async function getTopSalesProducts(date: DateRange, storeId: string) {
 	const result = await Order.aggregate([
 		{
 			$match: {
+				storeId,
 				createdAt: {
 					$gte: date.from,
 					$lte: date.to,
@@ -610,10 +631,11 @@ async function getTopSalesProducts(date: DateRange) {
 	return result
 }
 
-async function getTopSalesCategories(date: DateRange, limit = 5) {
+async function getTopSalesCategories(date: DateRange, storeId: string, limit = 5) {
 	const result = await Order.aggregate([
 		{
 			$match: {
+				storeId,
 				createdAt: {
 					$gte: date.from,
 					$lte: date.to,
@@ -659,19 +681,22 @@ export async function deleteOrder(id: string) {
 export async function getAllOrders({
 	limit,
 	page,
+	storeId,
 }: {
 	limit?: number
 	page: number
+	storeId?: string
 }) {
 	limit = limit || PAGE_SIZE
 	await connectToDatabase()
 	const skipAmount = (Number(page) - 1) * limit
-	const orders = await Order.find()
+	const filter = storeId ? { storeId } : {}
+	const orders = await Order.find(filter)
 		.populate('user', 'name')
 		.sort({ createdAt: 'desc' })
 		.skip(skipAmount)
 		.limit(limit)
-	const ordersCount = await Order.countDocuments()
+	const ordersCount = await Order.countDocuments(filter)
 	return {
 		data: JSON.parse(JSON.stringify(orders)) as IOrderList[],
 		totalPages: Math.ceil(ordersCount / limit),

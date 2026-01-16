@@ -44,9 +44,10 @@ interface SubCategoryModalProps {
     onClose: () => void
     subCategory?: ISubCategory | null
     onSuccess?: () => void
+    storeId: string
 }
 
-export function SubCategoryModal({ open, onClose, subCategory, onSuccess }: SubCategoryModalProps) {
+export function SubCategoryModal({ open, onClose, subCategory, onSuccess, storeId }: SubCategoryModalProps) {
     const { showSuccess, showError } = useToast()
     const isEditMode = !!subCategory
     const [categories, setCategories] = useState<{ categoryName: string; categorySlug: string; _id: string }[]>([])
@@ -61,16 +62,17 @@ export function SubCategoryModal({ open, onClose, subCategory, onSuccess }: SubC
             description: '',
             image: '',
             status: true,
+            storeId,
         },
     })
 
     useEffect(() => {
         const fetchCategories = async () => {
-            const activeCategories = await getActiveCategories()
+            const activeCategories = await getActiveCategories(storeId)
             setCategories(activeCategories as any)
         }
         fetchCategories()
-    }, [])
+    }, [storeId])
 
     useEffect(() => {
         if (subCategory) {
@@ -92,6 +94,7 @@ export function SubCategoryModal({ open, onClose, subCategory, onSuccess }: SubC
                 description: '',
                 image: '',
                 status: true,
+                storeId,
             })
         }
     }, [subCategory, form])

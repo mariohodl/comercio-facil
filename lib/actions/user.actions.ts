@@ -12,7 +12,7 @@ import { formatError } from '../utils';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '../constants'
-import { UserSignUpSchema, UserUpdateSchema, StoreSettingsSchema } from '../validator'
+import { UserSignUpSchema, UserUpdateSchema, StoreSettingsSchema, StoreUserCreateSchema, StoreUserUpdateSchema } from '../validator'
 import { ROL_CUSTOMER, ROL_ADMIN } from '@/lib/constants'
 
 import { z } from 'zod'
@@ -37,6 +37,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
 			name: userSignUp.name,
 			email: userSignUp.email,
 			password: userSignUp.password,
+			phone: userSignUp.phone,
 			confirmPassword: userSignUp.confirmPassword,
 		});
 
@@ -130,8 +131,13 @@ export async function updateUserName(user: IUserName) {
 export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
 	try {
 		await connectToDatabase()
-		const dbUser = await User.findById(user._id)
+		const dbUser = await User.findOne({ _id: user._id, isDeleted: { $ne: true } })
 		if (!dbUser) throw new Error('User not found')
+
+		if (dbUser.role === ROL_ADMIN && dbUser.isStore) {
+			throw new Error('Store Admin core details cannot be modified via this action')
+		}
+
 		dbUser.name = user.name
 		dbUser.email = user.email
 		dbUser.role = user.role
@@ -149,7 +155,7 @@ export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
 
 export async function getUserById(userId: string) {
 	await connectToDatabase()
-	const user = await User.findById(userId)
+	const user = await User.findOne({ _id: userId, isDeleted: { $ne: true } })
 	if (!user) throw new Error('User not found')
 	return JSON.parse(JSON.stringify(user)) as IUser
 }
@@ -159,8 +165,17 @@ export async function getUserById(userId: string) {
 export async function deleteUser(id: string) {
 	try {
 		await connectToDatabase()
-		const res = await User.findByIdAndDelete(id)
-		if (!res) throw new Error('Use not found')
+		const user = await User.findOne({ _id: id, isDeleted: { $ne: true } })
+		if (!user) throw new Error('User not found')
+
+		if (user.role === ROL_ADMIN && user.isStore) {
+			throw new Error('Store Admin users cannot be deleted')
+		}
+
+		user.isDeleted = true
+		user.deletedAt = new Date()
+		await user.save()
+
 		revalidatePath('/admin/users')
 		return {
 			success: true,
@@ -183,13 +198,147 @@ export async function getAllUsers({
 	await connectToDatabase()
 
 	const skipAmount = (Number(page) - 1) * limit
-	const users = await User.find()
+	const users = await User.find({ isDeleted: { $ne: true } })
 		.sort({ createdAt: 'desc' })
 		.skip(skipAmount)
 		.limit(limit)
-	const usersCount = await User.countDocuments()
+	const usersCount = await User.countDocuments({ isDeleted: { $ne: true } })
 	return {
 		data: JSON.parse(JSON.stringify(users)) as IUser[],
 		totalPages: Math.ceil(usersCount / limit),
+	}
+}
+
+export async function getUsersByStore({
+	storeId,
+	limit,
+	page,
+	query
+}: {
+	storeId: string
+	limit?: number
+	page: number
+	query?: string
+}) {
+	limit = limit || PAGE_SIZE
+	await connectToDatabase()
+
+	const skipAmount = (Number(page) - 1) * limit
+
+	// Resolve store slug to ID
+	const store = await Store.findOne({ slug: storeId })
+	if (!store) {
+		return {
+			data: [],
+			totalPages: 0,
+		}
+	}
+
+	const filter: any = {
+		'business.stores': store._id,
+		isDeleted: { $ne: true }
+	}
+
+	if (query) {
+		filter.$or = [
+			{ name: { $regex: query, $options: 'i' } },
+			{ email: { $regex: query, $options: 'i' } }
+		]
+	}
+
+	const users = await User.find(filter)
+		.sort({ createdAt: 'desc' })
+		.skip(skipAmount)
+		.limit(limit)
+
+	const usersCount = await User.countDocuments(filter)
+
+	return {
+		data: JSON.parse(JSON.stringify(users)) as IUser[],
+		totalPages: Math.ceil(usersCount / limit),
+	}
+}
+
+export async function createStoreUser(data: z.infer<typeof StoreUserCreateSchema>) {
+	try {
+		const validatedData = StoreUserCreateSchema.parse(data)
+		await connectToDatabase()
+
+		const session = await auth()
+		if (!session?.user?.id) throw new Error('Unauthorized')
+
+		// Resolve store slug to ID
+		const store = await Store.findOne({ slug: validatedData.storeId })
+		if (!store) {
+			return { success: false, message: 'Store not found' }
+		}
+
+		// Check if user already exists
+		const existingUser = await User.findOne({ email: validatedData.email })
+		if (existingUser) {
+			return { success: false, message: 'User with this email already exists' }
+		}
+
+		const hashedPassword = await bcrypt.hash(validatedData.password, 5)
+
+		const newUser = await User.create({
+			name: validatedData.name,
+			email: validatedData.email,
+			password: hashedPassword,
+			role: validatedData.role,
+			phone: validatedData.phone,
+			status: validatedData.status,
+			isStore: false,
+			business: {
+				companyId: store.company,
+				stores: [store._id],
+				defaultStoreId: store._id
+			}
+		})
+
+		revalidatePath(`/admin/${validatedData.storeId}/users`)
+		return { success: true, message: 'User created successfully' }
+	} catch (error) {
+		return { success: false, message: formatError(error) }
+	}
+}
+
+export async function updateStoreUser(data: z.infer<typeof StoreUserUpdateSchema>) {
+	try {
+		const validatedData = StoreUserUpdateSchema.parse(data)
+		await connectToDatabase()
+
+		const session = await auth()
+		if (!session?.user?.id) throw new Error('Unauthorized')
+
+		const user = await User.findOne({ _id: validatedData._id, isDeleted: { $ne: true } })
+		if (!user) throw new Error('User not found')
+
+		// Defensive check: Store Admin users can only change their password
+		if (user.role === ROL_ADMIN && user.isStore) {
+			if (validatedData.password) {
+				user.password = await bcrypt.hash(validatedData.password, 5)
+			}
+		} else {
+			user.name = validatedData.name
+			user.email = validatedData.email
+			user.role = validatedData.role
+			user.phone = validatedData.phone
+			user.status = validatedData.status
+
+			if (validatedData.password) {
+				user.password = await bcrypt.hash(validatedData.password, 5)
+			}
+		}
+
+		await user.save()
+
+		if (validatedData.storeId) {
+			revalidatePath(`/admin/${validatedData.storeId}/users`)
+		}
+
+		return { success: true, message: 'User updated successfully' }
+	} catch (error) {
+		return { success: false, message: formatError(error) }
 	}
 }

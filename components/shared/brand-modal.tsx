@@ -34,9 +34,10 @@ interface BrandModalProps {
     onClose: () => void
     brand?: IBrand | null
     onSuccess?: () => void
+    storeId: string
 }
 
-export function BrandModal({ open, onClose, brand, onSuccess }: BrandModalProps) {
+export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandModalProps) {
     const { showSuccess, showError } = useToast()
     const isEditMode = !!brand
 
@@ -46,6 +47,7 @@ export function BrandModal({ open, onClose, brand, onSuccess }: BrandModalProps)
             name: '',
             image: '',
             status: true,
+            storeId,
         },
     })
 
@@ -61,6 +63,7 @@ export function BrandModal({ open, onClose, brand, onSuccess }: BrandModalProps)
                 name: '',
                 image: '',
                 status: true,
+                storeId,
             })
         }
     }, [brand, form])

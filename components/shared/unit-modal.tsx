@@ -31,9 +31,10 @@ interface UnitModalProps {
     onClose: () => void
     unit?: IUnit | null
     onSuccess?: () => void
+    storeId: string
 }
 
-export function UnitModal({ open, onClose, unit, onSuccess }: UnitModalProps) {
+export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModalProps) {
     const { showSuccess, showError } = useToast()
     const isEditMode = !!unit
 
@@ -43,6 +44,7 @@ export function UnitModal({ open, onClose, unit, onSuccess }: UnitModalProps) {
             name: '',
             abbreviation: '',
             status: true,
+            storeId,
         },
     })
 
@@ -58,6 +60,7 @@ export function UnitModal({ open, onClose, unit, onSuccess }: UnitModalProps) {
                 name: '',
                 abbreviation: '',
                 status: true,
+                storeId,
             })
         }
     }, [unit, form])

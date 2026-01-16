@@ -178,6 +178,7 @@ export const OrderInputSchema = z.object({
 	paidAt: z.date().optional(),
 	isRounded: z.boolean().optional(),
 	amountRounded: z.number().optional(),
+	storeId: z.string().optional(),
 })
 
 export const CartSchema = z.object({
@@ -193,13 +194,14 @@ export const CartSchema = z.object({
 	paymentMethod: z.optional(z.string()),
 	deliveryDateIndex: z.optional(z.number()),
 	expectedDeliveryDate: z.optional(z.date()),
+	storeId: z.string().optional(),
 })
 
 // USER
 const UserName = z
 	.string()
 	.min(2, { message: 'Username must be at least 2 characters' })
-	.max(50, { message: 'Username must be at most 30 characters' })
+	.max(50, { message: 'Username must be at most 50 characters' })
 const Email = z.string().min(1, 'Email is required').email('Email is invalid')
 const Password = z.string().min(3, 'Password must be at least 3 characters')
 const UserRole = z.string().optional()
@@ -208,6 +210,7 @@ const StoreId = z.string().optional()
 export const UserInputSchema = z.object({
 	name: UserName,
 	email: Email,
+	phone: z.string().min(1, 'Phone is required'),
 	image: z.string().optional(),
 	emailVerified: z.boolean(),
 	role: UserRole,
@@ -233,6 +236,7 @@ export const UserSignInSchema = z.object({
 
 export const UserSignUpSchema = UserSignInSchema.extend({
 	name: UserName,
+	phone: z.string().min(1, 'Phone is required'),
 	confirmPassword: Password,
 }).refine((data) => data.password === data.confirmPassword, {
 	message: "Passwords don't match",
@@ -261,6 +265,40 @@ export const UserUpdateSchema = z.object({
 	name: UserName,
 	email: Email,
 	role: UserRole,
+})
+
+export const StoreUserCreateSchema = z.object({
+	name: UserName,
+	email: Email,
+	phone: z.string().min(1, 'Phone is required'),
+	password: Password,
+	confirmPassword: Password,
+	role: z.string().min(1, 'Role is required'),
+	status: z.boolean().default(true),
+	storeId: z.string().min(1, 'Store ID is required'),
+}).refine((data) => data.password === data.confirmPassword, {
+	message: "Passwords don't match",
+	path: ['confirmPassword'],
+})
+
+export const StoreUserUpdateSchema = z.object({
+	_id: MongoId,
+	name: UserName,
+	email: Email,
+	phone: z.string().optional(),
+	password: z.string().optional(),
+	confirmPassword: z.string().optional(),
+	role: z.string().min(1, 'Role is required'),
+	status: z.boolean().default(true),
+	storeId: z.string().optional(),
+}).refine((data) => {
+	if (data.password || data.confirmPassword) {
+		return data.password === data.confirmPassword;
+	}
+	return true;
+}, {
+	message: "Passwords don't match",
+	path: ['confirmPassword'],
 })
 
 export const IOrderReceptionProduct = z.object({
@@ -293,12 +331,14 @@ export const OrderReceptionSchema = z.object({
 	products: z
 		.array(IOrderReceptionProduct)
 		.min(1, 'Order must contain at least one item'),
+	storeId: z.string().optional(),
 })
 
 export const ProveedorInputSchema = z.object({
 	nameProvider: z.string().min(6, 'Name is required'),
 	clave: z.string().min(2, 'Clave is required'),
 	rfc: z.string().min(12, 'RFC is required'),
+	storeId: z.string().optional(),
 })
 
 export const IDateRange = z.object({
@@ -318,6 +358,7 @@ export const IReportInput = z.object({
 	title: z.string().min(5, 'Nombre es requerido con almenos 5 caracters'),
 	status: z.string(),
 	type: z.string(),
+	storeId: z.string().optional(),
 	dateRange: z.object({
 		from: z.date()
 			.refine(
@@ -345,6 +386,7 @@ export const ReportInputSchema = z.object({
 	title: z.string().min(6, 'Title report is required'),
 	type: z.string().min(3, 'Type of report is required'),
 	status: z.string().min(3, 'Status of report is required'),
+	storeId: z.string(),
 	allTotalValue: z.coerce.number(),
 	allSubTotalValue: z.coerce.number(),
 	allProducts: z.array(ReportInputProduct),
@@ -391,6 +433,7 @@ export const POSOrderSchema = z.object({
 export const CategoryInputSchema = z.object({
 	categoryName: z.string().min(1, 'Category name is required'),
 	categorySlug: z.string().min(1, 'Category slug is required'),
+	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })
 
@@ -405,6 +448,7 @@ export const SubCategoryInputSchema = z.object({
 	code: z.string().min(1, 'Category code is required'),
 	description: z.string().optional(),
 	image: z.string().optional(),
+	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })
 
@@ -415,6 +459,7 @@ export const SubCategoryUpdateSchema = SubCategoryInputSchema.extend({
 export const BrandInputSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	image: z.string().min(1, 'Image is required'),
+	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })
 
@@ -425,6 +470,7 @@ export const BrandUpdateSchema = BrandInputSchema.extend({
 export const UnitInputSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	abbreviation: z.string().min(1, 'Abbreviation is required'),
+	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })
 

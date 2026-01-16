@@ -16,11 +16,13 @@ export async function getAllCategories({
     page = 1,
     limit = PAGE_SIZE,
     status,
+    storeId,
 }: {
     query?: string
     page?: number
     limit?: number
     status?: string
+    storeId?: string
 }) {
     await connectToDatabase()
 
@@ -40,6 +42,7 @@ export async function getAllCategories({
     const categories = await Category.find({
         ...queryFilter,
         ...statusFilter,
+        ...(storeId ? { storeId } : {}),
     })
         .sort({ createdAt: -1 })
         .skip(limit * (Number(page) - 1))
@@ -49,6 +52,7 @@ export async function getAllCategories({
     const countCategories = await Category.countDocuments({
         ...queryFilter,
         ...statusFilter,
+        ...(storeId ? { storeId } : {}),
     })
 
     return {
@@ -71,8 +75,11 @@ export async function createCategory(data: ICategoryInput) {
         const category = CategoryInputSchema.parse(data)
         await connectToDatabase()
 
-        // Check if slug already exists
-        const existingCategory = await Category.findOne({ categorySlug: category.categorySlug })
+        // Check if slug already exists for this store
+        const existingCategory = await Category.findOne({
+            categorySlug: category.categorySlug,
+            storeId: category.storeId
+        })
         if (existingCategory) {
             return {
                 success: false,
@@ -100,6 +107,7 @@ export async function updateCategory(data: z.infer<typeof CategoryUpdateSchema>)
         // Check if slug already exists (excluding current category)
         const existingCategory = await Category.findOne({
             categorySlug: category.categorySlug,
+            storeId: category.storeId,
             _id: { $ne: category._id }
         })
         if (existingCategory) {
@@ -137,9 +145,12 @@ export async function deleteCategory(id: string) {
 }
 
 // GET ACTIVE CATEGORIES (for dropdowns/selects)
-export async function getActiveCategories() {
+export async function getActiveCategories(storeId?: string) {
     await connectToDatabase()
-    const categories = await Category.find({ status: true })
+    const categories = await Category.find({
+        status: true,
+        ...(storeId ? { storeId } : {})
+    })
         .select('categoryName categorySlug')
         .sort({ categoryName: 1 })
         .lean()

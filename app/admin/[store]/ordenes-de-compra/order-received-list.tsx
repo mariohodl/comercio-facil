@@ -33,7 +33,7 @@ type ProductListDataProps = {
   to: number
   from: number
 }
-const ProductList = () => {
+const ProductList = ({ store }: { store: string }) => {
   const [page, setPage] = useState<number>(1)
   const [inputValue, setInputValue] = useState<string>('')
   const [data, setData] = useState<ProductListDataProps>()
@@ -50,6 +50,7 @@ const ProductList = () => {
       const data = await getAllOrdersReceivedForAdmin({
         query: inputValue,
         page: newPage,
+        storeId: store,
       })
       setData(data)
     })
@@ -60,25 +61,25 @@ const ProductList = () => {
     setInputValue(value)
     if (value.length > 3) {
       clearTimeout((window as any).debounce)
-      ;(window as any).debounce = setTimeout(() => {
-        startTransition(async () => {
-          const data = await getAllOrdersReceivedForAdmin({ query: value, page: 1 })
-          setData(data)
-        })
-      }, 500)
+        ; (window as any).debounce = setTimeout(() => {
+          startTransition(async () => {
+            const data = await getAllOrdersReceivedForAdmin({ query: value, page: 1, storeId: store })
+            setData(data)
+          })
+        }, 500)
     } else {
       startTransition(async () => {
-        const data = await getAllOrdersReceivedForAdmin({ query: '', page })
+        const data = await getAllOrdersReceivedForAdmin({ query: '', page, storeId: store })
         setData(data)
       })
     }
   }
   useEffect(() => {
     startTransition(async () => {
-      const data = await getAllOrdersReceivedForAdmin({ query: '' })
+      const data = await getAllOrdersReceivedForAdmin({ query: '', storeId: store })
       setData(data)
     })
-  }, [])
+  }, [store])
 
   return (
     <div>
@@ -135,7 +136,7 @@ const ProductList = () => {
                   </TableCell>
                   <TableCell className='text-right'>{formatCurrency(ordenReceived?.total || 0)}</TableCell>
                   <TableCell className='text-center flex justify-center w-[120]'>
-                    {ordenReceived.isPaid ? <p className='flex text-green-700'>Sí <CheckCircleIcon size={20}/></p> : <p className='flex text-red-700'>No <OctagonXIcon size={20}/></p>}</TableCell>
+                    {ordenReceived.isPaid ? <p className='flex text-green-700'>Sí <CheckCircleIcon size={20} /></p> : <p className='flex text-red-700'>No <OctagonXIcon size={20} /></p>}</TableCell>
                   <TableCell>
                     {formatDateTime(ordenReceived.updatedAt).dateTime}
                   </TableCell>

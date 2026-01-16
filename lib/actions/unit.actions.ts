@@ -17,12 +17,14 @@ export async function getAllUnits({
     limit = PAGE_SIZE,
     status,
     sort = 'latest',
+    storeId,
 }: {
     query?: string
     page?: number
     limit?: number
     status?: string
     sort?: string
+    storeId?: string
 }) {
     await connectToDatabase()
 
@@ -44,6 +46,7 @@ export async function getAllUnits({
     const units = await Unit.find({
         ...queryFilter,
         ...statusFilter,
+        ...(storeId ? { storeId } : {}),
     })
         .sort(sortOrder)
         .skip(limit * (Number(page) - 1))
@@ -53,6 +56,7 @@ export async function getAllUnits({
     const countUnits = await Unit.countDocuments({
         ...queryFilter,
         ...statusFilter,
+        ...(storeId ? { storeId } : {}),
     })
 
     return {
@@ -75,8 +79,9 @@ export async function createUnit(data: z.infer<typeof UnitInputSchema>) {
         const unit = UnitInputSchema.parse(data)
         await connectToDatabase()
 
-        // Check if name or abbreviation already exists
+        // Check if name or abbreviation already exists for this store
         const existingUnit = await Unit.findOne({
+            storeId: unit.storeId,
             $or: [{ name: unit.name }, { abbreviation: unit.abbreviation }]
         })
         if (existingUnit) {
@@ -107,6 +112,7 @@ export async function updateUnit(data: z.infer<typeof UnitUpdateSchema>) {
         const existingUnit = await Unit.findOne({
             $and: [
                 { _id: { $ne: unit._id } },
+                { storeId: unit.storeId },
                 { $or: [{ name: unit.name }, { abbreviation: unit.abbreviation }] }
             ]
         })
@@ -145,9 +151,12 @@ export async function deleteUnit(id: string) {
 }
 
 // GET ACTIVE UNITS (for dropdowns/selects)
-export async function getActiveUnits() {
+export async function getActiveUnits(storeId?: string) {
     await connectToDatabase()
-    const units = await Unit.find({ status: true })
+    const units = await Unit.find({
+        status: true,
+        ...(storeId ? { storeId } : {})
+    })
         .select('name abbreviation')
         .sort({ name: 1 })
         .lean()

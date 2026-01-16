@@ -8,6 +8,7 @@ export interface ISubCategory extends Document {
     code: string
     description?: string
     image?: string
+    storeId: string
     status: boolean
     createdAt: Date
     updatedAt: Date
@@ -23,9 +24,12 @@ const subCategorySchema = new Schema<ISubCategory>(
         slug: {
             type: String,
             required: true,
-            unique: true,
             lowercase: true,
             trim: true,
+        },
+        storeId: {
+            type: String,
+            required: true,
         },
         parentCategory: {
             type: Schema.Types.ObjectId as any,

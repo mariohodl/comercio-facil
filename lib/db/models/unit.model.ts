@@ -4,6 +4,7 @@ export interface IUnit extends Document {
     _id: string
     name: string
     abbreviation: string
+    storeId: string
     status: boolean
     createdAt: Date
     updatedAt: Date
@@ -15,13 +16,15 @@ const unitSchema = new Schema<IUnit>(
             type: String,
             required: true,
             trim: true,
-            unique: true,
         },
         abbreviation: {
             type: String,
             required: true,
             trim: true,
-            unique: true,
+        },
+        storeId: {
+            type: String,
+            required: true,
         },
         status: {
             type: Boolean,

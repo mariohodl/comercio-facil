@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: 'Admin Proveedores',
 }
 
-export default async function AdminProveedores() {
-  return <ProveedoresList />
+export default async function AdminProveedors(props: {
+  params: Promise<{ store: string }>
+}) {
+  const params = await props.params
+  return <ProveedoresList store={params.store} />
 }

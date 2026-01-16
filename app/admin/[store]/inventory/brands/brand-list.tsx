@@ -48,7 +48,7 @@ import { BrandModal } from '@/components/shared/brand-modal'
 import { DeleteDialog } from '@/components/shared/delete-dialog'
 import { useToast } from '@/hooks/use-toast'
 
-export default function BrandList() {
+export default function BrandList({ store }: { store: string }) {
     const t = useTranslations('inventory')
     const tCommon = useTranslations('common')
     const { showSuccess, showError } = useToast()
@@ -76,6 +76,7 @@ export default function BrandList() {
                 limit,
                 status: statusFilter,
                 sort: sortBy,
+                storeId: store,
             })
             setBrands(result.brands)
             setTotalPages(result.totalPages)
@@ -331,11 +332,12 @@ export default function BrandList() {
                 onClose={handleModalClose}
                 brand={selectedBrand}
                 onSuccess={handleModalSuccess}
+                storeId={store}
             />
 
             <DeleteDialog
                 open={isDeleteDialogOpen}
-                onClose={() => setIsDeleteDialogOpen(false)}
+                onOpenChange={setIsDeleteDialogOpen}
                 onConfirm={handleDeleteConfirm}
                 title={t('deleteBrandTitle')}
                 description={t('deleteBrandDescription')}

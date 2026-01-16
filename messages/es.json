@@ -45,6 +45,7 @@
         "areYouSure": "¿Estás seguro?",
         "subtotal": "Subtotal",
         "tax": "Impuesto",
+        "notAvailable": "N/A",
         "close": "Cerrar"
     },
     "pos": {
@@ -349,7 +350,9 @@
             "reports": "Reportes",
             "settings": "Configuración",
             "purchases": "Compras",
-            "suppliers": "Proveedores"
+            "suppliers": "Proveedores",
+            "userManagement": "Gestión de Usuarios",
+            "users": "Usuarios"
         },
         "attributes": {
             "title": "Atributos de Variante",
@@ -425,6 +428,38 @@
             "customerSupplier": "Cliente/Proveedor",
             "status": "Estado",
             "total": "Total"
+        },
+        "users": {
+            "title": "Usuarios",
+            "manageUsers": "Administra tus usuarios",
+            "addUser": "Agregar Usuario",
+            "editUser": "Editar Usuario",
+            "viewUser": "Ver Usuario",
+            "name": "Usuario",
+            "userName": "Nombre",
+            "role": "Rol",
+            "action": "Acción",
+            "email": "Correo",
+            "phone": "Teléfono",
+            "password": "Contraseña",
+            "confirmPassword": "Confirmar Contraseña",
+            "status": "Estado",
+            "active": "Activo",
+            "inactive": "Inactivo",
+            "selectRole": "Selecciona un rol",
+            "search": "Buscar...",
+            "noUsersFound": "No se encontraron usuarios",
+            "cancel": "Cancelar",
+            "saveChanges": "Guardar Cambios",
+            "close": "Cerrar",
+            "roles": {
+                "Admin": "Administrador",
+                "Customer": "Cliente",
+                "Seller": "Vendedor",
+                "Manager": "Gerente",
+                "Supervisor": "Supervisor",
+                "SuperAdmin": "Super Administrador"
+            }
         }
     },
     "printBarcode": {

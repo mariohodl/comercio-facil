@@ -49,7 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				await connectToDatabase();
 				if (credentials == null) return null;
 
-				const DBuser = await User.findOne({ email: credentials.email }).populate('business.defaultStoreId');
+				const DBuser = await User.findOne({ email: credentials.email, isDeleted: { $ne: true } }).populate('business.defaultStoreId');
 
 				if (DBuser && DBuser.password) {
 					const isMatch = await bcrypt.compare(

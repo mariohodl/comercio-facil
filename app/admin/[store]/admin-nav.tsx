@@ -172,6 +172,16 @@ export function AdminNav({
         },
       ],
     },
+    {
+      title: t('userManagement'),
+      items: [
+        {
+          title: t('users'),
+          href: `/admin/${storeId}/users`,
+          icon: ShieldCheck,
+        },
+      ],
+    },
   ]
 
   return (

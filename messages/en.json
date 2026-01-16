@@ -44,6 +44,7 @@
         "areYouSure": "Are you sure?",
         "subtotal": "Subtotal",
         "tax": "Tax",
+        "notAvailable": "N/A",
         "close": "Close"
     },
     "pos": {
@@ -323,7 +324,9 @@
             "reports": "Reports",
             "settings": "Settings",
             "purchases": "Purchases",
-            "suppliers": "Suppliers"
+            "suppliers": "Suppliers",
+            "userManagement": "User Management",
+            "users": "Users"
         },
         "attributes": {
             "title": "Variant Attributes",
@@ -399,6 +402,38 @@
             "customerSupplier": "Customer/Supplier",
             "status": "Status",
             "total": "Total"
+        },
+        "users": {
+            "title": "Users",
+            "manageUsers": "Manage your users",
+            "addUser": "Add User",
+            "editUser": "Edit User",
+            "viewUser": "View User",
+            "name": "User",
+            "userName": "User Name",
+            "role": "Role",
+            "action": "Action",
+            "email": "Email",
+            "phone": "Phone",
+            "password": "Password",
+            "confirmPassword": "Confirm Password",
+            "status": "Status",
+            "active": "Active",
+            "inactive": "Inactive",
+            "selectRole": "Select a role",
+            "search": "Search...",
+            "noUsersFound": "No users found",
+            "cancel": "Cancel",
+            "saveChanges": "Save Changes",
+            "close": "Close",
+            "roles": {
+                "Admin": "Admin",
+                "Customer": "Customer",
+                "Seller": "Seller",
+                "Manager": "Manager",
+                "Supervisor": "Supervisor",
+                "SuperAdmin": "Super Admin"
+            }
         }
     },
     "printBarcode": {

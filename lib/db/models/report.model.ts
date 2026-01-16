@@ -18,18 +18,19 @@ const reportSchema = new Schema<IReport>(
         title: { type: String, required: true },
         type: { type: String, required: true },
         status: { type: String, required: true },
+        storeId: { type: String, required: true },
         allTotalValue: { type: Number, required: true },
         allSubTotalValue: { type: Number, required: true },
         allProducts: [
-			{
-				name: { type: String, required: true },
-				productId: { type: String, required: true },
-				countInStock: { type: Number, required: true },
-				price: { type: Number, required: true },
-				category: { type: String, required: true },
-				isValidProduct: { type: Boolean, default: true},
-			},
-		],
+            {
+                name: { type: String, required: true },
+                productId: { type: String, required: true },
+                countInStock: { type: Number, required: true },
+                price: { type: Number, required: true },
+                category: { type: String, required: true },
+                isValidProduct: { type: Boolean, default: true },
+            },
+        ],
         productsCount: { type: Number, required: true },
         dateRangeFormatted: { type: String, required: true },
         dateRange: {

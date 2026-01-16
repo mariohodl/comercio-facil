@@ -26,11 +26,13 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Search, Plus, Edit, Trash2, FileDown, FileUp, RefreshCw } from 'lucide-react'
 import { DeleteDialog } from '@/components/shared/delete-dialog'
+import { useParams } from 'next/navigation'
 
 export default function CategoriesPage() {
     const t = useTranslations('inventory')
     const tCommon = useTranslations('common')
     const { showSuccess, showError } = useToast()
+    const { store } = useParams<{ store: string }>()
 
     const [categories, setCategories] = useState<ICategory[]>([])
     const [totalPages, setTotalPages] = useState(0)
@@ -54,6 +56,7 @@ export default function CategoriesPage() {
                 page: currentPage,
                 limit: rowsPerPage,
                 status: statusFilter,
+                storeId: store,
             })
             setCategories(result.categories)
             setTotalPages(result.totalPages)
@@ -65,9 +68,11 @@ export default function CategoriesPage() {
     }
 
     useEffect(() => {
-        fetchCategories()
+        if (store) {
+            fetchCategories()
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchQuery, statusFilter, currentPage, rowsPerPage])
+    }, [searchQuery, statusFilter, currentPage, rowsPerPage, store])
 
     // Reset to page 1 when rowsPerPage changes
     useEffect(() => {
@@ -291,13 +296,13 @@ export default function CategoriesPage() {
                 </div>
             </div>
 
-
             {/* Category Modal */}
             <CategoryModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
                 category={selectedCategory}
                 onSuccess={handleModalSuccess}
+                storeId={store}
             />
 
             {/* Delete Dialog */}

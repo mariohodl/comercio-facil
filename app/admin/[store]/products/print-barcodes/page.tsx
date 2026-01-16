@@ -34,8 +34,11 @@ interface SelectedProduct {
     quantity: number
 }
 
+import { useParams } from 'next/navigation'
+
 export default function PrintBarcodesPage() {
     const t = useTranslations()
+    const { store } = useParams<{ store: string }>()
     const [searchQuery, setSearchQuery] = useState('')
     const [searchResults, setSearchResults] = useState<IProduct[]>([])
     const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([])
@@ -61,7 +64,8 @@ export default function PrintBarcodesPage() {
                 const result = await getAllProductsForAdmin({
                     query: debouncedSearch,
                     limit: 5,
-                    page: 1
+                    page: 1,
+                    store
                 })
                 setSearchResults(result.products)
             } catch (error) {

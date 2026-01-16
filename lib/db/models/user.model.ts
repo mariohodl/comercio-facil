@@ -11,6 +11,10 @@ import {
 
 export interface IUser extends Document, IUserInput {
 	_id: string;
+	status: boolean;
+	isDeleted: boolean;
+	deletedAt?: Date | null;
+	phone?: string;
 	business?: {
 		companyId: string;
 		stores: string[];
@@ -30,6 +34,10 @@ const userSchema = new Schema<IUser>(
 		image: { type: String },
 		emailVerified: { type: Boolean, default: false },
 		isStore: { type: Boolean, default: false },
+		status: { type: Boolean, default: true },
+		isDeleted: { type: Boolean, default: false },
+		deletedAt: { type: Date, default: null },
+		phone: { type: String },
 		business: {
 			companyId: { type: Schema.Types.ObjectId as any, ref: 'Company' },
 			stores: [{ type: Schema.Types.ObjectId as any, ref: 'Store' }],
