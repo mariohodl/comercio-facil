@@ -30,9 +30,11 @@ import Logo from '@/components/shared/header/logo'
 
 export function AdminNav({
   storeId,
+  storeName,
   className,
 }: {
   storeId: string
+  storeName?: string
   className?: string
 }) {
   const pathname = usePathname()
@@ -190,8 +192,20 @@ export function AdminNav({
       className
     )}>
       <div className='p-4 space-y-6 mt-6'>
-        <div className='px-2 mb-6'>
-          <Logo />
+        <div className='px-2 mb-8'>
+          <Link href={`/admin/${storeId}/overview`} className="flex flex-col items-center gap-3 group transition-all duration-300">
+            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-tr from-orange to-orange-dark rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
+              <Package className="w-7 h-7" />
+            </div>
+            <div className="flex flex-col overflow-hidden">
+              <h2 className='text-navy font-black text-xl leading-tight truncate tracking-tight group-hover:text-orange transition-colors'>
+                {storeName || 'Comercio Fácil'}
+              </h2>
+              <span className="text-[10px] uppercase text-center font-bold text-gray-400 tracking-widest leading-none">
+                Admin Panel
+              </span>
+            </div>
+          </Link>
         </div>
         {navSections.map((section, index) => (
           <div key={index}>

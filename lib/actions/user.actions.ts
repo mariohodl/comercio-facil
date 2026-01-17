@@ -29,6 +29,10 @@ export const SignInWithGoogle = async () => {
 	await signIn('google');
 };
 
+export const getSession = async () => {
+	return await auth();
+}
+
 // CREATE
 // CREATE
 export async function registerUser(userSignUp: IUserSignUp) {

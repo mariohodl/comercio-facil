@@ -98,6 +98,7 @@
         "quickAdd": "Agregar Rápido",
         "from": "Desde",
         "createCustomer": "Crear Cliente",
+        "roundoff": "Redondear",
         "name": "Nombre",
         "namePlaceholder": "Ingresa el nombre",
         "phone": "Teléfono",
@@ -114,7 +115,7 @@
             "title": "Pedidos",
             "unpaid": "Sin Pagar",
             "paid": "Pagado",
-            "searchPlaceholder": "Buscar Producto (ID)...",
+            "searchPlaceholder": "Buscar ID de pedido...",
             "noOrdersFound": "No se encontraron pedidos",
             "orderId": "ID Pedido",
             "cashier": "Cajero",
@@ -135,7 +136,27 @@
             "change": "Cambio",
             "startNewOrder": "Iniciar Nuevo Pedido",
             "printReceipt": "Imprimir Recibo",
-            "close": "Cerrar"
+            "close": "Cerrar",
+            "paymentMethod": "Método de Pago",
+            "status": "Estado",
+            "fulfillmentType": "Tipo de Entrega",
+            "inStore": "En tienda",
+            "pickupLater": "Recoger después",
+            "delivery": "A domicilio",
+            "all": "Todos",
+            "walkInCustomer": "Cliente sin cita",
+            "fulfillmentStatus": {
+                "pending": "Pendiente",
+                "ready": "Listo",
+                "outForDelivery": "En camino",
+                "delivered": "Entregado"
+            },
+            "paymentMethods": {
+                "cash": "Efectivo",
+                "card": "Tarjeta",
+                "split": "Dividido",
+                "unpaid": "Sin Pagar"
+            }
         },
         "paymentModal": {
             "title": "Completar Pago",
@@ -313,6 +334,13 @@
         "details": "Detalles"
     },
     "admin": {
+        "header": {
+            "searchPlaceholder": "Buscar en todo...",
+            "quickAction": "Acción Rápida",
+            "shortcuts": "Atajos",
+            "newProduct": "Nuevo Producto",
+            "newSale": "Nueva Venta"
+        },
         "nav": {
             "general": "General",
             "dashboard": "Panel",

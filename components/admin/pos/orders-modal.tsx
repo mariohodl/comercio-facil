@@ -23,9 +23,10 @@ interface OrdersModalProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     storeId: string
+    onOpenOrder?: (order: IOrder) => void
 }
 
-export default function OrdersModal({ open, onOpenChange, storeId }: OrdersModalProps) {
+export default function OrdersModal({ open, onOpenChange, storeId, onOpenOrder }: OrdersModalProps) {
     const t = useTranslations('pos.ordersModal')
     const [orders, setOrders] = useState<IOrder[]>([])
     const [loading, setLoading] = useState(false)
@@ -71,11 +72,15 @@ export default function OrdersModal({ open, onOpenChange, storeId }: OrdersModal
         }
     }
 
-    // Initial fetch and on filter/tab change
+    // Initial fetch and on filter/tab change with debounce for search
     useEffect(() => {
-        if (open) {
-            fetchOrders(true)
-        }
+        const timer = setTimeout(() => {
+            if (open) {
+                fetchOrders(true)
+            }
+        }, searchQuery ? 300 : 0)
+
+        return () => clearTimeout(timer)
     }, [open, status, searchQuery])
 
     // Load more when scrolling to bottom
@@ -93,21 +98,29 @@ export default function OrdersModal({ open, onOpenChange, storeId }: OrdersModal
     }, [page])
 
 
+    const getFulfillmentName = (typeCode: string) => {
+        switch (typeCode) {
+            case 'IN_STORE': return t('inStore')
+            case 'PICKUP_LATER': return t('pickupLater')
+            case 'DELIVERY': return t('delivery')
+            default: return typeCode
+        }
+    }
+
+
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
                 <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 gap-0 bg-[#F8F9FA]">
-                    {/* Header */}
                     <DialogHeader className="p-4 bg-white border-b">
                         <div className="flex items-center justify-between">
                             <DialogTitle className="text-xl font-bold">{t('title')}</DialogTitle>
-                            {/* Close button is built-in but we can customize if needed */}
                         </div>
 
                         <div className="flex items-center justify-between mt-4 gap-4">
                             <Tabs defaultValue="all" value={status} onValueChange={(v) => setStatus(v as any)} className="w-[400px]">
                                 <TabsList className="grid w-full grid-cols-3">
-                                    <TabsTrigger value="all">{t('title')} (All)</TabsTrigger>
+                                    <TabsTrigger value="all">{t('all')}</TabsTrigger>
                                     <TabsTrigger value="unpaid">{t('unpaid')}</TabsTrigger>
                                     <TabsTrigger value="paid">{t('paid')}</TabsTrigger>
                                 </TabsList>
@@ -144,18 +157,30 @@ export default function OrdersModal({ open, onOpenChange, storeId }: OrdersModal
                                         </Badge>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-y-2 text-sm">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-sm">
                                         <div className="text-gray-600">
                                             <span className="font-semibold text-gray-900">{t('cashier')} :</span> {(order.user as any)?.name || t('unknown')}
                                         </div>
                                         <div className="text-gray-600">
-                                            <span className="font-semibold text-gray-900">{t('customer')} :</span> {order.shippingAddress?.fullName || 'Walk in Customer'}
+                                            <span className="font-semibold text-gray-900">{t('customer')} :</span> {order.shippingAddress?.fullName || t('walkInCustomer')}
                                         </div>
                                         <div className="text-gray-600">
                                             <span className="font-semibold text-gray-900">{t('total')} :</span> {formatCurrency(order.totalPrice)}
                                         </div>
                                         <div className="text-gray-600">
                                             <span className="font-semibold text-gray-900">{t('date')} :</span> {formatDateTime(order.createdAt).dateTime}
+                                        </div>
+                                        <div className="text-gray-600">
+                                            <span className="font-semibold text-gray-900">{t('paymentMethod')} :</span> {t(`paymentMethods.${order.paymentMethod.toLowerCase()}` as any)}
+                                        </div>
+                                        <div className="text-gray-600">
+                                            <span className="font-semibold text-gray-900">{t('fulfillmentType')} :</span> {getFulfillmentName(order.fulfillmentType)}
+                                        </div>
+                                        <div className="text-gray-600 flex items-center gap-2">
+                                            <span className="font-semibold text-gray-900">{t('status')} :</span>
+                                            <Badge variant="outline" className="text-[10px] py-0 h-4">
+                                                {t(`fulfillmentStatus.${order.fulfillmentStatus.toLowerCase().replace(/_([a-z])/g, (g) => g[1].toUpperCase())}` as any)}
+                                            </Badge>
                                         </div>
                                     </div>
 
@@ -166,11 +191,17 @@ export default function OrdersModal({ open, onOpenChange, storeId }: OrdersModal
                                     )}
 
                                     <div className="flex gap-2 justify-end mt-2">
-                                        {!order.isPaid && (
-                                            <Button className="bg-[#D9520E] hover:bg-[#B7440B] text-white">
+                                        {/* {!order.isPaid && (
+                                            <Button
+                                                className="bg-[#D9520E] hover:bg-[#B7440B] text-white"
+                                                onClick={() => {
+                                                    if (onOpenOrder) onOpenOrder(order)
+                                                    onOpenChange(false)
+                                                }}
+                                            >
                                                 {t('openOrder')}
                                             </Button>
-                                        )}
+                                        )} */}
                                         <Button
                                             variant="default"
                                             className="bg-[#00A991] hover:bg-[#008f7a] text-white"

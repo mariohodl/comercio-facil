@@ -33,8 +33,42 @@ interface POSCartProps {
 }
 
 export default function POSCart({ storeId }: POSCartProps) {
-    const { cart, orderNumber, updateQuantity, removeFromCart, totalPrice, clearCart } = usePOSStore()
-    const [selectedCustomer, setSelectedCustomer] = useState<string>('walk-in')
+    const {
+        cart,
+        orderNumber,
+        updateQuantity,
+        removeFromCart,
+        totalPrice,
+        clearCart,
+        setCart,
+        customerId: selectedCustomer,
+        setCustomerId: setSelectedCustomer
+    } = usePOSStore()
+
+    const handleOpenOrder = (order: any) => {
+        const cartItems = order.items.map((item: any) => ({
+            product: item.product,
+            name: item.name,
+            slug: item.slug,
+            image: item.image,
+            category: item.category,
+            price: item.price,
+            countInStock: item.countInStock || 100, // Fallback if missing
+            quantity: item.quantity,
+            sku: item.sku || 'NO-SKU',
+            unit: item.unit || 'unit',
+            variantSku: item.sku,
+            variantDetails: (item.color || item.size)
+                ? `${item.color || ''} ${item.size || ''}`.trim()
+                : undefined
+        }))
+        setCart(cartItems)
+        if (order.customer) {
+            setSelectedCustomer(typeof order.customer === 'string' ? order.customer : order.customer._id)
+        } else {
+            setSelectedCustomer('walk-in')
+        }
+    }
     const [customers, setCustomers] = useState<ICustomer[]>([])
     const [scannerOpen, setScannerOpen] = useState(false)
     const [openCombobox, setOpenCombobox] = useState(false)
@@ -92,7 +126,7 @@ export default function POSCart({ storeId }: POSCartProps) {
                             onClick={() => setOrdersModalOpen(true)}
                         >
                             <ShoppingCart className="h-3 w-3 mr-1.5" />
-                            Pedidos
+                            {t('orders')}
                         </Button>
                         <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs px-2 py-0.5">
                             #{orderNumber}
@@ -310,7 +344,7 @@ export default function POSCart({ storeId }: POSCartProps) {
                                 checked={roundOff}
                                 onCheckedChange={setRoundOff}
                             />
-                            <Label htmlFor="round-mode" className="text-sm font-normal text-gray-600 cursor-pointer">Roundoff</Label>
+                            <Label htmlFor="round-mode" className="text-sm font-normal text-gray-600 cursor-pointer">{t('roundoff')}</Label>
                         </div>
                         {roundOff && (
                             <span className="font-medium text-gray-900">
@@ -373,6 +407,7 @@ export default function POSCart({ storeId }: POSCartProps) {
                 open={ordersModalOpen}
                 onOpenChange={setOrdersModalOpen}
                 storeId={storeId}
+                onOpenOrder={handleOpenOrder}
             />
         </Card >
     )

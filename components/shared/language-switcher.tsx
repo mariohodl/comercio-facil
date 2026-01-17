@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react'
 import { useLocale } from 'next-intl'
+import { cn } from '@/lib/utils'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,7 +18,7 @@ const languages = {
     en: { name: 'English', flag: '🇺🇸' },
 }
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
     const [isPending, startTransition] = useTransition()
     const locale = useLocale() as Locale
 
@@ -36,7 +37,12 @@ export function LanguageSwitcher() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full w-10 h-10 hover:bg-gray-100 transition-colors"
+                    className={cn(
+                        "rounded-full w-10 h-10 transition-all active:scale-95",
+                        variant === 'dark'
+                            ? "text-white hover:bg-gray-800"
+                            : "hover:bg-gray-100"
+                    )}
                     disabled={isPending}
                 >
                     <span className="text-xl leading-none">{languages[locale].flag}</span>

@@ -41,10 +41,15 @@ const generateOrderNumber = (): string => {
 interface POSState {
     cart: POSCartItem[];
     orderNumber: string;
+    customerId: string;
+    userId: string | null;
     addToCart: (product: IProduct, variant?: IVariant) => void;
     removeFromCart: (productId: string, variantSku?: string) => void;
     updateQuantity: (productId: string, quantity: number, variantSku?: string) => void;
     clearCart: () => void;
+    setCart: (items: POSCartItem[]) => void;
+    setCustomerId: (id: string) => void;
+    setUserId: (id: string | null) => void;
     totalPrice: () => number;
 }
 
@@ -53,6 +58,8 @@ export const usePOSStore = create<POSState>()(
         (set, get) => ({
             cart: [],
             orderNumber: generateOrderNumber(),
+            customerId: 'walk-in',
+            userId: null,
             addToCart: (product: IProduct, variant?: IVariant) => {
                 const { cart } = get();
                 // Determine unique item key by product ID and variant SKU (if present)
@@ -120,7 +127,10 @@ export const usePOSStore = create<POSState>()(
                     ),
                 });
             },
-            clearCart: () => set({ cart: [], orderNumber: generateOrderNumber() }),
+            setCart: (items: POSCartItem[]) => set({ cart: items }),
+            setCustomerId: (id: string) => set({ customerId: id }),
+            setUserId: (id: string | null) => set({ userId: id }),
+            clearCart: () => set({ cart: [], orderNumber: generateOrderNumber(), customerId: 'walk-in' }),
             totalPrice: () => get().cart.reduce((total, item) => total + item.price * item.quantity, 0),
         }),
         { name: 'pos-cart-storage' },

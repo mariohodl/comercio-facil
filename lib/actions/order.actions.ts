@@ -851,13 +851,21 @@ export async function getPOSOrders({
 
 	// Search query
 	if (query) {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const queryFilter: any[] = []
 		if (mongoose.Types.ObjectId.isValid(query)) {
-			queryFilter.push({ _id: query })
+			queryFilter.push({ _id: new mongoose.Types.ObjectId(query) })
+		} else {
+			// Search by partial ID string if not a full ObjectId
+			queryFilter.push({
+				$expr: {
+					$regexMatch: {
+						input: { $toString: '$_id' },
+						regex: query,
+						options: 'i'
+					}
+				}
+			})
 		}
-		// Add more search criteria if needed, e.g. customer name if we saved it
-		// For now searching by ID is safest
 		if (queryFilter.length > 0) {
 			filter = { ...filter, $or: queryFilter }
 		}

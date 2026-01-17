@@ -90,11 +90,19 @@
         "addedToCart": "Added {product} to cart",
         "productNotFound": "Product with SKU \"{sku}\" not found",
         "errorSearching": "Error searching for product",
+        "selectVariant": "Select a variant",
+        "addToCart": "Add to Cart",
+        "variants": "{count} Variants",
+        "selectOptions": "Select Options",
+        "quickAdd": "Quick Add",
+        "from": "From",
+        "createCustomer": "Create Customer",
+        "roundoff": "Round off",
         "ordersModal": {
             "title": "Orders",
             "unpaid": "Unpaid",
             "paid": "Paid",
-            "searchPlaceholder": "Search Product (ID)...",
+            "searchPlaceholder": "Search Order ID...",
             "noOrdersFound": "No orders found",
             "orderId": "Order ID",
             "cashier": "Cashier",
@@ -115,7 +123,27 @@
             "change": "Change",
             "startNewOrder": "Start New Order",
             "printReceipt": "Print Receipt",
-            "close": "Close"
+            "close": "Close",
+            "paymentMethod": "Payment Method",
+            "status": "Status",
+            "fulfillmentType": "Fulfillment Type",
+            "inStore": "In Store",
+            "pickupLater": "Pickup Later",
+            "delivery": "Delivery",
+            "all": "All",
+            "walkInCustomer": "Walk in Customer",
+            "fulfillmentStatus": {
+                "pending": "Pending",
+                "ready": "Ready",
+                "outForDelivery": "Out for delivery",
+                "delivered": "Delivered"
+            },
+            "paymentMethods": {
+                "cash": "Cash",
+                "card": "Card",
+                "split": "Split",
+                "unpaid": "Unpaid"
+            }
         },
         "paymentModal": {
             "title": "Complete Payment",
@@ -287,6 +315,13 @@
         "details": "Details"
     },
     "admin": {
+        "header": {
+            "searchPlaceholder": "Search everything...",
+            "quickAction": "Quick Action",
+            "shortcuts": "Shortcuts",
+            "newProduct": "New Product",
+            "newSale": "New Sale"
+        },
         "nav": {
             "general": "General",
             "dashboard": "Dashboard",

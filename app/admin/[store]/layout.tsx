@@ -18,9 +18,9 @@ export default async function AdminLayout({
     const session = await auth()
     return (
         <>
-            <div className='flex flex-col min-h-screen'>
-                <div className='bg-black text-white fixed top-0 left-0 w-full z-20'>
-                    <div className='flex h-16 items-center px-4'>
+            <div className='flex flex-col min-h-screen bg-gray-50/50'>
+                <div className='bg-[#0f172a] text-white fixed top-0 left-0 w-full z-20 border-b border-white/5 backdrop-blur-xl'>
+                    <div className='flex h-16 items-center px-6 transition-all duration-300'>
                         {/* Mobile Sidebar Trigger */}
                         <div className='md:hidden mr-2'>
                             <Sheet>
@@ -32,26 +32,32 @@ export default async function AdminLayout({
                                 <SheetContent side="left" className="p-0 w-72">
                                     <AdminNav
                                         storeId={session?.user?.storeId || ''}
+                                        storeName={session?.user?.storeName || ''}
                                     />
                                 </SheetContent>
                             </Sheet>
                         </div>
 
-                        <div className='flex items-center'>
+                        <div className='flex items-center shrink-0'>
                             <Link
-                                href='/'
-                                className='flex items-center header-button font-extrabold text-2xl m-1 rounded'
+                                href={`/`}
+                                className='flex items-center gap-3 px-3 py-1.5 rounded-xl hover:bg-white/5 transition-all active:scale-95 group'
                             >
-                                <Image
-                                    src='/images/logo-prueba3.png'
-                                    width={40}
-                                    height={40}
-                                    alt={`${APP_NAME} logo`}
-                                    className='rounded-full'
-                                />
+                                <div className="bg-white p-1 rounded-lg shadow-sm group-hover:shadow-orange-500/20 transition-all">
+                                    <Image
+                                        src='/images/logo.jpg'
+                                        width={28}
+                                        height={28}
+                                        alt="Store Logo"
+                                        className='rounded-sm object-contain'
+                                    />
+                                </div>
+                                <h1 className='text-lg font-black  tracking-tight text-white hidden lg:block group-hover:text-orange transition-colors'>
+                                    {APP_NAME}
+                                </h1>
                             </Link>
                         </div>
-                        <AdminHeader className='mx-6 hidden md:flex' />
+                        <AdminHeader className='mx-6 flex-1 hidden md:flex' />
                         <div className='ml-auto flex items-center space-x-4'>
                             <Menu forAdmin />
                         </div>
@@ -65,11 +71,14 @@ export default async function AdminLayout({
                 <div className='flex pt-[88px] md:pt-16'> {/* Adjust padding for mobile header height */}
                     {/* Desktop Sidebar */}
                     <div className='hidden md:block w-64 fixed left-0 top-16 bottom-0 z-10'>
-                        <AdminNav storeId={session?.user?.storeId || ''} />
+                        <AdminNav
+                            storeId={session?.user?.storeId || ''}
+                            storeName={session?.user?.storeName || ''}
+                        />
                     </div>
 
                     {/* Main Content */}
-                    <main className='flex-1 w-full md:ml-64 py-4 min-h-[calc(100vh-4rem)]'>
+                    <main className='flex-1 w-full md:ml-64 py-4 min-h-[calc(100vh-4rem)] p-5'>
                         {children}
                     </main>
                 </div>

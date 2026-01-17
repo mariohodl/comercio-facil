@@ -14,16 +14,24 @@ export default auth(async function middleware(req: NextRequest) {
 		pathname.startsWith('/sign-up') ||
 		pathname.startsWith('/api/auth');
 
-	// If user is a seller, redirect to their POS page
-	if (session?.user?.role === 'Seller' && session?.user?.storeId && !isAuthPage) {
-		// Don't redirect if already on POS page, API routes, or static files
-		if (!pathname.startsWith('/admin/pos') &&
-			!pathname.startsWith('/api') &&
-			!pathname.startsWith('/_next') &&
-			pathname !== '/') {
-			// Redirect to POS page for their store
-			const posUrl = new URL(`/admin/pos/${session.user.storeId}`, req.url);
-			return NextResponse.redirect(posUrl);
+	// Handle role-based redirection for authenticated users
+	if (session?.user?.storeId && !isAuthPage) {
+		const { role, storeId } = session.user;
+
+		if (role === 'Seller') {
+			// Sellers must stay within POS, especially after login (redirect from /)
+			if (!pathname.startsWith('/admin/pos') &&
+				!pathname.startsWith('/api') &&
+				!pathname.startsWith('/_next')) {
+				const posUrl = new URL(`/admin/pos/${storeId}`, req.url);
+				return NextResponse.redirect(posUrl);
+			}
+		} else if (role === 'Admin') {
+			// Admins are redirected to their dashboard if they hit the entry points
+			if (pathname === '/' || pathname === '/admin' || pathname === `/admin/${storeId}`) {
+				const adminUrl = new URL(`/admin/${storeId}/overview`, req.url);
+				return NextResponse.redirect(adminUrl);
+			}
 		}
 	}
 

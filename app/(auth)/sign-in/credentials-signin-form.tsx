@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { IUserSignIn } from '@/types'
-import { signInWithCredentials } from '@/lib/actions/user.actions'
+import { signInWithCredentials, getSession } from '@/lib/actions/user.actions'
 
 // import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,13 +26,13 @@ import { APP_NAME } from '@/lib/constants'
 const signInDefaultValues =
   process.env.NODE_ENV === 'development'
     ? {
-        email: 'mario@example.com',
-        password: '123456',
-      }
+      email: 'mario@example.com',
+      password: '123456',
+    }
     : {
-        email: '',
-        password: '',
-      }
+      email: '',
+      password: '',
+    }
 
 export default function CredentialsSignInForm() {
   const searchParams = useSearchParams()
@@ -51,16 +51,24 @@ export default function CredentialsSignInForm() {
         email: data.email,
         password: data.password,
       })
+
+      const session = await getSession()
+
+      if (session?.user) {
+        const { role, storeId } = session.user
+
+        if (role === 'Seller' && storeId) {
+          redirect(`/admin/pos/${storeId}`)
+        } else if (role === 'Admin' && storeId) {
+          redirect(`/admin/${storeId}/overview`)
+        }
+      }
+
       redirect(callbackUrl)
     } catch (error) {
       if (isRedirectError(error)) {
         throw error
       }
-    //   toast({
-    //     title: 'Error',
-    //     description: 'Invalid email or password',
-    //     variant: 'destructive',
-    //   })
     }
   }
 
@@ -87,7 +95,7 @@ export default function CredentialsSignInForm() {
                 </FormItem>
               )}
             />
-          
+
             <FormField
               control={control}
               name='password'
@@ -119,6 +127,6 @@ export default function CredentialsSignInForm() {
         </form>
       </Form>
     </section>
-    
+
   )
 }

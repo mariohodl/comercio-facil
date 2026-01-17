@@ -14,22 +14,48 @@ import { cn } from '@/lib/utils'
 import { ChevronDown, User as UserIcon } from 'lucide-react'
 import Link from 'next/link'
 
-export default async function UserButton() {
+export default async function UserButton({
+  variant = 'light',
+  showNav = true
+}: {
+  variant?: 'light' | 'dark',
+  showNav?: boolean
+}) {
   const session = await auth()
   const t = await getTranslations()
   return (
     <div className='flex gap-2 items-center'>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex items-center gap-2 h-auto py-1 px-2 hover:bg-gray-100 transition-colors rounded-full">
-            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-sm">
+          <Button
+            variant="ghost"
+            className={cn(
+              "flex items-center gap-2 h-auto py-1.5 px-3 transition-all rounded-full active:scale-95",
+              variant === 'dark'
+                ? "text-white hover:bg-gray-800"
+                : "hover:bg-gray-100"
+            )}
+          >
+            <div className={cn(
+              "flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm shadow-inner",
+              variant === 'dark'
+                ? "bg-gray-800 text-orange border border-gray-700"
+                : "bg-blue-100 text-blue-600"
+            )}>
               {session ? session.user.name?.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
             </div>
-            <div className="hidden md:flex md:flex-col text-left pl-1 gap-0.5">
-              <span className="text-[11px] text-gray-500 leading-tight whitespace-nowrap">{t('header.hello', { name: session?.user?.name ? session.user.name.split(' ')[0] : t('common.signIn') })}</span>
-              <span className="text-sm font-bold leading-tight whitespace-nowrap">{t('header.account')}</span>
+            <div className="hidden md:flex md:flex-col text-left gap-0">
+              <span className={cn(
+                "text-[10px] uppercase font-bold tracking-wider leading-none",
+                variant === 'dark' ? "text-gray-500" : "text-gray-400"
+              )}>
+                {t('header.hello', { name: '' }).split(',')[0]}
+              </span>
+              <span className="text-sm font-bold leading-tight whitespace-nowrap">
+                {session?.user?.name ? session.user.name.split(' ')[0] : t('common.signIn')}
+              </span>
             </div>
-            <ChevronDown className="w-4 h-4 text-gray-400 hidden md:block" />
+            <ChevronDown className="w-4 h-4 text-gray-500 hidden md:block" />
           </Button>
         </DropdownMenuTrigger>
         {session ? (
@@ -44,26 +70,28 @@ export default async function UserButton() {
                 </p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuGroup>
-              <Link className='w-full' href='/account'>
-                <DropdownMenuItem>{t('common.myAccount')}</DropdownMenuItem>
-              </Link>
-              <Link className='w-full' href='/account/orders'>
-                <DropdownMenuItem>{t('common.myOrders')}</DropdownMenuItem>
-              </Link>
-
-              {session.user.role === 'Admin' && (
-                <Link className='w-full' href={`/admin/${session?.user.storeId}/overview`}>
-                  <DropdownMenuItem>Admin</DropdownMenuItem>
+            {showNav && (
+              <DropdownMenuGroup>
+                <Link className='w-full' href='/account'>
+                  <DropdownMenuItem>{t('common.myAccount')}</DropdownMenuItem>
                 </Link>
-              )}
-
-              {(session.user.role === 'Seller' || session.user.role === 'Admin') && session.user.storeId && (
-                <Link className='w-full' href={`/admin/pos/${session.user.storeId}`}>
-                  <DropdownMenuItem>{t('common.goToPOS')}</DropdownMenuItem>
+                <Link className='w-full' href='/account/orders'>
+                  <DropdownMenuItem>{t('common.myOrders')}</DropdownMenuItem>
                 </Link>
-              )}
-            </DropdownMenuGroup>
+
+                {session.user.role === 'Admin' && (
+                  <Link className='w-full' href={`/admin/${session?.user.storeId}/overview`}>
+                    <DropdownMenuItem>Admin</DropdownMenuItem>
+                  </Link>
+                )}
+
+                {(session.user.role === 'Seller' || session.user.role === 'Admin') && session.user.storeId && (
+                  <Link className='w-full' href={`/admin/pos/${session.user.storeId}`}>
+                    <DropdownMenuItem>{t('common.goToPOS')}</DropdownMenuItem>
+                  </Link>
+                )}
+              </DropdownMenuGroup>
+            )}
             <DropdownMenuItem className='p-0 mb-1'>
               <form action={SignOut} className='w-full'>
                 <Button

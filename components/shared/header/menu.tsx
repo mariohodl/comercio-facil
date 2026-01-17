@@ -37,8 +37,8 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
   return (
     <div className='flex justify-end'>
       <nav className='md:flex gap-3 hidden w-full'>
-        <LanguageSwitcher />
-        <UserButton />
+        <LanguageSwitcher variant={forAdmin ? 'dark' : 'light'} />
+        <UserButton variant={forAdmin ? 'dark' : 'light'} />
         {forAdmin ? null : <CartButton />}
       </nav>
       <nav className='md:hidden'>
@@ -53,7 +53,7 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
             </SheetHeader>
 
             {/* Mobile Navigation Links */}
-            <div className='flex flex-col gap-4 border-b border-gray-100 pb-6'>
+            {/* <div className='flex flex-col gap-4 border-b border-gray-100 pb-6'>
               {data.headerMenus.map((menu) => (
                 <Link
                   href={menu.href}
@@ -63,7 +63,7 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
                   {t(menuTranslationMap[menu.name] || menu.name)}
                 </Link>
               ))}
-            </div>
+            </div> */}
 
             <div className='flex flex-col gap-6'>
               <div className='flex items-center justify-between'>
