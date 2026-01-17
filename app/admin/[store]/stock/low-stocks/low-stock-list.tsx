@@ -1,18 +1,14 @@
-// eslint-disable removed
 'use client'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import {
     ChevronLeft,
     ChevronRight,
-    Edit,
-    Eye,
     FileSpreadsheet,
     FileText,
-    Import,
-    Plus,
     RefreshCw,
     Search,
+    Edit,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,18 +29,21 @@ import {
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
-    deleteProduct,
-    getAllProductsForAdmin,
+    getLowStockProductsForAdmin,
     getAllCategories,
-    getAllBrands,
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { useState, useEffect, useTransition, useCallback } from 'react'
 import { formatCurrency } from '@/lib/utils'
-import DeleteDialog from '@/components/shared/delete-dialog'
 import Image from 'next/image'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { getUserWarehouses } from '@/lib/actions/warehouse.actions'
+import { getUserStores } from '@/lib/actions/store.actions'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import EditLowStockModal from '@/components/admin/stock/edit-low-stock-modal'
 
-type ProductListDataProps = {
+type LowStockListDataProps = {
     products: IProduct[]
     totalPages: number
     totalProducts: number
@@ -52,41 +51,47 @@ type ProductListDataProps = {
     from: number
 }
 
-const ProductList = ({ store }: { store: string }) => {
-    const t = useTranslations('products')
+const LowStockList = ({ store }: { store: string }) => {
+    const t = useTranslations('stock')
     const tCommon = useTranslations('common')
     const [page, setPage] = useState<number>(1)
     const [inputValue, setInputValue] = useState<string>('')
     const [category, setCategory] = useState<string>('all')
-    const [brand, setBrand] = useState<string>('all')
-    const [data, setData] = useState<ProductListDataProps>()
+    const [warehouse, setWarehouse] = useState<string>('all')
+    const [storeFilter, setStoreFilter] = useState<string>('all')
+    const [stockType, setStockType] = useState<'low' | 'out' | 'all'>('all')
+    const [data, setData] = useState<LowStockListDataProps>()
     const [categories, setCategories] = useState<string[]>([])
-    const [brands, setBrands] = useState<string[]>([])
+    const [warehouses, setWarehouses] = useState<any[]>([])
+    const [stores, setStores] = useState<any[]>([])
     const [isPending, startTransition] = useTransition()
+    const [editModalOpen, setEditModalOpen] = useState(false)
+    const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
 
     const fetchData = useCallback((pageToFetch: number) => {
         startTransition(() => {
-            getAllProductsForAdmin({
+            getLowStockProductsForAdmin({
                 query: inputValue,
                 page: pageToFetch,
                 category,
-                brand,
-                store,
+                store: storeFilter === 'all' ? store : storeFilter,
+                type: stockType,
             }).then((result) => {
                 setData(result)
             })
         })
-    }, [inputValue, category, brand])
+    }, [inputValue, category, storeFilter, stockType, store])
 
     useEffect(() => {
         const init = async () => {
-            const [cats, brds] = await Promise.all([
+            const [cats, whses, strs] = await Promise.all([
                 getAllCategories(),
-                getAllBrands(),
+                getUserWarehouses(),
+                getUserStores(),
             ])
             setCategories(cats)
-            setBrands(brds)
-            setBrands(brds)
+            setWarehouses(whses)
+            setStores(strs)
             fetchData(1)
         }
         init()
@@ -108,12 +113,17 @@ const ProductList = ({ store }: { store: string }) => {
         setInputValue(value)
     }
 
+    const handleEdit = (product: IProduct) => {
+        setSelectedProduct(product)
+        setEditModalOpen(true)
+    }
+
     return (
         <div className='space-y-4'>
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
                 <div>
-                    <h1 className='font-bold text-2xl'>{t('productList')}</h1>
-                    <p className='text-muted-foreground text-sm'>{t('manageProducts')}</p>
+                    <h1 className='font-bold text-2xl'>{t('lowStocks')}</h1>
+                    <p className='text-muted-foreground text-sm'>{t('manageLowStock')}</p>
                 </div>
                 <div className='flex flex-wrap gap-2'>
                     <Button variant='outline' size='icon'>
@@ -125,18 +135,28 @@ const ProductList = ({ store }: { store: string }) => {
                     <Button variant='outline' size='icon' onClick={() => fetchData(page)}>
                         <RefreshCw className='w-4 h-4' />
                     </Button>
-                    <Button asChild className='bg-orange hover:bg-orange-dark text-white'>
-                        <Link href={`/admin/${store}/products/create`}>
-                            <Plus className='w-4 h-4 mr-2' /> {t('addProduct')}
-                        </Link>
-                    </Button>
-                    <Button variant='default' className='bg-navy hover:bg-navy-dark text-white'>
-                        <Import className='w-4 h-4 mr-2' /> {t('importProduct')}
+                    <Button className='bg-navy hover:bg-navy-dark text-white'>
+                        {t('sendEmail')}
                     </Button>
                 </div>
             </div>
 
             <div className='bg-white p-4 rounded-lg border border-neutral-warm shadow-sm space-y-4'>
+                <div className='flex flex-col md:flex-row justify-between gap-4'>
+                    <Tabs value={stockType} onValueChange={(v) => setStockType(v as 'low' | 'out' | 'all')} className='w-full md:w-auto'>
+                        <TabsList className='grid w-full grid-cols-3'>
+                            <TabsTrigger value='all'>{t('all')}</TabsTrigger>
+                            <TabsTrigger value='low'>{t('lowStocks')}</TabsTrigger>
+                            <TabsTrigger value='out'>{t('outOfStocks')}</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+
+                    <div className='flex items-center gap-2'>
+                        <Switch id='notify' />
+                        <Label htmlFor='notify' className='text-sm cursor-pointer'>{t('notify')}</Label>
+                    </div>
+                </div>
+
                 <div className='flex flex-col md:flex-row justify-between gap-4'>
                     <div className='relative w-full md:w-72'>
                         <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
@@ -147,7 +167,33 @@ const ProductList = ({ store }: { store: string }) => {
                             className='pl-8'
                         />
                     </div>
-                    <div className='flex gap-2'>
+                    <div className='flex gap-2 flex-wrap'>
+                        <Select value={warehouse} onValueChange={setWarehouse}>
+                            <SelectTrigger className='w-[150px]'>
+                                <SelectValue placeholder={t('warehouse')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value='all'>{t('allWarehouses')}</SelectItem>
+                                {warehouses.map((w) => (
+                                    <SelectItem key={w._id} value={w._id}>
+                                        {w.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select value={storeFilter} onValueChange={setStoreFilter}>
+                            <SelectTrigger className='w-[150px]'>
+                                <SelectValue placeholder={t('store')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value='all'>{t('allStores')}</SelectItem>
+                                {stores.map((s) => (
+                                    <SelectItem key={s._id} value={s.slug}>
+                                        {s.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         <Select value={category} onValueChange={setCategory}>
                             <SelectTrigger className='w-[150px]'>
                                 <SelectValue placeholder={t('category')} />
@@ -161,19 +207,6 @@ const ProductList = ({ store }: { store: string }) => {
                                 ))}
                             </SelectContent>
                         </Select>
-                        <Select value={brand} onValueChange={setBrand}>
-                            <SelectTrigger className='w-[150px]'>
-                                <SelectValue placeholder={t('brand')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value='all'>{t('allBrands')}</SelectItem>
-                                {brands.map((b) => (
-                                    <SelectItem key={b} value={b}>
-                                        {b}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
                     </div>
                 </div>
 
@@ -181,35 +214,43 @@ const ProductList = ({ store }: { store: string }) => {
                     <Table>
                         <TableHeader className='bg-gray-50'>
                             <TableRow>
-                                <TableHead className='whitespace-nowrap'>{t('sku')}</TableHead>
+                                <TableHead className='w-12'>
+                                    <Checkbox />
+                                </TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('warehouse')}</TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('store')}</TableHead>
                                 <TableHead className='min-w-[200px]'>{t('productName')}</TableHead>
                                 <TableHead className='whitespace-nowrap'>{t('category')}</TableHead>
-                                <TableHead className='whitespace-nowrap'>{t('brand')}</TableHead>
-                                <TableHead className='whitespace-nowrap'>{t('price')}</TableHead>
-                                <TableHead className='whitespace-nowrap'>{t('unit')}</TableHead>
-                                <TableHead className='whitespace-nowrap'>{t('quantity')}</TableHead>
-                                <TableHead className='whitespace-nowrap'>{t('quantityAlert')}</TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('sku')}</TableHead>
+                                <TableHead className='whitespace-nowrap text-right'>{t('qty')}</TableHead>
+                                <TableHead className='whitespace-nowrap text-right'>{t('qtyAlert')}</TableHead>
                                 <TableHead className='text-right whitespace-nowrap'>{tCommon('actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isPending ? (
                                 <TableRow>
-                                    <TableCell colSpan={9} className='text-center h-24'>
+                                    <TableCell colSpan={8} className='text-center h-24'>
                                         {tCommon('loading')}
                                     </TableCell>
                                 </TableRow>
                             ) : data?.products.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={9} className='text-center h-24'>
+                                    <TableCell colSpan={8} className='text-center h-24'>
                                         {tCommon('noResults')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 data?.products.map((product) => (
                                     <TableRow key={product._id}>
-                                        <TableCell className='font-medium text-gray-500 whitespace-nowrap'>
-                                            {product.sku}
+                                        <TableCell>
+                                            <Checkbox />
+                                        </TableCell>
+                                        <TableCell className='whitespace-nowrap text-gray-600'>
+                                            {product.warehouse}
+                                        </TableCell>
+                                        <TableCell className='whitespace-nowrap text-gray-600'>
+                                            {product.store}
                                         </TableCell>
                                         <TableCell>
                                             <div className='flex items-center gap-3 min-w-[200px]'>
@@ -221,53 +262,30 @@ const ProductList = ({ store }: { store: string }) => {
                                                         className='object-cover'
                                                     />
                                                 </div>
-                                                <span className='font-medium text-blue-navy'>{product.name}</span>
+                                                <span className='font-medium'>{product.name}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className='whitespace-nowrap'>{product.category}</TableCell>
-                                        <TableCell className='whitespace-nowrap'>{product.brand}</TableCell>
-                                        <TableCell className='whitespace-nowrap'>{formatCurrency(product.listPrice)}</TableCell>
-                                        <TableCell className='whitespace-nowrap'>{product.unit}</TableCell>
-                                        <TableCell className='whitespace-nowrap font-bold'>
-                                            <span className={
-                                                product.countInStock === 0 ? 'text-red-500' :
-                                                    product.countInStock <= (product.quantityAlert || 0) ? 'text-orange' :
-                                                        'text-green-600'
-                                            }>
+                                        <TableCell className='whitespace-nowrap font-medium text-gray-500'>
+                                            {product.sku}
+                                        </TableCell>
+                                        <TableCell className='whitespace-nowrap text-right'>
+                                            <span className={`font-bold ${product.countInStock === 0 ? 'text-red-500' : 'text-orange'}`}>
                                                 {product.countInStock}
                                             </span>
                                         </TableCell>
-                                        <TableCell className='whitespace-nowrap font-medium text-gray-500'>
+                                        <TableCell className='whitespace-nowrap text-right text-gray-600'>
                                             {product.quantityAlert}
                                         </TableCell>
                                         <TableCell className='text-right whitespace-nowrap'>
-                                            <div className='flex justify-end gap-2'>
-                                                <Button
-                                                    asChild
-                                                    variant='ghost'
-                                                    size='icon'
-                                                    className='h-8 w-8 text-blue-500'
-                                                >
-                                                    <Link href={`/admin/${store}/products/${product._id}/details`}>
-                                                        <Eye className='w-4 h-4' />
-                                                    </Link>
-                                                </Button>
-                                                <Button
-                                                    asChild
-                                                    variant='ghost'
-                                                    size='icon'
-                                                    className='h-8 w-8 text-green-500'
-                                                >
-                                                    <Link href={`/admin/${store}/products/${product._id}`}>
-                                                        <Edit className='w-4 h-4' />
-                                                    </Link>
-                                                </Button>
-                                                <DeleteDialog
-                                                    id={product._id}
-                                                    action={deleteProduct}
-                                                    callbackAction={() => fetchData(page)}
-                                                />
-                                            </div>
+                                            <Button
+                                                variant='ghost'
+                                                size='icon'
+                                                className='h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50'
+                                                onClick={() => handleEdit(product)}
+                                            >
+                                                <Edit className='w-4 h-4' />
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -333,8 +351,17 @@ const ProductList = ({ store }: { store: string }) => {
                     )}
                 </div>
             </div>
+
+            <EditLowStockModal
+                open={editModalOpen}
+                onOpenChange={setEditModalOpen}
+                product={selectedProduct}
+                warehouses={warehouses}
+                stores={stores}
+                onSuccess={() => fetchData(page)}
+            />
         </div>
     )
 }
 
-export default ProductList
+export default LowStockList

@@ -77,7 +77,7 @@ export function AdminNav({
         // },
         {
           title: t('lowStocks'),
-          href: `/admin/${storeId}/inventory/low-stocks`,
+          href: `/admin/${storeId}/stock/low-stocks`,
           icon: TrendingDown,
         },
         {

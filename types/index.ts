@@ -77,6 +77,10 @@ export type IOrderList = IOrderInput & {
 		name: string
 		email: string
 	}
+	customer?: {
+		name: string
+		email?: string
+	}
 	createdAt: Date
 }
 

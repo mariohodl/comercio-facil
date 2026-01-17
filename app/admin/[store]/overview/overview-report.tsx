@@ -193,7 +193,7 @@ export default function OverviewReport() {
       {/* Row 3: New Sections - Top Selling, Low Stock, Recent Sales */}
       <div className='grid gap-4 md:grid-cols-3'>
         <TopSellingProducts data={data.topSalesProducts} />
-        <LowStockProducts data={data.lowStockProducts} />
+        <LowStockProducts data={data.lowStockProducts} storeId={store as string} />
         <RecentSalesList data={data.latestOrders} />
       </div>
 

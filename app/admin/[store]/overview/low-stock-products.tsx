@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
 interface LowStockProductsProps {
+    storeId: string,
     data: {
         _id: string
         name: string
@@ -12,13 +13,13 @@ interface LowStockProductsProps {
     }[]
 }
 
-export default function LowStockProducts({ data }: LowStockProductsProps) {
+export default function LowStockProducts({ data, storeId }: LowStockProductsProps) {
     const t = useTranslations('admin.dashboard')
     return (
         <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
                 <CardTitle className='text-base'>{t('lowStockProducts')}</CardTitle>
-                <Link href='/admin/products' className='text-sm text-blue-600 hover:underline'>
+                <Link href={`/admin/${storeId}/stock/low-stocks`} className='text-sm text-blue-600 hover:underline'>
                     {t('viewAll')}
                 </Link>
             </CardHeader>

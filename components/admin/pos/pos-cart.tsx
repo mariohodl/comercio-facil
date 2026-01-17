@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { formatCurrency } from '@/lib/utils'
 import { Minus, Plus, Trash2, ShoppingBag, ShoppingCart, Printer, ScanLine, Check, ChevronsUpDown, Search } from 'lucide-react'
 import { Switch } from "@/components/ui/switch"
+import { toast } from 'sonner'
 import {
     Popover,
     PopoverContent,
@@ -33,6 +34,7 @@ interface POSCartProps {
 }
 
 export default function POSCart({ storeId }: POSCartProps) {
+    const t = useTranslations('pos')
     const {
         cart,
         orderNumber,
@@ -82,7 +84,6 @@ export default function POSCart({ storeId }: POSCartProps) {
         changeGiven: number
         isPaid: boolean
     } | null>(null)
-    const t = useTranslations('pos')
 
     const total = totalPrice()
     const subtotal = total
@@ -303,6 +304,10 @@ export default function POSCart({ storeId }: POSCartProps) {
                                                         onClick={() => {
                                                             if (item.quantity < item.countInStock) {
                                                                 updateQuantity(item.product, item.quantity + 1, item.variantSku)
+                                                            } else {
+                                                                toast.error(t('insufficientStock'), {
+                                                                    description: `${t('onlyUnitsAvailable', { count: item.countInStock })} ${item.unit}`
+                                                                })
                                                             }
                                                         }}
                                                         disabled={item.quantity >= item.countInStock}
@@ -311,9 +316,16 @@ export default function POSCart({ storeId }: POSCartProps) {
                                                     </Button>
                                                 </div>
 
-                                                <span className="text-[10px] text-gray-500">
-                                                    × {formatCurrency(item.price)}
-                                                </span>
+                                                <div className="flex flex-col items-end">
+                                                    <span className="text-[10px] text-gray-500">
+                                                        × {formatCurrency(item.price)}
+                                                    </span>
+                                                    {item.countInStock <= 5 && (
+                                                        <span className="text-[9px] text-orange-600 font-medium">
+                                                            {item.countInStock - item.quantity} {item.unit} {t('left')}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                             <span className="font-bold text-xs text-gray-900">
                                                 {formatCurrency(item.price * item.quantity)}

@@ -5,12 +5,13 @@ import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Plus, Minus, AlertCircle, Layers } from 'lucide-react'
+import { Plus, Minus, AlertCircle, Layers, AlertTriangle } from 'lucide-react'
 import { IProduct } from '@/lib/db/models/product.model'
 import { usePOSStore } from '@/hooks/use-pos-store'
 import { formatCurrency } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import VariantSelectorDialog from './variant-selector-dialog'
+import { toast } from 'sonner'
 
 interface ProductCardProps {
     product: IProduct
@@ -23,7 +24,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
     const hasVariants = product.variants && product.variants.length > 0
     const isOutOfStock = product.countInStock <= 0
-    const isLowStock = product.countInStock <= 5 && !isOutOfStock
+    const isLowStock = product.countInStock <= product.quantityAlert && !isOutOfStock
+    const isCriticalStock = product.countInStock <= 3 && !isOutOfStock
 
     // Calculate total quantity of this product in cart (summing all variants)
     const cartItems = cart.filter(item => item.product === product._id)
@@ -34,11 +36,28 @@ export default function ProductCard({ product }: ProductCardProps) {
     const originalPrice = product.listPrice
 
     const handleCardClick = () => {
+        if (isOutOfStock) {
+            toast.error(t('outOfStock'), {
+                description: `${product.name} ${t('outOfStock').toLowerCase()}`
+            })
+            return
+        }
+
         if (hasVariants) {
             setIsVariantDialogOpen(true)
         } else {
-            if (!isOutOfStock) {
-                addToCart(product)
+            if (totalCartQty >= product.countInStock) {
+                toast.error(t('insufficientStock'), {
+                    description: `${t('onlyUnitsAvailable', { count: product.countInStock })} ${product.unit}`
+                })
+                return
+            }
+            addToCart(product)
+            if (isLowStock) {
+                const remaining = product.countInStock - totalCartQty - 1
+                toast.warning(t('stockWarning'), {
+                    description: `${t('unitsRemaining', { count: remaining })} ${product.unit}`
+                })
             }
         }
     }
@@ -48,15 +67,29 @@ export default function ProductCard({ product }: ProductCardProps) {
         if (hasVariants) {
             setIsVariantDialogOpen(true)
         } else {
-            if (totalCartQty < product.countInStock) {
-                // For simple products, we can assume just one item type in cart
-                // But safer to find the exact item if it exists
-                const item = cartItems[0]
-                if (item) {
-                    updateQuantity(product._id, item.quantity + 1)
-                } else {
-                    addToCart(product)
-                }
+            if (totalCartQty >= product.countInStock) {
+                toast.error(t('insufficientStock'), {
+                    description: `${t('onlyUnitsAvailable', { count: product.countInStock })} ${product.unit}`
+                })
+                return
+            }
+
+            const item = cartItems[0]
+            if (item) {
+                updateQuantity(product._id, item.quantity + 1)
+            } else {
+                addToCart(product)
+            }
+
+            if (totalCartQty + 1 >= product.countInStock) {
+                toast.warning(t('lastUnit'), {
+                    description: `${t('allUnitsAdded')} (${product.countInStock} ${product.unit})`
+                })
+            } else if (isLowStock) {
+                const remaining = product.countInStock - totalCartQty - 1
+                toast.warning(t('stockWarning'), {
+                    description: `${t('unitsRemaining', { count: remaining })} ${product.unit}`
+                })
             }
         }
     }
@@ -102,11 +135,14 @@ export default function ProductCard({ product }: ProductCardProps) {
                             </div>
                         )}
 
-                        {isLowStock && (
+                        {isLowStock && !hasVariants && (
                             <div className="absolute top-2 left-2 z-10">
-                                <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 shadow-sm">
-                                    <AlertCircle className="h-3 w-3 mr-1" />
-                                    {t('lowStock')}
+                                <Badge
+                                    variant="outline"
+                                    className={`shadow-sm ${isCriticalStock ? 'bg-red-50 text-red-700 border-red-300 animate-pulse' : 'bg-orange-50 text-orange-700 border-orange-200'}`}
+                                >
+                                    {isCriticalStock ? <AlertTriangle className="h-3 w-3 mr-1" /> : <AlertCircle className="h-3 w-3 mr-1" />}
+                                    {isCriticalStock ? `${product.countInStock} ${product.unit}` : t('lowStock')}
                                 </Badge>
                             </div>
                         )}

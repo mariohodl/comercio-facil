@@ -98,6 +98,13 @@
         "from": "From",
         "createCustomer": "Create Customer",
         "roundoff": "Round off",
+        "insufficientStock": "Insufficient stock",
+        "onlyUnitsAvailable": "Only {count} units available",
+        "lastUnit": "Last unit",
+        "allUnitsAdded": "You've added all available units",
+        "unitsRemaining": "{count} units remaining",
+        "stockWarning": "Stock warning",
+        "left": "left",
         "ordersModal": {
             "title": "Orders",
             "unpaid": "Unpaid",
@@ -257,7 +264,7 @@
         "fixed": "Fixed",
         "discountValue": "Discount Value",
         "enterDiscount": "Enter discount",
-        "quantityAlert": "Quantity Alert",
+        "quantityAlert": "Alert",
         "enterQuantityAlert": "Enter quantity alert",
         "makeProductVisible": "Make product visible to customers",
         "addImages": "Add Images",
@@ -616,5 +623,28 @@
             "statusOutForDelivery": "Out for delivery",
             "statusDelivered": "Delivered"
         }
+    },
+    "stock": {
+        "all": "All",
+        "lowStocks": "Low Stocks",
+        "outOfStocks": "Out of Stocks",
+        "manageLowStock": "Manage your low stocks",
+        "qty": "Qty",
+        "qtyAlert": "Qty Alert",
+        "allWarehouses": "All Warehouses",
+        "allStores": "All Stores",
+        "allCategories": "All Categories",
+        "warehouse": "Warehouse",
+        "store": "Store",
+        "productName": "Product Name",
+        "category": "Category",
+        "sku": "SKU",
+        "notify": "Notify",
+        "sendEmail": "Send Email",
+        "editLowStocks": "Edit Low Stocks",
+        "saving": "Saving...",
+        "saveChanges": "Save Changes",
+        "selectWarehouse": "Select warehouse",
+        "selectStore": "Select store"
     }
 }

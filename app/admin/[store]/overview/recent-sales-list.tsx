@@ -23,10 +23,18 @@ export default function RecentSalesList({ data }: RecentSalesListProps) {
                             <div className='flex items-center gap-4'>
                                 <div className='relative h-12 w-12 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center'>
                                     {/* Placeholder for product image or user avatar if no product image available easily */}
-                                    <span className='text-lg font-bold text-gray-500'>{order.user?.name?.charAt(0) || 'U'}</span>
+                                    <span className='text-lg font-bold text-gray-500'>
+                                        {(order.customer as any)?.name?.charAt(0) ||
+                                            order.shippingAddress?.fullName?.charAt(0) ||
+                                            order.user?.name?.charAt(0) || 'U'}
+                                    </span>
                                 </div>
                                 <div>
-                                    <p className='font-medium line-clamp-1'>{order.user?.name || t('deletedUser')}</p>
+                                    <p className='font-medium line-clamp-1'>
+                                        {(order.customer as any)?.name ||
+                                            order.shippingAddress?.fullName ||
+                                            order.user?.name || t('deletedUser')}
+                                    </p>
                                     <p className='text-sm text-muted-foreground'>
                                         {formatDateTime(order.createdAt).dateOnly}
                                     </p>

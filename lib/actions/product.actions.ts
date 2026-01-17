@@ -331,6 +331,104 @@ export async function getAllProductsForAdmin({
 		to: pageSize * (Number(page) - 1) + products.length,
 	}
 }
+export async function getLowStockProductsForAdmin({
+	query,
+	page = 1,
+	sort = 'latest',
+	limit,
+	category,
+	brand,
+	store,
+	type = 'low', // 'low', 'out' or 'all'
+}: {
+	query: string
+	page?: number
+	sort?: string
+	limit?: number
+	category?: string
+	brand?: string
+	store?: string
+	type?: 'low' | 'out' | 'all'
+}) {
+	await connectToDatabase()
+
+	const pageSize = limit || PAGE_SIZE
+	const queryFilter =
+		query && query !== 'all'
+			? {
+				name: {
+					$regex: query,
+					$options: 'i',
+				},
+			}
+			: {}
+	const categoryFilter = category && category !== 'all' ? { category } : {}
+	const brandFilter = brand && brand !== 'all' ? { brand } : {}
+	const storeFilter = store && store !== 'all' ? { store } : {}
+
+	let stockFilter = {}
+	if (type === 'low') {
+		stockFilter = {
+			$expr: {
+				$and: [
+					{ $gt: ['$countInStock', 0] },
+					{ $lte: ['$countInStock', '$quantityAlert'] },
+				],
+			},
+		}
+	} else if (type === 'out') {
+		stockFilter = { countInStock: 0 }
+	} else {
+		// 'all' type - shows both low stock and out of stock
+		stockFilter = {
+			$expr: {
+				$lte: ['$countInStock', '$quantityAlert'],
+			},
+		}
+	}
+
+	const order: Record<string, 1 | -1> =
+		sort === 'best-selling'
+			? { numSales: -1 }
+			: sort === 'price-low-to-high'
+				? { listPrice: 1 }
+				: sort === 'price-high-to-low'
+					? { listPrice: -1 }
+					: sort === 'avg-customer-review'
+						? { avgRating: -1 }
+						: { _id: -1 }
+
+	const products = await Product.find({
+		...queryFilter,
+		...categoryFilter,
+		...brandFilter,
+		...storeFilter,
+		...stockFilter,
+		isPublished: true,
+	})
+		.sort(order)
+		.skip(pageSize * (Number(page) - 1))
+		.limit(pageSize)
+		.lean()
+
+	const countProducts = await Product.countDocuments({
+		...queryFilter,
+		...categoryFilter,
+		...brandFilter,
+		...storeFilter,
+		...stockFilter,
+		isPublished: true,
+	})
+
+	return {
+		products: JSON.parse(JSON.stringify(products)) as IProduct[],
+		totalPages: Math.ceil(countProducts / pageSize),
+		totalProducts: countProducts,
+		from: pageSize * (Number(page) - 1) + 1,
+		to: pageSize * (Number(page) - 1) + products.length,
+	}
+}
+
 export async function getAllExistingProducts() {
 	await connectToDatabase()
 

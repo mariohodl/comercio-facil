@@ -344,6 +344,7 @@ export async function getOrderSummary(date: DateRange, storeId: string) {
 
 	const latestOrders = await Order.find({ storeId })
 		.populate('user', 'name')
+		.populate('customer', 'name')
 		.sort({ createdAt: 'desc' })
 		.limit(PAGE_SIZE)
 	return {
@@ -372,6 +373,7 @@ async function getTopCustomers(date: DateRange, storeId: string) {
 		{
 			$match: {
 				storeId,
+				customer: { $ne: null },
 				createdAt: {
 					$gte: date.from,
 					$lte: date.to,
@@ -380,7 +382,7 @@ async function getTopCustomers(date: DateRange, storeId: string) {
 		},
 		{
 			$group: {
-				_id: '$user',
+				_id: '$customer',
 				totalSpent: { $sum: '$totalPrice' },
 				orderCount: { $sum: 1 },
 			},
@@ -389,19 +391,18 @@ async function getTopCustomers(date: DateRange, storeId: string) {
 		{ $limit: 5 },
 		{
 			$lookup: {
-				from: 'users',
+				from: 'customers',
 				localField: '_id',
 				foreignField: '_id',
-				as: 'user',
+				as: 'customer',
 			},
 		},
-		{ $unwind: '$user' },
+		{ $unwind: '$customer' },
 		{
 			$project: {
 				_id: 1,
-				name: '$user.name',
-				email: '$user.email',
-				image: '$user.image',
+				name: '$customer.name',
+				email: '$customer.email',
 				totalSpent: 1,
 				orderCount: 1,
 			},
@@ -455,7 +456,8 @@ async function getRecentTransactions(date: DateRange, storeId: string) {
 		},
 	})
 		.populate('user', 'name')
-		.select('createdAt totalPrice isPaid isDelivered user')
+		.populate('customer', 'name')
+		.select('createdAt totalPrice isPaid isDelivered user customer shippingAddress')
 		.sort({ createdAt: -1 })
 		.limit(10)
 
@@ -476,7 +478,7 @@ async function getRecentTransactions(date: DateRange, storeId: string) {
 		...sales.map((sale) => ({
 			id: sale._id,
 			date: sale.createdAt,
-			name: sale.user ? (sale.user as { name: string }).name : 'Deleted User',
+			name: (sale.customer as any)?.name || sale.shippingAddress?.fullName || 'Walk-in Customer',
 			total: sale.totalPrice,
 			status: sale.isDelivered ? 'Completed' : sale.isPaid ? 'Processing' : 'Pending',
 			type: 'Sale',
