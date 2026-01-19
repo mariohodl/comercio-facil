@@ -59,44 +59,26 @@ export default function ProductSearch({ storeId, selectedCategory, onCategoryCha
     })
 
     return (
-        <div className="flex h-full flex-col space-y-3">
+        <div className="flex flex-1 h-full flex-col space-y-3">
             {/* Welcome Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-lg font-bold text-gray-900">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="hidden sm:block">
+                    <h2 className="text-lg font-bold text-gray-900 leading-tight">
                         {t('welcome')}, User
                     </h2>
-                    <p className="text-xs text-gray-500">{currentDate}</p>
+                    <p className="text-[10px] text-gray-500">{currentDate}</p>
                 </div>
 
-                <div className="relative w-2/3">
+                <div className="relative w-full sm:w-2/3">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                     <Input
                         autoFocus
                         placeholder={t('searchPlaceholder')}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        className="pl-9 h-9 bg-white border-gray-200 rounded-lg shadow-sm text-sm"
+                        className="pl-9 h-10 lg:h-9 bg-white border-gray-200 rounded-lg shadow-sm text-sm"
                     />
                 </div>
-                {/* <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-8 text-xs gap-1.5 border-gray-300"
-                        onClick={() => onCategoryChange('all')}
-                    >
-                        <Package className="h-3.5 w-3.5" />
-                        {t('viewAllBrands')}
-                    </Button>
-                    <Button
-                        variant="default"
-                        size="sm"
-                        className="h-8 text-xs gap-1.5 bg-orange-500 hover:bg-orange-600"
-                    >
-                        ⭐ {t('featured')}
-                    </Button>
-                </div> */}
             </div>
 
             {/* Search */}
@@ -124,7 +106,7 @@ export default function ProductSearch({ storeId, selectedCategory, onCategoryCha
             </div>
 
             {/* Products Grid */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto pb-20 lg:pb-0">
                 {loading ? (
                     <div className="flex h-full items-center justify-center">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -136,7 +118,7 @@ export default function ProductSearch({ storeId, selectedCategory, onCategoryCha
                         <p className="text-sm text-gray-400 mt-1">{t('tryAdjusting')}</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 pb-4">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 pb-40 lg:pb-4">
                         {filteredProducts.map((product) => (
                             <ProductCard key={product._id} product={product} />
                         ))}

@@ -96,8 +96,8 @@ export default function OverviewReport() {
     <div className='space-y-6'>
       <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-2 py-2'>
         <div>
-          <h1 className='h1-bold'>{t('welcome')}</h1>
-          <p className='text-muted-foreground'>{t('ordersToday', { count: data.ordersCount })}</p>
+          <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>{t('welcome')}</h1>
+          <p className='text-xs font-semibold text-slate-400 uppercase tracking-widest'>{t('ordersToday', { count: data.ordersCount })}</p>
         </div>
         <CalendarDateRangePicker defaultDate={date} setDate={setDate} className="w-full md:w-auto" />
       </div>
@@ -140,54 +140,38 @@ export default function OverviewReport() {
 
       {/* Row 2: Secondary Metrics */}
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <Card>
-          <CardContent className='p-6 flex items-center justify-between'>
-            <div>
-              <h3 className='text-xl font-bold'>{formatCurrency(data.totalSales - data.totalPurchases)}</h3>
-              <p className='text-sm text-muted-foreground'>{t('profit')}</p>
-              <p className='text-xs text-green-600 mt-1'>+35% {t('vsLastMonth')}</p>
-            </div>
-            <div className='p-2 bg-cyan-50 rounded-lg'>
-              <Layers className='h-5 w-5 text-cyan-500' />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-6 flex items-center justify-between'>
-            <div>
-              <h3 className='text-xl font-bold'>{formatCurrency(data.invoiceDue)}</h3>
-              <p className='text-sm text-muted-foreground'>{t('invoiceDue')}</p>
-              <p className='text-xs text-green-600 mt-1'>+35% {t('vsLastMonth')}</p>
-            </div>
-            <div className='p-2 bg-teal-50 rounded-lg'>
-              <Clock className='h-5 w-5 text-teal-500' />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-6 flex items-center justify-between'>
-            <div>
-              <h3 className='text-xl font-bold'>{formatCurrency(data.totalPurchases)}</h3>
-              <p className='text-sm text-muted-foreground'>{t('totalExpenses')}</p>
-              <p className='text-xs text-green-600 mt-1'>+41% {t('vsLastMonth')}</p>
-            </div>
-            <div className='p-2 bg-orange-50 rounded-lg'>
-              <Wallet className='h-5 w-5 text-orange-500' />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-6 flex items-center justify-between'>
-            <div>
-              <h3 className='text-xl font-bold'>{formatCurrency(0)}</h3>
-              <p className='text-sm text-muted-foreground'>{t('totalPaymentReturns')}</p>
-              <p className='text-xs text-red-600 mt-1'>-20% {t('vsLastMonth')}</p>
-            </div>
-            <div className='p-2 bg-indigo-50 rounded-lg'>
-              <Hash className='h-5 w-5 text-indigo-500' />
-            </div>
-          </CardContent>
-        </Card>
+        <SummaryCard
+          title={t('profit')}
+          value={formatCurrency(data.totalSales - data.totalPurchases)}
+          icon={Layers}
+          percentage={35}
+          className="bg-white border-slate-50"
+          iconClassName="bg-cyan-50 text-cyan-600"
+        />
+        <SummaryCard
+          title={t('invoiceDue')}
+          value={formatCurrency(data.invoiceDue)}
+          icon={Clock}
+          percentage={35}
+          className="bg-white border-slate-50"
+          iconClassName="bg-teal-50 text-teal-600"
+        />
+        <SummaryCard
+          title={t('totalExpenses')}
+          value={formatCurrency(data.totalPurchases)}
+          icon={Wallet}
+          percentage={41}
+          className="bg-white border-slate-50"
+          iconClassName="bg-amber-50 text-amber-600"
+        />
+        <SummaryCard
+          title={t('totalPaymentReturns')}
+          value={formatCurrency(0)}
+          icon={Hash}
+          percentage={-20}
+          className="bg-white border-slate-50"
+          iconClassName="bg-indigo-50 text-indigo-600"
+        />
       </div>
 
       {/* Row 3: New Sections - Top Selling, Low Stock, Recent Sales */}

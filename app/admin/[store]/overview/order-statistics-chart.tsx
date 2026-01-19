@@ -42,15 +42,15 @@ export default function OrderStatisticsChart({ data }: OrderStatisticsChartProps
     }
 
     return (
-        <Card>
-            <CardHeader className='flex flex-row items-center justify-between'>
-                <CardTitle className='text-base'>{t('orderStatistics')}</CardTitle>
-                <div className='text-sm text-muted-foreground'>{t('weekly')}</div>
+        <Card className="border-none shadow-sm h-full">
+            <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                <CardTitle className='text-sm font-bold text-navy uppercase tracking-wider'>{t('orderStatistics')}</CardTitle>
+                <div className='text-[10px] uppercase font-semibold text-slate-400 tracking-widest bg-slate-50 px-2 py-1 rounded-md'>{t('weekly')}</div>
             </CardHeader>
             <CardContent>
                 <div className='flex'>
                     {/* Y-Axis Labels */}
-                    <div className='flex flex-col-reverse justify-between mr-4 text-xs text-muted-foreground h-[200px] py-1'>
+                    <div className='flex flex-col-reverse justify-between mr-4 text-[10px] font-bold text-slate-400 uppercase tracking-tighter h-[200px] py-1'>
                         {timeBlocks.map((time) => (
                             <span key={time}>{time}</span>
                         ))}
@@ -63,7 +63,7 @@ export default function OrderStatisticsChart({ data }: OrderStatisticsChartProps
                                 {timeBlocks.map((_, timeIndex) => (
                                     <div
                                         key={timeIndex}
-                                        className='flex-1 rounded-sm bg-orange-400 transition-opacity hover:opacity-80'
+                                        className='flex-1 rounded-sm bg-orange-400/80 transition-all hover:bg-orange-500 hover:scale-105'
                                         style={{ opacity: getOpacity(dayIndex, timeIndex) }}
                                         title={`${day} ${timeBlocks[timeIndex]}`}
                                     />
@@ -73,7 +73,7 @@ export default function OrderStatisticsChart({ data }: OrderStatisticsChartProps
                     </div>
                 </div>
                 {/* X-Axis Labels */}
-                <div className='flex justify-between pl-12 mt-2 text-xs text-muted-foreground'>
+                <div className='flex justify-between pl-12 mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest'>
                     {days.map(day => <span key={day} className='w-full text-center'>{day}</span>)}
                 </div>
             </CardContent>

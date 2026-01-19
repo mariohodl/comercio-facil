@@ -99,16 +99,16 @@ export default function CreateCustomerModal({ onSuccess, storeId }: CreateCustom
                     <DialogTitle>{t('createCustomer')}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <FormField
                                 control={form.control}
                                 name="name"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="col-span-1">
                                         <FormLabel>{t('name')} *</FormLabel>
                                         <FormControl>
-                                            <Input placeholder={t('namePlaceholder')} {...field} />
+                                            <Input placeholder={t('namePlaceholder')} {...field} className="w-full" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -118,10 +118,10 @@ export default function CreateCustomerModal({ onSuccess, storeId }: CreateCustom
                                 control={form.control}
                                 name="phone"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="col-span-1">
                                         <FormLabel>{t('phone')}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder={t('phonePlaceholder')} {...field} />
+                                            <Input placeholder={t('phonePlaceholder')} {...field} className="w-full" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -131,10 +131,10 @@ export default function CreateCustomerModal({ onSuccess, storeId }: CreateCustom
                                 control={form.control}
                                 name="email"
                                 render={({ field }) => (
-                                    <FormItem className="col-span-2">
+                                    <FormItem className="sm:col-span-2">
                                         <FormLabel>{t('email')}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder={t('emailPlaceholder')} {...field} />
+                                            <Input placeholder={t('emailPlaceholder')} {...field} className="w-full" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -144,10 +144,10 @@ export default function CreateCustomerModal({ onSuccess, storeId }: CreateCustom
                                 control={form.control}
                                 name="address"
                                 render={({ field }) => (
-                                    <FormItem className="col-span-2">
+                                    <FormItem className="sm:col-span-2">
                                         <FormLabel>{t('address')}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder={t('addressPlaceholder')} {...field} />
+                                            <Input placeholder={t('addressPlaceholder')} {...field} className="w-full" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -157,21 +157,21 @@ export default function CreateCustomerModal({ onSuccess, storeId }: CreateCustom
                                 control={form.control}
                                 name="city"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="sm:col-span-2">
                                         <FormLabel>{t('city')}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder={t('cityPlaceholder')} {...field} />
+                                            <Input placeholder={t('cityPlaceholder')} {...field} className="w-full" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                         </div>
-                        <DialogFooter className="mt-6">
-                            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                        <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-8">
+                            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
                                 {tCommon('cancel')}
                             </Button>
-                            <Button type="submit" className="bg-orange hover:bg-orange-dark text-white" disabled={isLoading}>
+                            <Button type="submit" className="w-full sm:w-auto bg-orange hover:bg-orange-dark text-white" disabled={isLoading}>
                                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {tCommon('submit')}
                             </Button>

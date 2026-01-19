@@ -25,51 +25,52 @@ interface RecentTransactionsTableProps {
 export default function RecentTransactionsTable({ data }: RecentTransactionsTableProps) {
     const t = useTranslations('admin.dashboard')
     return (
-        <Card>
-            <CardHeader className='flex flex-row items-center justify-between'>
-                <CardTitle className='text-base'>{t('recentTransactions')}</CardTitle>
-                <Link href='/admin/orders' className='text-sm text-muted-foreground hover:underline'>
+        <Card className="border-none shadow-sm overflow-hidden">
+            <CardHeader className='flex flex-row items-center justify-between pb-2 bg-white'>
+                <CardTitle className='text-sm font-bold text-navy uppercase tracking-wider'>{t('recentTransactions')}</CardTitle>
+                <Link href='/admin/orders' className='text-[10px] uppercase font-semibold text-slate-400 hover:text-orange transition-colors tracking-widest bg-slate-50 px-2 py-1 rounded-md'>
                     {t('viewAll')}
                 </Link>
             </CardHeader>
-            <CardContent>
-                <div className="overflow-x-auto">
+            <CardContent className="p-0">
+                <div className="overflow-x-auto no-scrollbar">
                     <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="whitespace-nowrap">{t('date')}</TableHead>
-                                <TableHead className="whitespace-nowrap">{t('customerSupplier')}</TableHead>
-                                <TableHead>{t('status')}</TableHead>
-                                <TableHead className='text-right'>{t('total')}</TableHead>
+                        <TableHeader className='bg-slate-50/50'>
+                            <TableRow className="border-none hover:bg-transparent">
+                                <TableHead className="text-[10px] uppercase font-bold text-slate-400 tracking-widest py-3">{t('date')}</TableHead>
+                                <TableHead className="text-[10px] uppercase font-bold text-slate-400 tracking-widest py-3">{t('customerSupplier')}</TableHead>
+                                <TableHead className="text-[10px] uppercase font-bold text-slate-400 tracking-widest py-3">{t('status')}</TableHead>
+                                <TableHead className='text-[10px] uppercase font-bold text-slate-400 tracking-widest text-right py-3'>{t('total')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {data.map((transaction) => (
-                                <TableRow key={transaction.id}>
-                                    <TableCell className='text-muted-foreground whitespace-nowrap'>
+                                <TableRow key={transaction.id} className="group transition-colors hover:bg-slate-50 border-slate-50">
+                                    <TableCell className='text-[11px] font-semibold text-slate-500 whitespace-nowrap'>
                                         {formatDateTime(new Date(transaction.date)).dateOnly}
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap">
                                         <div className='flex items-center gap-3'>
-                                            {/* Avatar placeholder could go here */}
                                             <div>
-                                                <p className='font-medium'>{transaction.name}</p>
-                                                <p className='text-xs text-muted-foreground'>#{transaction.id.slice(-6)}</p>
+                                                <p className='text-sm font-semibold text-slate-900 group-hover:text-orange transition-colors'>{transaction.name}</p>
+                                                <p className='text-[10px] font-bold text-slate-400 uppercase tracking-tighter'>#{transaction.id.slice(-6)}</p>
                                             </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${transaction.status === 'Completed'
-                                            ? 'bg-green-100 text-green-700'
+                                        <span className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-tighter ${transaction.status === 'Completed'
+                                            ? 'bg-emerald-50 text-emerald-600'
                                             : transaction.status === 'Processing'
-                                                ? 'bg-blue-100 text-blue-700'
-                                                : 'bg-yellow-100 text-yellow-700'
+                                                ? 'bg-blue-50 text-blue-600'
+                                                : 'bg-amber-50 text-amber-600'
                                             }`}>
                                             {transaction.status}
                                         </span>
                                     </TableCell>
-                                    <TableCell className='text-right font-medium whitespace-nowrap'>
-                                        {formatCurrency(transaction.total)}
+                                    <TableCell className='text-right whitespace-nowrap'>
+                                        <span className="text-sm font-bold text-slate-900">
+                                            {formatCurrency(transaction.total)}
+                                        </span>
                                     </TableCell>
                                 </TableRow>
                             ))}

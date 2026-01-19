@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { APP_NAME } from '@/lib/constants'
 
 export const metadata: Metadata = {
-  title: 'Sign Up',
+  title: 'Regístrate',
 }
 
 export default async function SignUpPage(props: {
@@ -31,9 +31,18 @@ export default async function SignUpPage(props: {
   return (
     <section className='flex w-full min-h-screen'>
       <article className='w-full lg:w-1/2 px-6 md:px-16 lg:px-28 py-10 lg:py-20 flex flex-col justify-center'>
-        <div className=''>
-          <div className='flex justify-center mb-6'>
-            <AppLogo color="black" />
+        <div className='w-full max-w-md mx-auto'>
+          <div className='flex justify-center mb-10'>
+            <Link href="/">
+              <Image
+                src="/images/app-logo.png"
+                alt={APP_NAME}
+                width={300}
+                height={100}
+                priority
+                className="hover:opacity-80 transition-opacity"
+              />
+            </Link>
           </div>
           <div>
             <SignUpForm />

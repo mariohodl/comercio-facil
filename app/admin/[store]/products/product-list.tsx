@@ -110,46 +110,48 @@ const ProductList = ({ store }: { store: string }) => {
 
     return (
         <div className='space-y-4'>
-            <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
+            <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4'>
                 <div>
                     <h1 className='font-bold text-2xl'>{t('productList')}</h1>
                     <p className='text-muted-foreground text-sm'>{t('manageProducts')}</p>
                 </div>
-                <div className='flex flex-wrap gap-2'>
-                    <Button variant='outline' size='icon'>
-                        <FileText className='w-4 h-4 text-red-500' />
-                    </Button>
-                    <Button variant='outline' size='icon'>
-                        <FileSpreadsheet className='w-4 h-4 text-green-500' />
-                    </Button>
-                    <Button variant='outline' size='icon' onClick={() => fetchData(page)}>
-                        <RefreshCw className='w-4 h-4' />
-                    </Button>
-                    <Button asChild className='bg-orange hover:bg-orange-dark text-white'>
+                <div className='flex flex-wrap gap-2 w-full xl:w-auto'>
+                    <div className='flex gap-2 w-full sm:w-auto'>
+                        <Button variant='outline' size='icon' className="shrink-0">
+                            <FileText className='w-4 h-4 text-red-500' />
+                        </Button>
+                        <Button variant='outline' size='icon' className="shrink-0">
+                            <FileSpreadsheet className='w-4 h-4 text-green-500' />
+                        </Button>
+                        <Button variant='outline' size='icon' onClick={() => fetchData(page)} className="shrink-0">
+                            <RefreshCw className='w-4 h-4' />
+                        </Button>
+                    </div>
+                    <Button asChild className='bg-orange hover:bg-orange-dark text-white flex-1 sm:flex-none'>
                         <Link href={`/admin/${store}/products/create`}>
                             <Plus className='w-4 h-4 mr-2' /> {t('addProduct')}
                         </Link>
                     </Button>
-                    <Button variant='default' className='bg-navy hover:bg-navy-dark text-white'>
+                    <Button variant='default' className='bg-navy hover:bg-navy-dark text-white flex-1 sm:flex-none'>
                         <Import className='w-4 h-4 mr-2' /> {t('importProduct')}
                     </Button>
                 </div>
             </div>
 
             <div className='bg-white p-4 rounded-lg border border-neutral-warm shadow-sm space-y-4'>
-                <div className='flex flex-col md:flex-row justify-between gap-4'>
-                    <div className='relative w-full md:w-72'>
+                <div className='flex flex-col lg:flex-row justify-between gap-4'>
+                    <div className='relative w-full lg:w-72'>
                         <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
                         <Input
                             placeholder={tCommon('search')}
                             value={inputValue}
                             onChange={handleInputChange}
-                            className='pl-8'
+                            className='pl-8 w-full'
                         />
                     </div>
-                    <div className='flex gap-2'>
+                    <div className='flex flex-wrap sm:flex-nowrap gap-2 w-full lg:w-auto'>
                         <Select value={category} onValueChange={setCategory}>
-                            <SelectTrigger className='w-[150px]'>
+                            <SelectTrigger className='w-full sm:w-[150px]'>
                                 <SelectValue placeholder={t('category')} />
                             </SelectTrigger>
                             <SelectContent>
@@ -162,7 +164,7 @@ const ProductList = ({ store }: { store: string }) => {
                             </SelectContent>
                         </Select>
                         <Select value={brand} onValueChange={setBrand}>
-                            <SelectTrigger className='w-[150px]'>
+                            <SelectTrigger className='w-full sm:w-[150px]'>
                                 <SelectValue placeholder={t('brand')} />
                             </SelectTrigger>
                             <SelectContent>

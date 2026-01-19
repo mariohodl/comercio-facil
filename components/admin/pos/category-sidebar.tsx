@@ -67,23 +67,23 @@ export default function CategorySidebar({ storeId, selectedCategory, onCategoryC
     }
 
     return (
-        <div className="h-full flex flex-col bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-3 border-b border-gray-200">
+        <div className="h-full flex flex-col bg-white lg:rounded-xl shadow-sm border-b lg:border border-gray-200">
+            <div className="p-3 border-b border-gray-200 hidden lg:block">
                 <h2 className="text-sm font-bold text-gray-900">{t('categories')}</h2>
             </div>
-            <ScrollArea className="flex-1 h-0">
-                <div className="p-3">
+            <ScrollArea className="flex-1 w-full h-auto lg:h-0">
+                <div className="flex lg:flex-col p-2 lg:p-3 pr-8 lg:pr-3 gap-2 lg:gap-1 overflow-x-auto lg:overflow-x-visible">
                     {/* All Category */}
                     <Card
-                        className={`w-[80px] h-[100px] cursor-pointer transition-all duration-200 border mb-1 ${selectedCategory === 'all'
+                        className={`flex-shrink-0 min-w-[70px] lg:w-full h-[80px] lg:h-[100px] cursor-pointer transition-all duration-200 border ${selectedCategory === 'all'
                             ? 'bg-gradient-to-br from-orange-400 to-orange-500 border-orange-500 shadow-md'
-                            : 'bg-white border-gray-200 hover:border-orange-300 hover:shadow-sm'
+                            : 'bg-white border-gray-200 hover:border-orange-300'
                             }`}
                         onClick={() => onCategoryChange('all')}
                     >
-                        <div className="p-3 flex flex-col items-center justify-center space-y-1 pt-0">
-                            <div className="text-3xl">📦</div>
-                            <span className={`text-xs font-semibold text-center ${selectedCategory === 'all' ? 'text-white' : 'text-gray-900'
+                        <div className="h-full p-2 lg:p-3 flex flex-col items-center justify-center space-y-1">
+                            <div className="text-2xl lg:text-3xl">📦</div>
+                            <span className={`text-[10px] lg:text-xs font-semibold text-center leading-tight ${selectedCategory === 'all' ? 'text-white' : 'text-gray-900'
                                 }`}>
                                 {t('all')}
                             </span>
@@ -94,22 +94,21 @@ export default function CategorySidebar({ storeId, selectedCategory, onCategoryC
                     {categories.map((category) => (
                         <Card
                             key={category.name}
-                            className={`w-[80px] h-[100px] cursor-pointer transition-all duration-200 border mb-1 ${selectedCategory === category.name
+                            className={`flex-shrink-0 min-w-[70px] lg:w-full h-[80px] lg:h-[100px] cursor-pointer transition-all duration-200 border ${selectedCategory === category.name
                                 ? 'bg-gradient-to-br from-orange-400 to-orange-500 border-orange-500 shadow-md'
-                                : 'bg-white border-gray-200 hover:border-orange-300 hover:shadow-sm'
+                                : 'bg-white border-gray-200 hover:border-orange-300'
                                 }`}
                             onClick={() => onCategoryChange(category.name)}
                         >
-                            <div className="p-3 flex flex-col items-center justify-center pt-0">
-                                <div className="text-3xl">{category.icon}</div>
-                                <span className={`text-xs font-semibold text-center ${selectedCategory === category.name ? 'text-white' : 'text-gray-900'
+                            <div className="h-full p-2 lg:p-3 flex flex-col items-center justify-center space-y-1">
+                                <div className="text-2xl lg:text-3xl">{category.icon}</div>
+                                <span className={`text-[10px] lg:text-xs font-semibold text-center leading-tight ${selectedCategory === category.name ? 'text-white' : 'text-gray-900'
                                     }`}>
                                     {category.name}
                                 </span>
                             </div>
                         </Card>
                     ))}
-
                 </div>
             </ScrollArea>
         </div>

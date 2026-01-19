@@ -188,7 +188,7 @@ export function AdminNav({
 
   return (
     <nav className={cn(
-      'fixed w-64 h-[calc(100vh-3rem)] left-0 top-12 shadow-md overflow-y-auto bg-white border-r border-gray-200 pb-10',
+      'w-full h-full overflow-y-auto bg-white border-r border-gray-200 pb-10',
       className
     )}>
       <div className='p-4 space-y-6 mt-6'>

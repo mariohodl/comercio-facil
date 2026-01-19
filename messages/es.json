@@ -56,6 +56,7 @@
         "all": "Todos",
         "searchPlaceholder": "Buscar producto por nombre o SKU...",
         "productsFound": "productos encontrados",
+        "viewCart": "Ver Carrito",
         "itemsInCart": "artículos en carrito",
         "noProductsFound": "No se encontraron productos",
         "tryAdjusting": "Intenta ajustar tu búsqueda o filtros",

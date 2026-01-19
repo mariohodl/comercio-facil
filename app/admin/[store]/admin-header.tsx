@@ -45,29 +45,30 @@ export function AdminHeader({
       {...props}
     >
       {/* Left side: Breadcrumbs */}
-      <div className="flex items-center gap-3 text-sm">
-        <div className="h-6 w-[1px] bg-white/10 mx-2 hidden lg:block" /> {/* Separator from logo section */}
-        <div
-          className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 text-gray-400"
-        >
-          <Home className="w-4 h-4" />
+      <div className="flex items-center gap-2 overflow-hidden">
+        <div className="hidden lg:flex items-center gap-2">
+          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white/5 border border-white/10 text-gray-400">
+            <Home className="w-4 h-4" />
+          </div>
+          <ChevronRight className="w-3 h-3 text-gray-700" />
         </div>
-        <ChevronRight className="w-3 h-3 text-gray-600" />
-        <div className="flex items-center bg-white/5 rounded-full px-1 py-1 border border-white/5">
+
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 scroll-smooth">
           {breadcrumbs.map((crumb, index) => (
             <React.Fragment key={crumb.href}>
-              <span
+              <Link
+                href={crumb.href}
                 className={cn(
-                  "px-3 py-1 rounded-full whitespace-nowrap transition-all",
+                  "px-3 py-1.5 rounded-xl whitespace-nowrap transition-all text-xs font-bold ring-1",
                   crumb.active
-                    ? "bg-orange text-white font-semibold shadow-lg shadow-orange-500/20"
-                    : "text-gray-400"
+                    ? "bg-orange text-white ring-orange shadow-lg shadow-orange-500/20"
+                    : "text-gray-400 ring-white/10 hover:bg-white/5 hover:text-white"
                 )}
               >
                 {crumb.label}
-              </span>
+              </Link>
               {index < breadcrumbs.length - 1 && (
-                <ChevronRight className="w-3 h-3 mx-1 text-gray-700" />
+                <ChevronRight className="w-3 h-3 text-gray-800 shrink-0" />
               )}
             </React.Fragment>
           ))}

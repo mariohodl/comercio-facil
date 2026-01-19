@@ -55,6 +55,7 @@
         "all": "All",
         "searchPlaceholder": "Search Product by name or SKU...",
         "productsFound": "products found",
+        "viewCart": "View Cart",
         "itemsInCart": "items in cart",
         "noProductsFound": "No products found",
         "tryAdjusting": "Try adjusting your search or filters",
