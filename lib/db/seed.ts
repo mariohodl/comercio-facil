@@ -34,12 +34,10 @@ const main = async () => {
 
     const { companies, stores, warehouses } = data;
 
-    // 1. Create Users first (without business data initially)
-    await User.deleteMany(); // Ensure users are cleared before initial insert
+    await User.deleteMany();
     const createdUsersInitial = await User.insertMany(users);
     const userMap = new Map(createdUsersInitial.map(u => [u.email, u._id]));
 
-    // 2. Create Companies (linked to Owner)
     const createdCompanies = await Company.insertMany(companies.map(c => {
       const ownerId = userMap.get(c.ownerEmail);
       if (!ownerId) {
@@ -108,20 +106,33 @@ const main = async () => {
     const brandsToInsert = brands.map((brand) => ({
       ...brand,
       slug: toSlug(brand.name),
+      storeId: createdStores[0].slug, // Default to first store
     }));
     const createdBrands = await Brand.insertMany(brandsToInsert);
 
     // Seed units
     await Unit.deleteMany();
-    const createdUnits = await Unit.insertMany(units);
+    const unitsToInsert = units.map(unit => ({
+      ...unit,
+      storeId: createdStores[0].slug,
+    }));
+    const createdUnits = await Unit.insertMany(unitsToInsert);
 
     // Seed attributes
     await Attribute.deleteMany();
-    const createdAttributes = await Attribute.insertMany(attributes);
+    const attributesToInsert = attributes.map(attr => ({
+      ...attr,
+      store: createdStores[0].slug,
+    }));
+    const createdAttributes = await Attribute.insertMany(attributesToInsert);
 
     // Seed categories
     await Category.deleteMany();
-    const createdCategories = await Category.insertMany(categories);
+    const categoriesToInsert = categories.map(cat => ({
+      ...cat,
+      storeId: createdStores[0].slug,
+    }));
+    const createdCategories = await Category.insertMany(categoriesToInsert);
 
     // Seed sub-categories
     await SubCategory.deleteMany();
@@ -136,6 +147,7 @@ const main = async () => {
       return {
         ...sc,
         parentCategory: parentId,
+        storeId: createdStores[0].slug,
       };
     }).filter(Boolean);
 

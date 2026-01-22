@@ -22,6 +22,7 @@ import { UserSignUpSchema } from '@/lib/validator'
 import { Separator } from '@/components/ui/separator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { APP_NAME } from '@/lib/constants'
+import { toast } from 'sonner'
 
 const signUpDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -58,29 +59,20 @@ export default function SignUpForm() {
     try {
       const res = await registerUser(data)
       if (!res.success) {
-        // toast({
-        //   title: 'Error',
-        //   description: res.error,
-        //   variant: 'destructive',
-        // })
+        toast.error(res.error || 'Error al crear la cuenta')
         return
       }
-      await signInWithCredentials({
-        email: data.email,
-        password: data.password,
-      })
-      console.log({ res })
+
+      toast.success(res.message || 'Cuenta creada exitosamente')
+
+      // Redirect to verification page (don't sign in yet)
       const redirectTo = res.redirectUrl || callbackUrl
       redirect(redirectTo)
     } catch (error) {
       if (isRedirectError(error)) {
         throw error
       }
-      //   toast({
-      //     title: 'Error',
-      //     description: 'Invalid email or password',
-      //     variant: 'destructive',
-      //   })
+      toast.error('Ocurrió un error inesperado')
     }
   }
 
@@ -108,33 +100,35 @@ export default function SignUpForm() {
               )}
             />
 
-            <FormField
-              control={control}
-              name='email'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Ingresar email' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className='flex flex-col md:flex-row gap-4 md:gap-5'>
+              <FormField
+                control={control}
+                name='email'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Ingresar email' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={control}
-              name='phone'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormLabel>Teléfono</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Ingresar teléfono' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={control}
+                name='phone'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>Teléfono</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Ingresar teléfono' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <div className='flex gap-5'>
               <FormField
@@ -173,21 +167,21 @@ export default function SignUpForm() {
               />
             </div>
 
-            <div>
+            <div className='flex items-center gap-2'>
               <Button type='submit'>Crear Cuenta</Button>
+              <div className='text-sm'>
+                ¿Ya tienes una cuenta?{' '}
+                <Link className='link' href={`/sign-in?callbackUrl=${callbackUrl}`}>
+                  <span className='font-bold text-primary underline '>Inicia sesión</span>
+
+                </Link>
+              </div>
             </div>
             <div className='text-sm'>
               Al crear una cuenta, estarás aceptando las {' '}
               <Link href='/page/conditions-of-use'>Condiciones de Uso</Link> y{' '}
               <Link href='/page/privacy-policy'>Aviso de Privacidad.</Link> de{' '}
               {APP_NAME}
-            </div>
-            <Separator className='mb-4' />
-            <div className='text-sm'>
-              Ya tienes una cuenta?{' '}
-              <Link className='link' href={`/sign-in?callbackUrl=${callbackUrl}`}>
-                Inicia sesión
-              </Link>
             </div>
           </div>
         </form>

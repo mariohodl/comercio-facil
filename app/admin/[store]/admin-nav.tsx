@@ -32,10 +32,12 @@ export function AdminNav({
   storeId,
   storeName,
   className,
+  companyName
 }: {
   storeId: string
   storeName?: string
   className?: string
+  companyName?: string
 }) {
   const pathname = usePathname()
   const t = useTranslations('admin.nav')
@@ -185,7 +187,7 @@ export function AdminNav({
       ],
     },
   ]
-
+  console.log(companyName)
   return (
     <nav className={cn(
       'w-full h-full overflow-y-auto bg-white border-r border-gray-200 pb-10',
@@ -199,7 +201,7 @@ export function AdminNav({
             </div>
             <div className="flex flex-col overflow-hidden">
               <h2 className='text-navy font-black text-xl leading-tight truncate tracking-tight group-hover:text-orange transition-colors'>
-                {storeName || 'Comercio Fácil'}
+                {companyName || 'Comercio Fácil'}
               </h2>
               <span className="text-[10px] uppercase text-center font-bold text-gray-400 tracking-widest leading-none">
                 Admin Panel

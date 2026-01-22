@@ -29,11 +29,18 @@ export const SignInWithGoogle = async () => {
 	await signIn('google');
 };
 
+export const SignInWithFacebook = async () => {
+	await signIn('facebook');
+};
+
+export const SignInWithInstagram = async () => {
+	await signIn('instagram');
+};
+
 export const getSession = async () => {
 	return await auth();
 }
 
-// CREATE
 // CREATE
 export async function registerUser(userSignUp: IUserSignUp) {
 	try {
@@ -46,16 +53,37 @@ export async function registerUser(userSignUp: IUserSignUp) {
 		});
 
 		await connectToDatabase();
+
+		// Check if user already exists
+		const existingUser = await User.findOne({ email: user.email });
+		if (existingUser) {
+			return { success: false, error: 'Email already registered' };
+		}
+
 		const userCreated = await User.create({
 			...user,
 			password: await bcrypt.hash(user.password, 5),
 			role: ROL_ADMIN, // Default to admin for new signups as they are creating a store/company
 			isStore: true, // Default to true as per requirement
+			emailVerified: false, // User needs to verify email
 		});
 
-		return { success: true, message: 'User created successfully', redirectUrl: '/admin/setup' };
+		// Send verification email
+		const { sendVerificationEmail } = await import('@/lib/email/verification');
+		const emailResult = await sendVerificationEmail(user.email, user.name);
+
+		if (!emailResult.success) {
+			console.error('Failed to send verification email:', emailResult.error);
+			// Still allow user creation even if email fails
+		}
+
+		return {
+			success: true,
+			message: 'User created successfully. Please check your email for verification code.',
+			redirectUrl: `/verify-email?email=${encodeURIComponent(user.email)}`
+		};
 	} catch (error) {
-		console.log(error)
+
 		return { success: false, error: formatError(error) };
 	}
 }
@@ -76,33 +104,74 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 			throw new Error('User not found');
 		}
 
-		// Create Company
-		const company = await Company.create({
-			name: validatedData.companyName,
-			owner: user._id,
+		// Check if user already has a company to avoid duplicates
+		let company;
+		if (user.business?.companyId) {
+			company = await Company.findById(user.business.companyId);
+		}
+
+		if (!company) {
+			// Create Company
+			company = await Company.create({
+				name: validatedData.companyName,
+				owner: user._id,
+			});
+		} else {
+			// Update existing company name
+			company.name = validatedData.companyName;
+			await company.save();
+		}
+
+		// Generate unique suffixes for slugs if needed
+		const shortId = Math.random().toString(36).substring(2, 6);
+
+		// Handle Store idempotency
+		let store;
+		if (validatedData.storeId) {
+			store = await Store.findOne({ slug: validatedData.storeId });
+		}
+
+		if (!store) {
+			const storeSlug = validatedData.storeId || `${validatedData.storeName.toLowerCase().replace(/\s+/g, '-')}-${shortId}`;
+			store = await Store.create({
+				name: validatedData.storeName,
+				company: company._id,
+				location: validatedData.storeLocation,
+				slug: storeSlug,
+			});
+		} else {
+			store.name = validatedData.storeName;
+			store.location = validatedData.storeLocation;
+			await store.save();
+		}
+
+		// Handle Warehouse idempotency
+		// Warehouse slug usually includes the storeId to be unique-ish
+		const warehouseSlug = `${validatedData.warehouseName.toLowerCase().replace(/\s+/g, '-')}-${validatedData.storeId || shortId}`;
+
+		let warehouse = await Warehouse.findOne({
+			company: company._id,
+			name: validatedData.warehouseName
 		});
 
-		// Create Store
-		const store = await Store.create({
-			name: validatedData.storeName,
-			company: company._id,
-			location: validatedData.storeLocation,
-			slug: validatedData.storeId || validatedData.storeName.toLowerCase().replace(/\s+/g, '-'),
-		});
-
-		// Create Warehouse
-		const warehouse = await Warehouse.create({
-			name: validatedData.warehouseName,
-			company: company._id,
-			location: validatedData.warehouseLocation,
-			slug: validatedData.warehouseName.toLowerCase().replace(/\s+/g, '-'),
-		});
+		if (!warehouse) {
+			warehouse = await Warehouse.create({
+				name: validatedData.warehouseName,
+				company: company._id,
+				location: validatedData.warehouseLocation,
+				slug: warehouseSlug,
+			});
+		} else {
+			warehouse.name = validatedData.warehouseName;
+			warehouse.location = validatedData.warehouseLocation;
+			await warehouse.save();
+		}
 
 		user.business = {
 			companyId: company._id,
-			stores: [store._id],
-			warehouses: [warehouse._id],
-			defaultStoreId: store._id
+			stores: Array.from(new Set([...(user.business?.stores || []), store._id])),
+			warehouses: Array.from(new Set([...(user.business?.warehouses || []), warehouse._id])),
+			defaultStoreId: user.business?.defaultStoreId || store._id
 		};
 		user.isStore = true;
 
@@ -110,6 +179,7 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 
 		return { success: true, message: 'Store settings updated successfully' };
 	} catch (error) {
+		console.error('Error updating store settings:', error);
 		return { success: false, error: formatError(error) };
 	}
 }

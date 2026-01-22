@@ -76,7 +76,7 @@ const createOrdersReport = (reportsData, dataToFilter) => {
 export async function createNewReport(data: IReportInput) {
     const session = await auth();
     if (!session) throw new Error('User not authenticated');
-    // console.log('DATA', data)
+
     await connectToDatabase();
     const isCompleted = data?.status === 'completed' ? true : false;
     // const isInProgress = data?.status === 'in-progress' ? true : false;
@@ -95,7 +95,7 @@ export async function createNewReport(data: IReportInput) {
         try {
             await connectToDatabase();
             const queryFound = await OrderReception.find(queryToFilter)
-            console.log('QUERY', queryFound)
+
             const newReportToSave = await createOrdersReport(queryFound, data)
             const reporte = await Report.create(newReportToSave);
             return {
@@ -122,7 +122,7 @@ export async function createNewReport(data: IReportInput) {
         try {
             await connectToDatabase();
             const queryFound = await Order.find(queryToFilter)
-            console.log('QUERY', queryFound)
+
 
             const newReportToSave = await createOrdersReport(queryFound, data)
             const reporte = await Report.create(newReportToSave);

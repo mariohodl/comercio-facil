@@ -15,7 +15,7 @@ const warehouseSchema = new Schema<IWarehouse>(
         name: { type: String, required: true },
         company: { type: Schema.Types.ObjectId as any, ref: 'Company', required: true },
         location: { type: String, required: true },
-        slug: { type: String, required: true, unique: true },
+        slug: { type: String, required: true },
     },
     {
         timestamps: true,

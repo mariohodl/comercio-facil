@@ -48,15 +48,21 @@ export default async function SignUpPage(props: {
             <SignUpForm />
           </div>
           <SeparatorWithOr />
-          <div className='mt-4'>
+          <div className='mt-6'>
             <SocialAuth />
           </div>
 
-          <Link href={`/sign-in?callbackUrl=${encodeURIComponent(callbackUrl || '/')}`}>
-            <Button className='w-full mt-4' variant='outline'>
-              Ya tienes cuenta? Inicia sesión
-            </Button>
-          </Link>
+          {/* <div className='mt-8 text-center'>
+            <p className='text-sm text-gray-500'>
+              ¿Ya tienes una cuenta?{' '}
+              <Link
+                href={`/sign-in?callbackUrl=${encodeURIComponent(callbackUrl || '/')}`}
+                className='text-orange font-bold hover:underline'
+              >
+                Inicia sesión
+              </Link>
+            </p>
+          </div> */}
         </div>
       </article>
 

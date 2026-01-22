@@ -17,6 +17,7 @@ export default async function AdminLayout({
     children: React.ReactNode
 }) {
     const session = await auth()
+    console.log(session?.user)
     return (
         <>
             <div className='flex flex-col min-h-screen bg-gray-50/50'>
@@ -34,6 +35,7 @@ export default async function AdminLayout({
                                     <AdminNav
                                         storeId={session?.user?.storeId || ''}
                                         storeName={session?.user?.storeName || ''}
+                                        companyName={session?.user?.companyName || ''}
                                     />
                                 </SheetContent>
                             </Sheet>
@@ -71,6 +73,8 @@ export default async function AdminLayout({
                         <AdminNav
                             storeId={session?.user?.storeId || ''}
                             storeName={session?.user?.storeName || ''}
+                            companyName={session?.user?.companyName || ''}
+
                         />
                     </aside>
 

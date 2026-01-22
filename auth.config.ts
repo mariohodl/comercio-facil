@@ -24,6 +24,7 @@ export default {
 				token.storeName = user.storeName;
 				token.isStore = user.isStore;
 				token.companyId = user.companyId;
+				token.companyName = user.companyName;
 			}
 			if (session?.user?.name && trigger === 'update') {
 				token.name = session.user.name;
@@ -40,6 +41,9 @@ export default {
 			if (session?.user?.companyId && trigger === 'update') {
 				token.companyId = session.user.companyId;
 			}
+			if (session?.user?.companyName && trigger === 'update') {
+				token.companyName = session.user.companyName;
+			}
 			return token;
 		},
 		session: async ({ session, user, trigger, token }: any) => {
@@ -50,6 +54,7 @@ export default {
 			session.user.isStore = token.isStore;
 			session.user.storeName = token.storeName;
 			session.user.companyId = token.companyId;
+			session.user.companyName = token.companyName;
 
 			if (trigger === 'update') {
 				session.user.name = user.name;
@@ -57,6 +62,7 @@ export default {
 				session.user.storeName = token.storeName;
 				session.user.isStore = token.isStore;
 				session.user.companyId = token.companyId;
+				session.user.companyName = token.companyName;
 			}
 			return session;
 		},

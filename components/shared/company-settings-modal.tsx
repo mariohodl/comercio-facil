@@ -189,12 +189,6 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                             )}
                         />
 
-                        <div className="pt-4 border-t">
-                            <p className="text-sm text-gray-500 mb-2">Configuración Avanzada (Próximamente)</p>
-                            <p className="text-sm text-gray-500 mb-2">PIN de validacion aquî (PIN enviado a phone y email)</p>
-                            {/* Placeholder for advanced settings */}
-                        </div>
-
                         <DialogFooter>
                             <Button type="submit" disabled={isLoading}>
                                 {isLoading ? 'Guardando...' : 'Guardar y Continuar'}

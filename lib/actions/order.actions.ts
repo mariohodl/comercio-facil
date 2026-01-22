@@ -789,7 +789,7 @@ export async function updateOrderFulfillmentStatus(orderId: string, status: stri
 			throw new Error('Order not found')
 		}
 
-		console.log(`Updating order ${orderId} fulfillment status from ${order.fulfillmentStatus} to ${status}`)
+
 		order.fulfillmentStatus = status as any
 
 		if (status === 'DELIVERED') {
@@ -873,9 +873,7 @@ export async function getPOSOrders({
 		}
 	}
 
-	console.log('[getPOSOrders] storeId:', storeId)
-	console.log('[getPOSOrders] role:', session.user.role)
-	console.log('[getPOSOrders] filter:', JSON.stringify(filter, null, 2))
+
 
 	const orders = await Order.find(filter)
 		.populate({ path: 'user', select: 'name', model: User })

@@ -49,15 +49,21 @@ export default async function SignIn(props: {
             <CredentialsSignInForm />
           </div>
           <SeparatorWithOr />
-          <div className='mt-4'>
+          <div className='mt-6'>
             <SocialAuth />
           </div>
 
-          <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-            <Button className='w-full mt-4' variant='outline'>
-              Crea tu cuenta en {APP_NAME}
-            </Button>
-          </Link>
+          <div className='mt-8 text-center'>
+            <p className='text-sm text-gray-500'>
+              ¿No tienes una cuenta?{' '}
+              <Link
+                href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                className='text-orange font-bold hover:underline'
+              >
+                Regístrate ahora
+              </Link>
+            </p>
+          </div>
         </div>
       </article>
 
