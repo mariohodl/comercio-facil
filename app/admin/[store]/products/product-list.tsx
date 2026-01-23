@@ -43,6 +43,7 @@ import { useState, useEffect, useTransition, useCallback } from 'react'
 import { formatCurrency } from '@/lib/utils'
 import DeleteDialog from '@/components/shared/delete-dialog'
 import Image from 'next/image'
+import { Badge } from '@/components/ui/badge'
 
 type ProductListDataProps = {
     products: IProduct[]
@@ -191,19 +192,20 @@ const ProductList = ({ store }: { store: string }) => {
                                 <TableHead className='whitespace-nowrap'>{t('unit')}</TableHead>
                                 <TableHead className='whitespace-nowrap'>{t('quantity')}</TableHead>
                                 <TableHead className='whitespace-nowrap'>{t('quantityAlert')}</TableHead>
+                                <TableHead className='whitespace-nowrap'>{t('published')}</TableHead>
                                 <TableHead className='text-right whitespace-nowrap'>{tCommon('actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isPending ? (
                                 <TableRow>
-                                    <TableCell colSpan={9} className='text-center h-24'>
+                                    <TableCell colSpan={10} className='text-center h-24'>
                                         {tCommon('loading')}
                                     </TableCell>
                                 </TableRow>
                             ) : data?.products.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={9} className='text-center h-24'>
+                                    <TableCell colSpan={10} className='text-center h-24'>
                                         {tCommon('noResults')}
                                     </TableCell>
                                 </TableRow>
@@ -241,6 +243,17 @@ const ProductList = ({ store }: { store: string }) => {
                                         </TableCell>
                                         <TableCell className='whitespace-nowrap font-medium text-gray-500'>
                                             {product.quantityAlert}
+                                        </TableCell>
+                                        <TableCell className='whitespace-nowrap'>
+                                            <Badge
+                                                variant='outline'
+                                                className={product.isPublished
+                                                    ? 'bg-green-50 text-green-700 border-green-200'
+                                                    : 'bg-red-50 text-red-700 border-red-200'
+                                                }
+                                            >
+                                                {product.isPublished ? t('active') : t('inactive')}
+                                            </Badge>
                                         </TableCell>
                                         <TableCell className='text-right whitespace-nowrap'>
                                             <div className='flex justify-end gap-2'>

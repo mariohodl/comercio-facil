@@ -28,6 +28,8 @@ import OrdersModal from './orders-modal'
 
 import { getCustomersByStore } from '@/lib/actions/customer.actions'
 import { ICustomer } from '@/lib/db/models/customer.model'
+import { getAllProductsForAdmin } from '@/lib/actions/product.actions'
+import { IProduct } from '@/lib/db/models/product.model'
 
 interface POSCartProps {
     storeId: string
@@ -43,6 +45,7 @@ export default function POSCart({ storeId }: POSCartProps) {
         totalPrice,
         clearCart,
         setCart,
+        addToCart,
         customerId: selectedCustomer,
         setCustomerId: setSelectedCustomer
     } = usePOSStore()

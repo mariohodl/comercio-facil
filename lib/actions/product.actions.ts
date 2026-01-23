@@ -309,7 +309,6 @@ export async function getAllProductsForAdmin({
 		...categoryFilter,
 		...brandFilter,
 		...storeFilter,
-		isPublished: true,
 	})
 		.sort(order)
 		.skip(pageSize * (Number(page) - 1))
@@ -321,7 +320,6 @@ export async function getAllProductsForAdmin({
 		...categoryFilter,
 		...brandFilter,
 		...storeFilter,
-		isPublished: true,
 	})
 	return {
 		products: JSON.parse(JSON.stringify(products)) as IProduct[],
@@ -404,7 +402,6 @@ export async function getLowStockProductsForAdmin({
 		...brandFilter,
 		...storeFilter,
 		...stockFilter,
-		isPublished: true,
 	})
 		.sort(order)
 		.skip(pageSize * (Number(page) - 1))
@@ -417,7 +414,6 @@ export async function getLowStockProductsForAdmin({
 		...brandFilter,
 		...storeFilter,
 		...stockFilter,
-		isPublished: true,
 	})
 
 	return {

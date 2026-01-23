@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
 import ProductSearch from '@/components/admin/pos/product-search'
@@ -19,6 +19,9 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 import { formatCurrency } from '@/lib/utils'
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner'
+import { getAllProductsForAdmin } from '@/lib/actions/product.actions'
+import { toast } from 'sonner'
 
 export default function POSPageClient({
     storeId,
@@ -43,6 +46,55 @@ export default function POSPageClient({
             setUserId(session.user.id)
         }
     }, [session?.user?.id, userId, setUserId, clearCart])
+
+    const { addToCart } = usePOSStore()
+
+    const handleBarcodeScan = useCallback(async (barcode: string) => {
+        if (!barcode.trim()) return
+
+        try {
+            const result = await getAllProductsForAdmin({
+                query: '',
+                page: 1,
+                limit: 1000,
+                store: storeId,
+            })
+
+            let foundProduct: any = null
+            let foundVariant: any = undefined
+
+            for (const product of result.products) {
+                // Check main product barcode
+                if (product.itemBarcode === barcode) {
+                    foundProduct = product
+                    break
+                }
+
+                // Check variants barcodes
+                if (product.variants && product.variants.length > 0) {
+                    const variant = product.variants.find((v: any) => v.barcode === barcode)
+                    if (variant) {
+                        foundProduct = product
+                        foundVariant = variant
+                        break
+                    }
+                }
+            }
+
+            if (foundProduct) {
+                addToCart(foundProduct, foundVariant)
+                toast.success(t('addedToCart', { product: foundProduct.name }))
+            } else {
+                toast.error(t('productNotFound', { sku: barcode }))
+            }
+        } catch (error) {
+            console.error('Error searching product by barcode:', error)
+            toast.error(t('errorSearching'))
+        }
+    }, [storeId, addToCart, t])
+
+    // Listen for scanner everywhere on the POS page
+    useBarcodeScanner(handleBarcodeScan)
 
     const handleOpenOrder = (order: any) => {
         const cartItems = order.items.map((item: any) => ({

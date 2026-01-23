@@ -307,6 +307,9 @@
         "noImagesUploaded": "No images uploaded",
         "variantAddedSuccessfully": "Variant added successfully",
         "addVariantToProduct": "Add Variant to Product",
+        "editVariant": "Edit Variant",
+        "updateVariant": "Update Variant",
+        "variantUpdatedSuccessfully": "Variant updated successfully",
         "inventory": "Inventory",
         "pricing": "Pricing"
     },

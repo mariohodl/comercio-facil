@@ -79,7 +79,7 @@ export default async function AdminLayout({
                     </aside>
 
                     {/* Main Content */}
-                    <main className='flex-1 w-full md:ml-64 min-h-[calc(100vh-4rem)] p-4 sm:p-6 lg:p-8 overflow-hidden'>
+                    <main className='flex-1 w-full md:ml-64 min-h-[calc(100vh-4rem)] p-2 overflow-hidden'>
                         <div className="w-full space-y-6">
                             {children}
                         </div>

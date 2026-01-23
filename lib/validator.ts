@@ -26,7 +26,7 @@ export const ReviewInputSchema = z.object({
 		.min(1, 'Rating must be at least 1')
 		.max(5, 'Rating must be at most 5'),
 })
-export const ProductInputSchema = z.object({
+export const ProductBaseSchema = z.object({
 	_id: z.string().optional(),
 	productId: z.coerce
 		.number()
@@ -72,7 +72,7 @@ export const ProductInputSchema = z.object({
 	subCategory: z.string().min(1, 'Sub category is required'),
 	unit: z.string().min(1, 'Unit is required'),
 	barcodeSymbology: z.string().min(1, 'Barcode symbology is required'),
-	itemBarcode: z.string().min(1, 'Item barcode is required').regex(/^[a-zA-Z0-9]+$/, 'Item barcode can only contain letters and numbers'),
+	itemBarcode: z.string().optional(),
 	productType: z.string().min(1, 'Product type is required'),
 	taxType: z.string().min(1, 'Tax type is required'),
 	tax: z.coerce.number().nonnegative('Tax must be a non-negative number'),
@@ -98,9 +98,17 @@ export const ProductInputSchema = z.object({
 		})),
 		images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })).max(2).optional(),
 		barcode: z.string().optional(),
-		taxType: z.string().optional(),
-		tax: z.number().optional(),
 	})).optional(),
+})
+
+export const ProductInputSchema = ProductBaseSchema.superRefine((data, ctx) => {
+	if (data.productType === 'Single Product' && (!data.itemBarcode || data.itemBarcode.trim() === '')) {
+		ctx.addIssue({
+			code: z.ZodIssueCode.custom,
+			message: 'Item barcode is required',
+			path: ['itemBarcode'],
+		})
+	}
 })
 
 // Order Item
@@ -256,8 +264,16 @@ export const UserNameSchema = z.object({
 	name: UserName,
 })
 
-export const ProductUpdateSchema = ProductInputSchema.extend({
+export const ProductUpdateSchema = ProductBaseSchema.extend({
 	_id: z.string().optional(),
+}).superRefine((data, ctx) => {
+	if (data.productType === 'Single Product' && (!data.itemBarcode || data.itemBarcode.trim() === '')) {
+		ctx.addIssue({
+			code: z.ZodIssueCode.custom,
+			message: 'Item barcode is required',
+			path: ['itemBarcode'],
+		})
+	}
 })
 
 export const UserUpdateSchema = z.object({

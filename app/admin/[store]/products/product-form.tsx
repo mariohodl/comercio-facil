@@ -4,8 +4,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft, ChevronDown, X } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft, ChevronDown, X, Edit } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 import BarcodeScannerDialog from '@/components/shared/barcode-scanner'
@@ -23,6 +23,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner'
 import { createProduct, updateProduct, deleteProductImg } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { UploadButton } from '@/lib/uploadthing'
@@ -145,6 +146,8 @@ const ProductForm = ({
   const [subCategories, setSubCategories] = useState<any[]>([])
   const [isScannerOpen, setIsScannerOpen] = useState(false)
   const [barcodeScanned, setBarcodeScanned] = useState(false)
+  const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(null)
+  const variantBuilderRef = useRef<HTMLDivElement>(null)
 
   // State for the new variant builder
   const [builderAttributes, setBuilderAttributes] = useState<Record<string, string[]>>({})
@@ -181,6 +184,14 @@ const ProductForm = ({
       form.setValue('slug', toSlug(productName))
     }
   }, [productName, type, form])
+
+  // Clear main barcode when switching to Variable Product to avoid confusion/stale data
+  useEffect(() => {
+    if (productType === 'Variable Product') {
+      form.setValue('itemBarcode', '')
+      setBarcodeScanned(false)
+    }
+  }, [productType, form])
 
   // Calculate variant discount price automatically
   useEffect(() => {
@@ -316,6 +327,18 @@ const ProductForm = ({
       form.setValue('discountPrice', calculatedDiscountPrice)
     }
   }, [listPrice, discountType, discountValue, form])
+
+  // Hardware Scanner Integration
+  useBarcodeScanner((barcode) => {
+    if (productType === 'Variable Product') {
+      setNewVariantData(prev => ({ ...prev, barcode }))
+      showSuccess(t('barcodeScannedSuccessfully') + ': ' + barcode)
+    } else {
+      form.setValue('itemBarcode', barcode)
+      setBarcodeScanned(true)
+      showSuccess(t('barcodeScannedSuccessfully') + ': ' + barcode)
+    }
+  }, type === 'Create' || type === 'Update')
 
 
 
@@ -724,7 +747,7 @@ const ProductForm = ({
                   name='itemBarcode'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('itemBarcode')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>{t('itemBarcode')} {productType === 'Single Product' && <span className="text-red-500">*</span>}</FormLabel>
                       <div className="flex gap-2">
                         <div className="w-full flex-1">
                           <FormControl>
@@ -858,7 +881,7 @@ const ProductForm = ({
 
               {form.watch('productType') === 'Variable Product' && (
                 <div className="space-y-6 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
+                  <Card ref={variantBuilderRef} className="border-neutral-200 shadow-sm overflow-hidden bg-white">
                     <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
                       <div className="flex items-center justify-between">
                         <div className="space-y-1">
@@ -1251,7 +1274,20 @@ const ProductForm = ({
                                 }
 
                                 const currentVariants = form.getValues('variants') || []
-                                form.setValue('variants', [...currentVariants, newVariant])
+
+                                // Check if we're editing an existing variant
+                                if (editingVariantIndex !== null) {
+                                  // Update the existing variant
+                                  const updatedVariants = [...currentVariants]
+                                  updatedVariants[editingVariantIndex] = newVariant
+                                  form.setValue('variants', updatedVariants)
+                                  showSuccess(t('variantUpdatedSuccessfully'))
+                                  setEditingVariantIndex(null)
+                                } else {
+                                  // Add new variant
+                                  form.setValue('variants', [...currentVariants, newVariant])
+                                  showSuccess(t('variantAddedSuccessfully'))
+                                }
 
                                 // Regenerate SKU for next variant
                                 const namePart = productName ? productName.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(6, 'X') : 'PROD'
@@ -1261,18 +1297,19 @@ const ProductForm = ({
                                 const randomSuffix = Math.floor(1000 + Math.random() * 9000)
                                 const generatedSku = `${namePart}-${storePart}-${mainSkuLast5}-${randomSuffix}`
 
+                                // Reset builder
+                                setBuilderAttributes({})
                                 setNewVariantData(prev => ({
                                   ...prev,
                                   sku: generatedSku,
-                                  barcode: '', // Reset barcode
-                                  images: [] // Reset images
+                                  barcode: '',
+                                  images: []
                                 }))
-                                showSuccess(t('variantAddedSuccessfully'))
                               }}
                               className="bg-navy hover:bg-navy/90 text-white min-w-[200px]"
                             >
                               <PlusCircle className="mr-2 h-5 w-5" />
-                              {t('addVariantToProduct')}
+                              {editingVariantIndex !== null ? t('updateVariant') : t('addVariantToProduct')}
                             </Button>
                           </div>
                         </div>
@@ -1362,7 +1399,7 @@ const ProductForm = ({
                                     ${Number(variant.costPerUnit).toFixed(2)}
                                   </td>
                                   <td className="px-6 py-4 text-right font-medium text-navy">
-                                    ${Number(variant.price).toFixed(2)}
+                                    ${Number(variant.discountPrice && variant.discountPrice > 0 ? variant.discountPrice : variant.listPrice).toFixed(2)}
                                   </td>
                                   <td className="px-6 py-4 text-center">
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variant.countInStock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -1370,19 +1407,70 @@ const ProductForm = ({
                                     </span>
                                   </td>
                                   <td className="px-6 py-4 text-right">
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50"
-                                      onClick={() => {
-                                        const newVariants = [...(form.getValues('variants') || [])]
-                                        newVariants.splice(index, 1)
-                                        form.setValue('variants', newVariants)
-                                      }}
-                                    >
-                                      <Trash className="h-4 w-4" />
-                                    </Button>
+                                    <div className="flex items-center justify-end gap-2">
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-gray-400 hover:text-blue-500 hover:bg-blue-50"
+                                        onClick={() => {
+                                          // Populate the builder with this variant's data
+                                          const variantToEdit = variant
+
+                                          // Set attributes
+                                          const attrs: Record<string, string[]> = {}
+                                          variantToEdit.attributes.forEach((attr: any) => {
+                                            attrs[attr.name] = [attr.value]
+                                          })
+                                          setBuilderAttributes(attrs)
+
+                                          // Set variant data
+                                          setNewVariantData({
+                                            sku: variantToEdit.sku,
+                                            costPerUnit: variantToEdit.costPerUnit,
+                                            listPrice: variantToEdit.listPrice,
+                                            discountPrice: variantToEdit.discountPrice || 0,
+                                            discountType: variantToEdit.discountType || 'Percentage',
+                                            discountValue: variantToEdit.discountValue || 0,
+                                            countInStock: variantToEdit.countInStock,
+                                            barcode: variantToEdit.barcode || '',
+                                            taxType: variantToEdit.taxType || 'Exclusive',
+                                            tax: variantToEdit.tax || 0,
+                                            images: variantToEdit.images || [],
+                                            price: variantToEdit.discountPrice && variantToEdit.discountPrice > 0 ? variantToEdit.discountPrice : variantToEdit.listPrice
+                                          })
+
+                                          setEditingVariantIndex(index)
+
+                                          // Scroll to builder
+                                          setTimeout(() => {
+                                            variantBuilderRef.current?.scrollIntoView({
+                                              behavior: 'smooth',
+                                              block: 'start'
+                                            })
+                                          }, 100)
+                                        }}
+                                        title={t('editVariant')}
+                                      >
+                                        <Edit className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50"
+                                        onClick={() => {
+                                          const newVariants = [...(form.getValues('variants') || [])]
+                                          newVariants.splice(index, 1)
+                                          form.setValue('variants', newVariants)
+                                          if (editingVariantIndex === index) {
+                                            setEditingVariantIndex(null)
+                                          }
+                                        }}
+                                      >
+                                        <Trash className="h-4 w-4" />
+                                      </Button>
+                                    </div>
                                   </td>
                                 </tr>
                               )
@@ -1614,35 +1702,35 @@ const ProductForm = ({
                       </CardContent>
                     </Card>
                   </div>
-
-                  {/* Settings Section */}
-                  <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
-                    <CardContent className="p-6">
-                      <FormField
-                        control={form.control}
-                        name='isPublished'
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-gray-50/50">
-                            <div className="space-y-0.5">
-                              <FormLabel className="text-base font-medium text-navy">{t('published')}</FormLabel>
-                              <div className="text-sm text-muted-foreground">
-                                {t('makeProductVisible')}
-                              </div>
-                            </div>
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                className="data-[state=checked]:bg-orange"
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Settings Section - Always visible for all product types */}
+          <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
+            <CardContent className="p-6">
+              <FormField
+                control={form.control}
+                name='isPublished'
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-gray-50/50">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base font-medium text-navy">{t('published')}</FormLabel>
+                      <div className="text-sm text-muted-foreground">
+                        {t('makeProductVisible')}
+                      </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="data-[state=checked]:bg-orange"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </CardContent>
           </Card>
 

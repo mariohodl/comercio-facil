@@ -100,14 +100,14 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
                                 <TableRow key={user._id} className="hover:bg-gray-50 transition-colors">
                                     <TableCell>
                                         <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 relative overflow-hidden rounded-full bg-gray-100">
-                                                {user.image ? (
-                                                    <Image src={user.image} alt={user.name} fill className="object-cover" />
-                                                ) : (
-                                                    <div className="flex items-center justify-center h-full w-full text-gray-400 font-bold bg-gray-200">
-                                                        {user.name.charAt(0).toUpperCase()}
-                                                    </div>
-                                                )}
+                                            <div className={`h-10 w-10 flex items-center justify-center rounded-full font-bold text-sm shadow-inner ${['bg-blue-50 text-blue-600 border border-blue-100',
+                                                    'bg-purple-50 text-purple-600 border border-purple-100',
+                                                    'bg-orange-50 text-orange-600 border border-orange-100',
+                                                    'bg-green-50 text-green-600 border border-green-100',
+                                                    'bg-pink-50 text-pink-600 border border-pink-100',
+                                                    'bg-cyan-50 text-cyan-600 border border-cyan-100'][user.name.length % 6]
+                                                }`}>
+                                                {user.name.charAt(0).toUpperCase()}
                                             </div>
                                             <span className="font-medium text-gray-900">{user.name}</span>
                                         </div>

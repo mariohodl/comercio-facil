@@ -107,7 +107,7 @@ const productSchema = new Schema<IProduct>(
 		subCategory: { type: String, required: true },
 		unit: { type: String, required: true },
 		barcodeSymbology: { type: String, required: true },
-		itemBarcode: { type: String, required: true },
+		itemBarcode: { type: String, required: false },
 		productType: { type: String, required: true },
 		taxType: { type: String, required: true },
 		tax: { type: Number, required: true },
