@@ -137,7 +137,6 @@ const ProductForm = ({
   stores = [],
   warehouses = [],
 }: ProductFormProps) => {
-  console.log('ProductForm warehouses:', warehouses)
   const router = useRouter()
   const t = useTranslations('products')
   const tCommon = useTranslations('common')
@@ -418,19 +417,20 @@ const ProductForm = ({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-navy">{type === 'Create' ? t('createProduct') : t('updateProduct')}</h1>
-          <p className="text-muted-foreground">{t('createNewProduct')}</p>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      <div className="flex flex-row items-center justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg sm:text-2xl font-bold text-navy truncate">{type === 'Create' ? t('createProduct') : t('updateProduct')}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('createNewProduct')}</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="icon">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
             <RefreshCw className="h-4 w-4" />
           </Button>
           <Link href={`/admin/${storeId}/products`}>
-            <Button className="bg-navy hover:bg-navy/90 text-white">
-              <ChevronLeft className="mr-2 h-4 w-4" /> {t('backToProduct')}
+            <Button className="bg-navy hover:bg-navy/90 text-white h-8 px-3 sm:h-10 sm:px-4">
+              <ChevronLeft className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm">{tCommon('back')}</span>
             </Button>
           </Link>
         </div>
@@ -441,7 +441,6 @@ const ProductForm = ({
           method='post'
           onSubmit={form.handleSubmit(onSubmit, (errors) => {
             showError(t('checkFormErrors'))
-            console.log(errors)
           })}
           className='space-y-8'
         >
@@ -452,17 +451,17 @@ const ProductForm = ({
                 <span className="text-orange">ⓘ</span> {t('productInformation')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <CardContent className="space-y-3 p-3">
+              <div className='grid grid-cols-2 gap-2'>
                 <FormField
                   control={form.control}
                   name='store'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('store')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="text-sm">{t('store')} <span className="text-red-500">*</span></FormLabel>
                       <Select key={field.value} onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-10">
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
@@ -489,10 +488,10 @@ const ProductForm = ({
                   name='warehouse'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="text-sm">{t('warehouse')} <span className="text-red-500">*</span></FormLabel>
                       <Select key={field.value} onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-10">
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
@@ -516,15 +515,15 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-2 gap-2'>
                 <FormField
                   control={form.control}
                   name='name'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('productName')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="text-sm">{t('productName')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder={t('enterProductName')} {...field} />
+                        <Input placeholder={t('enterProductName')} {...field} className="h-10" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -535,10 +534,10 @@ const ProductForm = ({
                   name='slug'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('slug')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="text-sm">{t('slug')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <div className='relative'>
-                          <Input placeholder={t('enterProductSlug')} {...field} disabled />
+                          <Input placeholder={t('enterProductSlug')} {...field} disabled className="h-10" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -547,22 +546,22 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-1 gap-3'>
                 <FormField
                   control={form.control}
                   name='sku'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('sku')} <span className="text-red-500">*</span></FormLabel>
-                      <div className="flex gap-2">
+                      <FormLabel className="text-sm">{t('sku')} <span className="text-red-500">*</span></FormLabel>
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <div className="w-full flex-1">
                           <FormControl>
-                            <Input placeholder={t('enterBarcode')} {...field} />
+                            <Input placeholder={t('enterBarcode')} {...field} className="h-10" />
                           </FormControl>
                         </div>
                         <Button
                           type="button"
-                          className="bg-orange hover:bg-orange-dark text-white"
+                          className="bg-orange hover:bg-orange-dark text-white h-10 shrink-0 w-full sm:w-auto"
                           onClick={() => {
                             const name = form.getValues('name')
                             if (!name) {
@@ -588,14 +587,14 @@ const ProductForm = ({
 
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-2 gap-2 items-start'>
                 <FormField
                   control={form.control}
                   name='category'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('category')} <span className="text-red-500">*</span></FormLabel>
-                      <div className="flex gap-2 items-center">
+                      <FormLabel className="text-sm">{t('category')} <span className="text-red-500">*</span></FormLabel>
+                      <div className="flex flex-row gap-2 items-center">
                         <div className="w-full flex-1">
                           <Select
                             onValueChange={(value) => {
@@ -606,7 +605,7 @@ const ProductForm = ({
                             defaultValue={field.value}
                           >
                             <FormControl>
-                              <SelectTrigger className="w-full">
+                              <SelectTrigger className="w-full h-10">
                                 <SelectValue placeholder={t('select')} />
                               </SelectTrigger>
                             </FormControl>
@@ -625,8 +624,8 @@ const ProductForm = ({
                             </SelectContent>
                           </Select>
                         </div>
-                        <Button type="button" variant="ghost" className="text-orange hover:text-orange-dark whitespace-nowrap px-2">
-                          <PlusCircle className="w-4 h-4 mr-1" /> {t('addNew')}
+                        <Button type="button" variant="ghost" size="icon" className="text-orange hover:text-orange-dark shrink-0 h-10 w-10">
+                          <PlusCircle className="w-5 h-5" />
                         </Button>
                       </div>
                       <FormMessage />
@@ -638,10 +637,10 @@ const ProductForm = ({
                   name='subCategory'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('subCategory')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="text-sm">{t('subCategory')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-10">
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
@@ -660,16 +659,16 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-2 gap-2'>
                 <FormField
                   control={form.control}
                   name='brand'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('brand')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="text-sm">{t('brand')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-10">
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
@@ -694,10 +693,10 @@ const ProductForm = ({
                   name='unit'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('unit')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="text-sm">{t('unit')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-10">
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
@@ -719,16 +718,16 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-2 gap-2'>
                 <FormField
                   control={form.control}
                   name='barcodeSymbology'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('barcodeSymbology')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="text-sm">{t('barcodeSymbology')} <span className="text-red-500">*</span></FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-10">
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
@@ -742,20 +741,23 @@ const ProductForm = ({
                     </FormItem>
                   )}
                 />
+              </div>
+
+              <div className='grid grid-cols-1 gap-2'>
                 <FormField
                   control={form.control}
                   name='itemBarcode'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('itemBarcode')} {productType === 'Single Product' && <span className="text-red-500">*</span>}</FormLabel>
-                      <div className="flex gap-2">
-                        <div className="w-full flex-1">
+                      <FormLabel className="text-sm">{t('itemBarcode')} {productType === 'Single Product' && <span className="text-red-500">*</span>}</FormLabel>
+                      <div className="flex flex-row gap-1">
+                        <div className="flex-1 min-w-0">
                           <FormControl>
                             <Input
                               placeholder={t('enterBarcode')}
                               {...field}
                               readOnly={barcodeScanned}
-                              className={barcodeScanned ? 'bg-muted cursor-not-allowed' : ''}
+                              className={`h-10 ${barcodeScanned ? 'bg-muted cursor-not-allowed' : ''}`}
                               onChange={(e) => {
                                 const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
                                 field.onChange(value)
@@ -770,6 +772,7 @@ const ProductForm = ({
                           size="icon"
                           onClick={() => setIsScannerOpen(true)}
                           title={t('scanBarcode')}
+                          className="h-10 w-10 shrink-0"
                         >
                           <ScanBarcode className="h-4 w-4" />
                         </Button>
@@ -777,19 +780,20 @@ const ProductForm = ({
                           <Button
                             type="button"
                             variant="outline"
+                            size="icon"
                             onClick={() => {
                               form.setValue('itemBarcode', '')
                               setBarcodeScanned(false)
                             }}
                             title={t('clearScannedBarcode')}
+                            className="h-10 w-10 shrink-0"
                           >
-                            <Trash className="h-4 w-4 mr-1" />
-                            {t('clear')}
+                            <Trash className="h-4 w-4" />
                           </Button>
                         ) : (
                           <Button
                             type="button"
-                            className="bg-orange hover:bg-orange-dark text-white"
+                            className="bg-orange hover:bg-orange-dark text-white h-10 shrink-0 px-3 text-xs"
                             onClick={() => {
                               const symbology = form.getValues('barcodeSymbology')
                               let barcode = ''
@@ -848,7 +852,7 @@ const ProductForm = ({
                 <span className="text-orange">ⓘ</span> {t('pricingAndStocks')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-3 p-3">
               <FormField
                 control={form.control}
                 name='productType'
@@ -897,16 +901,16 @@ const ProductForm = ({
                         )}
                       </div>
                     </CardHeader>
-                    <CardContent className="p-6 space-y-8">
+                    <CardContent className="p-3 space-y-3">
                       {attributes && attributes.length > 0 ? (
-                        <div className="space-y-8">
+                        <div className="space-y-4">
                           {/* Step 1: Attributes */}
-                          <div className="space-y-4">
+                          <div className="space-y-3">
                             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
                               <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-xs">1</span>
                               {t('selectAttributes')}
                             </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                               {attributes.map((attr) => (
                                 <div key={attr._id} className="space-y-2">
                                   <label className="text-xs font-medium text-gray-500 uppercase">{attr.name}</label>
@@ -947,9 +951,9 @@ const ProductForm = ({
                           <div className="border-t border-gray-100"></div>
 
                           {/* Step 2 & 3: Details */}
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             {/* Left Column: Pricing & Inventory */}
-                            <div className="space-y-5">
+                            <div className="space-y-3">
                               <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
                                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-xs">2</span>
                                 {t('pricingAndInventory')}
@@ -966,7 +970,7 @@ const ProductForm = ({
                                 />
                               </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                                 <div className="space-y-2">
                                   <label className="text-xs font-medium text-gray-500 uppercase">{t('costPerUnit')} <span className="text-red-500">*</span></label>
                                   <div className="relative">
@@ -1008,7 +1012,7 @@ const ProductForm = ({
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-2">
                                   <label className="text-xs font-medium text-gray-500 uppercase">{t('discountType')}</label>
                                   <Select
@@ -1053,7 +1057,7 @@ const ProductForm = ({
                               </div>
                             </div>
 
-                            <div className="space-y-5">
+                            <div className="space-y-3">
                               <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
                                 <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-600 text-xs">3</span>
                                 {t('identifiersAndMedia')}
@@ -1486,7 +1490,7 @@ const ProductForm = ({
               {form.watch('productType') === 'Single Product' && (
                 <div className="space-y-6 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 items-start">
                     {/* Inventory Section */}
                     <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
                       <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
@@ -1494,43 +1498,45 @@ const ProductForm = ({
                           <span className="text-orange">📦</span> {t('inventory')}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="p-6 space-y-4">
-                        <FormField
-                          control={form.control}
-                          name='countInStock'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('quantity')} <span className="text-red-500">*</span></FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Input type='number' placeholder={t('enterQuantity')} {...field} className="pl-9" />
-                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span className="text-gray-500 text-sm">#</span>
+                      <CardContent className="p-3 space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <FormField
+                            control={form.control}
+                            name='countInStock'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm">{t('quantity')} <span className="text-red-500">*</span></FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input type='number' placeholder={t('enterQuantity')} {...field} className="pl-9 h-10" />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                      <span className="text-gray-500 text-sm">#</span>
+                                    </div>
                                   </div>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name='quantityAlert'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('quantityAlert')} <span className="text-red-500">*</span></FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Input type='number' placeholder={t('enterQuantityAlert')} {...field} className="pl-9" />
-                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span className="text-gray-500 text-sm">⚠️</span>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name='quantityAlert'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm">{t('quantityAlert')} <span className="text-red-500">*</span></FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input type='number' placeholder={t('enterQuantityAlert')} {...field} className="pl-9 h-10" />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                      <span className="text-gray-500 text-sm">⚠️</span>
+                                    </div>
                                   </div>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </CardContent>
                     </Card>
 
@@ -1541,8 +1547,8 @@ const ProductForm = ({
                           <span className="text-orange">💰</span> {t('pricing')}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="p-6 space-y-4">
-                        <div className="flex flex-row gap-4">
+                      <CardContent className="p-3 space-y-3">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                           <FormField
                             control={form.control}
                             name='costPerUnit'
@@ -1551,7 +1557,7 @@ const ProductForm = ({
                                 <FormLabel className="text-sm whitespace-nowrap">{t('costPerUnit')} <span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' step='0.01' placeholder={t('enterCost')} {...field} className="pl-9" />
+                                    <Input type='number' step='0.01' placeholder={t('enterCost')} {...field} className="pl-9 h-10" />
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                       <span className="text-gray-500 text-sm">$</span>
                                     </div>
@@ -1569,7 +1575,7 @@ const ProductForm = ({
                                 <FormLabel className="text-sm whitespace-nowrap">{t('listPrice')} <span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' step='0.01' placeholder={t('enterListPrice')} {...field} className="pl-9" />
+                                    <Input type='number' step='0.01' placeholder={t('enterListPrice')} {...field} className="pl-9 h-10" />
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                       <span className="text-gray-500 text-sm">$</span>
                                     </div>
@@ -1605,16 +1611,16 @@ const ProductForm = ({
                             )}
                           />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-2">
                           <FormField
                             control={form.control}
                             name='taxType'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{t('taxType')} <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel className="text-sm">{t('taxType')} <span className="text-red-500">*</span></FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="h-10">
                                       <SelectValue placeholder={t('select')} />
                                     </SelectTrigger>
                                   </FormControl>
@@ -1632,10 +1638,10 @@ const ProductForm = ({
                             name='tax'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{t('tax')} <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel className="text-sm">{t('tax')} <span className="text-red-500">*</span></FormLabel>
                                 <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={String(field.value)}>
                                   <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="h-10">
                                       <SelectValue placeholder={t('select')} />
                                     </SelectTrigger>
                                   </FormControl>
@@ -1659,46 +1665,48 @@ const ProductForm = ({
                           <span className="text-orange">🏷️</span> {t('discount')}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="p-6 space-y-4">
-                        <FormField
-                          control={form.control}
-                          name='discountType'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('discountType')} <span className="text-red-500">*</span></FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <CardContent className="p-3 space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <FormField
+                            control={form.control}
+                            name='discountType'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm">{t('discountType')} <span className="text-red-500">*</span></FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="h-10">
+                                      <SelectValue placeholder={t('select')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Percentage">{t('percentage')}</SelectItem>
+                                    <SelectItem value="Fixed">{t('fixed')}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name='discountValue'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm">{t('discountValue')} <span className="text-red-500">*</span></FormLabel>
                                 <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder={t('select')} />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Percentage">{t('percentage')}</SelectItem>
-                                  <SelectItem value="Fixed">{t('fixed')}</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name='discountValue'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('discountValue')} <span className="text-red-500">*</span></FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Input type='number' placeholder={t('enterDiscount')} {...field} className="pl-9" />
-                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span className="text-gray-500 text-sm">%</span>
+                                  <div className="relative">
+                                    <Input type='number' placeholder={t('enterDiscount')} {...field} className="pl-9 h-10" />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                      <span className="text-gray-500 text-sm">%</span>
+                                    </div>
                                   </div>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
@@ -1709,12 +1717,12 @@ const ProductForm = ({
 
           {/* Settings Section - Always visible for all product types */}
           <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
-            <CardContent className="p-6">
+            <CardContent className="p-3">
               <FormField
                 control={form.control}
                 name='isPublished'
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-gray-50/50">
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-gray-50/50">
                     <div className="space-y-0.5">
                       <FormLabel className="text-base font-medium text-navy">{t('published')}</FormLabel>
                       <div className="text-sm text-muted-foreground">
@@ -1774,7 +1782,6 @@ const ProductForm = ({
                             <UploadButton
                               endpoint='imageUploader'
                               onClientUploadComplete={(res: any[]) => {
-                                console.log('resIMG', res)
                                 const imgUploaded: ProductImage = {
                                   imgUrl: res[0].ufsUrl || res[0].url,
                                   imgKey: res[0].key
@@ -1782,7 +1789,6 @@ const ProductForm = ({
                                 form.setValue('images', [...images, imgUploaded])
                               }}
                               onUploadError={(error: Error) => {
-                                console.log(error)
                               }}
                             />
                           </FormControl>
@@ -1797,15 +1803,15 @@ const ProductForm = ({
             </CardContent>
           </Card>
 
-          <div className="flex justify-end gap-4">
-            <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2">
+            <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)} className="w-full sm:w-auto h-10">
               {tCommon('cancel')}
             </Button>
             <Button
               type='submit'
               size='lg'
               disabled={form.formState.isSubmitting}
-              className='bg-orange hover:bg-orange-dark text-white'
+              className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
             >
               {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
             </Button>

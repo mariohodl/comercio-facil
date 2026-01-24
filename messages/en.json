@@ -329,6 +329,7 @@
         "header": {
             "searchPlaceholder": "Search everything...",
             "quickAction": "Quick Action",
+            "quickActionShort": "New",
             "shortcuts": "Shortcuts",
             "newProduct": "New Product",
             "newSale": "New Sale"

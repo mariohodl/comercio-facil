@@ -2,7 +2,7 @@
 import React from 'react'
 import { MKInput } from '@/components/shared/MKInput'
 import { MKButton } from '@/components/shared/MKButton'
-import { useForm, SubmitHandler} from 'react-hook-form'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { createProveedor } from '@/lib/actions/proveedor.actions'
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -18,7 +18,7 @@ const CreateProveedor = () => {
   const router = useRouter();
   const { showSuccess, showError } = useToast()
 
-  const { register, handleSubmit,} = useForm<FormFields>({
+  const { register, handleSubmit, } = useForm<FormFields>({
     defaultValues: {
       nameProvider: '',
       clave: '',
@@ -32,7 +32,6 @@ const CreateProveedor = () => {
     const proveedorData = {
       ...data,
     }
-    console.log('proveedorData', proveedorData)
     createProveedor(proveedorData)
       .then((res) => {
         if (res?.success) {
@@ -46,7 +45,6 @@ const CreateProveedor = () => {
       })
       .catch((err) => {
         showError('Error al crear el proveedor')
-        console.log('err', err)
       })
 
   }
@@ -71,7 +69,7 @@ const CreateProveedor = () => {
             placeholder="Ingresa la clave del proveedor"
           />
         </div>
-        
+
         <div className='m-3 w-1/3'>
           <MKInput
             label="RFC del proveedor"
@@ -82,7 +80,7 @@ const CreateProveedor = () => {
         </div>
       </div>
 
-   
+
       <div className='flex justify-center m-3 mt-10'>
         <MKButton>Guardar Proveedor</MKButton>
       </div>

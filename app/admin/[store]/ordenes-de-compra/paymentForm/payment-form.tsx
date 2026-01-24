@@ -38,8 +38,7 @@ export default function OrderPaymentForm({
     // shippingAddress,
     isPaid,
   } = order
-//   const { toast } = useToast()
-console.log('ORDER', order)
+  //   const { toast } = useToast()
 
   if (isPaid) {
     redirect(`/account/orders/${order._id}`)
@@ -57,13 +56,13 @@ console.log('ORDER', order)
   const handleCreatePayPalOrder = async () => {
     const res = await createPayPalOrder(order._id)
     if (!res.success)
-      showSuccess(res.message, {duration: 3000, position: 'top-center', important: true})
+      showSuccess(res.message, { duration: 3000, position: 'top-center', important: true })
     return res.data
   }
   const handleApprovePayPalOrder = async (data: { orderID: string }) => {
     const res = await approvePayPalOrder(order._id, data)
 
-    showSuccess(res.message, {duration: 3000, position: 'top-center', important: true})
+    showSuccess(res.message, { duration: 3000, position: 'top-center', important: true })
   }
 
   const CheckoutSummary = () => (
@@ -72,7 +71,7 @@ console.log('ORDER', order)
         <div>
           {/* <div className='text-lg font-bold'>Order Summary</div> */}
           <div className='space-y-2 pt-0'>
-           
+
             {/* <div className='flex justify-between  pt-1 font-bold text-lg'>
               <span> Order Total:</span>
             

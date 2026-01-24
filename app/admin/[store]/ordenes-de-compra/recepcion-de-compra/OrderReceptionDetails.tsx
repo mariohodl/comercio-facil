@@ -108,8 +108,6 @@ const OrderReceptionDetails = () => {
 
 
   useEffect(() => {
-    console.log('nameProviderWatcher', nameProviderWatcher)
-    console.log('proveedoresData', proveedoresData)
     // if(nameProviderWatcher?.length < 3) {
     //   setFilteredProveedoresData([])
     //   setAutoCompleteReady(true)
@@ -141,11 +139,9 @@ const OrderReceptionDetails = () => {
   useEffect(() => {
 
     if (productToAddNameWatcher?.length > 2 && productsData?.length > 0) {
-      console.log(productToAddNameWatcher)
       const results = productsData?.filter((item: any) => {
         return item?.name?.toLowerCase().includes(productToAddNameWatcher?.toLowerCase())
       })
-      console.log(results)
       if (results.length > 0) {
         //assign results to the autoCompleteData
 
@@ -193,7 +189,6 @@ const OrderReceptionDetails = () => {
     }
     createOrderReception(orderReceptionData)
       .then((res) => {
-        console.log('res', res)
         if (res?.success) {
           showSuccess('Recepcion de compra creada correctamente')
           setTimeout(() => {
@@ -205,7 +200,6 @@ const OrderReceptionDetails = () => {
       })
       .catch((err) => {
         showError('Error al crear Recepcion de compra')
-        console.log('err', err)
       })
 
   }
@@ -224,7 +218,6 @@ const OrderReceptionDetails = () => {
       setIdBasedOnSavedProducts(idResult);
       const idSuggested = idResult + 1;
       setValue('productToAddProductId', idSuggested)
-      console.log('PRODUCTOS', data.products)
       setProductsData(data?.products)
     })
   }, [])
@@ -234,7 +227,6 @@ const OrderReceptionDetails = () => {
       const idSuggested = idBasedOnSavedProducts + (productsPreAdded.length + 1);
       setValue('productToAddProductId', idSuggested)
     }
-    console.log('se renderiza una ves')
   }, [productsPreAdded])
 
   const handleAutoCompleteProveedorSelected = (item: any) => {
@@ -282,8 +274,6 @@ const OrderReceptionDetails = () => {
       isAtLeastOneError = true
     }
 
-    console.log(productToAddPriceWatcherDDD)
-    console.log(productToAddQuantityWatcherDDD)
     if (isAtLeastOneError) {
       return
     }

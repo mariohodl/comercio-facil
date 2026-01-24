@@ -348,6 +348,7 @@
         "header": {
             "searchPlaceholder": "Buscar en todo...",
             "quickAction": "Acción Rápida",
+            "quickActionShort": "Nueva",
             "shortcuts": "Atajos",
             "newProduct": "Nuevo Producto",
             "newSale": "Nueva Venta"

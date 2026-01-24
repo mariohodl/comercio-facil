@@ -187,7 +187,6 @@ export function AdminNav({
       ],
     },
   ]
-  console.log(companyName)
   return (
     <nav className={cn(
       'w-full h-full overflow-y-auto bg-white border-r border-gray-200 pb-10',

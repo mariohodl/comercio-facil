@@ -17,12 +17,11 @@ export default async function AdminLayout({
     children: React.ReactNode
 }) {
     const session = await auth()
-    console.log(session?.user)
     return (
         <>
             <div className='flex flex-col min-h-screen bg-gray-50/50'>
                 <div className='bg-[#0f172a] text-white fixed top-0 left-0 w-full z-20 border-b border-white/5 backdrop-blur-xl'>
-                    <div className='flex h-16 items-center px-6 transition-all duration-300'>
+                    <div className='flex h-16 items-center md:px-6 transition-all duration-300'>
                         {/* Mobile Sidebar Trigger */}
                         <div className='md:hidden mr-2'>
                             <Sheet>
@@ -44,15 +43,15 @@ export default async function AdminLayout({
                         <div className='flex items-center shrink-0'>
                             <Link
                                 href={`/`}
-                                className='px-3 py-1.5 rounded-xl hover:bg-white/5 transition-all active:scale-95 group'
+                                className=' py-1.5 rounded-xl hover:bg-white/5 transition-all active:scale-95 group'
                             >
                                 <Image
                                     src='/images/app-logo.png'
                                     alt={APP_NAME}
                                     height={32}
-                                    width={120}
+                                    width={166}
                                     priority
-                                    className='object-contain brightness-0 invert'
+                                    className='object-contain'
                                 />
                             </Link>
                         </div>
@@ -62,12 +61,12 @@ export default async function AdminLayout({
                         </div>
                     </div>
                     {/* Mobile Header Links */}
-                    <div className='md:hidden border-t border-gray-800'>
-                        <AdminHeader className='flex px-4 py-2 overflow-x-auto' />
+                    <div className='md:hidden border-t border-white/5'>
+                        <AdminHeader className='px-6 py-1.5' />
                     </div>
                 </div>
 
-                <div className='flex pt-28 md:pt-16'> {/* Adjusted padding for mobile double header */}
+                <div className='flex pt-28 md:pt-16'>
                     {/* Desktop Sidebar */}
                     <aside className='hidden md:block w-64 fixed left-0 top-16 bottom-0 z-10'>
                         <AdminNav

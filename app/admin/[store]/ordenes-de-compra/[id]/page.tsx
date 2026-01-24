@@ -37,11 +37,8 @@ const OrdenDeCompra = async (props: OrderReceived) => {
   if (!order) notFound()
 
   const totalPrice = order?.total || 0
-  console.log('order', order)
 
   const session = await auth()
-
-  console.log('props', params)
   let client_secret = null
   if (paymentMethod === 'Stripe' && !order.isPaid) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)

@@ -25,7 +25,7 @@ const CreateProductPage = async (props: {
   const warehouses = await getUserWarehouses()
 
   return (
-    <main className='p-4'>
+    <main className='py-4'>
       <ProductForm type='Create' categories={categories} brands={brands} units={units} attributes={attributes} storeId={store} stores={stores} warehouses={warehouses} />
     </main>
   )
