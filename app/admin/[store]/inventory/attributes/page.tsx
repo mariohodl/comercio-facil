@@ -8,7 +8,7 @@ export default async function AttributesPage(props: {
     const attributes = await getAttributesByStore(params.store)
 
     return (
-        <div className="flex-1 space-y-4 p-8 pt-6">
+        <div className="flex-1 space-y-4 md:p-6">
             <AttributeClient data={attributes} storeId={params.store} />
         </div>
     )

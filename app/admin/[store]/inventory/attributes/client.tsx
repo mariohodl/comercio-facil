@@ -59,44 +59,48 @@ export function AttributeClient({ data, storeId }: AttributeClientProps) {
     })
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-navy">{t('title')}</h1>
-                    <p className="text-muted-foreground">{t('description')}</p>
+                    <p className="text-sm text-muted-foreground">{t('description')}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" className="text-red-500 bg-red-50 border-red-100 hover:bg-red-100">
-                        <FileText className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="text-green-600 bg-green-50 border-green-100 hover:bg-green-100">
-                        <FileSpreadsheet className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon">
-                        <RefreshCw className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon">
-                        <ChevronUp className="h-4 w-4" />
-                    </Button>
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <div className="flex items-center gap-2 mr-auto sm:mr-0">
+                        <Button variant="outline" size="icon" className="text-red-500 bg-red-50 border-red-100 hover:bg-red-100 h-9 w-9">
+                            <FileText className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="icon" className="text-green-600 bg-green-50 border-green-100 hover:bg-green-100 h-9 w-9">
+                            <FileSpreadsheet className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="icon" className="h-9 w-9">
+                            <RefreshCw className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="icon" className="h-9 w-9">
+                            <ChevronUp className="h-4 w-4" />
+                        </Button>
+                    </div>
                     <AttributeDialog
                         storeId={storeId}
                         trigger={
-                            <Button className="bg-orange hover:bg-orange-dark text-white">
-                                <Plus className="mr-2 h-4 w-4" /> {t('addVariant')}
+                            <Button className="bg-orange hover:bg-orange-dark text-white h-9 px-4 flex-1 sm:flex-none">
+                                <Plus className="mr-2 h-4 w-4" />
+                                <span className="hidden sm:inline">{t('addVariant')}</span>
+                                <span className="sm:hidden">{tCommon('add')}</span>
                             </Button>
                         }
                     />
                 </div>
             </div>
 
-            <div className="flex items-center py-4 bg-white p-4 rounded-lg border shadow-sm">
-                <div className="relative w-full md:w-72">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-col md:flex-row items-stretch md:items-center py-4 bg-white p-4 rounded-lg border shadow-sm gap-4">
+                <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder={t('search')}
                         value={globalFilter ?? ''}
                         onChange={(event) => setGlobalFilter(event.target.value)}
-                        className="pl-8"
+                        className="pl-10 w-full"
                     />
                 </div>
                 <div className="ml-auto">
@@ -104,64 +108,69 @@ export function AttributeClient({ data, storeId }: AttributeClientProps) {
                 </div>
             </div>
 
-            <div className="rounded-md border bg-white shadow-sm">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && 'selected'}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </TableCell>
-                                    ))}
+            <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id} className="bg-gray-50/50">
+                                    {headerGroup.headers.map((header) => {
+                                        return (
+                                            <TableHead key={header.id} className="font-semibold text-navy py-4">
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext()
+                                                    )}
+                                            </TableHead>
+                                        )
+                                    })}
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    {t('noResults')}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows?.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={row.getIsSelected() && 'selected'}
+                                        className="hover:bg-gray-50/50 transition-colors"
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id} className="py-4">
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-32 text-center text-gray-500"
+                                    >
+                                        {t('noResults')}
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+                <div className="flex-1 text-sm text-muted-foreground order-2 sm:order-1">
                     {/* Row per page selector could go here */}
                 </div>
-                <div className="space-x-2">
+                <div className="flex items-center gap-2 order-1 sm:order-2">
                     <Button
                         variant="outline"
                         size="sm"
+                        className="h-9 px-4"
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
@@ -170,6 +179,7 @@ export function AttributeClient({ data, storeId }: AttributeClientProps) {
                     <Button
                         variant="outline"
                         size="sm"
+                        className="h-9 px-4"
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >

@@ -28,11 +28,6 @@ declare module 'next-auth' {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	...authConfig,
-	pages: {
-		signIn: '/sign-in',
-		newUser: '/sign-up',
-		error: '/sign-in',
-	},
 	session: {
 		strategy: 'jwt',
 		maxAge: 30 * 24 * 60 * 60,

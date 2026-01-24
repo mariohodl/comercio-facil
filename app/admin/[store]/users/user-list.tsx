@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Trash2, Edit, Eye, Plus } from 'lucide-react'
+import { Trash2, Edit, Eye, Plus, Search } from 'lucide-react'
 import { IUser } from '@/lib/db/models/user.model'
 import { Button } from '@/components/ui/button'
 import Pagination from '@/components/shared/pagination'
@@ -54,114 +54,132 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
     }
 
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
-                <div className="relative w-72">
-                    <form onSubmit={handleSearch}>
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-2 md:px-0">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-navy">{t('userName')}</h1>
+                    <p className="text-sm text-muted-foreground">{t('manageUsers')}</p>
+                </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-white p-4 md:p-6 rounded-xl border border-neutral-warm shadow-sm mx-2 md:mx-0">
+                <div className="relative flex-1 group">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-orange" />
+                    <form onSubmit={handleSearch} className="w-full">
                         <Input
                             placeholder={t('search')}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="pl-4"
+                            className="pl-10 h-11 w-full bg-gray-50/50 border-gray-200 focus:bg-white transition-all"
                         />
                     </form>
                 </div>
                 <div className="flex gap-2">
                     <Button
                         onClick={() => openModal('add')}
-                        className="bg-orange hover:bg-orange-600 text-white"
+                        className="bg-orange hover:bg-orange-dark text-white h-11 px-6 shadow-md shadow-orange/20 font-bold flex-1 sm:flex-none"
                     >
-                        <Plus className="mr-2 h-4 w-4" /> {t('addUser')}
+                        <Plus className="mr-2 h-4 w-4" />
+                        <span className="hidden sm:inline">{t('addUser')}</span>
+                        <span className="sm:hidden">{tCommon('add')}</span>
                     </Button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                <Table>
-                    <TableHeader className="bg-gray-50">
-                        <TableRow>
-                            <TableHead className="font-semibold text-gray-600">{t('userName')}</TableHead>
-                            <TableHead className="font-semibold text-gray-600">{t('phone')}</TableHead>
-                            <TableHead className="font-semibold text-gray-600">{t('email')}</TableHead>
-                            <TableHead className="font-semibold text-gray-600">{t('role')}</TableHead>
-                            <TableHead className="font-semibold text-gray-600">{t('status')}</TableHead>
-                            <TableHead className="font-semibold text-gray-600 text-right">{t('action')}</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {users.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                                    {t('noUsersFound')}
-                                </TableCell>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mx-2 md:mx-0">
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader className="bg-gray-50/50">
+                            <TableRow className="hover:bg-transparent">
+                                <TableHead className="font-bold text-navy py-4 min-w-[200px]">{t('userName')}</TableHead>
+                                <TableHead className="font-bold text-navy py-4 min-w-[150px]">{t('phone')}</TableHead>
+                                <TableHead className="font-bold text-navy py-4 min-w-[200px]">{t('email')}</TableHead>
+                                <TableHead className="font-bold text-navy py-4 min-w-[100px]">{t('role')}</TableHead>
+                                <TableHead className="font-bold text-navy py-4 min-w-[100px]">{t('status')}</TableHead>
+                                <TableHead className="font-bold text-navy py-4 text-right w-[120px]">{tCommon('actions')}</TableHead>
                             </TableRow>
-                        ) : (
-                            users.map((user) => (
-                                <TableRow key={user._id} className="hover:bg-gray-50 transition-colors">
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <div className={`h-10 w-10 flex items-center justify-center rounded-full font-bold text-sm shadow-inner ${['bg-blue-50 text-blue-600 border border-blue-100',
+                        </TableHeader>
+                        <TableBody>
+                            {users.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="text-center py-16 text-gray-500">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Search className="h-8 w-8 text-gray-300" />
+                                            <p>{t('noUsersFound')}</p>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                users.map((user) => (
+                                    <TableRow key={user._id} className="hover:bg-gray-50/50 transition-colors border-b last:border-0">
+                                        <TableCell className="py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`h-10 w-10 flex items-center justify-center rounded-full font-bold text-sm shadow-sm flex-shrink-0 ${['bg-blue-50 text-blue-600 border border-blue-100',
                                                     'bg-purple-50 text-purple-600 border border-purple-100',
                                                     'bg-orange-50 text-orange-600 border border-orange-100',
                                                     'bg-green-50 text-green-600 border border-green-100',
                                                     'bg-pink-50 text-pink-600 border border-pink-100',
                                                     'bg-cyan-50 text-cyan-600 border border-cyan-100'][user.name.length % 6]
-                                                }`}>
-                                                {user.name.charAt(0).toUpperCase()}
+                                                    }`}>
+                                                    {user.name.charAt(0).toUpperCase()}
+                                                </div>
+                                                <span className="font-semibold text-navy truncate max-w-[150px]">{user.name}</span>
                                             </div>
-                                            <span className="font-medium text-gray-900">{user.name}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-gray-600">
-                                        {user.phone || (user as any).address?.phone || tCommon('notAvailable')}
-                                    </TableCell>
-                                    <TableCell className="text-gray-600">{user.email}</TableCell>
-                                    <TableCell>
-                                        <span className="text-gray-600">{t(`roles.${user.role}`)}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                        {user.status !== false ? (
-                                            <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none shadow-none">
-                                                {t('active')}
+                                        </TableCell>
+                                        <TableCell className="text-gray-600 py-4 font-medium italic">
+                                            {user.phone || (user as any).address?.phone || tCommon('notAvailable')}
+                                        </TableCell>
+                                        <TableCell className="text-gray-600 py-4">{user.email}</TableCell>
+                                        <TableCell className="py-4">
+                                            <Badge variant="outline" className="bg-gray-50/50 text-gray-600 border-gray-200">
+                                                {t(`roles.${user.role}`)}
                                             </Badge>
-                                        ) : (
-                                            <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-none shadow-none">
-                                                {t('inactive')}
-                                            </Badge>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex items-center justify-end gap-2">
-
-                                            {!(user.role === 'Admin' && user.isStore) && (
-                                                <DeleteDialog id={user._id} action={deleteUser} />
+                                        </TableCell>
+                                        <TableCell className="py-4">
+                                            {user.status !== false ? (
+                                                <Badge className="bg-green-50 text-green-600 hover:bg-green-100 border-none shadow-none flex items-center gap-1 w-fit">
+                                                    <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                                                    {t('active')}
+                                                </Badge>
+                                            ) : (
+                                                <Badge className="bg-red-50 text-red-600 hover:bg-red-100 border-none shadow-none flex items-center gap-1 w-fit">
+                                                    <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                                                    {t('inactive')}
+                                                </Badge>
                                             )}
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => openModal('view', user)}
-                                                className="h-8 w-8 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
-                                            >
-                                                <Eye className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => openModal('edit', user)}
-                                                className="h-8 w-8 text-green-500 hover:text-green-700 hover:bg-green-50"
-                                            >
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )))}
-                    </TableBody>
-                </Table>
+                                        </TableCell>
+                                        <TableCell className="text-right py-4">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => openModal('view', user)}
+                                                    className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => openModal('edit', user)}
+                                                    className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50 transition-colors"
+                                                >
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                                {!(user.role === 'Admin' && user.isStore) && (
+                                                    <DeleteDialog id={user._id} action={deleteUser} />
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )))}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
 
             {totalPages > 1 && (
-                <div className="mt-4">
+                <div className="mt-6 flex justify-center sm:justify-end px-2 md:px-0">
                     <Pagination page={page} totalPages={totalPages} />
                 </div>
             )}

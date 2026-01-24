@@ -35,6 +35,7 @@ export default async function AdminLayout({
                                         storeId={session?.user?.storeId || ''}
                                         storeName={session?.user?.storeName || ''}
                                         companyName={session?.user?.companyName || ''}
+                                        isMobile={true}
                                     />
                                 </SheetContent>
                             </Sheet>

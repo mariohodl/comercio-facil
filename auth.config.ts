@@ -3,6 +3,11 @@ import type { NextAuthConfig } from 'next-auth';
 // Notice this is only an object, not a full Auth.js instance
 export default {
 	providers: [],
+	pages: {
+		signIn: '/sign-in',
+		newUser: '/sign-up',
+		error: '/sign-in',
+	},
 	callbacks: {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		authorized({ request, auth }: any) {

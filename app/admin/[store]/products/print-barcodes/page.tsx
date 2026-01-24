@@ -22,7 +22,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { Trash2, Plus, Minus, Printer, RotateCcw, Settings } from 'lucide-react'
+import { Trash2, Plus, Minus, Printer, RotateCcw, Settings, Search } from 'lucide-react'
 import { getAllProductsForAdmin } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { useDebounce } from '@/hooks/use-debounce'
@@ -115,19 +115,21 @@ export default function PrintBarcodesPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight">{t('printBarcode.title')}</h1>
-                <p className="text-muted-foreground">{t('printBarcode.subtitle')}</p>
+        <div className="space-y-6 md:p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-2 md:px-0">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-navy">{t('printBarcode.title')}</h1>
+                    <p className="text-sm text-muted-foreground">{t('printBarcode.subtitle')}</p>
+                </div>
             </div>
 
-            <Card>
-                <CardContent className="p-6 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="mx-2 md:mx-0">
+                <CardContent className="p-4 md:p-6 space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                         <div className="space-y-2">
-                            <Label>{t('printBarcode.warehouse')} <span className="text-red-500">*</span></Label>
+                            <Label className="text-sm font-semibold text-navy">{t('printBarcode.warehouse')} <span className="text-red-500">*</span></Label>
                             <Select>
-                                <SelectTrigger>
+                                <SelectTrigger className="h-10">
                                     <SelectValue placeholder={t('printBarcode.select')} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -136,9 +138,9 @@ export default function PrintBarcodesPage() {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label>{t('printBarcode.store')} <span className="text-red-500">*</span></Label>
+                            <Label className="text-sm font-semibold text-navy">{t('printBarcode.store')} <span className="text-red-500">*</span></Label>
                             <Select>
-                                <SelectTrigger>
+                                <SelectTrigger className="h-10">
                                     <SelectValue placeholder={t('printBarcode.select')} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -149,22 +151,36 @@ export default function PrintBarcodesPage() {
                     </div>
 
                     <div className="space-y-2 relative">
-                        <Label>{t('printBarcode.product')} <span className="text-red-500">*</span></Label>
-                        <Input
-                            placeholder={t('printBarcode.searchPlaceholder')}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+                        <Label className="text-sm font-semibold text-navy">{t('printBarcode.product')} <span className="text-red-500">*</span></Label>
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder={t('printBarcode.searchPlaceholder')}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-10 h-10 w-full"
+                            />
+                        </div>
                         {searchResults.length > 0 && (
-                            <div className="absolute z-10 w-full bg-white border rounded-md shadow-lg mt-1 max-h-60 overflow-auto">
+                            <div className="absolute z-20 w-full bg-white border rounded-md shadow-xl mt-1 max-h-60 overflow-auto border-gray-100">
                                 {searchResults.map(product => (
                                     <div
                                         key={product._id}
-                                        className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                                        className="p-3 hover:bg-gray-50 cursor-pointer flex justify-between items-center border-b last:border-0 transition-colors"
                                         onClick={() => handleAddProduct(product)}
                                     >
-                                        <span>{product.name}</span>
-                                        <span className="text-sm text-gray-500">{product.sku}</span>
+                                        <div className="flex items-center gap-3">
+                                            <div className="relative h-8 w-8 rounded bg-gray-50 border overflow-hidden">
+                                                <Image
+                                                    src={product.images[0]?.imgUrl || '/placeholder.png'}
+                                                    alt={product.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                            <span className="font-medium text-navy text-sm">{product.name}</span>
+                                        </div>
+                                        <span className="text-xs font-mono text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{product.sku}</span>
                                     </div>
                                 ))}
                             </div>
@@ -172,82 +188,90 @@ export default function PrintBarcodesPage() {
                     </div>
 
                     {selectedProducts.length > 0 && (
-                        <div className="border rounded-md">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className="bg-gray-50">
-                                        <TableHead>{t('printBarcode.product')}</TableHead>
-                                        <TableHead>{t('printBarcode.sku')}</TableHead>
-                                        <TableHead>{t('printBarcode.code')}</TableHead>
-                                        <TableHead>{t('printBarcode.qty')}</TableHead>
-                                        <TableHead className="w-[50px]"></TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {selectedProducts.map(({ product, quantity }) => (
-                                        <TableRow key={product._id}>
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="relative h-10 w-10 overflow-hidden rounded-md border">
-                                                        <Image
-                                                            src={product.images[0]?.imgUrl || '/placeholder.png'}
-                                                            alt={product.name}
-                                                            fill
-                                                            className="object-cover"
-                                                        />
-                                                    </div>
-                                                    <span>{product.name}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>{product.sku}</TableCell>
-                                            <TableCell>{product.itemBarcode}</TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="h-8 w-8"
-                                                        onClick={() => handleQuantityChange(product._id, -1)}
-                                                    >
-                                                        <Minus className="h-4 w-4" />
-                                                    </Button>
-                                                    <span className="w-8 text-center">{quantity}</span>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="h-8 w-8"
-                                                        onClick={() => handleQuantityChange(product._id, 1)}
-                                                    >
-                                                        <Plus className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                    onClick={() => handleRemoveProduct(product._id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </TableCell>
+                        <div className="border rounded-lg overflow-hidden bg-white">
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-gray-50/50">
+                                            <TableHead className="min-w-[200px]">{t('printBarcode.product')}</TableHead>
+                                            <TableHead className="min-w-[120px]">{t('printBarcode.sku')}</TableHead>
+                                            <TableHead className="min-w-[120px]">{t('printBarcode.code')}</TableHead>
+                                            <TableHead className="min-w-[140px]">{t('printBarcode.qty')}</TableHead>
+                                            <TableHead className="w-[50px]"></TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {selectedProducts.map(({ product, quantity }) => (
+                                            <TableRow key={product._id} className="hover:bg-gray-50/30 transition-colors">
+                                                <TableCell className="font-medium">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="relative h-10 w-10 overflow-hidden rounded-md border bg-gray-50 flex-shrink-0">
+                                                            <Image
+                                                                src={product.images[0]?.imgUrl || '/placeholder.png'}
+                                                                alt={product.name}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        </div>
+                                                        <span className="text-navy font-semibold text-sm line-clamp-1">{product.name}</span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600 italic">
+                                                        {product.sku}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="text-sm text-gray-600">{product.itemBarcode}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-8 w-8 hover:bg-orange-50 hover:text-orange"
+                                                            onClick={() => handleQuantityChange(product._id, -1)}
+                                                        >
+                                                            <Minus className="h-3 w-3" />
+                                                        </Button>
+                                                        <span className="w-8 text-center font-bold text-navy">{quantity}</span>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-8 w-8 hover:bg-orange-50 hover:text-orange"
+                                                            onClick={() => handleQuantityChange(product._id, 1)}
+                                                        >
+                                                            <Plus className="h-3 w-3" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                                        onClick={() => handleRemoveProduct(product._id)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </div>
                     )}
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardContent className="p-6">
+            <Card className="mx-2 md:mx-0">
+                <CardContent className="p-4 md:p-6">
                     <div className="space-y-6">
                         <div className="space-y-2">
-                            <Label>{t('printBarcode.paperSize')} <span className="text-red-500">*</span></Label>
+                            <Label className="text-sm font-semibold text-navy">{t('printBarcode.paperSize')} <span className="text-red-500">*</span></Label>
                             <Select value={paperSize} onValueChange={setPaperSize}>
-                                <SelectTrigger>
+                                <SelectTrigger className="h-10">
                                     <SelectValue placeholder={t('printBarcode.select')} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -259,37 +283,46 @@ export default function PrintBarcodesPage() {
                             </Select>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="flex items-center justify-between space-x-2">
-                                <Label htmlFor="store-name">{t('printBarcode.showStoreName')}</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-gray-50/30">
+                                <Label htmlFor="store-name" className="text-sm font-medium text-navy cursor-pointer">
+                                    {t('printBarcode.showStoreName')}
+                                </Label>
                                 <Switch
                                     id="store-name"
                                     checked={showStoreName}
                                     onCheckedChange={setShowStoreName}
+                                    className="data-[state=checked]:bg-orange"
                                 />
                             </div>
-                            <div className="flex items-center justify-between space-x-2">
-                                <Label htmlFor="product-name">{t('printBarcode.showProductName')}</Label>
+                            <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-gray-50/30">
+                                <Label htmlFor="product-name" className="text-sm font-medium text-navy cursor-pointer">
+                                    {t('printBarcode.showProductName')}
+                                </Label>
                                 <Switch
                                     id="product-name"
                                     checked={showProductName}
                                     onCheckedChange={setShowProductName}
+                                    className="data-[state=checked]:bg-orange"
                                 />
                             </div>
-                            <div className="flex items-center justify-between space-x-2">
-                                <Label htmlFor="price">{t('printBarcode.showPrice')}</Label>
+                            <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-gray-50/30">
+                                <Label htmlFor="price" className="text-sm font-medium text-navy cursor-pointer">
+                                    {t('printBarcode.showPrice')}
+                                </Label>
                                 <Switch
                                     id="price"
                                     checked={showPrice}
                                     onCheckedChange={setShowPrice}
+                                    className="data-[state=checked]:bg-orange"
                                 />
                             </div>
                         </div>
 
-                        <div className="flex justify-end gap-3 pt-4">
+                        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                             <Button
                                 variant="outline"
-                                className="bg-orange-400 text-white hover:bg-orange-500 hover:text-white border-none"
+                                className="bg-orange/10 text-orange hover:bg-orange hover:text-white border-orange/20 h-11 px-6 font-bold"
                                 onClick={() => setIsModalOpen(true)}
                                 disabled={selectedProducts.length === 0}
                             >
@@ -298,18 +331,18 @@ export default function PrintBarcodesPage() {
                             </Button>
                             <Button
                                 variant="outline"
-                                className="bg-navy text-white hover:bg-navy-dark hover:text-white border-none"
+                                className="bg-navy/5 text-navy hover:bg-navy hover:text-white border-navy/10 h-11 px-6 font-bold"
                                 onClick={handleReset}
                             >
                                 <RotateCcw className="mr-2 h-4 w-4" />
                                 {t('printBarcode.resetBarcode')}
                             </Button>
                             <Button
-                                className="bg-red-600 hover:bg-red-700 text-white"
+                                className="bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-200 h-11 px-8 font-extrabold"
                                 onClick={() => setIsModalOpen(true)}
                                 disabled={selectedProducts.length === 0}
                             >
-                                <Printer className="mr-2 h-4 w-4" />
+                                <Printer className="mr-2 h-5 w-5" />
                                 {t('printBarcode.printBarcode')}
                             </Button>
                         </div>

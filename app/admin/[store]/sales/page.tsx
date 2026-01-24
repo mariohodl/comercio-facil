@@ -13,7 +13,7 @@ export default async function SalesPage(props: {
     const params = await props.params
 
     return (
-        <div className='p-6'>
+        <div className='md:p-6'>
             <SalesList store={params.store} />
         </div>
     )

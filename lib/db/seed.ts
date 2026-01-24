@@ -57,23 +57,18 @@ const main = async () => {
     }));
     const companyMap = new Map(createdCompanies.map(c => [c.name, c._id]));
 
-    // 3. Create Stores
     const storesToInsert = stores.map(s => ({
       ...s,
       company: companyMap.get(s.companyName)
     }));
     const createdStores = await Store.insertMany(storesToInsert);
-    // const storeMap = new Map(createdStores.map(s => [s.slug, s._id]));
 
-    // 4. Create Warehouses
     const warehousesToInsert = warehouses.map(w => ({
       ...w,
       company: companyMap.get(w.companyName)
     }));
     const createdWarehouses = await Warehouse.insertMany(warehousesToInsert);
-    // const warehouseMap = new Map(createdWarehouses.map(w => [w.slug, w._id]));
 
-    // 5. Update Users with Business Object
     for (const user of createdUsersInitial) {
       const userData = users.find(u => u.email === user.email);
       const storeId = userData?.storeId;

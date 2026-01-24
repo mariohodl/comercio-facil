@@ -27,20 +27,27 @@ import {
   ChevronRight
 } from 'lucide-react'
 import Logo from '@/components/shared/header/logo'
+import { SheetClose } from '@/components/ui/sheet'
 
 export function AdminNav({
   storeId,
   storeName,
   className,
-  companyName
+  companyName,
+  isMobile
 }: {
   storeId: string
   storeName?: string
   className?: string
   companyName?: string
+  isMobile?: boolean
 }) {
   const pathname = usePathname()
   const t = useTranslations('admin.nav')
+
+  const handleItemClick = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }
 
   const navSections = [
     {
@@ -187,6 +194,15 @@ export function AdminNav({
       ],
     },
   ]
+
+  // Helper component to wrap links with SheetClose only if on mobile
+  const NavLinkWrapper = ({ children, asChild }: { children: React.ReactNode, asChild?: boolean }) => {
+    if (isMobile) {
+      return <SheetClose asChild={asChild}>{children}</SheetClose>
+    }
+    return <>{children}</>
+  }
+
   return (
     <nav className={cn(
       'w-full h-full overflow-y-auto bg-white border-r border-gray-200 pb-10',
@@ -194,19 +210,25 @@ export function AdminNav({
     )}>
       <div className='p-4 space-y-6 mt-6'>
         <div className='px-2 mb-8'>
-          <Link href={`/admin/${storeId}/overview`} className="flex flex-col items-center gap-3 group transition-all duration-300">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-tr from-orange to-orange-dark rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
-              <Package className="w-7 h-7" />
-            </div>
-            <div className="flex flex-col overflow-hidden">
-              <h2 className='text-navy font-black text-xl leading-tight truncate tracking-tight group-hover:text-orange transition-colors'>
-                {companyName || 'Comercio Fácil'}
-              </h2>
-              <span className="text-[10px] uppercase text-center font-bold text-gray-400 tracking-widest leading-none">
-                Admin Panel
-              </span>
-            </div>
-          </Link>
+          <NavLinkWrapper asChild>
+            <Link
+              href={`/admin/${storeId}/overview`}
+              onClick={handleItemClick}
+              className="flex flex-col items-center gap-3 group transition-all duration-300"
+            >
+              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-tr from-orange to-orange-dark rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
+                <Package className="w-7 h-7" />
+              </div>
+              <div className="flex flex-col overflow-hidden text-center">
+                <h2 className='text-navy font-black text-xl leading-tight truncate tracking-tight group-hover:text-orange transition-colors'>
+                  {companyName || 'Comercio Fácil'}
+                </h2>
+                <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest leading-none">
+                  Admin Panel
+                </span>
+              </div>
+            </Link>
+          </NavLinkWrapper>
         </div>
         {navSections.map((section, index) => (
           <div key={index}>
@@ -222,24 +244,26 @@ export function AdminNav({
                 const Icon = item.icon
 
                 return (
-                  <Link
-                    key={itemIndex}
-                    href={item.href}
-                    className={cn(
-                      'flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors',
-                      isActive
-                        ? 'bg-orange-50 text-orange border-r-4 border-orange'
-                        : 'text-navy hover:bg-gray-100'
-                    )}
-                  >
-                    <div className='flex items-center gap-3'>
-                      <Icon className={cn('w-5 h-5', isActive ? 'text-orange' : 'text-gray-500')} />
-                      <span>{item.title}</span>
-                    </div>
-                    {item.hasSubmenu && (
-                      <ChevronRight className='w-4 h-4 text-gray-400' />
-                    )}
-                  </Link>
+                  <NavLinkWrapper key={itemIndex} asChild>
+                    <Link
+                      href={item.href}
+                      onClick={handleItemClick}
+                      className={cn(
+                        'flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-orange-50 text-orange border-r-4 border-orange'
+                          : 'text-navy hover:bg-gray-100'
+                      )}
+                    >
+                      <div className='flex items-center gap-3'>
+                        <Icon className={cn('w-5 h-5', isActive ? 'text-orange' : 'text-gray-500')} />
+                        <span>{item.title}</span>
+                      </div>
+                      {item.hasSubmenu && (
+                        <ChevronRight className='w-4 h-4 text-gray-400' />
+                      )}
+                    </Link>
+                  </NavLinkWrapper>
                 )
               })}
             </div>

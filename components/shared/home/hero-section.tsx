@@ -61,8 +61,8 @@ export function HeroSection() {
                     </div>
                 </div>
 
-                <div className="mt-16 md:mt-24 relative max-w-5xl mx-auto">
-                    <div className="relative rounded-3xl bg-gray-900 p-2 md:p-4 shadow-2xl shadow-blue-900/20 border border-gray-800/50 backdrop-blur-sm">
+                {/* <div className="mt-16 md:mt-24 relative max-w-5xl mx-auto"> */}
+                {/* <div className="relative rounded-3xl bg-gray-900 p-2 md:p-4 shadow-2xl shadow-blue-900/20 border border-gray-800/50 backdrop-blur-sm">
                         <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl blur opacity-20"></div>
                         <div className="relative rounded-2xl overflow-hidden bg-white aspect-[16/9] md:aspect-[21/9] flex items-center justify-center">
                             <div className="w-full h-full bg-gray-50 flex flex-col">
@@ -93,14 +93,14 @@ export function HeroSection() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    {/* Floating Phone */}
-                    <div className="absolute -bottom-12 -right-4 md:-right-12 w-[120px] md:w-[240px] aspect-[1/2] bg-black rounded-[2rem] md:rounded-[3rem] border-4 md:border-8 border-gray-900 shadow-2xl transform rotate-[-10deg] hidden sm:block">
+                    </div> */}
+                {/* Floating Phone */}
+                {/* <div className="absolute -bottom-12 -right-4 md:-right-12 w-[120px] md:w-[240px] aspect-[1/2] bg-black rounded-[2rem] md:rounded-[3rem] border-4 md:border-8 border-gray-900 shadow-2xl transform rotate-[-10deg] hidden sm:block">
                         <div className="w-full h-full bg-white rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden">
                             <div className="w-full h-full bg-blue-50"></div>
                         </div>
-                    </div>
-                </div>
+                    </div> */}
+                {/* </div> */}
             </div>
         </section>
     )

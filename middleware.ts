@@ -5,19 +5,27 @@ import type { NextRequest } from 'next/server';
 
 const { auth } = NextAuth(authConfig);
 
-export default auth(async function middleware(req: NextRequest) {
-	const session = await auth();
+export default auth(async function middleware(req) {
+	const session = req.auth;
 	const { pathname } = req.nextUrl;
 
-	// Exclude auth pages from redirect
-	const isAuthPage = pathname.startsWith('/sign-in') ||
-		pathname.startsWith('/sign-up') ||
-		pathname.startsWith('/api/auth') ||
-		pathname.includes('#_=_'); // Facebook fragment balance
+	// protected paths
+	const isProtectedPath =
+		pathname.startsWith('/admin') ||
+		pathname.startsWith('/checkout') ||
+		pathname.startsWith('/account');
+
+	// Redirect unauthenticated users to login for protected paths
+	if (!session && isProtectedPath) {
+		const loginUrl = new URL('/sign-in', req.url);
+		loginUrl.searchParams.set('callbackUrl', encodeURI(req.url));
+		return NextResponse.redirect(loginUrl);
+	}
 
 	// Handle role-based redirection for authenticated users
-	if (session?.user && !isAuthPage) {
+	if (session?.user) {
 		const { role, storeId } = session.user;
+		const isAuthPage = pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up');
 
 		// 1. Redirect to setup if no storeId (and user is Admin/Store owner)
 		if (!storeId && pathname !== '/admin/setup' && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
@@ -25,10 +33,10 @@ export default auth(async function middleware(req: NextRequest) {
 			return NextResponse.redirect(setupUrl);
 		}
 
-		// 2. Existing redirections when storeId exists
+		// 2. Redirections when storeId exists
 		if (storeId) {
 			if (role === 'Seller') {
-				// Sellers must stay within POS, especially after login (redirect from /)
+				// Sellers must stay within POS
 				if (!pathname.startsWith('/admin/pos') &&
 					!pathname.startsWith('/api') &&
 					!pathname.startsWith('/_next')) {
@@ -37,11 +45,16 @@ export default auth(async function middleware(req: NextRequest) {
 				}
 			} else if (role === 'Admin') {
 				// Admins are redirected to their dashboard if they hit the entry points
-				if (pathname === '/' || pathname === '/admin' || pathname === `/admin/${storeId}`) {
+				if (pathname === '/' || pathname === '/admin' || (pathname === `/admin/${storeId}`)) {
 					const adminUrl = new URL(`/admin/${storeId}/overview`, req.url);
 					return NextResponse.redirect(adminUrl);
 				}
 			}
+		}
+
+		if (isAuthPage) {
+			const redirectUrl = storeId ? `/admin/${storeId}/overview` : '/';
+			return NextResponse.redirect(new URL(redirectUrl, req.url));
 		}
 	}
 
