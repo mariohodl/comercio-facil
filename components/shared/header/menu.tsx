@@ -49,7 +49,7 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
       </nav>
       <nav className='md:hidden'>
         <Sheet>
-          <SheetTrigger className='align-middle header-button p-2 text-white hover:bg-white/10 rounded-xl transition-all'>
+          <SheetTrigger className={`align-middle header-button p-2 ${forAdmin ? 'text-white hover:bg-white/10' : 'text-navy hover:bg-gray-100'} rounded-xl transition-all`}>
             <AlignRight className='h-7 w-7' />
           </SheetTrigger>
           <SheetContent className='bg-gray-50 p-0 sm:max-w-md w-full border-l-0 flex flex-col h-full [&>button:last-child]:hidden'>
