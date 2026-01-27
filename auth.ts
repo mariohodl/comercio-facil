@@ -76,6 +76,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				await connectToDatabase();
 				if (credentials == null) return null;
 
+				// Force model registration before population
+				await import('./lib/db/models/store.model');
+				await import('./lib/db/models/company.model');
+
 				const DBuser = await User.findOne({ email: credentials.email, isDeleted: { $ne: true } })
 					.populate('business.defaultStoreId')
 					.populate('business.companyId') as any;
@@ -150,6 +154,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					// For credentials, storeId is already passed. For social login via adapter, it's not.
 					if (!u.storeId && user.email) {
 						await connectToDatabase();
+
+						// Extremely defensive model registration before population
+						await import('./lib/db/models/store.model');
+						await import('./lib/db/models/company.model');
+
 						const dbUser = await User.findOne({ email: user.email })
 							.populate('business.defaultStoreId')
 							.populate('business.companyId') as any;

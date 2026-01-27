@@ -14,5 +14,12 @@ export const connectToDatabase = async (
 
 	cached.conn = await cached.promise;
 
+	// Registration of core models to prevent MissingSchemaError during population
+	if (cached.conn) {
+		await import('./models/user.model');
+		await import('./models/store.model');
+		await import('./models/company.model');
+	}
+
 	return cached.conn;
 };
