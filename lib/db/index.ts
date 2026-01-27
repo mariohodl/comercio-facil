@@ -11,14 +11,13 @@ export const connectToDatabase = async (
 	if (!MONGODB_URI) throw new Error('MONGODB_URI is missing');
 
 	cached.promise = cached.promise || mongoose.connect(MONGODB_URI);
-
 	cached.conn = await cached.promise;
 
-	// Registration of core models to prevent MissingSchemaError during population
-	if (cached.conn) {
-		await import('./models/user.model');
+	// Registration of core models to ensure they are available for population across serverless function executions.
+	if (cached.conn && !mongoose.models.Store) {
 		await import('./models/store.model');
 		await import('./models/company.model');
+		await import('./models/warehouse.model');
 	}
 
 	return cached.conn;

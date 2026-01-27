@@ -76,10 +76,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				await connectToDatabase();
 				if (credentials == null) return null;
 
-				// Force model registration before population
-				await import('./lib/db/models/store.model');
-				await import('./lib/db/models/company.model');
-
 				const DBuser = await User.findOne({ email: credentials.email, isDeleted: { $ne: true } })
 					.populate('business.defaultStoreId')
 					.populate('business.companyId') as any;
@@ -155,10 +151,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					if (!u.storeId && user.email) {
 						await connectToDatabase();
 
-						// Extremely defensive model registration before population
-						await import('./lib/db/models/store.model');
-						await import('./lib/db/models/company.model');
-
 						const dbUser = await User.findOne({ email: user.email })
 							.populate('business.defaultStoreId')
 							.populate('business.companyId') as any;
@@ -167,25 +159,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 							token.role = dbUser.role || ROL_ADMIN;
 							token.isStore = !!dbUser.isStore;
 
-							let defaultStore: any = dbUser.business?.defaultStoreId;
-							let company: any = dbUser.business?.companyId;
+							const defaultStore = dbUser.business?.defaultStoreId;
+							const company = dbUser.business?.companyId;
 
-							// If they aren't fully populated (they are just IDs/Strings), fetch them manually
-							if (defaultStore && typeof defaultStore !== 'object') {
-								const StoreModel = (await import('./lib/db/models/store.model')).default;
-								defaultStore = await StoreModel.findById(defaultStore);
-							}
-							if (company && typeof company !== 'object') {
-								const CompanyModel = (await import('./lib/db/models/company.model')).default;
-								company = await CompanyModel.findById(company);
-							}
-
-							token.storeId = (defaultStore as any)?.slug || '';
-							token.storeName = (defaultStore as any)?.name || '';
-							token.companyId = (company as any)?._id?.toString() || '';
-							token.companyName = (company as any)?.name || '';
-							token.plan = (company as any)?.plan || '';
-							token.planStatus = (company as any)?.planStatus || '';
+							token.storeId = defaultStore?.slug || '';
+							token.storeName = defaultStore?.name || '';
+							token.companyId = company?._id?.toString() || '';
+							token.companyName = company?.name || '';
+							token.plan = company?.plan || '';
+							token.planStatus = company?.planStatus || '';
 
 							// Safely handle dates
 							const trialEndDate = (company as any)?.trialEndDate;
