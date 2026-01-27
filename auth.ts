@@ -31,6 +31,7 @@ declare module 'next-auth' {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	...authConfig,
+	trustHost: true,
 	session: {
 		strategy: 'jwt',
 		maxAge: 30 * 24 * 60 * 60,
@@ -41,9 +42,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			allowDangerousEmailAccountLinking: true,
 		}),
 		Facebook({
+			clientId: process.env.AUTH_FACEBOOK_ID,
+			clientSecret: process.env.AUTH_FACEBOOK_SECRET,
 			allowDangerousEmailAccountLinking: true,
 		}),
 		Instagram({
+			clientId: process.env.AUTH_INSTAGRAM_ID,
+			clientSecret: process.env.AUTH_INSTAGRAM_SECRET,
 			allowDangerousEmailAccountLinking: true,
 		}),
 		CredentialsProvider({
