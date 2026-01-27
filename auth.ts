@@ -109,86 +109,104 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 	},
 	callbacks: {
 		signIn: async ({ user, account }) => {
-			if (account?.provider !== 'credentials') {
-				await connectToDatabase();
-				const dbUser = await User.findOne({ email: user.email });
-				if (dbUser && !dbUser.emailVerified) {
-					dbUser.emailVerified = true;
-					// Also set admin role if they are new or didn't have a specific role
-					if (dbUser.role === 'Customer' || !dbUser.role) {
-						dbUser.role = ROL_ADMIN;
-						dbUser.isStore = true;
+			try {
+				if (account?.provider !== 'credentials') {
+					await connectToDatabase();
+					const dbUser = await User.findOne({ email: user.email });
+					if (dbUser && !dbUser.emailVerified) {
+						dbUser.emailVerified = true;
+						// Also set admin role if they are new or didn't have a specific role
+						if (dbUser.role === 'Customer' || !dbUser.role) {
+							dbUser.role = ROL_ADMIN;
+							dbUser.isStore = true;
+						}
+						await dbUser.save();
 					}
-					await dbUser.save();
 				}
+				return true;
+			} catch (error) {
+				console.error('SignIn callback error:', error);
+				return true; // Still allow sign in if role update fails
 			}
-			return true;
 		},
 		jwt: async ({ token, user, trigger, session }) => {
-			if (user) {
-				const u = user as any;
-				// For credentials, storeId is already passed. For social login via adapter, it's not.
-				if (!u.storeId && user.email) {
-					await connectToDatabase();
-					const dbUser = await User.findOne({ email: user.email })
-						.populate('business.defaultStoreId')
-						.populate('business.companyId');
-					if (dbUser) {
-						const defaultStore = dbUser.business?.defaultStoreId as any;
-						const company = dbUser.business?.companyId as any;
-						token.role = dbUser.role || ROL_ADMIN;
-						token.storeId = defaultStore?.slug || '';
-						token.storeName = defaultStore?.name || '';
-						token.isStore = !!dbUser.isStore;
-						token.companyId = company?._id?.toString() || '';
-						token.companyName = company?.name || '';
-						token.plan = company?.plan || '';
-						token.planStatus = company?.planStatus || '';
-						token.trialEndDate = company?.trialEndDate?.toISOString() || '';
-					}
-				} else {
-					token.role = u.role || ROL_ADMIN;
-					token.storeId = u.storeId || '';
-					token.storeName = u.storeName || '';
-					token.isStore = !!u.isStore;
-					token.companyId = u.companyId || '';
-					token.companyName = u.companyName || '';
-					token.plan = u.plan || '';
-					token.planStatus = u.planStatus || '';
-					token.trialEndDate = u.trialEndDate || '';
-				}
-				token.name = user.name || user.email!.split('@')[0];
-				token.sub = user.id;
-			}
+			try {
+				if (user) {
+					const u = user as any;
+					// For credentials, storeId is already passed. For social login via adapter, it's not.
+					if (!u.storeId && user.email) {
+						await connectToDatabase();
+						const dbUser = await User.findOne({ email: user.email })
+							.populate('business.defaultStoreId')
+							.populate('business.companyId');
+						if (dbUser) {
+							const defaultStore = dbUser.business?.defaultStoreId as any;
+							const company = dbUser.business?.companyId as any;
+							token.role = dbUser.role || ROL_ADMIN;
+							token.storeId = defaultStore?.slug || '';
+							token.storeName = defaultStore?.name || '';
+							token.isStore = !!dbUser.isStore;
+							token.companyId = company?._id?.toString() || '';
+							token.companyName = company?.name || '';
+							token.plan = company?.plan || '';
+							token.planStatus = company?.planStatus || '';
 
-			if (session?.user?.name && trigger === 'update') {
-				token.name = session.user.name;
+							// Safely handle dates
+							if (company?.trialEndDate instanceof Date) {
+								token.trialEndDate = company.trialEndDate.toISOString();
+							} else if (company?.trialEndDate) {
+								token.trialEndDate = new Date(company.trialEndDate).toISOString();
+							} else {
+								token.trialEndDate = '';
+							}
+						}
+					} else {
+						token.role = u.role || ROL_ADMIN;
+						token.storeId = u.storeId || '';
+						token.storeName = u.storeName || '';
+						token.isStore = !!u.isStore;
+						token.companyId = u.companyId || '';
+						token.companyName = u.companyName || '';
+						token.plan = u.plan || '';
+						token.planStatus = u.planStatus || '';
+						token.trialEndDate = u.trialEndDate || '';
+					}
+					token.name = user.name || user.email!.split('@')[0];
+					token.sub = user.id;
+				}
+
+				if (session?.user?.name && trigger === 'update') {
+					token.name = session.user.name;
+				}
+				if (session?.user?.storeId && trigger === 'update') {
+					token.storeId = session.user.storeId;
+				}
+				if (session?.user?.storeName && trigger === 'update') {
+					token.storeName = session.user.storeName;
+				}
+				if (session?.user?.isStore !== undefined && trigger === 'update') {
+					token.isStore = session.user.isStore;
+				}
+				if (session?.user?.companyId && trigger === 'update') {
+					token.companyId = session.user.companyId;
+				}
+				if (session?.user?.companyName && trigger === 'update') {
+					token.companyName = session.user.companyName;
+				}
+				if (session?.user?.plan && trigger === 'update') {
+					token.plan = session.user.plan;
+				}
+				if (session?.user?.planStatus && trigger === 'update') {
+					token.planStatus = session.user.planStatus;
+				}
+				if (session?.user?.trialEndDate && trigger === 'update') {
+					token.trialEndDate = session.user.trialEndDate;
+				}
+				return token;
+			} catch (error) {
+				console.error('JWT callback error:', error);
+				return token;
 			}
-			if (session?.user?.storeId && trigger === 'update') {
-				token.storeId = session.user.storeId;
-			}
-			if (session?.user?.storeName && trigger === 'update') {
-				token.storeName = session.user.storeName;
-			}
-			if (session?.user?.isStore !== undefined && trigger === 'update') {
-				token.isStore = session.user.isStore;
-			}
-			if (session?.user?.companyId && trigger === 'update') {
-				token.companyId = session.user.companyId;
-			}
-			if (session?.user?.companyName && trigger === 'update') {
-				token.companyName = session.user.companyName;
-			}
-			if (session?.user?.plan && trigger === 'update') {
-				token.plan = session.user.plan;
-			}
-			if (session?.user?.planStatus && trigger === 'update') {
-				token.planStatus = session.user.planStatus;
-			}
-			if (session?.user?.trialEndDate && trigger === 'update') {
-				token.trialEndDate = session.user.trialEndDate;
-			}
-			return token;
 		},
 		session: async ({ session, user, trigger, token }) => {
 			session.user.id = token.sub as string;
