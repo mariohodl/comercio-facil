@@ -27,29 +27,26 @@ export default auth(async function middleware(req) {
 	if (session?.user) {
 		const { role, storeId } = session.user;
 
-		// SuperAdmin isolation (Strictly verify access to root super-admin paths)
+		// SuperAdmin isolation (strictly verify access to root super-admin paths)
 		if (pathname.startsWith('/super-admin') && role !== 'SuperAdmin') {
 			const redirectUrl = storeId ? `/admin/${storeId}/overview` : '/';
 			return NextResponse.redirect(new URL(redirectUrl, req.url));
 		}
 
 		const isAuthPage = pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up');
+		const isSetupPage = pathname === '/admin/setup';
 
-		// Redirect to setup if no storeId (Exempt SuperAdmin)
-		if (!storeId && role !== 'SuperAdmin' && pathname !== '/admin/setup' && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
-			const setupUrl = new URL('/admin/setup', req.url);
-			return NextResponse.redirect(setupUrl);
-		}
-
-		// Redirections when storeId exists
+		// If user has a store, don't let them go to setup or auth pages
 		if (storeId) {
+			if (isAuthPage || isSetupPage) {
+				const targetPath = role === 'SuperAdmin' ? '/super-admin' : `/admin/${storeId}/overview`;
+				return NextResponse.redirect(new URL(targetPath, req.url));
+			}
+
+			// Role-based restrictions within admin
 			if (role === 'Seller') {
-				// Sellers must stay within POS
-				if (!pathname.startsWith('/admin/pos') &&
-					!pathname.startsWith('/api') &&
-					!pathname.startsWith('/_next')) {
-					const posUrl = new URL(`/admin/pos/${storeId}`, req.url);
-					return NextResponse.redirect(posUrl);
+				if (!pathname.startsWith('/admin/pos') && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
+					return NextResponse.redirect(new URL(`/admin/pos/${storeId}`, req.url));
 				}
 			} else if (role === 'Admin' || role === 'SuperAdmin') {
 				if (pathname === '/' || pathname === '/admin' || pathname === `/admin/${storeId}`) {
@@ -59,9 +56,14 @@ export default auth(async function middleware(req) {
 			}
 		}
 
+		// If no storeId yet (and not a SuperAdmin), force setup 
+		if (!storeId && role !== 'SuperAdmin' && !isSetupPage && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
+			return NextResponse.redirect(new URL('/admin/setup', req.url));
+		}
+
+		// Authenticated users without storeId on auth pages go to setup
 		if (isAuthPage) {
-			const redirectUrl = storeId ? `/admin/${storeId}/overview` : '/';
-			return NextResponse.redirect(new URL(redirectUrl, req.url));
+			return NextResponse.redirect(new URL('/admin/setup', req.url));
 		}
 	}
 
