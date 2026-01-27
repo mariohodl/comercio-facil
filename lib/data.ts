@@ -120,7 +120,7 @@ const users: IUserInput[] = [
 		role: 'Admin',
 		storeName: uniqueStoreName,
 		storeId: uniqueStoreId,
-		isStore: false,
+		isStore: true,
 		address: {
 			fullName: 'Mario López',
 			street: 'Manuel M. Dieguez 900',
@@ -154,6 +154,90 @@ const users: IUserInput[] = [
 		paymentMethod: 'PayPal',
 		emailVerified: false,
 		phone: '123-456-7890',
+	},
+	{
+		name: 'Ana',
+		email: 'ana@example.com',
+		password: bcrypt.hashSync('123456', 5),
+		role: 'Admin',
+		storeName: 'Materiales La Roca',
+		storeId: 'la-roca-1',
+		isStore: true,
+		address: {
+			fullName: 'Ana Martínez',
+			street: 'Av. Vallarta 500',
+			city: 'Guadalajara',
+			province: 'Jal',
+			postalCode: '44100',
+			country: 'MX',
+			phone: '331-234-5678',
+		},
+		paymentMethod: 'Stripe',
+		emailVerified: true,
+		phone: '331-234-5678',
+	},
+	{
+		name: 'Pedro',
+		email: 'pedro@example.com',
+		password: bcrypt.hashSync('123456', 5),
+		role: 'Seller',
+		storeName: 'Materiales La Roca',
+		storeId: 'la-roca-1',
+		isStore: false,
+		address: {
+			fullName: 'Pedro Paramo',
+			street: 'Calle Comala 12',
+			city: 'Guadalajara',
+			province: 'Jal',
+			postalCode: '44100',
+			country: 'MX',
+			phone: '331-876-5432',
+		},
+		paymentMethod: 'Cash On Delivery',
+		emailVerified: true,
+		phone: '331-876-5432',
+	},
+	{
+		name: 'Luis',
+		email: 'luis@example.com',
+		password: bcrypt.hashSync('123456', 5),
+		role: 'Admin',
+		storeName: 'Construcción Alpha',
+		storeId: 'alpha-corp',
+		isStore: true,
+		address: {
+			fullName: 'Luis Herrera',
+			street: 'Paseo de la Reforma 200',
+			city: 'Ciudad de México',
+			province: 'CDMX',
+			postalCode: '06500',
+			country: 'MX',
+			phone: '555-111-2222',
+		},
+		paymentMethod: 'Stripe',
+		emailVerified: true,
+		phone: '555-111-2222',
+	},
+	{
+		name: 'Elena',
+		email: 'elena@example.com',
+		password: bcrypt.hashSync('123456', 5),
+		role: 'Seller',
+		storeName: 'Construcción Alpha',
+		storeId: 'alpha-corp',
+		isStore: false,
+		address: {
+			fullName: 'Elena Garro',
+			street: 'Calle de los Recuerdos 45',
+			city: 'Cuernavaca',
+			province: 'Mor',
+			postalCode: '62000',
+			country: 'MX',
+			phone: '777-333-4444',
+		},
+		paymentMethod: 'PayPal',
+		emailVerified: true,
+		phone: '777-333-4444',
 	}
 ]
 
@@ -826,15 +910,45 @@ const attributes = [
 ]
 
 const companies = [
-	{ name: 'Mi Empresa S.A. de C.V.', ownerEmail: 'mario@example.com' }
+	{
+		name: 'Mi Empresa S.A. de C.V.',
+		ownerEmail: 'mario@example.com',
+		plan: 'INTERMEDIATE',
+		planStatus: 'FREE_TRIAL',
+		trialStartDate: new Date('2025-01-20'),
+		trialEndDate: new Date('2025-03-20'),
+		freeMonths: 2,
+	},
+	{
+		name: 'Materiales La Roca S.A.',
+		ownerEmail: 'ana@example.com',
+		plan: 'BASIC',
+		planStatus: 'FREE_TRIAL',
+		trialStartDate: new Date('2025-01-25'),
+		trialEndDate: new Date('2025-02-25'),
+		freeMonths: 1,
+	},
+	{
+		name: 'Alpha Construcciones S.A. de C.V.',
+		ownerEmail: 'luis@example.com',
+		plan: 'ADVANCED',
+		planStatus: 'ACTIVE',
+		trialStartDate: new Date('2024-12-01'),
+		trialEndDate: new Date('2025-01-01'),
+		freeMonths: 0,
+	}
 ]
 
 const stores = [
-	{ name: uniqueStoreName, slug: uniqueStoreId, companyName: 'Mi Empresa S.A. de C.V.', location: 'Sucursal Centro' }
+	{ name: uniqueStoreName, slug: uniqueStoreId, companyName: 'Mi Empresa S.A. de C.V.', location: 'Sucursal Centro' },
+	{ name: 'Materiales La Roca', slug: 'la-roca-1', companyName: 'Materiales La Roca S.A.', location: 'Sucursal Matriz' },
+	{ name: 'Alpha Construcciones', slug: 'alpha-corp', companyName: 'Alpha Construcciones S.A. de C.V.', location: 'Sede Central' }
 ]
 
 const warehouses = [
-	{ name: 'Almacén General', slug: 'almacen-general', companyName: 'Mi Empresa S.A. de C.V.', location: 'Calle Industrial 456' }
+	{ name: 'Almacén General', slug: 'almacen-general', companyName: 'Mi Empresa S.A. de C.V.', location: 'Calle Industrial 456' },
+	{ name: 'Bodega La Roca', slug: 'bodega-roca', companyName: 'Materiales La Roca S.A.', location: 'Av. Industrial 78' },
+	{ name: 'Centro de Distribución Alpha', slug: 'cedis-alpha', companyName: 'Alpha Construcciones S.A. de C.V.', location: 'Zona Industrial 101' }
 ]
 
 

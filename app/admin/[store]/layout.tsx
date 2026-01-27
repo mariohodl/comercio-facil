@@ -36,6 +36,7 @@ export default async function AdminLayout({
                                         storeName={session?.user?.storeName || ''}
                                         companyName={session?.user?.companyName || ''}
                                         isMobile={true}
+                                        userRole={session?.user?.role}
                                     />
                                 </SheetContent>
                             </Sheet>
@@ -74,7 +75,7 @@ export default async function AdminLayout({
                             storeId={session?.user?.storeId || ''}
                             storeName={session?.user?.storeName || ''}
                             companyName={session?.user?.companyName || ''}
-
+                            userRole={session?.user?.role}
                         />
                     </aside>
 

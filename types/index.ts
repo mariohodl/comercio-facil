@@ -61,7 +61,15 @@ export type Data = {
 	brands: IBrandInput[];
 	units: IUnitInput[];
 	attributes: IAttributeInput[];
-	companies: any[];
+	companies: {
+		name: string;
+		ownerEmail: string;
+		plan: string;
+		planStatus: string;
+		trialStartDate: Date;
+		trialEndDate: Date;
+		freeMonths: number;
+	}[];
 	stores: any[];
 	warehouses: any[];
 };

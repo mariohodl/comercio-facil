@@ -34,13 +34,15 @@ export function AdminNav({
   storeName,
   className,
   companyName,
-  isMobile
+  isMobile,
+  userRole
 }: {
   storeId: string
   storeName?: string
   className?: string
   companyName?: string
   isMobile?: boolean
+  userRole?: string
 }) {
   const pathname = usePathname()
   const t = useTranslations('admin.nav')
@@ -49,7 +51,7 @@ export function AdminNav({
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }
 
-  const navSections = [
+  const baseNavSections = [
     {
       title: t('general'),
       items: [
@@ -60,7 +62,23 @@ export function AdminNav({
         },
         {
           title: t('superAdmin'),
-          href: `/admin/${storeId}/superadmin`,
+          href: '/super-admin',
+          icon: ShieldCheck,
+          role: 'SuperAdmin'
+        },
+        {
+          title: t('settings'),
+          href: `/admin/${storeId}/settings`,
+          icon: Settings2,
+        },
+      ],
+    },
+    {
+      title: t('userManagement'),
+      items: [
+        {
+          title: t('users'),
+          href: `/admin/${storeId}/users`,
           icon: ShieldCheck,
         },
       ],
@@ -79,11 +97,6 @@ export function AdminNav({
           href: `/admin/${storeId}/products/create`,
           icon: PlusSquare,
         },
-        // {
-        //   title: t('expiredProducts'),
-        //   href: `/admin/${storeId}/inventory/expired-products`,
-        //   icon: AlertCircle,
-        // },
         {
           title: t('lowStocks'),
           href: `/admin/${storeId}/stock/low-stocks`,
@@ -114,21 +127,11 @@ export function AdminNav({
           href: `/admin/${storeId}/inventory/attributes`,
           icon: Settings2,
         },
-        // {
-        //   title: t('warranties'),
-        //   href: `/admin/${storeId}/inventory/warranties`,
-        //   icon: ShieldCheck,
-        // },
         {
           title: t('printBarcode'),
           href: `/admin/${storeId}/products/print-barcodes`,
           icon: Barcode,
         },
-        // {
-        //   title: t('printQRCode'),
-        //   href: `/admin/${storeId}/inventory/print-qrcode`,
-        //   icon: QrCode,
-        // },
       ],
     },
     {
@@ -183,17 +186,13 @@ export function AdminNav({
         },
       ],
     },
-    {
-      title: t('userManagement'),
-      items: [
-        {
-          title: t('users'),
-          href: `/admin/${storeId}/users`,
-          icon: ShieldCheck,
-        },
-      ],
-    },
   ]
+
+  // Filter sections based on role
+  const navSections = baseNavSections.map(section => ({
+    ...section,
+    items: section.items.filter((item: any) => !item.role || item.role === userRole)
+  })).filter(section => section.items.length > 0)
 
   // Helper component to wrap links with SheetClose only if on mobile
   const NavLinkWrapper = ({ children, asChild }: { children: React.ReactNode, asChild?: boolean }) => {
@@ -236,7 +235,7 @@ export function AdminNav({
               {section.title}
             </h4>
             <div className='space-y-1'>
-              {section.items.map((item, itemIndex) => {
+              {section.items.map((item: any, itemIndex: number) => {
                 // @ts-ignore
                 const isActive = (pathname === item.href || pathname.startsWith(`${item.href}/`)) &&
                   // @ts-ignore

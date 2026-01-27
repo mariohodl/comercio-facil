@@ -85,6 +85,12 @@ export default async function UserButton({
                   </Link>
                 )}
 
+                {session.user.role === 'SuperAdmin' && (
+                  <Link className='w-full' href='/super-admin'>
+                    <DropdownMenuItem>Super Admin</DropdownMenuItem>
+                  </Link>
+                )}
+
                 {(session.user.role === 'Seller' || session.user.role === 'Admin') && session.user.storeId && (
                   <Link className='w-full' href={`/admin/pos/${session.user.storeId}`}>
                     <DropdownMenuItem>{t('common.goToPOS')}</DropdownMenuItem>

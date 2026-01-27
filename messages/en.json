@@ -651,5 +651,98 @@
         "saveChanges": "Save Changes",
         "selectWarehouse": "Select warehouse",
         "selectStore": "Select store"
+    },
+    "settings": {
+        "common": {
+            "loading": "Loading..."
+        },
+        "pageTitle": "Settings - Comercio Fácil",
+        "title": "Settings",
+        "subtitle": "Manage your settings on portal",
+        "saveSuccess": "Settings saved successfully",
+        "saveError": "Failed to save settings",
+        "sections": {
+            "profile": "Profile",
+            "store": "Store Settings",
+            "warehouse": "Warehouse Settings",
+            "billing": "Billing & Plan"
+        },
+        "profileDescription": "Manage your company profile information",
+        "storeDescription": "Configure your store details and location",
+        "warehouseDescription": "Manage your warehouse information",
+        "billingDescription": "View and manage your subscription plan",
+        "fields": {
+            "companyName": "Company Name",
+            "taxId": "Tax ID (RFC)",
+            "storeName": "Store Name",
+            "storeLocation": "Store Location",
+            "storeId": "Store ID",
+            "warehouseName": "Warehouse Name",
+            "warehouseLocation": "Warehouse Location",
+            "planStatus": "Status",
+            "trialEndDate": "Trial End Date",
+            "subscriptionEndDate": "Subscription End Date"
+        },
+        "placeholders": {
+            "companyName": "Enter your company name",
+            "taxId": "Enter your tax ID",
+            "storeName": "Enter store name",
+            "storeLocation": "Enter store location",
+            "storeId": "Store identifier",
+            "warehouseName": "Enter warehouse name",
+            "warehouseLocation": "Enter warehouse location"
+        },
+        "storeIdHelp": "Store ID cannot be changed once set",
+        "planStatuses": {
+            "ACTIVE": "Active",
+            "FREE_TRIAL": "Free Trial",
+            "EXPIRED": "Expired",
+            "CANCELLED": "Cancelled"
+        },
+        "daysRemaining": "days remaining",
+        "expired": "Expired",
+        "currentPlanFeatures": "Current Plan Features",
+        "features": {
+            "basic": {
+                "feature1": "Up to 100 products",
+                "feature2": "1 store location",
+                "feature3": "Basic reporting"
+            },
+            "intermediate": {
+                "feature1": "Up to 1,000 products",
+                "feature2": "Up to 3 store locations",
+                "feature3": "Advanced reporting and analytics"
+            },
+            "advanced": {
+                "feature1": "Unlimited products",
+                "feature2": "Unlimited store locations",
+                "feature3": "Premium support and custom features"
+            }
+        },
+        "upgradeCTA": {
+            "title": "Unlock More Features",
+            "description": "Upgrade your plan to access advanced features and grow your business",
+            "button": "Upgrade Plan"
+        },
+        "companyLogo": {
+            "title": "Company Logo",
+            "description": "Upload your company logo. You can update it 3 times every 6 months.",
+            "uploadButton": "Upload Logo",
+            "uploading": "Uploading...",
+            "allowedFormats": "JPG, PNG (max 2MB)",
+            "sizeLimit": "Maximum file size: 2MB. Accepted formats: JPG, PNG",
+            "limitInfo": "Company Logo Update Limit",
+            "remainingUpdates": "Remaining updates",
+            "nextAvailable": "Next update available",
+            "limitReached": "Company logo update limit reached.",
+            "updateSuccess": "Company logo updated successfully!",
+            "updateError": "Failed to update company logo",
+            "updatesRemaining": "updates remaining"
+        },
+        "actions": {
+            "save": "Save Changes",
+            "cancel": "Cancel",
+            "saving": "Saving..."
+        }
     }
 }

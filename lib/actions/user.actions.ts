@@ -13,7 +13,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '../constants'
 import { UserSignUpSchema, UserUpdateSchema, StoreSettingsSchema, StoreUserCreateSchema, StoreUserUpdateSchema } from '../validator'
-import { ROL_CUSTOMER, ROL_ADMIN } from '@/lib/constants'
+import { ROL_CUSTOMER, ROL_ADMIN, PLAN_BASIC, PLAN_STATUS_FREE_TRIAL } from '@/lib/constants'
 
 import { z } from 'zod'
 
@@ -59,6 +59,10 @@ export async function registerUser(userSignUp: IUserSignUp) {
 		if (existingUser) {
 			return { success: false, error: 'Email already registered' };
 		}
+
+		const trialStartDate = new Date();
+		const trialEndDate = new Date();
+		trialEndDate.setMonth(trialEndDate.getMonth() + 1); // 1 month free by default
 
 		const userCreated = await User.create({
 			...user,
@@ -111,14 +115,38 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 		}
 
 		if (!company) {
+			const trialStartDate = new Date();
+			const trialEndDate = new Date();
+			trialEndDate.setMonth(trialEndDate.getMonth() + 1);
+
 			// Create Company
 			company = await Company.create({
 				name: validatedData.companyName,
 				owner: user._id,
+				plan: validatedData.plan || PLAN_BASIC,
+				planStatus: PLAN_STATUS_FREE_TRIAL,
+				trialStartDate,
+				trialEndDate,
+				freeMonths: 1,
 			});
 		} else {
 			// Update existing company name
 			company.name = validatedData.companyName;
+			company.taxId = validatedData.taxId;
+
+			// Handle legacy companies without billing info
+			if (!company.plan) {
+				const trialStartDate = new Date();
+				const trialEndDate = new Date();
+				trialEndDate.setMonth(trialEndDate.getMonth() + 1);
+
+				company.plan = PLAN_BASIC;
+				company.planStatus = PLAN_STATUS_FREE_TRIAL;
+				company.trialStartDate = trialStartDate;
+				company.trialEndDate = trialEndDate;
+				company.freeMonths = 1;
+			}
+
 			await company.save();
 		}
 
@@ -180,6 +208,51 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 		return { success: true, message: 'Store settings updated successfully' };
 	} catch (error) {
 		console.error('Error updating store settings:', error);
+		return { success: false, error: formatError(error) };
+	}
+}
+
+export async function getStoreSettings() {
+	try {
+		const session = await auth();
+		if (!session?.user?.id) {
+			throw new Error('Unauthorized');
+		}
+
+		await connectToDatabase();
+		const user = await User.findById(session.user.id);
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		if (!user.business?.companyId) {
+			return { success: false, error: 'No company found' };
+		}
+
+		const company = await Company.findById(user.business.companyId);
+		const store = await Store.findById(user.business.defaultStoreId);
+
+		// Get the warehouse associated with this store or company
+		let warehouse = await Warehouse.findOne({ company: company?._id });
+
+		return {
+			success: true,
+			data: {
+				companyName: company?.name || '',
+				storeName: store?.name || '',
+				storeLocation: store?.location || '',
+				warehouseName: warehouse?.name || '',
+				warehouseLocation: warehouse?.location || '',
+				storeId: store?.slug || '',
+				taxId: company?.taxId || '',
+				plan: company?.plan || 'BASIC',
+				planStatus: company?.planStatus || 'FREE_TRIAL',
+				trialEndDate: company?.trialEndDate ? company.trialEndDate.toISOString() : null,
+				subscriptionEndDate: company?.subscriptionEndDate ? company.subscriptionEndDate.toISOString() : null,
+			}
+		};
+	} catch (error) {
+		console.error('Error fetching store settings:', error);
 		return { success: false, error: formatError(error) };
 	}
 }
@@ -397,7 +470,7 @@ export async function updateStoreUser(data: z.infer<typeof StoreUserUpdateSchema
 			user.name = validatedData.name
 			user.email = validatedData.email
 			user.role = validatedData.role
-			user.phone = validatedData.phone
+			if (validatedData.phone) user.phone = validatedData.phone
 			user.status = validatedData.status
 
 			if (validatedData.password) {
@@ -408,10 +481,109 @@ export async function updateStoreUser(data: z.infer<typeof StoreUserUpdateSchema
 		await user.save()
 
 		if (validatedData.storeId) {
-			revalidatePath(`/admin/${validatedData.storeId}/users`)
+			revalidatePath(`/admin/${validatedData.storeId as string}/users`)
 		}
 
 		return { success: true, message: 'User updated successfully' }
+	} catch (error) {
+		return { success: false, message: formatError(error) }
+	}
+}
+export async function updateCompanyLogo(imageUrl: string) {
+	try {
+		await connectToDatabase()
+		const session = await auth()
+		if (!session?.user?.id) throw new Error('Unauthorized')
+
+		const user = await User.findById(session.user.id)
+		if (!user) throw new Error('User not found')
+
+		if (!user.business?.companyId) throw new Error('No company found')
+
+		const company = await Company.findById(user.business.companyId)
+		if (!company) throw new Error('Company not found')
+
+		// Get update history (default to empty array if not exists)
+		const updateHistory = company.logoUpdateHistory || []
+
+		// Calculate date 6 months ago
+		const sixMonthsAgo = new Date()
+		sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
+		// Filter updates within the last 6 months
+		const recentUpdates = updateHistory.filter((date: Date) => new Date(date) > sixMonthsAgo)
+
+		// Check if company has reached the limit
+		if (recentUpdates.length >= 3) {
+			const oldestUpdate = new Date(Math.min(...recentUpdates.map((d: Date) => new Date(d).getTime())))
+			const nextAllowedDate = new Date(oldestUpdate)
+			nextAllowedDate.setMonth(nextAllowedDate.getMonth() + 6)
+
+			return {
+				success: false,
+				error: 'LIMIT_REACHED',
+				remainingUpdates: 0,
+				nextAvailableDate: nextAllowedDate.toISOString()
+			}
+		}
+
+		// Update the company logo
+		company.logo = imageUrl
+
+		// Add current date to update history
+		company.logoUpdateHistory = [...updateHistory, new Date()]
+
+		await company.save()
+
+		revalidatePath('/admin/[store]/settings')
+
+		return {
+			success: true,
+			message: 'Company logo updated successfully',
+			remainingUpdates: 3 - (recentUpdates.length + 1)
+		}
+	} catch (error) {
+		return { success: false, message: formatError(error) }
+	}
+}
+
+export async function getCompanyLogoUpdateInfo() {
+	try {
+		await connectToDatabase()
+		const session = await auth()
+		if (!session?.user?.id) throw new Error('Unauthorized')
+
+		const user = await User.findById(session.user.id)
+		if (!user) throw new Error('User not found')
+
+		if (!user.business?.companyId) throw new Error('No company found')
+
+		const company = await Company.findById(user.business.companyId)
+		if (!company) throw new Error('Company not found')
+
+		const updateHistory = company.logoUpdateHistory || []
+		const sixMonthsAgo = new Date()
+		sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
+		const recentUpdates = updateHistory.filter((date: Date) => new Date(date) > sixMonthsAgo)
+		const remainingUpdates = Math.max(0, 3 - recentUpdates.length)
+
+		let nextAvailableDate = null
+		if (recentUpdates.length >= 3) {
+			const oldestUpdate = new Date(Math.min(...recentUpdates.map((d: Date) => new Date(d).getTime())))
+			nextAvailableDate = new Date(oldestUpdate)
+			nextAvailableDate.setMonth(nextAvailableDate.getMonth() + 6)
+		}
+
+		return {
+			success: true,
+			data: {
+				remainingUpdates,
+				totalUpdates: recentUpdates.length,
+				nextAvailableDate: nextAvailableDate?.toISOString() || null,
+				currentImage: company.logo || null
+			}
+		}
 	} catch (error) {
 		return { success: false, message: formatError(error) }
 	}

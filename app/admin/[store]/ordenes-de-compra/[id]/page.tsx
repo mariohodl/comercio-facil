@@ -39,7 +39,7 @@ const OrdenDeCompra = async (props: OrderReceived) => {
   const totalPrice = order?.total || 0
 
   const session = await auth()
-  let client_secret = null
+  let client_secret: string | null = null
   if (paymentMethod === 'Stripe' && !order.isPaid) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
     const paymentIntent = await stripe.paymentIntents.create({

@@ -72,6 +72,17 @@ export const ROL_SUPER_ADMIN = 'SuperAdmin'
 
 export const USER_ROLES = ['Admin', 'Customer', 'Seller', 'Manager', 'Supervisor', 'SuperAdmin']
 
+export const PLAN_BASIC = 'BASIC'
+export const PLAN_INTERMEDIATE = 'INTERMEDIATE'
+export const PLAN_ADVANCED = 'ADVANCED'
+export const PLANS = [PLAN_BASIC, PLAN_INTERMEDIATE, PLAN_ADVANCED]
+
+export const PLAN_STATUS_FREE_TRIAL = 'FREE_TRIAL'
+export const PLAN_STATUS_ACTIVE = 'ACTIVE'
+export const PLAN_STATUS_EXPIRED = 'EXPIRED'
+export const PLAN_STATUS_CANCELLED = 'CANCELLED'
+export const PLAN_STATUSES = [PLAN_STATUS_FREE_TRIAL, PLAN_STATUS_ACTIVE, PLAN_STATUS_EXPIRED, PLAN_STATUS_CANCELLED]
+
 export const AVAILABLE_CATEGORIES = [
 	{
 		id: 'res',

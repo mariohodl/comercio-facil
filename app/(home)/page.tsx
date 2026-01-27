@@ -15,7 +15,7 @@ export default async function HomePage() {
       <FeaturesSection />
       <MetricsSection />
       <TechnicalModulesSection />
-      <PricingSection />
+      {/* <PricingSection /> */}
 
       <ScalabilitySection />
       <FooterSection />

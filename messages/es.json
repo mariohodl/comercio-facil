@@ -670,5 +670,98 @@
         "saveChanges": "Guardar Cambios",
         "selectWarehouse": "Seleccionar almacén",
         "selectStore": "Seleccionar tienda"
+    },
+    "settings": {
+        "common": {
+            "loading": "Cargando..."
+        },
+        "pageTitle": "Configuración - Comercio Fácil",
+        "title": "Configuración",
+        "subtitle": "Administra tu configuración en el portal",
+        "saveSuccess": "Configuración guardada exitosamente",
+        "saveError": "Error al guardar la configuración",
+        "sections": {
+            "profile": "Perfil",
+            "store": "Configuración de Tienda",
+            "warehouse": "Configuración de Almacén",
+            "billing": "Facturación y Plan"
+        },
+        "profileDescription": "Administra la información del perfil de tu empresa",
+        "storeDescription": "Configura los detalles y ubicación de tu tienda",
+        "warehouseDescription": "Administra la información de tu almacén",
+        "billingDescription": "Ver y administrar tu plan de suscripción",
+        "fields": {
+            "companyName": "Nombre de la Empresa",
+            "taxId": "RFC (ID Fiscal)",
+            "storeName": "Nombre de la Tienda",
+            "storeLocation": "Ubicación de la Tienda",
+            "storeId": "ID de la Tienda",
+            "warehouseName": "Nombre del Almacén",
+            "warehouseLocation": "Ubicación del Almacén",
+            "planStatus": "Estado",
+            "trialEndDate": "Fecha de Fin de Prueba",
+            "subscriptionEndDate": "Fecha de Fin de Suscripción"
+        },
+        "placeholders": {
+            "companyName": "Ingresa el nombre de tu empresa",
+            "taxId": "Ingresa tu RFC",
+            "storeName": "Ingresa el nombre de la tienda",
+            "storeLocation": "Ingresa la ubicación de la tienda",
+            "storeId": "Identificador de tienda",
+            "warehouseName": "Ingresa el nombre del almacén",
+            "warehouseLocation": "Ingresa la ubicación del almacén"
+        },
+        "storeIdHelp": "El ID de la tienda no se puede cambiar una vez establecido",
+        "planStatuses": {
+            "ACTIVE": "Activo",
+            "FREE_TRIAL": "Prueba Gratuita",
+            "EXPIRED": "Vencido",
+            "CANCELLED": "Cancelado"
+        },
+        "daysRemaining": "días restantes",
+        "expired": "Vencido",
+        "currentPlanFeatures": "Características del Plan Actual",
+        "features": {
+            "basic": {
+                "feature1": "Hasta 100 productos",
+                "feature2": "1 ubicación de tienda",
+                "feature3": "Reportes básicos"
+            },
+            "intermediate": {
+                "feature1": "Hasta 1,000 productos",
+                "feature2": "Hasta 3 ubicaciones de tienda",
+                "feature3": "Reportes y análisis avanzados"
+            },
+            "advanced": {
+                "feature1": "Productos ilimitados",
+                "feature2": "Ubicaciones de tienda ilimitadas",
+                "feature3": "Soporte premium y características personalizadas"
+            }
+        },
+        "upgradeCTA": {
+            "title": "Desbloquea Más Características",
+            "description": "Actualiza tu plan para acceder a características avanzadas y hacer crecer tu negocio",
+            "button": "Actualizar Plan"
+        },
+        "companyLogo": {
+            "title": "Logo de la Empresa",
+            "description": "Sube el logo de tu empresa. Puedes actualizarlo 3 veces cada 6 meses.",
+            "uploadButton": "Subir Logo",
+            "uploading": "Subiendo...",
+            "allowedFormats": "JPG, PNG (máx 2MB)",
+            "sizeLimit": "Tamaño máximo de archivo: 2MB. Formatos aceptados: JPG, PNG",
+            "limitInfo": "Límite de Actualización de Logo de Empresa",
+            "remainingUpdates": "Actualizaciones restantes",
+            "nextAvailable": "Próxima actualización disponible",
+            "limitReached": "Se ha alcanzado el límite de actualizaciones de logo de empresa.",
+            "updateSuccess": "¡Logo de empresa actualizado exitosamente!",
+            "updateError": "Error al actualizar el logo de empresa",
+            "updatesRemaining": "actualizaciones restantes"
+        },
+        "actions": {
+            "save": "Guardar Cambios",
+            "cancel": "Cancelar",
+            "saving": "Guardando..."
+        }
     }
 }

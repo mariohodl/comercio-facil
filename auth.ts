@@ -22,6 +22,9 @@ declare module 'next-auth' {
 			storeName: string;
 			companyId: string;
 			companyName: string;
+			plan: string;
+			planStatus: string;
+			trialEndDate?: string;
 		} & DefaultSession['user'];
 	}
 }
@@ -75,7 +78,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 							isStore: DBuser.isStore,
 							storeName: defaultStore?.name || '',
 							companyId: company?._id?.toString() || '',
-							companyName: company?.name || ''
+							companyName: company?.name || '',
+							plan: company?.plan || '',
+							planStatus: company?.planStatus || '',
+							trialEndDate: company?.trialEndDate?.toISOString() || '',
 						};
 						return user
 					}
@@ -131,6 +137,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 						token.isStore = !!dbUser.isStore;
 						token.companyId = company?._id?.toString() || '';
 						token.companyName = company?.name || '';
+						token.plan = company?.plan || '';
+						token.planStatus = company?.planStatus || '';
+						token.trialEndDate = company?.trialEndDate?.toISOString() || '';
 					}
 				} else {
 					token.role = u.role || ROL_ADMIN;
@@ -139,6 +148,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					token.isStore = !!u.isStore;
 					token.companyId = u.companyId || '';
 					token.companyName = u.companyName || '';
+					token.plan = u.plan || '';
+					token.planStatus = u.planStatus || '';
+					token.trialEndDate = u.trialEndDate || '';
 				}
 				token.name = user.name || user.email!.split('@')[0];
 				token.sub = user.id;
@@ -162,6 +174,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			if (session?.user?.companyName && trigger === 'update') {
 				token.companyName = session.user.companyName;
 			}
+			if (session?.user?.plan && trigger === 'update') {
+				token.plan = session.user.plan;
+			}
+			if (session?.user?.planStatus && trigger === 'update') {
+				token.planStatus = session.user.planStatus;
+			}
+			if (session?.user?.trialEndDate && trigger === 'update') {
+				token.trialEndDate = session.user.trialEndDate;
+			}
 			return token;
 		},
 		session: async ({ session, user, trigger, token }) => {
@@ -174,6 +195,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			session.user.storeName = token.storeName as string;
 			session.user.companyId = token.companyId as string;
 			session.user.companyName = token.companyName as string;
+			session.user.plan = token.plan as string;
+			session.user.planStatus = token.planStatus as string;
+			session.user.trialEndDate = token.trialEndDate as string;
 
 			if (trigger === 'update') {
 				session.user.name = user.name;
@@ -182,6 +206,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				session.user.isStore = token.isStore as boolean;
 				session.user.companyId = token.companyId as string;
 				session.user.companyName = token.companyName as string;
+				session.user.plan = token.plan as string;
+				session.user.planStatus = token.planStatus as string;
+				session.user.trialEndDate = token.trialEndDate as string;
 			}
 			return session;
 		},

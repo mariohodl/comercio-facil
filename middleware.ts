@@ -12,6 +12,7 @@ export default auth(async function middleware(req) {
 	// protected paths
 	const isProtectedPath =
 		pathname.startsWith('/admin') ||
+		pathname.includes('/super-admin') ||
 		pathname.startsWith('/checkout') ||
 		pathname.startsWith('/account');
 
@@ -25,15 +26,22 @@ export default auth(async function middleware(req) {
 	// Handle role-based redirection for authenticated users
 	if (session?.user) {
 		const { role, storeId } = session.user;
+
+		// SuperAdmin isolation (Strictly verify access to root super-admin paths)
+		if (pathname.startsWith('/super-admin') && role !== 'SuperAdmin') {
+			const redirectUrl = storeId ? `/admin/${storeId}/overview` : '/';
+			return NextResponse.redirect(new URL(redirectUrl, req.url));
+		}
+
 		const isAuthPage = pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up');
 
-		// 1. Redirect to setup if no storeId (and user is Admin/Store owner)
-		if (!storeId && pathname !== '/admin/setup' && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
+		// Redirect to setup if no storeId (Exempt SuperAdmin)
+		if (!storeId && role !== 'SuperAdmin' && pathname !== '/admin/setup' && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
 			const setupUrl = new URL('/admin/setup', req.url);
 			return NextResponse.redirect(setupUrl);
 		}
 
-		// 2. Redirections when storeId exists
+		// Redirections when storeId exists
 		if (storeId) {
 			if (role === 'Seller') {
 				// Sellers must stay within POS
@@ -43,11 +51,10 @@ export default auth(async function middleware(req) {
 					const posUrl = new URL(`/admin/pos/${storeId}`, req.url);
 					return NextResponse.redirect(posUrl);
 				}
-			} else if (role === 'Admin') {
-				// Admins are redirected to their dashboard if they hit the entry points
-				if (pathname === '/' || pathname === '/admin' || (pathname === `/admin/${storeId}`)) {
-					const adminUrl = new URL(`/admin/${storeId}/overview`, req.url);
-					return NextResponse.redirect(adminUrl);
+			} else if (role === 'Admin' || role === 'SuperAdmin') {
+				if (pathname === '/' || pathname === '/admin' || pathname === `/admin/${storeId}`) {
+					const targetPath = role === 'SuperAdmin' ? '/super-admin' : `/admin/${storeId}/overview`;
+					return NextResponse.redirect(new URL(targetPath, req.url));
 				}
 			}
 		}

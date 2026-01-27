@@ -14,7 +14,7 @@ export interface IUser extends Document, IUserInput {
 	status: boolean;
 	isDeleted: boolean;
 	deletedAt?: Date | null;
-	phone?: string;
+	phone: string;
 	business?: {
 		companyId: string;
 		stores: string[];

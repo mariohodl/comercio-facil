@@ -257,7 +257,12 @@ export const StoreSettingsSchema = z.object({
 	storeLocation: z.string().min(3, 'Store location must be at least 3 characters'),
 	warehouseName: z.string().min(3, 'Warehouse name must be at least 3 characters'),
 	warehouseLocation: z.string().min(3, 'Warehouse location must be at least 3 characters'),
+	taxId: z.string().optional(),
 	storeId: StoreId,
+	plan: z.enum(['BASIC', 'INTERMEDIATE', 'ADVANCED']).optional(),
+	planStatus: z.string().optional(),
+	trialEndDate: z.string().nullable().optional(),
+	subscriptionEndDate: z.string().nullable().optional(),
 })
 
 export const UserNameSchema = z.object({
