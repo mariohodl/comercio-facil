@@ -1,5 +1,5 @@
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import Facebook from 'next-auth/providers/facebook';
@@ -26,6 +26,18 @@ declare module 'next-auth' {
 			planStatus: string;
 			trialEndDate?: string;
 		} & DefaultSession['user'];
+	}
+
+	interface JWT {
+		role: string;
+		storeId: string;
+		isStore: boolean;
+		storeName: string;
+		companyId: string;
+		companyName: string;
+		plan: string;
+		planStatus: string;
+		trialEndDate: string;
 	}
 }
 
@@ -64,7 +76,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 				const DBuser = await User.findOne({ email: credentials.email, isDeleted: { $ne: true } })
 					.populate('business.defaultStoreId')
-					.populate('business.companyId');
+					.populate('business.companyId') as any;
 
 				if (DBuser && DBuser.password) {
 					const isMatch = await bcrypt.compare(
@@ -112,7 +124,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			try {
 				if (account?.provider !== 'credentials') {
 					await connectToDatabase();
-					const dbUser = await User.findOne({ email: user.email });
+					const dbUser = await User.findOne({ email: user.email }) as any;
 					if (dbUser && !dbUser.emailVerified) {
 						dbUser.emailVerified = true;
 						// Also set admin role if they are new or didn't have a specific role
@@ -138,24 +150,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 						await connectToDatabase();
 						const dbUser = await User.findOne({ email: user.email })
 							.populate('business.defaultStoreId')
-							.populate('business.companyId');
+							.populate('business.companyId') as any;
+
 						if (dbUser) {
-							const defaultStore = dbUser.business?.defaultStoreId as any;
-							const company = dbUser.business?.companyId as any;
 							token.role = dbUser.role || ROL_ADMIN;
-							token.storeId = defaultStore?.slug || '';
-							token.storeName = defaultStore?.name || '';
 							token.isStore = !!dbUser.isStore;
-							token.companyId = company?._id?.toString() || '';
-							token.companyName = company?.name || '';
-							token.plan = company?.plan || '';
-							token.planStatus = company?.planStatus || '';
+
+							let defaultStore: any = dbUser.business?.defaultStoreId;
+							let company: any = dbUser.business?.companyId;
+
+							// If they aren't fully populated (they are just IDs/Strings), fetch them manually
+							if (defaultStore && typeof defaultStore !== 'object') {
+								const StoreModel = (await import('./lib/db/models/store.model')).default;
+								defaultStore = await StoreModel.findById(defaultStore);
+							}
+							if (company && typeof company !== 'object') {
+								const CompanyModel = (await import('./lib/db/models/company.model')).default;
+								company = await CompanyModel.findById(company);
+							}
+
+							token.storeId = (defaultStore as any)?.slug || '';
+							token.storeName = (defaultStore as any)?.name || '';
+							token.companyId = (company as any)?._id?.toString() || '';
+							token.companyName = (company as any)?.name || '';
+							token.plan = (company as any)?.plan || '';
+							token.planStatus = (company as any)?.planStatus || '';
 
 							// Safely handle dates
-							if (company?.trialEndDate instanceof Date) {
-								token.trialEndDate = company.trialEndDate.toISOString();
-							} else if (company?.trialEndDate) {
-								token.trialEndDate = new Date(company.trialEndDate).toISOString();
+							const trialEndDate = (company as any)?.trialEndDate;
+							if (trialEndDate instanceof Date) {
+								token.trialEndDate = trialEndDate.toISOString();
+							} else if (trialEndDate) {
+								token.trialEndDate = new Date(trialEndDate).toISOString();
 							} else {
 								token.trialEndDate = '';
 							}
