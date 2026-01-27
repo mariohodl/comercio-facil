@@ -7,6 +7,8 @@ import Instagram from 'next-auth/providers/instagram';
 import { connectToDatabase } from './lib/db';
 import client from './lib/db/client';
 import User from './lib/db/models/user.model';
+import Store from './lib/db/models/store.model';
+import Company from './lib/db/models/company.model';
 import { ROL_ADMIN } from './lib/constants';
 
 import NextAuth, { type DefaultSession } from 'next-auth';
