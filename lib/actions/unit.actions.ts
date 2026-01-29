@@ -153,12 +153,29 @@ export async function deleteUnit(id: string) {
 // GET ACTIVE UNITS (for dropdowns/selects)
 export async function getActiveUnits(storeId?: string) {
     await connectToDatabase()
-    const units = await Unit.find({
-        status: true,
-        ...(storeId ? { storeId } : {})
-    })
-        .select('name abbreviation')
-        .sort({ name: 1 })
-        .lean()
-    return JSON.parse(JSON.stringify(units)) as IUnit[]
+
+    // Use aggregation to deduplicate by name while keeping one ID
+    const units = await Unit.aggregate([
+        {
+            $match: {
+                status: true,
+                ...(storeId ? { $or: [{ storeId }, { isGlobal: true }] } : { isGlobal: true })
+            }
+        },
+        {
+            $group: {
+                _id: "$name",
+                docId: { $first: "$_id" },
+                name: { $first: "$name" },
+                abbreviation: { $first: "$abbreviation" }
+            }
+        },
+        { $sort: { name: 1 } }
+    ]);
+
+    return units.map(u => ({
+        _id: u.docId.toString(),
+        name: u.name,
+        abbreviation: u.abbreviation
+    })) as any[]
 }

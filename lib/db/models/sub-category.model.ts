@@ -4,11 +4,15 @@ export interface ISubCategory extends Document {
     _id: string
     name: string
     slug: string
-    parentCategory: string // ObjectId
+    parentCategory: Schema.Types.ObjectId
     code: string
-    description?: string
-    image?: string
-    storeId: string
+    industry: string
+    synonyms: string[]
+    usageCount: number
+    isApproved: boolean
+    isGlobal: boolean
+
+    storeId?: string
     status: boolean
     createdAt: Date
     updatedAt: Date
@@ -27,9 +31,31 @@ const subCategorySchema = new Schema<ISubCategory>(
             lowercase: true,
             trim: true,
         },
-        storeId: {
+        industry: {
             type: String,
             required: true,
+            index: true,
+            default: 'general'
+        },
+        synonyms: {
+            type: [String],
+            default: []
+        },
+        usageCount: {
+            type: Number,
+            default: 0
+        },
+        isApproved: {
+            type: Boolean,
+            default: false
+        },
+        isGlobal: {
+            type: Boolean,
+            default: false
+        },
+        storeId: {
+            type: String,
+            required: false,
         },
         parentCategory: {
             type: Schema.Types.ObjectId as any,
@@ -41,14 +67,6 @@ const subCategorySchema = new Schema<ISubCategory>(
             required: true,
             trim: true,
         },
-        description: {
-            type: String,
-            trim: true,
-        },
-        image: {
-            type: String,
-            trim: true,
-        },
         status: {
             type: Boolean,
             default: true,
@@ -58,6 +76,8 @@ const subCategorySchema = new Schema<ISubCategory>(
         timestamps: true,
     }
 )
+
+subCategorySchema.index({ name: 1, industry: 1, storeId: 1, parentCategory: 1 }, { unique: true })
 
 const SubCategory = models.SubCategory || model<ISubCategory>('SubCategory', subCategorySchema)
 

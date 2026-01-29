@@ -4,7 +4,12 @@ export interface IUnit extends Document {
     _id: string
     name: string
     abbreviation: string
-    storeId: string
+    industry: string
+    synonyms: string[]
+    usageCount: number
+    isApproved: boolean
+    isGlobal: boolean
+    storeId?: string
     status: boolean
     createdAt: Date
     updatedAt: Date
@@ -22,9 +27,31 @@ const unitSchema = new Schema<IUnit>(
             required: true,
             trim: true,
         },
-        storeId: {
+        industry: {
             type: String,
             required: true,
+            index: true,
+            default: 'general'
+        },
+        synonyms: {
+            type: [String],
+            default: []
+        },
+        usageCount: {
+            type: Number,
+            default: 0
+        },
+        isApproved: {
+            type: Boolean,
+            default: true
+        },
+        isGlobal: {
+            type: Boolean,
+            default: false
+        },
+        storeId: {
+            type: String,
+            required: false,
         },
         status: {
             type: Boolean,
@@ -35,6 +62,8 @@ const unitSchema = new Schema<IUnit>(
         timestamps: true,
     }
 )
+
+unitSchema.index({ name: 1, industry: 1, storeId: 1 }, { unique: true })
 
 const Unit = models.Unit || model<IUnit>('Unit', unitSchema)
 

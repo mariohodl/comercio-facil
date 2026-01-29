@@ -1,0 +1,209 @@
+'use client'
+
+import { useState, useEffect, useMemo } from 'react'
+import { Check, ChevronsUpDown, Plus, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/ui/command'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover'
+import { getCategorySuggestions, getBrandSuggestions, getSubCategorySuggestions, getUnitSuggestions } from '@/lib/actions/catalog.actions'
+import { useDebounce } from '@/hooks/use-debounce'
+import { useToast } from '@/hooks/use-toast'
+
+interface Option {
+    _id: string
+    name: string
+    isGlobal?: boolean
+    abbreviation?: string
+}
+
+interface CatalogAutocompleteProps {
+    value: string
+    onSelect: (option: Option | null) => void
+    onCustomCreate?: (name: string) => void
+    initialOptions?: Option[]
+    placeholder?: string
+    industry?: string
+    mode?: 'category' | 'brand' | 'subCategory' | 'unit'
+    categoryId?: string
+}
+
+export function CatalogAutocomplete({
+    value,
+    onSelect,
+    onCustomCreate,
+    initialOptions = [],
+    placeholder = "Select...",
+    industry = 'general',
+    mode = 'category',
+    categoryId,
+}: CatalogAutocompleteProps) {
+    const { showSuccess } = useToast()
+    const [open, setOpen] = useState(false)
+    const [query, setQuery] = useState('')
+    const [suggestions, setSuggestions] = useState<Option[]>(initialOptions)
+    const [loading, setLoading] = useState(false)
+    const debouncedQuery = useDebounce(query, 300)
+
+    // Initially sync suggestions with initialOptions
+    useEffect(() => {
+        if (!query) {
+            setSuggestions(initialOptions)
+        }
+    }, [initialOptions, query])
+
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            // Local filtering of initialOptions
+            const localResults = initialOptions.filter(opt =>
+                opt.name.toLowerCase().includes(debouncedQuery.toLowerCase())
+            )
+
+            // Perform server fetch
+            setLoading(true)
+            try {
+                let res: any;
+                switch (mode) {
+                    case 'category':
+                        res = await getCategorySuggestions(debouncedQuery, industry);
+                        break;
+                    case 'brand':
+                        res = await getBrandSuggestions(debouncedQuery, industry);
+                        break;
+                    case 'subCategory':
+                        res = await getSubCategorySuggestions(debouncedQuery, categoryId, industry);
+                        break;
+                    case 'unit':
+                        res = await getUnitSuggestions(debouncedQuery, industry);
+                        break;
+                    default:
+                        res = { success: false };
+                }
+
+                if (res.success && res.suggestions) {
+                    const globalMapped = res.suggestions.map((s: any) => ({
+                        _id: (s._id || s.id || Math.random().toString()).toString(),
+                        name: mode === 'category' ? (s.categoryName || s.name) : s.name,
+                        isGlobal: s.isGlobal,
+                        abbreviation: s.abbreviation
+                    }))
+
+                    // Merge local and global
+                    const combined = [...localResults, ...globalMapped]
+
+                    // Deduplicate by Name to prevent cmdk/React key errors
+                    const unique = combined.filter((v, i, a) =>
+                        a.findIndex(t => t.name.toLowerCase() === v.name.toLowerCase()) === i
+                    )
+                    setSuggestions(unique)
+                } else {
+                    setSuggestions(localResults)
+                }
+            } catch (err) {
+                console.error(err)
+                setSuggestions(localResults)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchSuggestions()
+    }, [debouncedQuery, industry, mode, initialOptions, categoryId])
+
+    const selectedOption = useMemo(() => {
+        return suggestions.find((s) => s.name === value)
+    }, [suggestions, value])
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between h-10"
+                >
+                    <span className="truncate">
+                        {value ? value : placeholder}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                <Command shouldFilter={false}>
+                    <CommandInput
+                        placeholder={`Search ${mode}...`}
+                        value={query}
+                        onValueChange={setQuery}
+                    />
+                    <CommandList>
+                        <CommandEmpty className="p-2">
+                            {loading ? (
+                                <div className="flex items-center justify-center p-4">
+                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                    <span>Searching...</span>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <p className="text-sm">No {mode} found.</p>
+                                    {mode !== 'subCategory' && onCustomCreate && (
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            className="w-full justify-start"
+                                            onClick={() => {
+                                                onCustomCreate(query)
+                                                showSuccess(`${mode.charAt(0).toUpperCase() + mode.slice(1)} "${query}" created`)
+                                                setOpen(false)
+                                            }}
+                                        >
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Create new "{query}"
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+                        </CommandEmpty>
+                        <CommandGroup>
+                            {suggestions.map((option) => (
+                                <CommandItem
+                                    key={option._id}
+                                    value={option.name}
+                                    onSelect={() => {
+                                        onSelect(option)
+                                        showSuccess(`${mode.charAt(0).toUpperCase() + mode.slice(1)} "${option.name}" selected`)
+                                        setOpen(false)
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            value === option.name ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    <span>{option.name}</span>
+                                    {option.abbreviation && (
+                                        <span className="ml-1 text-muted-foreground">
+                                            ({option.abbreviation})
+                                        </span>
+                                    )}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    )
+}

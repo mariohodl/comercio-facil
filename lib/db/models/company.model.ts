@@ -18,6 +18,7 @@ export interface ICompany extends Document {
     trialEndDate?: Date;
     subscriptionEndDate?: Date;
     freeMonths: number;
+    industry: string;
     taxId?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -26,6 +27,7 @@ export interface ICompany extends Document {
 const companySchema = new Schema<ICompany>(
     {
         name: { type: String, required: true },
+        industry: { type: String, default: 'general', index: true },
         logo: { type: String },
         logoUpdateHistory: { type: [Date], default: [] },
         taxId: { type: String },

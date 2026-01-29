@@ -30,10 +30,6 @@ const productSchema = new Schema<IProduct>(
 			required: false,
 			unique: false, //cambiar a true
 		},
-		category: {
-			type: String,
-			required: true,
-		},
 		sku: { type: String, required: true, unique: true },
 		images: [
 			{
@@ -41,10 +37,6 @@ const productSchema = new Schema<IProduct>(
 				imgKey: { type: String, required: true }
 			}
 		],
-		brand: {
-			type: String,
-			required: false,
-		},
 		description: {
 			type: String,
 			trim: true,
@@ -94,7 +86,6 @@ const productSchema = new Schema<IProduct>(
 			required: true,
 			default: false,
 		},
-
 		reviews: [
 			{
 				type: Schema.Types.ObjectId,
@@ -104,8 +95,23 @@ const productSchema = new Schema<IProduct>(
 		],
 		store: { type: String, required: true },
 		warehouse: { type: String, required: true },
+
+		// References to Hybrid Catalog
+		categoriaId: { type: Schema.Types.ObjectId, ref: 'Category' },
+		subCategoriaId: { type: Schema.Types.ObjectId, ref: 'SubCategory' },
+		brandId: { type: Schema.Types.ObjectId, ref: 'Brand' },
+		unitId: { type: Schema.Types.ObjectId, ref: 'Unit' },
+
+		// Backwards compatibility / Custom strings
+		category: { type: String, required: true },
 		subCategory: { type: String, required: true },
+		brand: { type: String, required: false },
 		unit: { type: String, required: true },
+
+		// Flag to identify if it's using custom data
+		isCustomCategory: { type: Boolean, default: false },
+		isCustomBrand: { type: Boolean, default: false },
+
 		barcodeSymbology: { type: String, required: true },
 		itemBarcode: { type: String, required: false },
 		productType: { type: String, required: true },

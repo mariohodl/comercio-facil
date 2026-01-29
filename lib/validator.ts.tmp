@@ -1,0 +1,125 @@
+import { z } from 'zod'
+import { formatNumberWithDecimal } from './utils'
+
+const MongoId = z
+	.string()
+	.regex(/^[0-9a-fA-F]{24}$/, { message: 'Invalid MongoDB ID' })
+
+// Common
+const Price = (field: string) =>
+	z.coerce
+		.number()
+		.refine(
+			(value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
+			`${field} must have exactly two decimal places (e.g., 49.99)`
+		)
+
+export const ReviewInputSchema = z.object({
+	product: MongoId,
+	user: MongoId,
+	isVerifiedPurchase: z.boolean(),
+	title: z.string().min(1, 'Title is required'),
+	comment: z.string().min(1, 'Comment is required'),
+	rating: z.coerce
+		.number()
+		.int()
+		.min(1, 'Rating must be at least 1')
+		.max(5, 'Rating must be at most 5'),
+})
+export const ProductBaseSchema = z.object({
+	_id: z.string().optional(),
+	productId: z.coerce
+		.number()
+		.int()
+		.nonnegative('Number of sales must be a non-negative number'),
+	name: z.string().min(3, 'Name must be at least 3 characters'),
+	slug: z.string().min(3, 'Slug must be at least 3 characters'),
+	sku: z.string().min(1, 'SKU is required').regex(/^[a-zA-Z0-9-_]+$/, 'SKU can only contain letters, numbers, hyphens, and underscores'),
+	images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })),
+	description: z.string().optional(),
+	isPublished: z.boolean(),
+	listPrice: z.coerce
+		.number()
+		.nonnegative('List price must be a non-negative number'),
+	discountPrice: z.coerce
+		.number()
+		.nonnegative('Discount price must be a non-negative number')
+		.optional(),
+	countInStock: z.coerce
+		.number()
+		.int()
+		.nonnegative('Count in stock must be a non-negative number'),
+	tags: z.array(z.string()).default([]),
+	avgRating: z.coerce
+		.number()
+		.nonnegative('Average rating must be a non-negative number'),
+	numReviews: z.coerce
+		.number()
+		.int()
+		.nonnegative('Number of reviews must be a non-negative number'),
+	ratingDistribution: z
+		.array(z.object({ rating: z.number(), count: z.number() }))
+		.max(5),
+	reviews: z.array(z.string()).default([]),
+	numSales: z.coerce
+		.number()
+		.int()
+		.nonnegative('Number of sales must be a non-negative number'),
+	store: z.string().min(1, 'Store is required'),
+	warehouse: z.string().min(1, 'Warehouse is required'),
+	
+	// Hybrid Catalog References (Optional for backwards compatibility)
+	categoriaId: z.string().optional(),
+	subCategoriaId: z.string().optional(),
+	brandId: z.string().optional(),
+	unitId: z.string().optional(),
+
+	// String representations
+	category: z.string().min(1, 'Category is required'),
+	subCategory: z.string().min(1, 'Sub category is required'),
+	unit: z.string().min(1, 'Unit is required'),
+	brand: z.string().optional(),
+
+	// Custom data flags (Default to false)
+	isCustomCategory: z.boolean().default(false),
+	isCustomBrand: z.boolean().default(false),
+
+	barcodeSymbology: z.string().min(1, 'Barcode symbology is required'),
+	itemBarcode: z.string().optional(),
+	productType: z.string().min(1, 'Product type is required'),
+	taxType: z.string().min(1, 'Tax type is required'),
+	tax: z.coerce.number().nonnegative('Tax must be a non-negative number'),
+	discountType: z.string().optional(),
+	discountValue: z.coerce.number().optional(),
+	quantityAlert: z.coerce.number().int().nonnegative('Quantity alert must be a non-negative number'),
+	costPerUnit: z.coerce.number().nonnegative('Cost per unit must be a non-negative number'),
+	attributes: z.array(z.object({
+		name: z.string(),
+		values: z.array(z.string())
+	})).optional(),
+	variants: z.array(z.object({
+		sku: z.string(),
+		costPerUnit: z.number(),
+		listPrice: z.number(),
+		discountPrice: z.number().optional(),
+		discountType: z.string().optional(),
+		discountValue: z.number().optional(),
+		countInStock: z.number(),
+		attributes: z.array(z.object({
+			name: z.string(),
+			value: z.string()
+		})),
+		images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })).max(2).optional(),
+		barcode: z.string().optional(),
+	})).optional(),
+})
+
+export const ProductInputSchema = ProductBaseSchema.superRefine((data, ctx) => {
+	if (data.productType === 'Single Product' && (!data.itemBarcode || data.itemBarcode.trim() === '')) {
+		ctx.addIssue({
+			code: z.ZodIssueCode.custom,
+			message: 'Item barcode is required',
+			path: ['itemBarcode'],
+		})
+	}
+})

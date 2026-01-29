@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CategoryInputSchema } from '@/lib/validator'
@@ -26,6 +26,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import { SuggestedSubCategoriesDialog } from './suggested-sub-categories-dialog'
 
 interface CategoryModalProps {
     open: boolean
@@ -38,6 +39,8 @@ interface CategoryModalProps {
 export function CategoryModal({ open, onClose, category, onSuccess, storeId }: CategoryModalProps) {
     const { showSuccess, showError } = useToast()
     const isEditMode = !!category
+    const [showSuggestions, setShowSuggestions] = useState(false)
+    const [createdCategory, setCreatedCategory] = useState<{ id: string, name: string } | null>(null)
 
     const form = useForm<ICategoryInput>({
         resolver: zodResolver(CategoryInputSchema),
@@ -82,9 +85,23 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
 
             if (result.success) {
                 showSuccess(result.message)
-                form.reset()
-                onClose()
-                onSuccess?.()
+
+                if (!isEditMode && result.categoryId) {
+                    setCreatedCategory({
+                        id: result.categoryId,
+                        name: result.categoryName
+                    })
+                    // Don't close immediately if suggested, or close usage of this form and open suggestions?
+                    // User might want to create another category.
+                    // The common pattern is: Close this form, open suggestion form.
+                    form.reset()
+                    onClose() // Close the category modal
+                    setShowSuggestions(true) // Open suggestions modal
+                } else {
+                    form.reset()
+                    onClose()
+                    onSuccess?.()
+                }
             } else {
                 showError(result.message)
             }
@@ -199,6 +216,23 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
                     </form>
                 </Form>
             </DialogContent>
+
+            {createdCategory && (
+                <SuggestedSubCategoriesDialog
+                    open={showSuggestions}
+                    onOpenChange={(open) => {
+                        setShowSuggestions(open)
+                        if (!open) {
+                            // When suggestions dialog closes, trigger parent onSuccess
+                            onSuccess?.()
+                            setCreatedCategory(null)
+                        }
+                    }}
+                    categoryName={createdCategory.name}
+                    categoryId={createdCategory.id}
+                    storeId={storeId}
+                />
+            )}
         </Dialog>
     )
 }

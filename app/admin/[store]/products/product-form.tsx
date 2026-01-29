@@ -42,9 +42,12 @@ import { Switch } from "@/components/ui/switch"
 import Link from 'next/link'
 import { IStore } from '@/lib/db/models/store.model'
 import { IWarehouse } from '@/lib/db/models/warehouse.model'
+import { CatalogAutocomplete } from '@/components/shared/catalog-autocomplete'
+
+const useDefaultValues = false;
 
 const productDefaultValues: IProductInput =
-  process.env.NODE_ENV === 'development'
+  process.env.NODE_ENV === 'development' && useDefaultValues
     ? {
       name: 'Sample Product',
       slug: 'sample-product',
@@ -77,6 +80,10 @@ const productDefaultValues: IProductInput =
       discountValue: 0,
       quantityAlert: 5,
       costPerUnit: 50,
+      categoriaId: '',
+      subCategoriaId: '',
+      brandId: '',
+      unitId: '',
     }
     : {
       name: '',
@@ -110,6 +117,10 @@ const productDefaultValues: IProductInput =
       discountValue: 0,
       quantityAlert: 0,
       costPerUnit: 0,
+      categoriaId: '',
+      subCategoriaId: '',
+      brandId: '',
+      unitId: '',
     }
 
 type ProductFormProps = {
@@ -123,6 +134,7 @@ type ProductFormProps = {
   attributes?: { _id: string; name: string; values: string[] }[]
   stores?: IStore[]
   warehouses?: IWarehouse[]
+  industry?: string
 }
 
 const ProductForm = ({
@@ -136,11 +148,18 @@ const ProductForm = ({
   attributes = [],
   stores = [],
   warehouses = [],
+  industry = 'general',
 }: ProductFormProps) => {
   const router = useRouter()
   const t = useTranslations('products')
   const tCommon = useTranslations('common')
 
+  // Safely deduplicate units and brands from props to prevent UI crashes
+  const uniqueUnits = Array.from(new Map(units.map(u => [u.name.toLowerCase(), u])).values())
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  const uniqueBrands = Array.from(new Map(brands.map(b => [b.name.toLowerCase(), b])).values())
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   const [subCategories, setSubCategories] = useState<any[]>([])
   const [isScannerOpen, setIsScannerOpen] = useState(false)
@@ -271,33 +290,35 @@ const ProductForm = ({
     }
   }, [productName, type, storeId, form])
 
+  const selectedCategoryId = form.watch('categoriaId')
+
   useEffect(() => {
     const fetchSubCategories = async () => {
-      if (!selectedCategory) {
+      let categoryId = selectedCategoryId
+
+      if (!categoryId && selectedCategory) {
+        const found = categories.find(c => c.categoryName === selectedCategory)
+        categoryId = found?._id
+      }
+
+      if (!categoryId) {
         setSubCategories([])
         form.setValue('subCategory', '')
         return
       }
 
-      const category = categories.find(c => c.categoryName === selectedCategory)
-      if (category && category._id) {
-        const subs = await getSubCategoriesByCategory(category._id)
-        setSubCategories(subs)
+      const subs = await getSubCategoriesByCategory(categoryId)
+      setSubCategories(subs)
 
-        // Check if current subCategory is valid for the new category
-        const currentSub = form.getValues('subCategory')
-        const isValid = subs.some(s => s.name === currentSub) || currentSub === 'None'
-        if (currentSub && !isValid) {
-          form.setValue('subCategory', '')
-        }
-      } else {
-        setSubCategories([])
+      const currentSub = form.getValues('subCategory')
+      const isValid = subs.some(s => s.name === currentSub) || currentSub === 'None'
+      if (currentSub && !isValid) {
         form.setValue('subCategory', '')
       }
     }
 
     fetchSubCategories()
-  }, [selectedCategory, categories, form])
+  }, [selectedCategory, selectedCategoryId, categories, form])
 
   // Watch pricing fields for automatic discount calculation
   const discountType = form.watch('discountType')
@@ -444,7 +465,6 @@ const ProductForm = ({
           })}
           className='space-y-8'
         >
-          {/* Product Information Section */}
           <Card className="border-neutral-200 shadow-sm">
             <CardHeader>
               <CardTitle className="text-navy flex items-center gap-2">
@@ -594,40 +614,33 @@ const ProductForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm">{t('category')} <span className="text-red-500">*</span></FormLabel>
-                      <div className="flex flex-row gap-2 items-center">
-                        <div className="w-full flex-1">
-                          <Select
-                            onValueChange={(value) => {
-                              field.onChange(value)
+                      <FormControl>
+                        <CatalogAutocomplete
+                          value={field.value}
+                          initialOptions={categories.map(c => ({ _id: c._id, name: c.categoryName, isGlobal: false }))}
+                          industry={industry}
+                          mode="category"
+                          placeholder={t('select')}
+                          onSelect={(option) => {
+                            if (option) {
+                              form.setValue('category', option.name)
+                              form.setValue('categoriaId', option._id)
+                              form.setValue('isCustomCategory', false)
+                              // Reset subcategory when category changes
                               form.setValue('subCategory', '')
                               setSubCategories([])
-                            }}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="w-full h-10">
-                                <SelectValue placeholder={t('select')} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {categories.length > 0 ? (
-                                categories.map((cat) => (
-                                  <SelectItem key={cat.categorySlug} value={cat.categoryName}>
-                                    {cat.categoryName}
-                                  </SelectItem>
-                                ))
-                              ) : (
-                                <SelectItem value="no-categories" disabled>
-                                  {t('noCategoriesAvailable')}
-                                </SelectItem>
-                              )}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button type="button" variant="ghost" size="icon" className="text-orange hover:text-orange-dark shrink-0 h-10 w-10">
-                          <PlusCircle className="w-5 h-5" />
-                        </Button>
-                      </div>
+                            }
+                          }}
+                          onCustomCreate={(name) => {
+                            form.setValue('category', name)
+                            form.setValue('categoriaId', undefined)
+                            form.setValue('isCustomCategory', true)
+                            // Reset subcategory
+                            form.setValue('subCategory', '')
+                            setSubCategories([])
+                          }}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -638,21 +651,22 @@ const ProductForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm">{t('subCategory')} <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-10">
-                            <SelectValue placeholder={t('select')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="None">{t('none')}</SelectItem>
-                          {subCategories.map((sub) => (
-                            <SelectItem key={sub.slug} value={sub.name}>
-                              {sub.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <CatalogAutocomplete
+                          value={field.value}
+                          initialOptions={subCategories.map(s => ({ _id: (s as any)._id || s.slug, name: s.name, isGlobal: s.isGlobal }))}
+                          industry={industry}
+                          mode="subCategory"
+                          categoryId={selectedCategoryId}
+                          placeholder={t('select')}
+                          onSelect={(option) => {
+                            if (option) {
+                              form.setValue('subCategory', option.name)
+                              form.setValue('subCategoriaId', option._id)
+                            }
+                          }}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -666,24 +680,27 @@ const ProductForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm">{t('brand')} <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-10">
-                            <SelectValue placeholder={t('select')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {brands.length > 0 ? (
-                            brands.map((brand) => (
-                              <SelectItem key={brand.slug} value={brand.name}>
-                                {brand.name}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="Generico">{t('generic')}</SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <CatalogAutocomplete
+                          value={field.value || ''}
+                          initialOptions={uniqueBrands.map(b => ({ _id: (b as any)._id || b.slug, name: b.name, isGlobal: (b as any).isGlobal }))}
+                          industry={industry}
+                          mode="brand"
+                          placeholder={t('select')}
+                          onSelect={(option) => {
+                            if (option) {
+                              form.setValue('brand', option.name)
+                              form.setValue('brandId', option._id)
+                              form.setValue('isCustomBrand', false)
+                            }
+                          }}
+                          onCustomCreate={(name) => {
+                            form.setValue('brand', name)
+                            form.setValue('brandId', undefined)
+                            form.setValue('isCustomBrand', true)
+                          }}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -694,24 +711,25 @@ const ProductForm = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm">{t('unit')} <span className="text-red-500">*</span></FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-10">
-                            <SelectValue placeholder={t('select')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {units.length > 0 ? (
-                            units.map((unit) => (
-                              <SelectItem key={unit._id} value={unit.name}>
-                                {unit.name} ({unit.abbreviation})
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="Piece">{t('piece')}</SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <CatalogAutocomplete
+                          value={field.value}
+                          initialOptions={uniqueUnits.map(u => ({ _id: (u as any)._id || u.name, name: u.name, abbreviation: u.abbreviation, isGlobal: (u as any).isGlobal }))}
+                          industry={industry}
+                          mode="unit"
+                          placeholder={t('select')}
+                          onSelect={(option) => {
+                            if (option) {
+                              form.setValue('unit', option.name)
+                              form.setValue('unitId', option._id)
+                            }
+                          }}
+                          onCustomCreate={(name) => {
+                            form.setValue('unit', name)
+                            form.setValue('unitId', undefined)
+                          }}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

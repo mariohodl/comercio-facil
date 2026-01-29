@@ -46,7 +46,9 @@
         "subtotal": "Subtotal",
         "tax": "Impuesto",
         "notAvailable": "N/A",
-        "close": "Cerrar"
+        "close": "Cerrar",
+        "saving": "Guardando...",
+        "name": "Nombre"
     },
     "pos": {
         "title": "Punto de Venta",
@@ -532,8 +534,8 @@
         "categories": "Categorías",
         "subCategories": "Subcategorías",
         "manageBrands": "Administrar tus marcas",
-        "manageCategories": "Administrar tus categorías",
-        "manageSubCategories": "Administrar tus subcategorías",
+        "manageCategories": "Las categorías se podrán utilizar en productos una vez aprobadas.",
+        "manageSubCategories": "Las subcategorías se podrán utilizar en productos una vez aprobadas.",
         "manageUnits": "Administrar tus unidades",
         "addBrand": "Agregar Marca",
         "addCategory": "Agregar Categoría",
@@ -571,7 +573,17 @@
         "noSubCategoriesFound": "No se encontraron subcategorías",
         "noBrandsFound": "No se encontraron marcas",
         "deleteBrandTitle": "Eliminar Marca",
-        "deleteBrandDescription": "¿Estás seguro de que deseas eliminar esta marca? Esta acción no se puede deshacer."
+        "deleteBrandDescription": "¿Estás seguro de que deseas eliminar esta marca? Esta acción no se puede deshacer.",
+        "setupCatalog": "Configurar Catálogo",
+        "type": "Tipo",
+        "approval": "Aprobación",
+        "approved": "Aprobado",
+        "pending": "Pendiente",
+        "editSubCategory": "Editar Subcategoría",
+        "updateSubCategory": "Actualizar Subcategoría",
+        "parentCategory": "Categoría Padre",
+        "selectCategory": "Selecciona una categoría",
+        "enterSubCategoryName": "Ingresa el nombre de la subcategoría"
     },
     "auth": {
         "signIn": "Iniciar Sesión",

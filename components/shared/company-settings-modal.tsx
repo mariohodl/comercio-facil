@@ -60,6 +60,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
             warehouseName: '',
             warehouseLocation: '',
             storeId: generateStoreId(),
+            industry: 'general',
         },
     })
 
@@ -95,7 +96,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
 
     return (
         <Dialog open={open} onOpenChange={() => { }}>
-            <DialogContent className="sm:max-w-[425px]" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+            <DialogContent className="sm:max-w-[425px] md:max-w-[600px] lg:max-w-[700px]" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>Configuración de la Empresa</DialogTitle>
                     <DialogDescription>
@@ -175,19 +176,60 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                             />
                         </div>
 
-                        <FormField
-                            control={form.control}
-                            name="storeId"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>ID de la Sucursal (Generado)</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} readOnly className="bg-gray-100" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="industry"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Giro de la Empresa</FormLabel>
+                                        <FormControl>
+                                            <select
+                                                {...field}
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                <option value="general">General</option>
+                                                <option value="farmacia">Farmacia</option>
+                                                <option value="abarrotes">Abarrotes</option>
+                                                <option value="ferreteria">Ferretería</option>
+                                                <option value="ropa">Ropa y Calzado</option>
+                                                <option value="tienda-de-conveniencia">Tienda de Conveniencia</option>
+                                                <option value="papeleria">Papelería</option>
+                                                <option value="cosmeticos">Cosméticos y Belleza</option>
+                                                <option value="electronica">Electrónica y Computación</option>
+                                                <option value="jugueteria">Juguetería</option>
+                                                <option value="libreria">Librería</option>
+                                                <option value="mascotas">Mascotas y Veterinaria</option>
+                                                <option value="deportes">Artículos Deportivos</option>
+                                                <option value="alimentos-preparados">Restaurante / Alimentos Preparados</option>
+                                                <option value="panaderia">Panadería y Pastelería</option>
+                                                <option value="carniceria">Carnicería</option>
+                                                <option value="frutas-verduras">Frutas y Verduras</option>
+                                                <option value="automotriz">Automotriz y Autopartes</option>
+                                                <option value="muebleria">Mueblería y Hogar</option>
+                                                <option value="tecnologia">Tecnología y Gadgets</option>
+                                                <option value="regalos">Tienda de Regalos</option>
+                                                <option value="joyeria">Joyería y Relojería</option>
+                                            </select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="storeId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>ID de la Sucursal (Generado)</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} readOnly className="bg-gray-100" />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
                         <DialogFooter>
                             <Button type="submit" disabled={isLoading}>

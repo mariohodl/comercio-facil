@@ -34,10 +34,8 @@ export const ProductBaseSchema = z.object({
 		.nonnegative('Number of sales must be a non-negative number'),
 	name: z.string().min(3, 'Name must be at least 3 characters'),
 	slug: z.string().min(3, 'Slug must be at least 3 characters'),
-	category: z.string().min(1, 'Category is required'),
 	sku: z.string().min(1, 'SKU is required').regex(/^[a-zA-Z0-9-_]+$/, 'SKU can only contain letters, numbers, hyphens, and underscores'),
 	images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })),
-	brand: z.string().optional(),
 	description: z.string().optional(),
 	isPublished: z.boolean(),
 	listPrice: z.coerce
@@ -69,8 +67,23 @@ export const ProductBaseSchema = z.object({
 		.nonnegative('Number of sales must be a non-negative number'),
 	store: z.string().min(1, 'Store is required'),
 	warehouse: z.string().min(1, 'Warehouse is required'),
+
+	// Hybrid Catalog References (Optional for backwards compatibility)
+	categoriaId: z.string().optional(),
+	subCategoriaId: z.string().optional(),
+	brandId: z.string().optional(),
+	unitId: z.string().optional(),
+
+	// String representations
+	category: z.string().min(1, 'Category is required'),
 	subCategory: z.string().min(1, 'Sub category is required'),
 	unit: z.string().min(1, 'Unit is required'),
+	brand: z.string().optional(),
+
+	// Custom data flags
+	isCustomCategory: z.boolean().optional(),
+	isCustomBrand: z.boolean().optional(),
+
 	barcodeSymbology: z.string().min(1, 'Barcode symbology is required'),
 	itemBarcode: z.string().optional(),
 	productType: z.string().min(1, 'Product type is required'),
@@ -259,6 +272,7 @@ export const StoreSettingsSchema = z.object({
 	warehouseLocation: z.string().min(3, 'Warehouse location must be at least 3 characters'),
 	taxId: z.string().optional(),
 	storeId: StoreId,
+	industry: z.string().min(1, 'Industry is required'),
 	plan: z.enum(['BASIC', 'INTERMEDIATE', 'ADVANCED']).optional(),
 	planStatus: z.string().optional(),
 	trialEndDate: z.string().nullable().optional(),
@@ -464,11 +478,9 @@ export const CategoryUpdateSchema = CategoryInputSchema.extend({
 
 export const SubCategoryInputSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
-	slug: z.string().min(1, 'Slug is required'),
+	slug: z.string().optional(),
 	parentCategory: z.string().min(1, 'Parent category is required'),
-	code: z.string().min(1, 'Category code is required'),
-	description: z.string().optional(),
-	image: z.string().optional(),
+	code: z.string().optional(),
 	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })

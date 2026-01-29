@@ -155,12 +155,29 @@ export async function deleteBrand(id: string) {
 // GET ACTIVE BRANDS (for dropdowns/selects)
 export async function getActiveBrands(storeId?: string) {
     await connectToDatabase()
-    const brands = await Brand.find({
-        status: true,
-        ...(storeId ? { storeId } : {})
-    })
-        .select('name slug image')
-        .sort({ name: 1 })
-        .lean()
-    return JSON.parse(JSON.stringify(brands)) as IBrand[]
+
+    // Aggregation to deduplicate by name
+    const brands = await Brand.aggregate([
+        {
+            $match: {
+                status: true,
+                ...(storeId ? { $or: [{ storeId }, { isGlobal: true }] } : { isGlobal: true })
+            }
+        },
+        {
+            $group: {
+                _id: "$name",
+                docId: { $first: "$_id" },
+                name: { $first: "$name" },
+                slug: { $first: "$slug" }
+            }
+        },
+        { $sort: { name: 1 } }
+    ]);
+
+    return brands.map(b => ({
+        _id: b.docId.toString(),
+        name: b.name,
+        slug: b.slug
+    })) as any[]
 }

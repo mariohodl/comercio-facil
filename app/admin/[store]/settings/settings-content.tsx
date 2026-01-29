@@ -32,6 +32,7 @@ interface SettingsData {
     warehouseLocation: string;
     storeId: string;
     taxId: string;
+    industry: string;
     plan: 'BASIC' | 'INTERMEDIATE' | 'ADVANCED';
     planStatus: string;
     trialEndDate: string | null;
@@ -58,6 +59,7 @@ export default function SettingsContent() {
         warehouseLocation: '',
         storeId: '',
         taxId: '',
+        industry: 'general',
         plan: 'BASIC',
         planStatus: 'FREE_TRIAL',
         trialEndDate: null,
@@ -164,7 +166,6 @@ export default function SettingsContent() {
 
     return (
         <div className="container mx-auto  max-w-7xl">
-            {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                     {t('title')}
@@ -175,7 +176,6 @@ export default function SettingsContent() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Sidebar Navigation */}
                 <div className="lg:col-span-1">
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sticky top-4">
                         <nav className="space-y-1">
@@ -209,7 +209,6 @@ export default function SettingsContent() {
                 {/* Main Content */}
                 <div className="lg:col-span-3">
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Profile Section */}
                         {activeSection === 'profile' && (
                             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                                 <div className="flex items-center gap-3 mb-6">
@@ -227,22 +226,54 @@ export default function SettingsContent() {
                                 </div>
 
                                 <div className="space-y-6">
-                                    {/* Company Logo Upload */}
                                     <CompanyLogoUpload />
 
-                                    {/* Divider */}
                                     <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-                                    {/* Company Information */}
-                                    <div>
-                                        <Label htmlFor="companyName">{t('fields.companyName')}</Label>
-                                        <Input
-                                            id="companyName"
-                                            value={formData.companyName}
-                                            onChange={(e) => handleInputChange('companyName', e.target.value)}
-                                            placeholder={t('placeholders.companyName')}
-                                            className="mt-1.5"
-                                        />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <Label htmlFor="companyName">{t('fields.companyName')}</Label>
+                                            <Input
+                                                id="companyName"
+                                                value={formData.companyName}
+                                                onChange={(e) => handleInputChange('companyName', e.target.value)}
+                                                placeholder={t('placeholders.companyName')}
+                                                className="mt-1.5"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="industry">Giro de la Empresa</Label>
+                                            <select
+                                                id="industry"
+                                                value={formData.industry}
+                                                onChange={(e) => handleInputChange('industry', e.target.value)}
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1.5"
+                                            >
+                                                <option value="general">General</option>
+                                                <option value="farmacia">Farmacia</option>
+                                                <option value="abarrotes">Abarrotes</option>
+                                                <option value="ferreteria">Ferretería</option>
+                                                <option value="ropa">Ropa y Calzado</option>
+                                                <option value="tienda-de-conveniencia">Tienda de Conveniencia</option>
+                                                <option value="papeleria">Papelería</option>
+                                                <option value="cosmeticos">Cosméticos y Belleza</option>
+                                                <option value="electronica">Electrónica y Computación</option>
+                                                <option value="jugueteria">Juguetería</option>
+                                                <option value="libreria">Librería</option>
+                                                <option value="mascotas">Mascotas y Veterinaria</option>
+                                                <option value="deportes">Artículos Deportivos</option>
+                                                <option value="alimentos-preparados">Restaurante / Alimentos Preparados</option>
+                                                <option value="panaderia">Panadería y Pastelería</option>
+                                                <option value="carniceria">Carnicería</option>
+                                                <option value="frutas-verduras">Frutas y Verduras</option>
+                                                <option value="automotriz">Automotriz y Autopartes</option>
+                                                <option value="muebleria">Mueblería y Hogar</option>
+                                                <option value="tecnologia">Tecnología y Gadgets</option>
+                                                <option value="regalos">Tienda de Regalos</option>
+                                                <option value="joyeria">Joyería y Relojería</option>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div>
@@ -364,7 +395,6 @@ export default function SettingsContent() {
                         {/* Billing Section */}
                         {activeSection === 'billing' && (
                             <div className="space-y-6">
-                                {/* Current Plan Card */}
                                 <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-xl shadow-sm border border-orange-200 dark:border-orange-800 p-6">
                                     <div className="flex items-start justify-between mb-6">
                                         <div className="flex items-center gap-3">
@@ -514,14 +544,12 @@ export default function SettingsContent() {
                             </div>
                         )}
 
-                        {/* Messages */}
                         {message && (
                             <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
                                 <AlertDescription>{message.text}</AlertDescription>
                             </Alert>
                         )}
 
-                        {/* Action Buttons */}
                         {activeSection !== 'billing' && (
                             <div className="flex items-center justify-end gap-3 pt-4">
                                 <Button

@@ -985,6 +985,596 @@ const customers: ICustomer[] = [
 	} as ICustomer
 ]
 
+export const globalCatalog = [
+	{
+		industry: 'general',
+		categories: [
+			{
+				name: 'Varios',
+				subcategories: ['General', 'Otros', 'Surtido'],
+				units: ['Pieza', 'Unidad', 'Servicio', 'Juego'],
+				brands: ['Genérico', 'Varios', 'Sin Marca']
+			}
+		]
+	},
+	{
+		industry: 'farmacia',
+		categories: [
+			{
+				name: 'Medicamentos',
+				subcategories: [
+					'Analgésicos y Antiinflamatorios',
+					'Antibióticos',
+					'Antigripales y Antialérgicos',
+					'Vitaminas y Suplementos',
+					'Medicamentos Dermatológicos',
+					'Anticonceptivos',
+					'Medicamentos Gastrointestinales',
+					'Medicamentos Cardiovasculares',
+					'Medicamentos para Diabetes',
+					'Medicamentos Respiratorios'
+				],
+				units: ['Tableta', 'Cápsula', 'Frasco', 'Ampolleta', 'Jeringa', 'Crema', 'Ungüento', 'Gotas', 'Supositorio', 'Parche'],
+				brands: ['Pfizer', 'Bayer', 'GSK', 'Sanofi', 'Novartis', 'Roche', 'AstraZeneca', 'Merck', 'Johnson & Johnson', 'Genérico', 'Similares', 'Farmacias del Ahorro']
+			},
+			{
+				name: 'Cuidado Personal',
+				subcategories: [
+					'Cuidado Oral',
+					'Shampoo y Acondicionadores',
+					'Jabones y Gel de Baño',
+					'Desodorantes y Antitranspirantes',
+					'Cuidado Facial',
+					'Protección Solar',
+					'Cuidado Femenino',
+					'Pañales para Adultos',
+					'Toallas Húmedas'
+				],
+				units: ['Pieza', 'Paquete', 'Tubo', 'Botella', 'Frasco', 'Barra', 'Sobre'],
+				brands: ['Colgate', 'Oral-B', 'Dove', 'Pantene', 'Head & Shoulders', 'Nivea', 'Rexona', 'Neutrogena', 'Always', 'Huggies', 'Pampers']
+			},
+			{
+				name: 'Equipo Médico',
+				subcategories: [
+					'Termómetros',
+					'Tensíometros',
+					'Pruebas de Embarazo',
+					'Pruebas de Glucosa',
+					'Curitas y Apósitos',
+					'Cubrebocas',
+					'Guantes Médicos',
+					'Jeringas y Agujas'
+				],
+				units: ['Pieza', 'Paquete', 'Caja', 'Juego'],
+				brands: ['Omron', 'Accu-Chek', 'OneTouch', 'Band-Aid', '3M', 'Medline']
+			}
+		]
+	},
+	{
+		industry: 'abarrotes',
+		categories: [
+			{
+				name: 'Alimentos Básicos',
+				subcategories: [
+					'Arroz y Granos',
+					'Frijol y Legumbres',
+					'Pastas y Harinas',
+					'Aceites y Grasas',
+					'Azúcar y Endulzantes',
+					'Sal y Especias',
+					'Conservas y Enlatados',
+					'Sopas y Caldos'
+				],
+				units: ['Kilogramo', 'Gramo', 'Litro', 'Mililitro', 'Pieza', 'Paquete', 'Lata'],
+				brands: ['Herdez', 'La Costeña', 'Knorr', 'McCormick', 'Cristal', 'Zwan', 'Great Value', 'Safeway']
+			},
+			{
+				name: 'Bebidas',
+				subcategories: [
+					'Refrescos y Gaseosas',
+					'Jugos y Néctares',
+					'Aguas y Bebidas Hidratantes',
+					'Cervezas',
+					'Vinos y Licores',
+					'Bebidas Energéticas',
+					'Leche y Bebidas Lácteas',
+					'Tés y Cafés Preparados'
+				],
+				units: ['Mililitro', 'Litro', 'Botella', 'Lata', 'Six-pack', 'Caja', 'Garrafón'],
+				brands: ['Coca-Cola', 'Pepsi', 'Jumex', 'Boing', 'Bonafont', 'Corona', 'Modelo', 'Heineken', 'Nestlé', 'Lala', 'Alpura']
+			},
+			{
+				name: 'Botana y Dulces',
+				subcategories: [
+					'Papas Fritas y Frituras',
+					'Galletas y Pastelitos',
+					'Chocolates y Dulces',
+					'Frutos Secos',
+					'Palomitas y Botanas',
+					'Gomas y Caramelos',
+					'Helados y Postres Congelados'
+				],
+				units: ['Gramo', 'Paquete', 'Pieza', 'Caja', 'Bolsa'],
+				brands: ['Sabritas', 'Barcel', 'Gamesa', 'Marinela', 'Coca-Cola (snacks)', 'Nestlé', 'Hershey\'s', 'M&M\'s']
+			}
+		]
+	},
+	{
+		industry: 'ferretería',
+		categories: [
+			{
+				name: 'Herramientas',
+				subcategories: [
+					'Herramientas Manuales',
+					'Herramientas Eléctricas',
+					'Herramientas de Medición',
+					'Herramientas de Corte',
+					'Cajas y Organizadores',
+					'Escaleras y Andamios',
+					'Equipo de Seguridad'
+				],
+				units: ['Pieza', 'Juego', 'Set', 'Paquete', 'Metro'],
+				brands: ['Truper', 'Urrea', 'Stanley', 'DeWalt', 'Bosch', 'Makita', 'Black & Decker', 'Milwaukee']
+			},
+			{
+				name: 'Materiales de Construcción',
+				subcategories: [
+					'Cemento y Agregados',
+					'Varilla y Alambre',
+					'Madera y Tablas',
+					'Pegamentos y Adhesivos',
+					'Pinturas y Recubrimientos',
+					'Plomería y Tubería',
+					'Material Eléctrico',
+					'Cerámica y Azulejo'
+				],
+				units: ['Kilogramo', 'Pieza', 'Metro', 'Litro', 'Galón', 'Saco', 'Tabla'],
+				brands: ['Cemex', 'Apasco', 'Comex', 'Sherwin-Williams', 'Rotoplas', 'Kwikset', 'Leviton', 'Steren']
+			}
+		]
+	},
+	{
+		industry: 'ropa',
+		categories: [
+			{
+				name: 'Ropa',
+				subcategories: [
+					'Camisetas y Playeras',
+					'Pantalones y Jeans',
+					'Vestidos y Faldas',
+					'Suéteres y Sudaderas',
+					'Ropa Interior',
+					'Ropa Deportiva',
+					'Trajes y Etiqueta',
+					'Ropa para Bebés'
+				],
+				units: ['Pieza', 'Par', 'Juego', 'Paquete'],
+				brands: ['Levi\'s', 'Nike', 'Adidas', 'Zara', 'H&M', 'Calvin Klein', 'Tommy Hilfiger', 'Under Armour']
+			},
+			{
+				name: 'Calzado',
+				subcategories: [
+					'Tenis y Zapatillas',
+					'Zapatos Formales',
+					'Sandalias y Huaraches',
+					'Botas y Botines',
+					'Calzado Deportivo',
+					'Calzado para Niños',
+					'Accesorios para Calzado'
+				],
+				units: ['Par', 'Pieza', 'Juego'],
+				brands: ['Nike', 'Adidas', 'Converse', 'Vans', 'Skechers', 'Steve Madden', 'Clarks', 'Timberland']
+			}
+		]
+	},
+	{
+		industry: 'tienda-de-conveniencia',
+		categories: [
+			{
+				name: 'Productos de Conveniencia',
+				subcategories: [
+					'Bebidas Frías',
+					'Bebidas Calientes',
+					'Snacks Rápidos',
+					'Dulces y Chocolates',
+					'Sándwiches y Comida Rápida',
+					'Helados',
+					'Cigarros y Tabaco',
+					'Revistas y Periódicos'
+				],
+				units: ['Pieza', 'Paquete', 'Lata', 'Botella'],
+				brands: ['Coca-Cola', 'Pepsi', 'Mars', 'Snickers', 'Oxxo (marca propia)', '7-Eleven', 'Bimbo', 'Lays']
+			}
+		]
+	},
+	{
+		industry: 'papelería',
+		categories: [
+			{
+				name: 'Material Escolar',
+				subcategories: [
+					'Cuadernos y Libretas',
+					'Lápices y Bolígrafos',
+					'Colores y Marcadores',
+					'Calculadoras',
+					'Mochilas y Loncheras',
+					'Reglas y Geometría',
+					'Papelería General'
+				],
+				units: ['Pieza', 'Paquete', 'Caja', 'Juego', 'Resma'],
+				brands: ['Bic', 'Paper Mate', 'Faber-Castell', 'Pelikan', 'Norma', 'Scribe', 'Crayola', 'Casio']
+			},
+			{
+				name: 'Oficina',
+				subcategories: [
+					'Papel y Resmas',
+					'Impresión y Copiado',
+					'Archivo y Organización',
+					'Encuadernación',
+					'Artículos de Escritorio',
+					'Presentaciones',
+					'Sellos y Tintas'
+				],
+				units: ['Pieza', 'Resma', 'Caja', 'Paquete', 'Juego'],
+				brands: ['HP', 'Epson', 'Canon', 'Post-it', 'Avery', 'Staples', 'Office Depot', 'Fellowes']
+			}
+		]
+	},
+	{
+		industry: 'cosmeticos',
+		categories: [
+			{
+				name: 'Maquillaje',
+				subcategories: [
+					'Bases y Correctores',
+					'Labiales y Brillos',
+					'Sombras y Delineadores',
+					'Rubores y Bronceadores',
+					'Máscaras de Pestañas',
+					'Cepillos y Aplicadores',
+					'Kits de Maquillaje'
+				],
+				units: ['Pieza', 'Kit', 'Paleta', 'Tubo', 'Frasco'],
+				brands: ['Maybelline', 'L\'Oréal', 'MAC', 'Revlon', 'NYX', 'Avon', 'Mary Kay', 'NARS']
+			},
+			{
+				name: 'Cuidado de la Piel',
+				subcategories: [
+					'Crema Facial',
+					'Limpiadores y Tónicos',
+					'Protectores Solares',
+					'Tratamientos Anti-edad',
+					'Cuidado Corporal',
+					'Mascarillas',
+					'Contorno de Ojos'
+				],
+				units: ['Mililitro', 'Gramo', 'Tubo', 'Frasco', 'Pote'],
+				brands: ['Neutrogena', 'Cetaphil', 'La Roche-Posay', 'Nivea', 'Olay', 'Bioderma', 'Vichy', 'CeraVe']
+			}
+		]
+	},
+	{
+		industry: 'electronica',
+		categories: [
+			{
+				name: 'Electrónica',
+				subcategories: [
+					'Celulares y Tablets',
+					'Computadoras y Laptops',
+					'Televisores y Monitores',
+					'Audio y Sonido',
+					'Videojuegos',
+					'Cámaras y Fotografía',
+					'GPS y Navegación'
+				],
+				units: ['Pieza', 'Juego', 'Kit', 'Paquete'],
+				brands: ['Apple', 'Samsung', 'Sony', 'LG', 'HP', 'Dell', 'Microsoft', 'Nintendo']
+			},
+			{
+				name: 'Accesorios',
+				subcategories: [
+					'Cables y Cargadores',
+					'Audífonos',
+					'Fundas y Protección',
+					'Memorias y Almacenamiento',
+					'Baterías',
+					'Adaptadores',
+					'Soporte y Brazos'
+				],
+				units: ['Pieza', 'Par', 'Juego', 'Paquete'],
+				brands: ['Belkin', 'Anker', 'Logitech', 'JBL', 'SanDisk', 'Seagate', 'Case Logic', 'OtterBox']
+			}
+		]
+	},
+	{
+		industry: 'juguetería',
+		categories: [
+			{
+				name: 'Juguetes',
+				subcategories: [
+					'Muñecas y Accesorios',
+					'Carritos y Vehículos',
+					'Juguetes Educativos',
+					'Juegos de Mesa',
+					'Peluches',
+					'Juguetes de Exterior',
+					'Juguetes para Bebés',
+					'Figuras de Acción'
+				],
+				units: ['Pieza', 'Juego', 'Set', 'Paquete'],
+				brands: ['LEGO', 'Mattel', 'Hasbro', 'Fisher-Price', 'Barbie', 'Hot Wheels', 'Nerf', 'Play-Doh']
+			}
+		]
+	},
+	{
+		industry: 'librería',
+		categories: [
+			{
+				name: 'Libros',
+				subcategories: [
+					'Literatura y Novelas',
+					'Libros Académicos',
+					'Libros Infantiles',
+					'Revistas y Periódicos',
+					'Best Sellers',
+					'Libros de Texto',
+					'Libros Especializados',
+					'E-books y Audiolibros'
+				],
+				units: ['Pieza', 'Colección', 'Paquete', 'Suscripción'],
+				brands: ['Penguin', 'HarperCollins', 'Random House', 'McGraw-Hill', 'Pearson', 'Cambridge', 'Oxford']
+			}
+		]
+	},
+	{
+		industry: 'mascotas',
+		categories: [
+			{
+				name: 'Alimentos para Mascotas',
+				subcategories: [
+					'Alimento para Perros',
+					'Alimento para Gatos',
+					'Alimento para Aves',
+					'Alimento para Peces',
+					'Premios y Golosinas',
+					'Suplementos',
+					'Alimento Especializado'
+				],
+				units: ['Kilogramo', 'Gramo', 'Lata', 'Bolsa', 'Paquete'],
+				brands: ['Purina', 'Pedigree', 'Whiskas', 'Royal Canin', 'Hills', 'Iams', 'Eukanuba']
+			},
+			{
+				name: 'Accesorios',
+				subcategories: [
+					'Correas y Collares',
+					'Camas y Casas',
+					'Juguetes',
+					'Cepillos y Cuidado',
+					'Arenas y Desechables',
+					'Comederos y Bebederos',
+					'Transportadoras'
+				],
+				units: ['Pieza', 'Juego', 'Paquete', 'Kilogramo'],
+				brands: ['Petmate', 'Kong', 'Hartz', 'Trixie', 'Ferplast', 'Outward Hound']
+			}
+		]
+	},
+	{
+		industry: 'deportes',
+		categories: [
+			{
+				name: 'Equipo Deportivo',
+				subcategories: [
+					'Ropa Deportiva',
+					'Calzado Deportivo',
+					'Pelotas',
+					'Raquetas',
+					'Pesas y Ejercicio',
+					'Bicicletas y Accesorios',
+					'Natación',
+					'Campismo y Outdoor'
+				],
+				units: ['Pieza', 'Par', 'Juego', 'Set'],
+				brands: ['Nike', 'Adidas', 'Under Armour', 'Reebok', 'Wilson', 'Spalding', 'Schwinn', 'Columbia']
+			}
+		]
+	},
+	{
+		industry: 'alimentos-preparados',
+		categories: [
+			{
+				name: 'Comida Preparada',
+				subcategories: [
+					'Platos del Día',
+					'Ensaladas',
+					'Sándwiches y Tortas',
+					'Pizzas',
+					'Pastas',
+					'Postres',
+					'Bebidas Preparadas',
+					'Desayunos'
+				],
+				units: ['Porción', 'Plato', 'Orden', 'Pieza', 'Litro'],
+				brands: ['Propio', 'Local', 'Casero']
+			}
+		]
+	},
+	{
+		industry: 'panadería',
+		categories: [
+			{
+				name: 'Panadería',
+				subcategories: [
+					'Pan Dulce',
+					'Pan Salado',
+					'Pasteles',
+					'Galletas',
+					'Donas',
+					'Pan de Caja',
+					'Repostería Fina',
+					'Productos para Diabéticos'
+				],
+				units: ['Pieza', 'Kilogramo', 'Docena', 'Paquete'],
+				brands: ['Bimbo', 'Marinela', 'Tía Rosa', 'Larín', 'Propio', 'Artesanal']
+			}
+		]
+	},
+	{
+		industry: 'carnicería',
+		categories: [
+			{
+				name: 'Carnes',
+				subcategories: [
+					'Res',
+					'Pollo',
+					'Cerdo',
+					'Pescados y Mariscos',
+					'Embutidos',
+					'Carnes Frías',
+					'Cortes Especiales',
+					'Orgánicos'
+				],
+				units: ['Kilogramo', 'Gramo', 'Pieza', 'Paquete'],
+				brands: ['Sukarne', 'Kekén', 'Parma', 'Fud', 'San Rafael', 'Local', 'Granja']
+			}
+		]
+	},
+	{
+		industry: 'frutas-verduras',
+		categories: [
+			{
+				name: 'Frutas y Verduras',
+				subcategories: [
+					'Frutas Tropicales',
+					'Verduras de Hoja',
+					'Raíces y Tubérculos',
+					'Cítricos',
+					'Frutos del Bosque',
+					'Orgánicos',
+					'Exóticos',
+					'Precortados y Ensaladas'
+				],
+				units: ['Kilogramo', 'Gramo', 'Pieza', 'Manojo', 'Bolsa', 'Caja'],
+				brands: ['Del Monte', 'Dole', 'Chiquita', 'Local', 'Orgánico', 'Productor Directo']
+			}
+		]
+	},
+	{
+		industry: 'automotriz',
+		categories: [
+			{
+				name: 'Refacciones',
+				subcategories: [
+					'Filtros',
+					'Bujías y Cables',
+					'Frenos',
+					'Suspensión',
+					'Motor',
+					'Transmisión',
+					'Escape',
+					'Iluminación'
+				],
+				units: ['Pieza', 'Juego', 'Kit', 'Par', 'Litro'],
+				brands: ['Bosch', 'NGK', 'ACDelco', 'Monroe', 'KYB', 'Denso', 'Valeo', 'Mopar']
+			},
+			{
+				name: 'Accesorios',
+				subcategories: [
+					'Audio para Auto',
+					'Alarmas y Seguridad',
+					'Limpieza y Cuidado',
+					'Interiores',
+					'Exteriores',
+					'Herramientas para Auto',
+					'Neumáticos y Llantas'
+				],
+				units: ['Pieza', 'Juego', 'Kit', 'Par'],
+				brands: ['Pioneer', 'Kenwood', 'Michelin', 'Goodyear', 'Meguair\'s', 'Armor All', 'WeatherTech']
+			}
+		]
+	},
+	{
+		industry: 'mueblería',
+		categories: [
+			{
+				name: 'Muebles',
+				subcategories: [
+					'Sala',
+					'Comedor',
+					'Recámara',
+					'Oficina',
+					'Exterior',
+					'Juvenil',
+					'Modular',
+					'Accesorios'
+				],
+				units: ['Pieza', 'Juego', 'Set', 'Paquete'],
+				brands: ['IKEA', 'Muebles Dico', 'Troncoso', 'Flexi', 'Muebles Tapizados', 'Artens', 'Local']
+			}
+		]
+	},
+	{
+		industry: 'tecnología',
+		categories: [
+			{
+				name: 'Gadgets',
+				subcategories: [
+					'Wearables',
+					'Smart Home',
+					'Audio Portátil',
+					'Cámaras de Acción',
+					'Drones',
+					'Realidad Virtual',
+					'Power Banks',
+					'Streaming Devices'
+				],
+				units: ['Pieza', 'Kit', 'Juego'],
+				brands: ['Apple', 'Samsung', 'GoPro', 'DJI', 'Fitbit', 'Garmin', 'Sonos', 'Amazon']
+			}
+		]
+	},
+	{
+		industry: 'regalos',
+		categories: [
+			{
+				name: 'Regalos',
+				subcategories: [
+					'Tarjetas y Papelería',
+					'Velas y Aromatizantes',
+					'Decoración',
+					'Joyería de Fantasía',
+					'Artículos de Temporada',
+					'Personalizados',
+					'Experiencias',
+					'Flores y Plantas'
+				],
+				units: ['Pieza', 'Juego', 'Arreglo', 'Paquete'],
+				brands: ['Hallmark', 'Yankee Candle', 'Papyrus', 'Local', 'Artístico', 'Personalizado']
+			}
+		]
+	},
+	{
+		industry: 'joyería',
+		categories: [
+			{
+				name: 'Joyería',
+				subcategories: [
+					'Anillos',
+					'Collares y Cadenas',
+					'Aretes',
+					'Pulseras',
+					'Relojes',
+					'Joyería en Plata',
+					'Joyería en Oro',
+					'Piedras Preciosas'
+				],
+				units: ['Pieza', 'Par', 'Juego'],
+				brands: ['Pandora', 'Swarovski', 'Tiffany & Co.', 'Cartier', 'Rolex', 'Tag Heuer', 'Local', 'Platería']
+			}
+		]
+	}
+];
+
 const data: Data = {
 	headerMenus: [
 		{

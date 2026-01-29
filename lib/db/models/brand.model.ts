@@ -4,8 +4,13 @@ export interface IBrand extends Document {
     _id: string
     name: string
     slug: string
-    image: string
-    storeId: string
+    industry: string
+    synonyms: string[]
+    usageCount: number
+    isApproved: boolean
+    isGlobal: boolean
+    image?: string
+    storeId?: string
     status: boolean
     createdAt: Date
     updatedAt: Date
@@ -24,13 +29,35 @@ const brandSchema = new Schema<IBrand>(
             lowercase: true,
             trim: true,
         },
-        image: {
+        industry: {
             type: String,
             required: true,
+            index: true,
+            default: 'general'
+        },
+        synonyms: {
+            type: [String],
+            default: []
+        },
+        usageCount: {
+            type: Number,
+            default: 0
+        },
+        isApproved: {
+            type: Boolean,
+            default: true
+        },
+        isGlobal: {
+            type: Boolean,
+            default: false
+        },
+        image: {
+            type: String,
+            required: false,
         },
         storeId: {
             type: String,
-            required: true,
+            required: false,
         },
         status: {
             type: Boolean,
@@ -41,6 +68,8 @@ const brandSchema = new Schema<IBrand>(
         timestamps: true,
     }
 )
+
+brandSchema.index({ name: 1, industry: 1, storeId: 1 }, { unique: true })
 
 const Brand = models.Brand || model<IBrand>('Brand', brandSchema)
 

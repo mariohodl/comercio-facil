@@ -123,6 +123,7 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 			company = await Company.create({
 				name: validatedData.companyName,
 				owner: user._id,
+				industry: validatedData.industry || 'general',
 				plan: validatedData.plan || PLAN_BASIC,
 				planStatus: PLAN_STATUS_FREE_TRIAL,
 				trialStartDate,
@@ -133,6 +134,7 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 			// Update existing company name
 			company.name = validatedData.companyName;
 			company.taxId = validatedData.taxId;
+			company.industry = validatedData.industry || company.industry || 'general';
 
 			// Handle legacy companies without billing info
 			if (!company.plan) {
@@ -245,6 +247,7 @@ export async function getStoreSettings() {
 				warehouseLocation: warehouse?.location || '',
 				storeId: store?.slug || '',
 				taxId: company?.taxId || '',
+				industry: company?.industry || 'general',
 				plan: company?.plan || 'BASIC',
 				planStatus: company?.planStatus || 'FREE_TRIAL',
 				trialEndDate: company?.trialEndDate ? company.trialEndDate.toISOString() : null,
@@ -568,7 +571,7 @@ export async function getCompanyLogoUpdateInfo() {
 		const recentUpdates = updateHistory.filter((date: Date) => new Date(date) > sixMonthsAgo)
 		const remainingUpdates = Math.max(0, 3 - recentUpdates.length)
 
-		let nextAvailableDate = null
+		let nextAvailableDate: Date | null = null
 		if (recentUpdates.length >= 3) {
 			const oldestUpdate = new Date(Math.min(...recentUpdates.map((d: Date) => new Date(d).getTime())))
 			nextAvailableDate = new Date(oldestUpdate)
@@ -580,7 +583,7 @@ export async function getCompanyLogoUpdateInfo() {
 			data: {
 				remainingUpdates,
 				totalUpdates: recentUpdates.length,
-				nextAvailableDate: nextAvailableDate?.toISOString() || null,
+				nextAvailableDate: nextAvailableDate ? nextAvailableDate.toISOString() : null,
 				currentImage: company.logo || null
 			}
 		}

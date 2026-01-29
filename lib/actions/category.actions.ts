@@ -7,6 +7,7 @@ import { formatError } from '../utils'
 import { CategoryInputSchema, CategoryUpdateSchema } from '../validator'
 import { ICategoryInput } from '@/types'
 import { z } from 'zod'
+import { getCompanyIndustry } from './catalog.actions'
 
 const PAGE_SIZE = 10
 
@@ -39,21 +40,21 @@ export async function getAllCategories({
     const statusFilter =
         status && status !== 'all' ? { status: status === 'active' } : {}
 
-    const categories = await Category.find({
+    const safePage = Math.max(1, Number(page))
+
+    const finalFilter = {
         ...queryFilter,
         ...statusFilter,
-        ...(storeId ? { storeId } : {}),
-    })
+        ...(storeId ? { storeId } : {})
+    }
+
+    const categories = await Category.find(finalFilter)
         .sort({ createdAt: -1 })
-        .skip(limit * (Number(page) - 1))
+        .skip(limit * (safePage - 1))
         .limit(limit)
         .lean()
 
-    const countCategories = await Category.countDocuments({
-        ...queryFilter,
-        ...statusFilter,
-        ...(storeId ? { storeId } : {}),
-    })
+    const countCategories = await Category.countDocuments(finalFilter)
 
     return {
         categories: JSON.parse(JSON.stringify(categories)) as ICategory[],
@@ -87,11 +88,20 @@ export async function createCategory(data: ICategoryInput) {
             }
         }
 
-        await Category.create(category)
+        const industry = await getCompanyIndustry()
+
+        const newCategory = await Category.create({
+            ...category,
+            industry,
+            isApproved: false,
+            isGlobal: false,
+        })
         revalidatePath('/admin/[store]/inventory/categories', 'page')
         return {
             success: true,
-            message: 'Category created successfully',
+            message: 'Category proposed successfully and is pending approval',
+            categoryId: newCategory._id.toString(),
+            categoryName: newCategory.categoryName
         }
     } catch (error) {
         return { success: false, message: formatError(error) }
@@ -147,12 +157,41 @@ export async function deleteCategory(id: string) {
 // GET ACTIVE CATEGORIES (for dropdowns/selects)
 export async function getActiveCategories(storeId?: string) {
     await connectToDatabase()
-    const categories = await Category.find({
+    const filter = {
         status: true,
-        ...(storeId ? { storeId } : {})
-    })
+        isApproved: true,
+        ...(storeId ? {
+            $or: [
+                { isGlobal: true },
+                { storeId: storeId }
+            ]
+        } : { isGlobal: true })
+    }
+
+    const categories = await Category.find(filter)
         .select('categoryName categorySlug')
         .sort({ categoryName: 1 })
         .lean()
     return JSON.parse(JSON.stringify(categories)) as ICategory[]
+}
+
+// APPROVE CATEGORY (SuperAdmin only)
+export async function approveCategory(id: string, isGlobal: boolean = false) {
+    try {
+        await connectToDatabase()
+        const category = await Category.findByIdAndUpdate(
+            id,
+            { isApproved: true, isGlobal },
+            { new: true }
+        )
+        if (!category) throw new Error('Category not found')
+
+        revalidatePath('/admin/[store]/inventory/categories', 'page')
+        return {
+            success: true,
+            message: `Category approved ${isGlobal ? 'as global' : ''}`,
+        }
+    } catch (error) {
+        return { success: false, message: formatError(error) }
+    }
 }

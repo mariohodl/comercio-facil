@@ -45,7 +45,9 @@
         "subtotal": "Subtotal",
         "tax": "Tax",
         "notAvailable": "N/A",
-        "close": "Close"
+        "close": "Close",
+        "saving": "Saving...",
+        "name": "Name"
     },
     "pos": {
         "title": "Point of Sale",
@@ -552,7 +554,17 @@
         "noSubCategoriesFound": "No sub categories found",
         "noBrandsFound": "No brands found",
         "deleteBrandTitle": "Delete Brand",
-        "deleteBrandDescription": "Are you sure you want to delete this brand? This action cannot be undone."
+        "deleteBrandDescription": "Are you sure you want to delete this brand? This action cannot be undone.",
+        "setupCatalog": "Setup Catalog",
+        "type": "Type",
+        "approval": "Approval",
+        "approved": "Approved",
+        "pending": "Pending",
+        "editSubCategory": "Edit Sub Category",
+        "updateSubCategory": "Update Sub Category",
+        "parentCategory": "Parent Category",
+        "selectCategory": "Select a category",
+        "enterSubCategoryName": "Enter sub category name"
     },
     "auth": {
         "signIn": "Sign In",
