@@ -332,7 +332,12 @@
         "updateVariant": "Actualizar Variante",
         "variantUpdatedSuccessfully": "Variante actualizada exitosamente",
         "inventory": "Inventario",
-        "pricing": "Precios"
+        "pricing": "Precios",
+        "compressingImages": "Comprimiendo imágenes...",
+        "imageUploaded": "Imagen cargada exitosamente",
+        "fileAlreadyUploaded": "Este archivo ya ha sido cargado: {name}",
+        "maxImagesReached": "Se ha alcanzado el límite máximo de 4 imágenes.",
+        "maxImagesDescription": "Puedes subir hasta un máximo de 4 imágenes por producto."
     },
     "orders": {
         "title": "Órdenes",
@@ -768,7 +773,10 @@
             "limitReached": "Se ha alcanzado el límite de actualizaciones de logo de empresa.",
             "updateSuccess": "¡Logo de empresa actualizado exitosamente!",
             "updateError": "Error al actualizar el logo de empresa",
-            "updatesRemaining": "actualizaciones restantes"
+            "updatesRemaining": "actualizaciones restantes",
+            "compressing": "Comprimiendo imagen...",
+            "uploadSuccess": "¡Logo de empresa cargado exitosamente!",
+            "fileAlreadyUploaded": "Este logo ya ha sido cargado"
         },
         "actions": {
             "save": "Guardar Cambios",

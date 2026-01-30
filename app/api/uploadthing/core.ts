@@ -2,15 +2,15 @@ import { createUploadthing, type FileRouter } from 'uploadthing/next'
 import { UploadThingError, UTApi } from 'uploadthing/server'
 import { auth } from '@/auth'
 import { addProductImg } from '../../../lib/actions/product.actions'
+import { UPLOADTHING_TOKEN } from '@/lib/constants'
 
-export const utapi = new UTApi()
+export const utapi = new UTApi({
+  token: UPLOADTHING_TOKEN,
+})
 const f = createUploadthing()
 
-// FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
-  // Define as many FileRoutes as you like, each with a unique routeSlug
-  imageUploader: f({ image: { maxFileSize: '4MB' } })
-    // Set permissions and file types for this FileRoute
+  imageUploader: f({ image: { maxFileSize: '4MB', maxFileCount: 10 } })
     .middleware(async (context) => {
       const splittedValues = context.req.headers.get('referer')?.split('/');
       const idValue = splittedValues?.[splittedValues.length - 1] || '';
@@ -27,8 +27,7 @@ export const ourFileRouter = {
     })
     // eslint-disable removed
     .onUploadComplete(async ({ metadata, file }) => {
-      // This code RUNS ON YOUR SERVER after upload
-      // Only update the product if we have a valid product ID (not "create")
+
       if (metadata.productId && metadata.productId !== 'create') {
         // Check if productId is a valid MongoDB ObjectId (24 hex characters)
         const isValidId = /^[0-9a-fA-F]{24}$/.test(metadata.productId);
@@ -38,7 +37,6 @@ export const ourFileRouter = {
           console.log(productUpdated)
         }
       }
-      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.userId }
     }),
 } satisfies FileRouter

@@ -9,7 +9,7 @@ export const APP_URL = process.env.APP_URL || 'http://localhost:3000'
 export const APP_DESCRIPTION =
 	process.env.APP_DESCRIPTION ||
 	'Distribuidor de occidente, el hacer tu comercio más facil nos motiva..'
-export const APP_SLOGAN = process.env.APP_SLOGAN || 'Come mas, gasta menos'
+export const APP_SLOGAN = process.env.APP_SLOGAN || 'Centralice su Inventario, Optimice sus Ventas en Punto de Servicio (POS) y tome decisiones con Reportes en Tiempo Real.'
 
 export const PAGE_SIZE = Number(process.env.PAGE_SIZE || 9)
 
@@ -159,3 +159,7 @@ export const AVAILABLE_CATEGORIES = [
 ]
 
 export const TAX_RATE = 0.16 as number
+
+export const UPLOADTHING_TOKEN = process.env.NODE_ENV === 'production'
+	? process.env.UPLOADTHING_TOKEN_PROD
+	: process.env.UPLOADTHING_TOKEN_DEV

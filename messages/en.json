@@ -313,7 +313,12 @@
         "updateVariant": "Update Variant",
         "variantUpdatedSuccessfully": "Variant updated successfully",
         "inventory": "Inventory",
-        "pricing": "Pricing"
+        "pricing": "Pricing",
+        "compressingImages": "Compressing images...",
+        "imageUploaded": "Image uploaded successfully",
+        "fileAlreadyUploaded": "This file has already been uploaded: {name}",
+        "maxImagesReached": "Maximum limit of 4 images reached.",
+        "maxImagesDescription": "You can upload up to a maximum of 4 images per product."
     },
     "orders": {
         "title": "Orders",
@@ -749,7 +754,10 @@
             "limitReached": "Company logo update limit reached.",
             "updateSuccess": "Company logo updated successfully!",
             "updateError": "Failed to update company logo",
-            "updatesRemaining": "updates remaining"
+            "updatesRemaining": "updates remaining",
+            "compressing": "Compressing image...",
+            "uploadSuccess": "Company logo uploaded successfully!",
+            "fileAlreadyUploaded": "This logo has already been uploaded"
         },
         "actions": {
             "save": "Save Changes",

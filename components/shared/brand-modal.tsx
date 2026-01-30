@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { BrandInputSchema } from '@/lib/validator'
 import { IBrandInput } from '@/types'
@@ -9,6 +10,7 @@ import { IBrand } from '@/lib/db/models/brand.model'
 import { createBrand, updateBrand } from '@/lib/actions/brand.actions'
 import { useToast } from '@/hooks/use-toast'
 import { UploadButton } from '@/lib/uploadthing'
+import { compressImage } from '@/lib/image-compression'
 import Image from 'next/image'
 import {
     Dialog,
@@ -38,8 +40,10 @@ interface BrandModalProps {
 }
 
 export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandModalProps) {
-    const { showSuccess, showError } = useToast()
+    const { showSuccess, showError, showToast } = useToast()
+    const t = useTranslations('products')
     const isEditMode = !!brand
+    const lastUploadedRef = useRef<{ name: string; size: number } | null>(null)
 
     const form = useForm<IBrandInput>({
         resolver: zodResolver(BrandInputSchema),
@@ -144,10 +148,31 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                                                             <p className="text-sm font-medium mb-2">Add Image</p>
                                                             <UploadButton
                                                                 endpoint="imageUploader"
+                                                                onBeforeUploadBegin={async (files) => {
+                                                                    if (files.length > 0) {
+                                                                        const duplicates = files.filter(f => lastUploadedRef.current &&
+                                                                            lastUploadedRef.current.name === f.name &&
+                                                                            lastUploadedRef.current.size === f.size);
+                                                                        if (duplicates.length > 0) {
+                                                                            showError(t('fileAlreadyUploaded', { name: duplicates[0].name }));
+                                                                            return [];
+                                                                        }
+                                                                        lastUploadedRef.current = { name: files[0].name, size: files[0].size };
+                                                                    }
+                                                                    showToast(t('compressingImages') || 'Compressing image...', { duration: 2000 });
+                                                                    const compressedFiles = await Promise.all(
+                                                                        files.map(async (file) => {
+                                                                            return await compressImage(file);
+                                                                        })
+                                                                    );
+                                                                    return compressedFiles;
+                                                                }}
                                                                 onClientUploadComplete={(res) => {
-                                                                    const url = res[0].ufsUrl || res[0].url;
-                                                                    field.onChange(url)
-                                                                    showSuccess('Image uploaded successfully')
+                                                                    if (res && res.length > 0) {
+                                                                        const url = res[0].ufsUrl || res[0].url;
+                                                                        field.onChange(url)
+                                                                        showSuccess(t('imageUploadedSuccessfully') || 'Image uploaded successfully')
+                                                                    }
                                                                 }}
                                                                 onUploadError={(error: Error) => {
                                                                     showError(`ERROR! ${error.message}`)

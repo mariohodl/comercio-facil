@@ -76,7 +76,10 @@ export type Data = {
 
 export type ProductImage = {
 	imgUrl: string,
-	imgKey: string
+	imgKey: string,
+	name?: string,
+	size?: number,
+	file?: File
 }
 
 export type IOrderList = IOrderInput & {

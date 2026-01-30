@@ -440,6 +440,15 @@ export async function createProduct(data: IProductInput) {
 		await connectToDatabase()
 		const product = ProductInputSchema.parse(data)
 
+		// Clean up empty strings for fields that might be empty or ObjectIds to prevent BSON errors
+		const cleanedProduct: any = { ...product };
+		const fieldsToClean = ['brandId', 'unitId', 'categoriaId', 'subCategoriaId', 'barcodeSymbology', 'taxType', 'itemBarcode'];
+		fieldsToClean.forEach(field => {
+			if (cleanedProduct[field] === "") {
+				delete cleanedProduct[field];
+			}
+		});
+
 		// Calculate discount price if discount is provided
 		const discountPrice = calculateDiscountPrice(
 			product.listPrice,
@@ -449,7 +458,7 @@ export async function createProduct(data: IProductInput) {
 		console.log('discountPrice', discountPrice)
 
 		const newProduct = new Product({
-			...product,
+			...cleanedProduct,
 			discountPrice, // Set calculated discount price
 		})
 
@@ -470,6 +479,15 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
 		const product = ProductUpdateSchema.parse(data)
 		await connectToDatabase()
 
+		// Clean up empty strings for fields that might be empty or ObjectIds to prevent BSON errors
+		const cleanedProduct: any = { ...product };
+		const fieldsToClean = ['brandId', 'unitId', 'categoriaId', 'subCategoriaId', 'barcodeSymbology', 'taxType', 'itemBarcode'];
+		fieldsToClean.forEach(field => {
+			if (cleanedProduct[field] === "") {
+				cleanedProduct[field] = undefined;
+			}
+		});
+
 		// Calculate discount price if discount is provided
 		const discountPrice = calculateDiscountPrice(
 			product.listPrice,
@@ -478,7 +496,7 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
 		)
 
 		await Product.findByIdAndUpdate(product._id, {
-			...product,
+			...cleanedProduct,
 			discountPrice, // Set calculated discount price
 		})
 		revalidatePath('/admin/products')

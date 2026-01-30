@@ -35,7 +35,13 @@ export const ProductBaseSchema = z.object({
 	name: z.string().min(3, 'Name must be at least 3 characters'),
 	slug: z.string().min(3, 'Slug must be at least 3 characters'),
 	sku: z.string().min(1, 'SKU is required').regex(/^[a-zA-Z0-9-_]+$/, 'SKU can only contain letters, numbers, hyphens, and underscores'),
-	images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })),
+	images: z.array(z.object({
+		imgUrl: z.string(),
+		imgKey: z.string(),
+		name: z.string().optional(),
+		size: z.number().optional(),
+		file: z.any().optional()
+	})),
 	description: z.string().optional(),
 	isPublished: z.boolean(),
 	listPrice: z.coerce
@@ -76,19 +82,19 @@ export const ProductBaseSchema = z.object({
 
 	// String representations
 	category: z.string().min(1, 'Category is required'),
-	subCategory: z.string().min(1, 'Sub category is required'),
+	subCategory: z.string().min(1, 'Subcategory is required'),
 	unit: z.string().min(1, 'Unit is required'),
-	brand: z.string().optional(),
+	brand: z.string().min(1, 'Brand is required'),
 
 	// Custom data flags
 	isCustomCategory: z.boolean().optional(),
 	isCustomBrand: z.boolean().optional(),
 
-	barcodeSymbology: z.string().min(1, 'Barcode symbology is required'),
+	barcodeSymbology: z.string().optional(),
 	itemBarcode: z.string().optional(),
 	productType: z.string().min(1, 'Product type is required'),
-	taxType: z.string().min(1, 'Tax type is required'),
-	tax: z.coerce.number().nonnegative('Tax must be a non-negative number'),
+	taxType: z.string().optional(),
+	tax: z.coerce.number().nonnegative('Tax must be a non-negative number').optional(),
 	discountType: z.string().optional(),
 	discountValue: z.coerce.number().optional(),
 	quantityAlert: z.coerce.number().int().nonnegative('Quantity alert must be a non-negative number'),
@@ -109,7 +115,13 @@ export const ProductBaseSchema = z.object({
 			name: z.string(),
 			value: z.string()
 		})),
-		images: z.array(z.object({ imgUrl: z.string(), imgKey: z.string() })).max(2).optional(),
+		images: z.array(z.object({
+			imgUrl: z.string(),
+			imgKey: z.string(),
+			name: z.string().optional(),
+			size: z.number().optional(),
+			file: z.any().optional()
+		})).max(2).optional(),
 		barcode: z.string().optional(),
 	})).optional(),
 })

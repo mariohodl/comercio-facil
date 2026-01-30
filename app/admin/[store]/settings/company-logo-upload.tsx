@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -8,6 +8,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Building2, Upload, Loader2, Info } from 'lucide-react';
 import { updateCompanyLogo, getCompanyLogoUpdateInfo } from '@/lib/actions/user.actions';
 import { UploadButton } from '@/lib/uploadthing';
+import { compressImage } from '@/lib/image-compression';
+import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +27,8 @@ export default function CompanyLogoUpload() {
     const [updateInfo, setUpdateInfo] = useState<ProfilePhotoUpdateInfo | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
     const [loading, setLoading] = useState(true);
+    const lastUploadedRef = useRef<{ name: string; size: number } | null>(null);
+    const { showToast, showSuccess, showError } = useToast();
 
     useEffect(() => {
         loadUpdateInfo();
@@ -130,12 +134,33 @@ export default function CompanyLogoUpload() {
                     {canUpdate ? (
                         <UploadButton
                             endpoint="imageUploader"
+                            onBeforeUploadBegin={async (files) => {
+                                if (files.length > 0) {
+                                    const file = files[0];
+                                    if (lastUploadedRef.current &&
+                                        lastUploadedRef.current.name === file.name &&
+                                        lastUploadedRef.current.size === file.size) {
+                                        showError(t('companyLogo.fileAlreadyUploaded') || 'This logo has already been uploaded');
+                                        return [];
+                                    }
+                                    lastUploadedRef.current = { name: file.name, size: file.size };
+                                }
+                                showToast(t('companyLogo.compressing') || 'Compressing image...', { duration: 2000 });
+                                const compressedFiles = await Promise.all(
+                                    files.map(async (file) => {
+                                        return await compressImage(file);
+                                    })
+                                );
+                                return compressedFiles;
+                            }}
                             onClientUploadComplete={(res) => {
                                 if (res && res[0]) {
                                     handleLogoUpdate(res[0].url);
+                                    showSuccess(t('companyLogo.uploadSuccess') || 'Image uploaded successfully');
                                 }
                             }}
                             onUploadError={(error: Error) => {
+                                showError(error.message);
                                 setMessage({ type: 'error', text: error.message });
                             }}
                             appearance={{

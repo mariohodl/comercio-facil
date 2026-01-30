@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft, ChevronDown, X, Edit } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 import BarcodeScannerDialog from '@/components/shared/barcode-scanner'
@@ -26,7 +26,8 @@ import { useToast } from '@/hooks/use-toast'
 import { useBarcodeScanner } from '@/hooks/use-barcode-scanner'
 import { createProduct, updateProduct, deleteProductImg } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
-import { UploadButton } from '@/lib/uploadthing'
+import { UploadButton, useUploadThing } from '@/lib/uploadthing'
+import { compressImage } from '@/lib/image-compression'
 import { ProductInputSchema, ProductUpdateSchema } from '@/lib/validator'
 import { toSlug } from '@/lib/utils'
 import { IProductInput, ProductImage } from '@/types'
@@ -155,11 +156,6 @@ const ProductForm = ({
   const tCommon = useTranslations('common')
 
   // Safely deduplicate units and brands from props to prevent UI crashes
-  const uniqueUnits = Array.from(new Map(units.map(u => [u.name.toLowerCase(), u])).values())
-    .sort((a, b) => a.name.localeCompare(b.name))
-
-  const uniqueBrands = Array.from(new Map(brands.map(b => [b.name.toLowerCase(), b])).values())
-    .sort((a, b) => a.name.localeCompare(b.name))
 
   const [subCategories, setSubCategories] = useState<any[]>([])
   const [isScannerOpen, setIsScannerOpen] = useState(false)
@@ -184,7 +180,77 @@ const ProductForm = ({
     images: [] as ProductImage[]
   })
 
-  const { showSuccess, showError } = useToast()
+  // Memoized options for CatalogAutocomplete components
+  const uniqueUnits = useMemo(() =>
+    Array.from(new Map(units.map(u => [u.name.toLowerCase(), u])).values())
+      .sort((a, b) => a.name.localeCompare(b.name)),
+    [units]
+  )
+
+  const uniqueBrands = useMemo(() =>
+    Array.from(new Map(brands.map(b => [b.name.toLowerCase(), b])).values())
+      .sort((a, b) => a.name.localeCompare(b.name)),
+    [brands]
+  )
+
+  const categoryOptions = useMemo(() =>
+    categories.map(c => ({ _id: c._id, name: c.categoryName, isGlobal: false })),
+    [categories]
+  )
+
+  const subCategoryOptions = useMemo(() =>
+    subCategories.map(s => ({ _id: (s as any)._id || s.slug, name: s.name, isGlobal: (s as any).isGlobal || false })),
+    [subCategories]
+  )
+
+  const brandOptions = useMemo(() =>
+    uniqueBrands.map(b => ({ _id: (b as any)._id || b.slug, name: b.name, isGlobal: (b as any).isGlobal || false })),
+    [uniqueBrands]
+  )
+
+  const unitOptions = useMemo(() =>
+    uniqueUnits.map(u => ({ _id: (u as any)._id || u.name, name: u.name, abbreviation: u.abbreviation, isGlobal: (u as any).isGlobal || false })),
+    [uniqueUnits]
+  )
+
+  const { startUpload, isUploading } = useUploadThing("imageUploader")
+
+  const { showSuccess, showError, showToast } = useToast()
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>, target: 'main' | 'variant') => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    showToast(t('compressingImages') || 'Compressing images...', { duration: 2000 });
+
+    const compressedFiles = await Promise.all(
+      files.map(async (file) => await compressImage(file))
+    );
+
+    const newImages: ProductImage[] = compressedFiles.map(file => ({
+      imgUrl: URL.createObjectURL(file),
+      imgKey: Math.random().toString(36).substring(7),
+      name: file.name,
+      size: file.size,
+      file: file
+    }));
+
+    if (target === 'main') {
+      const currentImages = form.getValues('images') || [];
+      if (currentImages.length + newImages.length > 4) {
+        showError(t('maxImagesReached') || 'Maximum of 4 images allowed');
+        return;
+      }
+      form.setValue('images', [...currentImages, ...newImages]);
+    } else {
+      setNewVariantData(prev => ({
+        ...prev,
+        images: [...prev.images, ...newImages].slice(0, 2)
+      }));
+    }
+    // Reset input
+    e.target.value = '';
+  };
 
   const form = useForm<IProductInput>({
     resolver: type === 'Update' ? zodResolver(ProductUpdateSchema) : zodResolver(ProductInputSchema),
@@ -363,69 +429,130 @@ const ProductForm = ({
 
 
   async function onSubmit(values: IProductInput) {
-    let finalValues = { ...values }
+    try {
+      showToast(tCommon('loading') || 'Processing...', { duration: 0 });
+      let finalValues = { ...values }
 
-    // If Variable Product, calculate aggregates from variants
-    if (values.productType === 'Variable Product' && values.variants && values.variants.length > 0) {
-      const totalStock = values.variants.reduce((acc: number, curr: any) => acc + (Number(curr.countInStock) || 0), 0)
-      const minListPrice = Math.min(...values.variants.map((v: any) => Number(v.listPrice) || 0))
-      const maxCost = Math.max(...values.variants.map((v: any) => Number(v.costPerUnit) || 0))
+      // Handle main images upload
+      const mainImagesPending = (values.images as any[]).filter(img => img.file).map(img => img.file as File);
+      if (mainImagesPending.length > 0) {
+        const uploadRes = await startUpload(mainImagesPending);
+        if (!uploadRes) throw new Error("Main image upload failed");
 
-      // Calculate attributes summary from variants
-      const attributesSummary: Record<string, Set<string>> = {}
-      values.variants.forEach((variant: any) => {
-        variant.attributes.forEach((attr: any) => {
-          if (!attributesSummary[attr.name]) {
-            attributesSummary[attr.name] = new Set()
+        let uploadIdx = 0;
+        finalValues.images = (values.images as any[]).map(img => {
+          if (img.file) {
+            const uploaded = uploadRes[uploadIdx++];
+            return {
+              imgUrl: uploaded.ufsUrl || uploaded.url,
+              imgKey: uploaded.key,
+              name: img.name,
+              size: img.size
+            };
           }
-          attributesSummary[attr.name].add(attr.value)
+          return img;
+        });
+      }
+
+      // Handle variant images upload
+      if (values.variants && values.variants.length > 0) {
+        const updatedVariants = await Promise.all(values.variants.map(async (variant) => {
+          const variantImagesPending = ((variant.images as any[]) || []).filter(img => img.file).map(img => img.file as File);
+          if (variantImagesPending.length === 0) return variant;
+
+          const uploadRes = await startUpload(variantImagesPending);
+          if (!uploadRes) throw new Error(`Variant image upload failed for SKU: ${variant.sku}`);
+
+          let uploadIdx = 0;
+          return {
+            ...variant,
+            images: ((variant.images as any[]) || []).map(img => {
+              if (img.file) {
+                const uploaded = uploadRes[uploadIdx++];
+                return {
+                  imgUrl: uploaded.ufsUrl || uploaded.url,
+                  imgKey: uploaded.key,
+                  name: img.name,
+                  size: img.size
+                };
+              }
+              return img;
+            })
+          };
+        }));
+        finalValues.variants = updatedVariants;
+      }
+
+      // If Variable Product, calculate aggregates from variants
+      if (values.productType === 'Variable Product' && finalValues.variants && finalValues.variants.length > 0) {
+        const totalStock = finalValues.variants.reduce((acc: number, curr: any) => acc + (Number(curr.countInStock) || 0), 0)
+        const minListPrice = Math.min(...finalValues.variants.map((v: any) => Number(v.listPrice) || 0))
+        const maxCost = Math.max(...finalValues.variants.map((v: any) => Number(v.costPerUnit) || 0))
+
+        // Calculate attributes summary from variants
+        const attributesSummary: Record<string, Set<string>> = {}
+        finalValues.variants.forEach((variant: any) => {
+          variant.attributes.forEach((attr: any) => {
+            if (!attributesSummary[attr.name]) {
+              attributesSummary[attr.name] = new Set()
+            }
+            attributesSummary[attr.name].add(attr.value)
+          })
         })
-      })
 
-      const attributes = Object.entries(attributesSummary).map(([name, valuesSet]) => ({
-        name,
-        values: Array.from(valuesSet) as string[]
-      }))
+        const attributes = Object.entries(attributesSummary).map(([name, valuesSet]) => ({
+          name,
+          values: Array.from(valuesSet) as string[]
+        }))
 
-      finalValues = {
-        ...finalValues,
-        countInStock: totalStock,
-        listPrice: minListPrice,
-        costPerUnit: maxCost,
-        attributes: attributes,
-        discountPrice: 0
+        finalValues = {
+          ...finalValues,
+          countInStock: totalStock,
+          listPrice: minListPrice,
+          costPerUnit: maxCost,
+          attributes: attributes,
+          discountPrice: 0
+        }
       }
-    }
 
-    if (type === 'Create') {
-      const res = await createProduct(finalValues)
-      if (!res.success) {
-        showError(res.message)
-      } else {
-        showSuccess(res.message)
-        router.push(`/admin/${storeId}/products`)
+      if (type === 'Create') {
+        const res = await createProduct(finalValues)
+        if (!res.success) {
+          showError(res.message)
+        } else {
+          showSuccess(res.message)
+          router.push(`/admin/${storeId}/products`)
+        }
       }
-    }
-    if (type === 'Update') {
-      if (!productId) {
-        router.push(`/admin/${storeId}/products`)
-        return
+      if (type === 'Update') {
+        if (!productId) {
+          router.push(`/admin/${storeId}/products`)
+          return
+        }
+        const res = await updateProduct({ ...finalValues, _id: productId })
+        if (!res.success) {
+          showError(res.message)
+        } else {
+          showSuccess(res.message)
+          router.push(`/admin/${storeId}/products`)
+        }
       }
-      const res = await updateProduct({ ...finalValues, _id: productId })
-      if (!res.success) {
-        showError(res.message)
-      } else {
-        showSuccess(res.message)
-        router.push(`/admin/${storeId}/products`)
-      }
+    } catch (error: any) {
+      showError(error.message || "An error occurred");
     }
   }
 
   const images = form.watch('images')
 
   const handleRemoveImage = async (image: ProductImage) => {
+    if (image.file) {
+      URL.revokeObjectURL(image.imgUrl)
+      form.setValue('images', images.filter((img: ProductImage) => img.imgKey !== image.imgKey))
+      return
+    }
+
     if (!productId) {
-      showError(t('productIdRequired'))
+      form.setValue('images', images.filter((img: ProductImage) => img.imgKey !== image.imgKey))
       return
     }
     const res = await deleteProductImg(productId, image.imgKey)
@@ -616,8 +743,8 @@ const ProductForm = ({
                       <FormLabel className="text-sm">{t('category')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <CatalogAutocomplete
-                          value={field.value}
-                          initialOptions={categories.map(c => ({ _id: c._id, name: c.categoryName, isGlobal: false }))}
+                          value={field.value || ''}
+                          initialOptions={categoryOptions}
                           industry={industry}
                           mode="category"
                           placeholder={t('select')}
@@ -653,8 +780,8 @@ const ProductForm = ({
                       <FormLabel className="text-sm">{t('subCategory')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <CatalogAutocomplete
-                          value={field.value}
-                          initialOptions={subCategories.map(s => ({ _id: (s as any)._id || s.slug, name: s.name, isGlobal: s.isGlobal }))}
+                          value={field.value || ''}
+                          initialOptions={subCategoryOptions}
                           industry={industry}
                           mode="subCategory"
                           categoryId={selectedCategoryId}
@@ -683,7 +810,7 @@ const ProductForm = ({
                       <FormControl>
                         <CatalogAutocomplete
                           value={field.value || ''}
-                          initialOptions={uniqueBrands.map(b => ({ _id: (b as any)._id || b.slug, name: b.name, isGlobal: (b as any).isGlobal }))}
+                          initialOptions={brandOptions}
                           industry={industry}
                           mode="brand"
                           placeholder={t('select')}
@@ -713,8 +840,8 @@ const ProductForm = ({
                       <FormLabel className="text-sm">{t('unit')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <CatalogAutocomplete
-                          value={field.value}
-                          initialOptions={uniqueUnits.map(u => ({ _id: (u as any)._id || u.name, name: u.name, abbreviation: u.abbreviation, isGlobal: (u as any).isGlobal }))}
+                          value={field.value || ''}
+                          initialOptions={unitOptions}
                           industry={industry}
                           mode="unit"
                           placeholder={t('select')}
@@ -736,13 +863,13 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-2 gap-2'>
+              {/* <div className='grid grid-cols-2 gap-2'>
                 <FormField
                   control={form.control}
                   name='barcodeSymbology'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm">{t('barcodeSymbology')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="text-sm">{t('barcodeSymbology')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger className="h-10">
@@ -759,7 +886,7 @@ const ProductForm = ({
                     </FormItem>
                   )}
                 />
-              </div>
+              </div> */}
 
               <div className='grid grid-cols-1 gap-2'>
                 <FormField
@@ -968,7 +1095,6 @@ const ProductForm = ({
 
                           <div className="border-t border-gray-100"></div>
 
-                          {/* Step 2 & 3: Details */}
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             {/* Left Column: Pricing & Inventory */}
                             <div className="space-y-3">
@@ -1059,7 +1185,7 @@ const ProductForm = ({
                               </div>
 
                               <div className="space-y-2">
-                                <label className="text-xs font-medium text-gray-500 uppercase">{t('taxType')} <span className="text-red-500">*</span></label>
+                                <label className="text-xs font-medium text-gray-500 uppercase">{t('taxType')}</label>
                                 <Select
                                   value={newVariantData.taxType}
                                   onValueChange={(value) => setNewVariantData(prev => ({ ...prev, taxType: value }))}
@@ -1160,32 +1286,28 @@ const ProductForm = ({
                                 <div className="p-4 border border-dashed border-gray-200 rounded-lg bg-gray-50/50 hover:bg-gray-50 transition-colors">
                                   {newVariantData.images.length < 2 && (
                                     <div className="flex justify-center mb-4">
-                                      <UploadButton
-                                        endpoint="imageUploader"
-                                        onClientUploadComplete={(res) => {
-                                          if (res) {
-                                            const newImages = res.map(file => ({
-                                              imgUrl: file.url,
-                                              imgKey: file.key
-                                            }))
-                                            setNewVariantData(prev => ({
-                                              ...prev,
-                                              images: [...prev.images, ...newImages].slice(0, 2)
-                                            }))
-                                            showSuccess(t('imageUploadedSuccessfully'))
-                                          }
-                                        }}
-                                        onUploadError={(error: Error) => {
-                                          showError(`Upload failed: ${error.message}`)
-                                        }}
-                                        className="ut-button:bg-white ut-button:text-orange ut-button:border-orange ut-button:border ut-button:hover:bg-orange/5 ut-allowed-content:hidden"
-                                        content={{
-                                          button({ ready }) {
-                                            if (ready) return <div className="flex items-center gap-2 text-sm"><PlusCircle className="w-4 h-4" /> {t('uploadImage')}</div>
-                                            return "Loading..."
-                                          }
-                                        }}
+                                      <Input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={(e) => handleImageSelect(e, 'variant')}
+                                        className="hidden"
+                                        id="variant-image-upload"
+                                        disabled={isUploading}
                                       />
+                                      <label htmlFor="variant-image-upload">
+                                        <Button
+                                          variant="outline"
+                                          type="button"
+                                          className="text-orange border-orange hover:bg-orange/5 cursor-pointer"
+                                          asChild
+                                        >
+                                          <div className="flex items-center gap-2 text-sm">
+                                            <PlusCircle className="w-4 h-4" />
+                                            {t('uploadImage')}
+                                          </div>
+                                        </Button>
+                                      </label>
                                     </div>
                                   )}
 
@@ -1355,13 +1477,13 @@ const ProductForm = ({
                   </Card>
 
                   {/* Generated Variants Table */}
-                  {form.watch('variants') && form.watch('variants').length > 0 && (
+                  {(form.watch('variants')?.length ?? 0) > 0 && (
                     <Card className="border-neutral-200 shadow-sm overflow-hidden">
                       <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-4">
                         <CardTitle className="text-base font-semibold text-navy flex items-center justify-between">
                           <span>{t('generatedVariants')}</span>
                           <span className="text-xs font-normal text-muted-foreground bg-white px-2 py-1 rounded border">
-                            {form.watch('variants').length} {t('variants')}
+                            {form.watch('variants')?.length ?? 0} {t('variants')}
                           </span>
                         </CardTitle>
                       </CardHeader>
@@ -1635,7 +1757,7 @@ const ProductForm = ({
                             name='taxType'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm">{t('taxType')} <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel className="text-sm">{t('taxType')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger className="h-10">
@@ -1656,7 +1778,7 @@ const ProductForm = ({
                             name='tax'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm">{t('tax')} <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel className="text-sm">{t('tax')}</FormLabel>
                                 <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={String(field.value)}>
                                   <FormControl>
                                     <SelectTrigger className="h-10">
@@ -1690,7 +1812,7 @@ const ProductForm = ({
                             name='discountType'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm">{t('discountType')} <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel className="text-sm">{t('discountType')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                   <FormControl>
                                     <SelectTrigger className="h-10">
@@ -1711,7 +1833,7 @@ const ProductForm = ({
                             name='discountValue'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm">{t('discountValue')} <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel className="text-sm">{t('discountValue')}</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input type='number' placeholder={t('enterDiscount')} {...field} className="pl-9 h-10" />
@@ -1784,6 +1906,7 @@ const ProductForm = ({
                               className='w-36 h-36 object-cover object-center rounded-sm'
                               width={100}
                               height={100}
+                              unoptimized={true}
                             />
                             <Button
                               variant={'destructive'}
@@ -1797,20 +1920,41 @@ const ProductForm = ({
                         ))}
                         <div className="flex flex-col items-center justify-center p-4">
                           <FormControl>
-                            <UploadButton
-                              endpoint='imageUploader'
-                              onClientUploadComplete={(res: any[]) => {
-                                const imgUploaded: ProductImage = {
-                                  imgUrl: res[0].ufsUrl || res[0].url,
-                                  imgKey: res[0].key
-                                }
-                                form.setValue('images', [...images, imgUploaded])
-                              }}
-                              onUploadError={(error: Error) => {
-                              }}
-                            />
+                            {images.length < 4 ? (
+                              <div className="flex flex-col items-center gap-2">
+                                <Input
+                                  type="file"
+                                  multiple
+                                  accept="image/*"
+                                  onChange={(e) => handleImageSelect(e, 'main')}
+                                  className="hidden"
+                                  id="main-image-upload"
+                                  disabled={isUploading}
+                                />
+                                <label htmlFor="main-image-upload">
+                                  <Button
+                                    variant="outline"
+                                    type="button"
+                                    className="bg-orange hover:bg-orange-dark text-white cursor-pointer"
+                                    asChild
+                                  >
+                                    <span>{t('uploadImage')}</span>
+                                  </Button>
+                                </label>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center gap-2 p-6 bg-orange-50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-900/30 rounded-xl">
+                                <span className="text-orange-600 dark:text-orange-400 font-bold text-lg">4/4</span>
+                                <p className="text-orange-600 dark:text-orange-400 text-sm font-medium">{t('maxImagesReached')}</p>
+                              </div>
+                            )}
                           </FormControl>
-                          <p className="text-sm text-neutral-500 mt-2">{t('addImages')}</p>
+                          {images.length < 4 && (
+                            <div className="text-center mt-2 space-y-1">
+                              <p className="text-sm text-neutral-500 font-medium">{t('addImages')}</p>
+                              <p className="text-xs text-neutral-400">{t('maxImagesDescription')}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

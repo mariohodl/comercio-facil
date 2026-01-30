@@ -10,7 +10,9 @@ export interface IProduct extends Document, IProductInput {
 const variantImageSchema = new Schema(
 	{
 		imgUrl: { type: String, required: false },
-		imgKey: { type: String, required: false }
+		imgKey: { type: String, required: false },
+		name: { type: String, required: false },
+		size: { type: Number, required: false }
 	},
 	{ _id: false }
 )
@@ -34,7 +36,9 @@ const productSchema = new Schema<IProduct>(
 		images: [
 			{
 				imgUrl: { type: String, required: true },
-				imgKey: { type: String, required: true }
+				imgKey: { type: String, required: true },
+				name: { type: String, required: false },
+				size: { type: Number, required: false }
 			}
 		],
 		description: {
@@ -105,18 +109,18 @@ const productSchema = new Schema<IProduct>(
 		// Backwards compatibility / Custom strings
 		category: { type: String, required: true },
 		subCategory: { type: String, required: true },
-		brand: { type: String, required: false },
+		brand: { type: String, required: true },
 		unit: { type: String, required: true },
 
 		// Flag to identify if it's using custom data
 		isCustomCategory: { type: Boolean, default: false },
 		isCustomBrand: { type: Boolean, default: false },
 
-		barcodeSymbology: { type: String, required: true },
+		barcodeSymbology: { type: String, required: false },
 		itemBarcode: { type: String, required: false },
 		productType: { type: String, required: true },
-		taxType: { type: String, required: true },
-		tax: { type: Number, required: true },
+		taxType: { type: String, required: false },
+		tax: { type: Number, required: false },
 		discountType: { type: String, required: false },
 		discountValue: { type: Number, required: false },
 		quantityAlert: { type: Number, required: true },
@@ -154,6 +158,10 @@ const productSchema = new Schema<IProduct>(
 	}
 )
 
+
+if (process.env.NODE_ENV === 'development' && models.Product) {
+	delete (models as any).Product
+}
 
 const Product =
 	(models.Product as Model<IProduct>) ||
