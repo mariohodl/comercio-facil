@@ -139,7 +139,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				}
 				return true;
 			} catch (error) {
-				console.error('SignIn callback error:', error);
+				// console.error('SignIn callback error:', error);
 				return true; // Still allow sign in if role update fails
 			}
 		},
@@ -223,7 +223,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				}
 				return token;
 			} catch (error) {
-				console.error('JWT callback error:', error);
+				// console.error('JWT callback error:', error);
 				return token;
 			}
 		},

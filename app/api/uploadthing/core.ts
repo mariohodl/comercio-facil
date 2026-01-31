@@ -34,7 +34,7 @@ export const ourFileRouter = {
         if (isValidId) {
           const fileUrl = (file as any).ufsUrl || file.url;
           const productUpdated = await addProductImg(metadata.productId, fileUrl, file.key)
-          console.log(productUpdated)
+          // console.log(productUpdated)
         }
       }
       return { uploadedBy: metadata.userId }

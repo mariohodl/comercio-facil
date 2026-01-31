@@ -11,13 +11,12 @@ export function useBarcodeScanner(onScan: (barcode: string) => void, active: boo
     useEffect(() => {
         if (!active) return
 
-        console.log('%c BARCODE SCANNER: Online & Listening ', 'background: #22c55e; color: #fff; font-weight: bold; border-radius: 4px; padding: 2px 5px;');
-
         const handleKeyDown = (event: KeyboardEvent) => {
             const currentTime = Date.now()
             const timeDiff = currentTime - lastKeyTimeRef.current
 
-            const isFast = timeDiff > 0 && timeDiff < 65;
+            // Scanners usually send keys at < 10ms intervals. humans can type at 40-70ms for certain combinations.
+            const isFast = timeDiff > 0 && timeDiff < 35;
 
             if (isFast || isScanningRef.current) {
                 event.preventDefault()
@@ -50,7 +49,6 @@ export function useBarcodeScanner(onScan: (barcode: string) => void, active: boo
                     event.stopImmediatePropagation()
 
                     const barcode = bufferRef.current
-                    console.log('%c SCAN CAPTURED ', 'background: #3b82f6; color: #fff; font-weight: bold; border-radius: 4px; padding: 2px 5px;', barcode);
 
                     onScan(barcode)
                 }
@@ -78,7 +76,6 @@ export function useBarcodeScanner(onScan: (barcode: string) => void, active: boo
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown, true)
-            console.log('%c BARCODE SCANNER: Disconnected ', 'background: #ef4444; color: #fff; font-weight: bold; border-radius: 4px; padding: 2px 5px;');
         }
     }, [onScan, active])
 }

@@ -24,87 +24,101 @@ export async function seedGlobalCatalog() {
             const { industry, categories } = item;
 
             for (const catData of categories) {
-                // Upsert Category
                 let category = await Category.findOne({
-                    categoryName: catData.name,
+                    categoryName: { $regex: new RegExp(`^${catData.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
                     industry,
                     isGlobal: true
                 });
 
-                if (!category) {
-                    category = await Category.create({
-                        categoryName: catData.name,
-                        categorySlug: normalizeText(catData.name).replace(/\s+/g, '-'),
-                        industry,
-                        isGlobal: true,
-                        isApproved: true,
-                        status: true
-                    });
-                    results.categories++;
+                try {
+                    if (!category) {
+                        category = await Category.create({
+                            categoryName: catData.name,
+                            categorySlug: normalizeText(catData.name).replace(/\s+/g, '-'),
+                            industry,
+                            isGlobal: true,
+                            isApproved: true,
+                            status: true
+                        });
+                        results.categories++;
+                    }
+                } catch (error) {
+                    // console.error(`Skipping category ${catData.name} due to error:`, error);
+                    continue; // Skip subcategories if category doesn't exist/can't be created
                 }
 
                 // Upsert Subcategories
                 for (const subName of catData.subcategories) {
                     const subExists = await SubCategory.findOne({
-                        name: subName,
+                        name: { $regex: new RegExp(`^${subName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
                         parentCategory: category._id,
                         industry
                     });
 
-                    if (!subExists) {
-                        await SubCategory.create({
-                            name: subName,
-                            slug: normalizeText(subName).replace(/\s+/g, '-'),
-                            parentCategory: category._id,
-                            industry,
-                            isGlobal: true,
-                            isApproved: true,
-                            code: normalizeText(subName).substring(0, 3).toUpperCase(),
-                            status: true
-                        });
-                        results.subcategories++;
+                    try {
+                        if (!subExists) {
+                            await SubCategory.create({
+                                name: subName,
+                                slug: normalizeText(subName).replace(/\s+/g, '-'),
+                                parentCategory: category._id,
+                                industry,
+                                isGlobal: true,
+                                isApproved: true,
+                                code: normalizeText(subName).substring(0, 3).toUpperCase(),
+                                status: true
+                            });
+                            results.subcategories++;
+                        }
+                    } catch (error) {
+                        // console.error(`Skipping subcategory ${subName} due to error:`, error);
                     }
                 }
 
                 // Upsert Brands (Industry wide or General)
                 for (const brandName of catData.brands) {
-                    const normalizedBrand = normalizeText(brandName);
-                    // Check if exists in this industry OR in general
+                    // Check if exists in this industry OR in general (Case-insensitive search with actual name)
                     const brandExists = await Brand.findOne({
-                        name: { $regex: new RegExp(`^${normalizedBrand}$`, 'i') },
+                        name: { $regex: new RegExp(`^${brandName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
                         $or: [{ industry }, { industry: 'general' }]
                     });
-                    if (!brandExists) {
-                        await Brand.create({
-                            name: brandName,
-                            slug: normalizeText(brandName).replace(/\s+/g, '-'),
-                            industry: industry === 'general' ? 'general' : industry,
-                            isGlobal: true,
-                            isApproved: true,
-                            status: true
-                        });
-                        results.brands++;
+                    try {
+                        if (!brandExists) {
+                            await Brand.create({
+                                name: brandName,
+                                slug: normalizeText(brandName).replace(/\s+/g, '-'),
+                                industry: industry === 'general' ? 'general' : industry,
+                                isGlobal: true,
+                                isApproved: true,
+                                status: true
+                            });
+                            results.brands++;
+                        }
+                    } catch (error) {
+                        // console.error(`Skipping brand ${brandName} due to error:`, error);
                     }
                 }
 
                 // Upsert Units (Industry wide or General)
                 for (const unitName of catData.units) {
-                    const normalizedUnit = normalizeText(unitName);
-                    // Units are mostly universal, check across all global units if possible
+                    // Units are mostly universal (Case-insensitive search with actual name)
                     const unitExists = await Unit.findOne({
-                        name: { $regex: new RegExp(`^${normalizedUnit}$`, 'i') },
+                        name: { $regex: new RegExp(`^${unitName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
                         isGlobal: true
                     });
-                    if (!unitExists) {
-                        await Unit.create({
-                            name: unitName,
-                            abbreviation: unitName.substring(0, 3).toLowerCase(),
-                            industry: 'general', // Units should ideally be general
-                            isGlobal: true,
-                            isApproved: true,
-                            status: true
-                        });
-                        results.units++;
+                    try {
+                        if (!unitExists) {
+                            await Unit.create({
+                                name: unitName,
+                                abbreviation: unitName.substring(0, 3).toLowerCase(),
+                                industry: 'general', // Units should ideally be general
+                                isGlobal: true,
+                                isApproved: true,
+                                status: true
+                            });
+                            results.units++;
+                        }
+                    } catch (error) {
+                        // console.error(`Skipping unit ${unitName} due to error:`, error);
                     }
                 }
             }
@@ -120,7 +134,7 @@ export async function seedGlobalCatalog() {
             consolidation: consolidation.success ? consolidation.report : null
         };
     } catch (error: any) {
-        console.error('Error seeding global catalog:', error);
+        // console.error('Error seeding global catalog:', error);
         return { success: false, error: error.message };
     }
 }
@@ -175,7 +189,7 @@ export async function consolidateGlobalCatalog() {
 
         return { success: true, report };
     } catch (error: any) {
-        console.error('Consolidation error:', error);
+        // console.error('Consolidation error:', error);
         return { success: false, error: error.message };
     }
 }
@@ -238,7 +252,7 @@ export async function getCompanyIndustry() {
         const user = await User.findOne({ email: session.user.email }).populate('business.companyId');
         return (user as any)?.business?.companyId?.industry || 'general';
     } catch (error) {
-        console.error(error);
+        // console.error(error);
         return 'general';
     }
 }
