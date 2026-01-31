@@ -151,7 +151,7 @@ export default function CategoriesPage({
                         </Button>
                     </div>
 
-                    {/* <Button
+                    <Button
                         variant="outline"
                         onClick={handleSeedCatalog}
                         disabled={isSeeding}
@@ -159,7 +159,7 @@ export default function CategoriesPage({
                     >
                         {isSeeding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />}
                         {t('setupCatalog') || 'Setup Catalog'}
-                    </Button> */}
+                    </Button>
                     <Button
                         onClick={handleAddCategory}
                         className="bg-orange hover:bg-orange-dark text-white font-bold flex-1 sm:flex-none shadow-lg shadow-orange-500/20 active:scale-95 transition-all"
