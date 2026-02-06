@@ -381,10 +381,91 @@ export const OrderReceptionSchema = z.object({
 	storeId: z.string().optional(),
 })
 
+export const PurchaseStatusSchema = z.enum(['Received', 'Pending', 'Ordered', 'Cancelled', 'Completed', 'WithExchanges'])
+export const PaymentStatusSchema = z.enum(['Paid', 'Unpaid', 'Partial', 'Overdue'])
+export const PurchaseTypeSchema = z.enum(['Normal', 'WithExchanges', 'OnlyReplacement'])
+export const EntryTypeSchema = z.enum(['Replacement', 'Exchange', 'Return'])
+
+export const PurchaseItemSchema = z.object({
+	productId: MongoId,
+	name: z.string(),
+	quantity: z.coerce.number().positive('Quantity must be positive'),
+	costPrice: z.coerce.number().nonnegative('Cost price must be non-negative'),
+	tax: z.coerce.number().nonnegative('Tax must be non-negative').optional(),
+	subtotal: z.coerce.number().nonnegative('Subtotal must be non-negative'),
+	entryType: EntryTypeSchema.default('Replacement'),
+	reason: z.string().optional(),
+})
+
+export const PurchaseAttachmentSchema = z.object({
+	name: z.string(),
+	url: z.string().url(),
+	type: z.string(),
+})
+
+export const PurchaseInputSchema = z.object({
+	supplierId: z.string().min(1, 'providerRequired').regex(/^[0-9a-fA-F]{24}$/, { message: 'providerRequired' }),
+	reference: z.string().min(1, 'referenceRequired'),
+	purchaseDate: z.date(),
+	status: PurchaseStatusSchema,
+	type: PurchaseTypeSchema.default('Normal'),
+	items: z.array(PurchaseItemSchema).min(1, 'itemsRequired'),
+	totalAmount: z.coerce.number().positive('amountRequired'),
+	paidAmount: z.coerce.number().nonnegative().default(0),
+	paymentStatus: PaymentStatusSchema,
+	notes: z.string().optional(),
+	storeId: z.string().optional(),
+	attachments: z.array(PurchaseAttachmentSchema).optional(),
+})
+
+export const PurchaseUpdateSchema = PurchaseInputSchema.extend({
+	_id: MongoId,
+})
+
 export const ProveedorInputSchema = z.object({
-	nameProvider: z.string().min(6, 'Name is required'),
-	clave: z.string().min(2, 'Clave is required'),
-	rfc: z.string().min(12, 'RFC is required'),
+	// Basic Info
+	nameProvider: z.string().min(1, 'El nombre es obligatorio'),
+	tradeName: z.string().optional(),
+	rfc: z.string().optional(), // Validated conditionally in UI
+	clave: z.string().min(1, 'La clave es obligatoria'),
+
+	// Contact Info
+	mainContact: z.string().optional(),
+	phone: z.string().min(10, 'El teléfono debe tener al menos 10 dígitos'),
+	whatsapp: z.string().optional(),
+	email: z.string().email('Correo electrónico inválido').optional().or(z.literal('')),
+
+	// Delivery Config
+	deliveryDays: z.array(z.string()).optional(),
+	deliveryHoursStart: z.string().optional(),
+	deliveryHoursEnd: z.string().optional(),
+
+	// Financial Terms
+	paymentTerms: z.string().optional(), // 'contado', '7_dias', etc.
+	earlyPaymentDiscount: z.coerce.number().optional(),
+	creditLimit: z.coerce.number().optional(),
+	notes: z.string().optional(),
+
+	// Grocery Specifics
+	acceptsReturns: z.boolean().default(true),
+	returnPolicy: z.string().optional(), // 'solo_cambios', 'cambios_y_devoluciones', 'no_acepta'
+	daysBeforeExpiration: z.coerce.number().optional(),
+	typicalExchangePercentage: z.coerce.number().optional(),
+	mainCategories: z.string().optional(),
+
+	// Fiscal Data
+	fiscalAddress: z.string().optional(),
+	postalCode: z.string().optional(),
+	fiscalRegime: z.string().optional(),
+
+	// Documents
+	documents: z.array(z.object({
+		type: z.string(),
+		name: z.string(),
+		url: z.string(),
+	})).optional(),
+
+	isActive: z.boolean().default(true),
 	storeId: z.string().optional(),
 })
 

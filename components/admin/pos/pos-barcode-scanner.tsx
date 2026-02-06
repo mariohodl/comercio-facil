@@ -37,17 +37,12 @@ export default function POSBarcodeScanner({ open, onOpenChange, storeId }: POSBa
                 store: storeId,
             })
 
-            console.log('Search results:', result)
-            console.log('Looking for barcode:', barcode)
-
             // Find exact barcode match
             const product = result.products.find(p => {
-                console.log('Checking product:', p.name, 'itemBarcode:', p.itemBarcode)
                 return p.itemBarcode === barcode
             })
 
             if (product) {
-                console.log('Found product:', product)
                 addToCart(product)
                 setManualSKU('')
                 onOpenChange(false)
@@ -58,7 +53,6 @@ export default function POSBarcodeScanner({ open, onOpenChange, storeId }: POSBa
                 document.body.appendChild(successMsg)
                 setTimeout(() => successMsg.remove(), 2000)
             } else {
-                console.log('Product not found with barcode:', barcode)
                 alert(t('productNotFound', { sku: barcode }))
             }
         } catch (error) {

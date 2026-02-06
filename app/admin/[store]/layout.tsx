@@ -20,10 +20,10 @@ export default async function AdminLayout({
     return (
         <>
             <div className='flex flex-col min-h-screen bg-gray-50/50'>
-                <div className='bg-[#0f172a] text-white fixed top-0 left-0 w-full z-20 border-b border-white/5 backdrop-blur-xl'>
+                <div className='bg-black text-white fixed top-0 left-0 w-full z-20 border-b border-white/5 backdrop-blur-xl'>
                     <div className='flex h-16 items-center md:px-6 transition-all duration-300'>
                         {/* Mobile Sidebar Trigger */}
-                        <div className='md:hidden mr-2'>
+                        <div className='nav:hidden mr-2'>
                             <Sheet>
                                 <SheetTrigger asChild>
                                     <button className='p-2 hover:bg-gray-800 rounded-md'>
@@ -57,20 +57,20 @@ export default async function AdminLayout({
                                 />
                             </Link>
                         </div>
-                        <AdminHeader className='mx-6 flex-1 hidden md:flex' />
+                        <AdminHeader className='mx-6 flex-1 hidden nav:flex' />
                         <div className='ml-auto flex items-center space-x-4'>
                             <Menu forAdmin />
                         </div>
                     </div>
                     {/* Mobile Header Links */}
-                    <div className='md:hidden border-t border-white/5'>
+                    <div className='nav:hidden border-t border-white/5'>
                         <AdminHeader className='px-6 py-1.5' />
                     </div>
                 </div>
 
-                <div className='flex pt-28 md:pt-16'>
+                <div className='flex pt-28 nav:pt-16'>
                     {/* Desktop Sidebar */}
-                    <aside className='hidden md:block w-64 fixed left-0 top-16 bottom-0 z-10'>
+                    <aside className='hidden nav:block w-64 fixed left-0 top-16 bottom-0 z-10'>
                         <AdminNav
                             storeId={session?.user?.storeId || ''}
                             storeName={session?.user?.storeName || ''}
@@ -80,7 +80,7 @@ export default async function AdminLayout({
                     </aside>
 
                     {/* Main Content */}
-                    <main className='flex-1 w-full md:ml-64 min-h-[calc(100vh-4rem)] p-2 overflow-hidden'>
+                    <main className='flex-1 w-full nav:ml-64 min-h-[calc(100vh-4rem)] p-2 overflow-hidden'>
                         <div className="w-full space-y-6">
                             {children}
                         </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import * as React from 'react'
+import { useRef } from 'react'
 import Image from 'next/image'
 import Autoplay from 'embla-carousel-autoplay'
 import {
@@ -24,7 +24,7 @@ export function HomeCarousel({
     buttonCaption: string
   }[]
 }) {
-  const plugin = React.useRef(
+  const plugin = useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true })
   )
 
@@ -36,19 +36,19 @@ export function HomeCarousel({
       onMouseEnter={plugin.current.stop}
       onMouseLeave={plugin.current.reset}
     >
-      
+
       <CarouselContent>
         {items.map((item) => (
           <CarouselItem key={item.title}>
-              <div className='flex border-2 aspect-[16/6] items-center justify-center p-6 relative -m-1 text-center'>
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className='object-cover'
-                  priority
-                />
-                <div className='absolute bg-neutral-900 bg-opacity-50  w-full h-full  top-1/2 transform -translate-y-1/2 flex flex-col items-center justify-center'>
+            <div className='flex border-2 aspect-[16/6] items-center justify-center p-6 relative -m-1 text-center'>
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                className='object-cover'
+                priority
+              />
+              <div className='absolute bg-neutral-900 bg-opacity-50  w-full h-full  top-1/2 transform -translate-y-1/2 flex flex-col items-center justify-center'>
                 <div className=''>
                   <h2 className='text-center text-7xl md:text-7xl font-medium mb-4 text-white max-w-[850px] mx-auto'>
                     {item.title}
@@ -60,9 +60,9 @@ export function HomeCarousel({
                     {item.buttonCaption}
                   </MKButton>
                 </div>
-                  
-                </div>
+
               </div>
+            </div>
           </CarouselItem>
         ))}
       </CarouselContent>

@@ -47,7 +47,6 @@ export default function SignUpForm() {
     defaultValues: signUpDefaultValues,
   })
   const { control, handleSubmit, formState: { errors } } = form
-  console.log({ errors })
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
@@ -55,7 +54,6 @@ export default function SignUpForm() {
 
 
   const onSubmit = async (data: IUserSignUp) => {
-    console.log({ data })
     try {
       const res = await registerUser(data)
       if (!res.success) {

@@ -30,6 +30,21 @@ export async function createProveedor(data: IProveedorInput) {
   }
 }
 
+// VALIDATE RFC
+export async function checkRFCExists(rfc: string, currentId?: string) {
+  const session = await auth();
+  if (!session) throw new Error('User not authenticated');
+
+  await connectToDatabase();
+  const query: any = { rfc, storeId: session.user.storeId };
+  if (currentId) {
+    query._id = { $ne: currentId };
+  }
+
+  const existing = await Proveedor.findOne(query);
+  return { exists: !!existing };
+}
+
 // DELETE
 export async function deleteProveedor(id: string) {
   try {

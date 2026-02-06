@@ -24,13 +24,10 @@ export async function GET(req: Request) {
             userId: session.user.id,
             status: 'open'
         })
-        console.log('Fetching status for:', { storeId, userId: session.user.id })
-        console.log('Found session:', currentSession)
 
         return NextResponse.json({ session: currentSession || null }, { status: 200 })
 
     } catch (error) {
-        console.error('Error fetching cash register status:', error)
         return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 })
     }
 }

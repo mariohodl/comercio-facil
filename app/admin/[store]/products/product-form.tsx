@@ -11,6 +11,7 @@ import { useTranslations } from 'next-intl'
 import BarcodeScannerDialog from '@/components/shared/barcode-scanner'
 import { getSubCategoriesByCategory } from '@/lib/actions/sub-category.actions'
 import { Button } from '@/components/ui/button'
+import { HelpTooltip } from '@/components/shared/help-tooltip'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Form,
@@ -29,7 +30,7 @@ import { IProduct } from '@/lib/db/models/product.model'
 import { UploadButton, useUploadThing } from '@/lib/uploadthing'
 import { compressImage } from '@/lib/image-compression'
 import { ProductInputSchema, ProductUpdateSchema } from '@/lib/validator'
-import { toSlug } from '@/lib/utils'
+import { cn, toSlug } from '@/lib/utils'
 import { IProductInput, ProductImage } from '@/types'
 import {
   Select,
@@ -136,6 +137,8 @@ type ProductFormProps = {
   stores?: IStore[]
   warehouses?: IWarehouse[]
   industry?: string
+  isModal?: boolean
+  onSuccess?: (product: any) => void
 }
 
 const ProductForm = ({
@@ -150,6 +153,8 @@ const ProductForm = ({
   stores = [],
   warehouses = [],
   industry = 'general',
+  isModal = false,
+  onSuccess,
 }: ProductFormProps) => {
   const router = useRouter()
   const t = useTranslations('products')
@@ -256,6 +261,7 @@ const ProductForm = ({
     resolver: type === 'Update' ? zodResolver(ProductUpdateSchema) : zodResolver(ProductInputSchema),
     defaultValues:
       product && type === 'Update' ? product : productDefaultValues,
+    shouldFocusError: false,
   })
 
   // Watch for changes in product type to reset fields if needed
@@ -521,12 +527,16 @@ const ProductForm = ({
           showError(res.message)
         } else {
           showSuccess(res.message)
-          router.push(`/admin/${storeId}/products`)
+          if (onSuccess) {
+            onSuccess(res.product)
+          } else {
+            router.push(`/admin/${storeId}/products`)
+          }
         }
       }
       if (type === 'Update') {
         if (!productId) {
-          router.push(`/admin/${storeId}/products`)
+          if (!isModal) router.push(`/admin/${storeId}/products`)
           return
         }
         const res = await updateProduct({ ...finalValues, _id: productId })
@@ -534,7 +544,11 @@ const ProductForm = ({
           showError(res.message)
         } else {
           showSuccess(res.message)
-          router.push(`/admin/${storeId}/products`)
+          if (onSuccess) {
+            onSuccess(res.product)
+          } else {
+            router.push(`/admin/${storeId}/products`)
+          }
         }
       }
     } catch (error: any) {
@@ -565,24 +579,26 @@ const ProductForm = ({
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex flex-row items-center justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-lg sm:text-2xl font-bold text-navy truncate">{type === 'Create' ? t('createProduct') : t('updateProduct')}</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('createNewProduct')}</p>
-        </div>
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-          <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-          <Link href={`/admin/${storeId}/products`}>
-            <Button className="bg-navy hover:bg-navy/90 text-white h-8 px-3 sm:h-10 sm:px-4">
-              <ChevronLeft className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="text-xs sm:text-sm">{tCommon('back')}</span>
+    <div className={cn("space-y-6", !isModal && "max-w-7xl mx-auto")}>
+      {!isModal && (
+        <div className="flex flex-row items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-2xl font-bold text-navy truncate">{type === 'Create' ? t('createProduct') : t('updateProduct')}</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('createNewProduct')}</p>
+          </div>
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+              <RefreshCw className="h-4 w-4" />
             </Button>
-          </Link>
+            <Link href={`/admin/${storeId}/products`}>
+              <Button className="bg-navy hover:bg-navy/90 text-white h-8 px-3 sm:h-10 sm:px-4">
+                <ChevronLeft className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">{tCommon('back')}</span>
+              </Button>
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
       <Form {...form}>
         <form
@@ -599,13 +615,13 @@ const ProductForm = ({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 p-3">
-              <div className='grid grid-cols-2 gap-2'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='store'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm">{t('store')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="gap-1.5">{t('store')} <span className="text-red-500">*</span><HelpTooltip content={t('help.store')} /></FormLabel>
                       <Select key={field.value} onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger className="h-10">
@@ -635,7 +651,7 @@ const ProductForm = ({
                   name='warehouse'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm">{t('warehouse')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="gap-1.5">{t('warehouse')} <span className="text-red-500">*</span><HelpTooltip content={t('help.warehouse')} /></FormLabel>
                       <Select key={field.value} onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger className="h-10">
@@ -662,7 +678,7 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-2 gap-2'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='name'
@@ -670,7 +686,7 @@ const ProductForm = ({
                     <FormItem>
                       <FormLabel className="text-sm">{t('productName')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder={t('enterProductName')} {...field} className="h-10" />
+                        <Input placeholder={t('enterProductName')} {...field} className="h-10" autoFocus />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -681,7 +697,10 @@ const ProductForm = ({
                   name='slug'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm">{t('slug')} <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel className="gap-1.5">
+                        {t('slug')} <span className="text-red-500">*</span>
+                        <HelpTooltip content={t('help.slug')} />
+                      </FormLabel>
                       <FormControl>
                         <div className='relative'>
                           <Input placeholder={t('enterProductSlug')} {...field} disabled className="h-10" />
@@ -693,48 +712,50 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-1 gap-3'>
-                <FormField
-                  control={form.control}
-                  name='sku'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">{t('sku')} <span className="text-red-500">*</span></FormLabel>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <div className="w-full flex-1">
-                          <FormControl>
-                            <Input placeholder={t('enterBarcode')} {...field} className="h-10" />
-                          </FormControl>
+              {type === 'Update' && (
+                <div className='grid grid-cols-1 gap-3'>
+                  <FormField
+                    control={form.control}
+                    name='sku'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="gap-1.5">
+                          {t('sku')} <span className="text-red-500">*</span>
+                          <HelpTooltip content={t('help.sku')} />
+                        </FormLabel>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <div className="w-full flex-1">
+                            <FormControl>
+                              <Input placeholder={t('enterBarcode')} {...field} className="h-10" />
+                            </FormControl>
+                          </div>
+                          <Button
+                            type="button"
+                            className="bg-orange hover:bg-orange-dark text-white h-10 shrink-0 w-full sm:w-auto"
+                            onClick={() => {
+                              const name = form.getValues('name')
+                              if (!name) {
+                                showError(t('enterProductNameFirst'))
+                                return
+                              }
+                              const namePart = name.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(3, 'X')
+                              const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : 'STOR'
+                              const randomPart = Math.floor(10000 + Math.random() * 90000)
+                              const sku = `${namePart}-${storePart}-${randomPart}`
+                              form.setValue('sku', sku)
+                            }}
+                          >
+                            {t('generate')}
+                          </Button>
                         </div>
-                        <Button
-                          type="button"
-                          className="bg-orange hover:bg-orange-dark text-white h-10 shrink-0 w-full sm:w-auto"
-                          onClick={() => {
-                            const name = form.getValues('name')
-                            if (!name) {
-                              showError(t('enterProductNameFirst'))
-                              return
-                            }
-                            const namePart = name.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(3, 'X')
-                            const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : 'STOR'
-                            const randomPart = Math.floor(10000 + Math.random() * 90000)
-                            const sku = `${namePart}-${storePart}-${randomPart}`
-                            form.setValue('sku', sku)
-                          }}
-                        >
-                          {t('generate')}
-                        </Button>
-                      </div>
-                      <FormMessage />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
 
-
-                    </FormItem>
-                  )}
-                />
-
-              </div>
-
-              <div className='grid grid-cols-2 gap-2 items-start'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 items-start'>
                 <FormField
                   control={form.control}
                   name='category'
@@ -750,7 +771,7 @@ const ProductForm = ({
                           placeholder={t('select')}
                           onSelect={(option) => {
                             if (option) {
-                              form.setValue('category', option.name)
+                              field.onChange(option.name)
                               form.setValue('categoriaId', option._id)
                               form.setValue('isCustomCategory', false)
                               // Reset subcategory when category changes
@@ -759,7 +780,7 @@ const ProductForm = ({
                             }
                           }}
                           onCustomCreate={(name) => {
-                            form.setValue('category', name)
+                            field.onChange(name)
                             form.setValue('categoriaId', undefined)
                             form.setValue('isCustomCategory', true)
                             // Reset subcategory
@@ -788,7 +809,7 @@ const ProductForm = ({
                           placeholder={t('select')}
                           onSelect={(option) => {
                             if (option) {
-                              form.setValue('subCategory', option.name)
+                              field.onChange(option.name)
                               form.setValue('subCategoriaId', option._id)
                             }
                           }}
@@ -800,7 +821,7 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-2 gap-2'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='brand'
@@ -816,13 +837,13 @@ const ProductForm = ({
                           placeholder={t('select')}
                           onSelect={(option) => {
                             if (option) {
-                              form.setValue('brand', option.name)
+                              field.onChange(option.name)
                               form.setValue('brandId', option._id)
                               form.setValue('isCustomBrand', false)
                             }
                           }}
                           onCustomCreate={(name) => {
-                            form.setValue('brand', name)
+                            field.onChange(name)
                             form.setValue('brandId', undefined)
                             form.setValue('isCustomBrand', true)
                           }}
@@ -847,12 +868,12 @@ const ProductForm = ({
                           placeholder={t('select')}
                           onSelect={(option) => {
                             if (option) {
-                              form.setValue('unit', option.name)
+                              field.onChange(option.name)
                               form.setValue('unitId', option._id)
                             }
                           }}
                           onCustomCreate={(name) => {
-                            form.setValue('unit', name)
+                            field.onChange(name)
                             form.setValue('unitId', undefined)
                           }}
                         />
@@ -894,7 +915,10 @@ const ProductForm = ({
                   name='itemBarcode'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm">{t('itemBarcode')} {productType === 'Single Product' && <span className="text-red-500">*</span>}</FormLabel>
+                      <FormLabel className="gap-1.5">
+                        {t('itemBarcode')} {productType === 'Single Product' && <span className="text-red-500">*</span>}
+                        <HelpTooltip content={t('help.itemBarcode')} />
+                      </FormLabel>
                       <div className="flex flex-row gap-1">
                         <div className="flex-1 min-w-0">
                           <FormControl>
@@ -1107,6 +1131,7 @@ const ProductForm = ({
                                 <label className="text-xs font-medium text-gray-500 uppercase">{t('quantity')} <span className="text-red-500">*</span></label>
                                 <Input
                                   type="number"
+                                  min="0"
                                   value={newVariantData.countInStock}
                                   onChange={(e) => setNewVariantData(prev => ({ ...prev, countInStock: Number(e.target.value) }))}
                                   placeholder="0"
@@ -1114,13 +1139,14 @@ const ProductForm = ({
                                 />
                               </div>
 
-                              <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 <div className="space-y-2">
                                   <label className="text-xs font-medium text-gray-500 uppercase">{t('costPerUnit')} <span className="text-red-500">*</span></label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                                     <Input
                                       type="number"
+                                      min="0"
                                       value={newVariantData.costPerUnit}
                                       onChange={(e) => setNewVariantData(prev => ({ ...prev, costPerUnit: Number(e.target.value) }))}
                                       placeholder="0.00"
@@ -1134,6 +1160,7 @@ const ProductForm = ({
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                                     <Input
                                       type="number"
+                                      min="0"
                                       value={newVariantData.listPrice}
                                       onChange={(e) => setNewVariantData(prev => ({ ...prev, listPrice: Number(e.target.value) }))}
                                       placeholder="0.00"
@@ -1147,6 +1174,7 @@ const ProductForm = ({
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                                     <Input
                                       type="number"
+                                      min="0"
                                       value={newVariantData.discountPrice}
                                       readOnly
                                       className="pl-7 h-10 bg-gray-50 text-gray-500 cursor-not-allowed"
@@ -1156,7 +1184,7 @@ const ProductForm = ({
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-2 gap-2">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                   <label className="text-xs font-medium text-gray-500 uppercase">{t('discountType')}</label>
                                   <Select
@@ -1176,6 +1204,7 @@ const ProductForm = ({
                                   <label className="text-xs font-medium text-gray-500 uppercase">{t('discountValue')}</label>
                                   <Input
                                     type="number"
+                                    min="0"
                                     value={newVariantData.discountValue}
                                     onChange={(e) => setNewVariantData(prev => ({ ...prev, discountValue: Number(e.target.value) }))}
                                     placeholder="0"
@@ -1630,74 +1659,29 @@ const ProductForm = ({
               {form.watch('productType') === 'Single Product' && (
                 <div className="space-y-6 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 items-start">
-                    {/* Inventory Section */}
-                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
-                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
-                        <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
-                          <span className="text-orange">📦</span> {t('inventory')}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-3 space-y-3">
-                        <div className="grid grid-cols-2 gap-2">
-                          <FormField
-                            control={form.control}
-                            name='countInStock'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-sm">{t('quantity')} <span className="text-red-500">*</span></FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Input type='number' placeholder={t('enterQuantity')} {...field} className="pl-9 h-10" />
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                      <span className="text-gray-500 text-sm">#</span>
-                                    </div>
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name='quantityAlert'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-sm">{t('quantityAlert')} <span className="text-red-500">*</span></FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Input type='number' placeholder={t('enterQuantityAlert')} {...field} className="pl-9 h-10" />
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                      <span className="text-gray-500 text-sm">⚠️</span>
-                                    </div>
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
+                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 items-start">
 
                     {/* Pricing Section */}
-                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
+                    <Card className="lg:col-span-2 border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
                       <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
                         <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
                           <span className="text-orange">💰</span> {t('pricing')}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="p-3 space-y-3">
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                           <FormField
                             control={form.control}
                             name='costPerUnit'
                             render={({ field }) => (
                               <FormItem className="flex-1">
-                                <FormLabel className="text-sm whitespace-nowrap">{t('costPerUnit')} <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel className="gap-1.5">
+                                  {t('costPerUnit')} <span className="text-red-500">*</span>
+                                  <HelpTooltip content={t('help.costPerUnit')} />
+                                </FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' step='0.01' placeholder={t('enterCost')} {...field} className="pl-9 h-10" />
+                                    <Input type='number' step='0.01' min="0" placeholder={t('enterCost')} {...field} className="pl-9 h-10" />
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                       <span className="text-gray-500 text-sm">$</span>
                                     </div>
@@ -1712,10 +1696,13 @@ const ProductForm = ({
                             name='listPrice'
                             render={({ field }) => (
                               <FormItem className="flex-1">
-                                <FormLabel className="text-sm whitespace-nowrap">{t('listPrice')} <span className="text-red-500">*</span></FormLabel>
+                                <FormLabel className="gap-1.5">
+                                  {t('listPrice')} <span className="text-red-500">*</span>
+                                  <HelpTooltip content={t('help.listPrice')} />
+                                </FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' step='0.01' placeholder={t('enterListPrice')} {...field} className="pl-9 h-10" />
+                                    <Input type='number' step='0.01' min="0" placeholder={t('enterListPrice')} {...field} className="pl-9 h-10" />
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                       <span className="text-gray-500 text-sm">$</span>
                                     </div>
@@ -1730,12 +1717,16 @@ const ProductForm = ({
                             name='discountPrice'
                             render={({ field }) => (
                               <FormItem className="flex-1">
-                                <FormLabel className="text-sm whitespace-nowrap">{t('discountPrice')}</FormLabel>
+                                <FormLabel className="gap-1.5">
+                                  {t('discountPrice')}
+                                  <HelpTooltip content={t('help.discountPrice')} />
+                                </FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input
                                       type='number'
                                       step='0.01'
+                                      min="0"
                                       placeholder={t('calculatedPrice')}
                                       {...field}
                                       disabled
@@ -1751,7 +1742,7 @@ const ProductForm = ({
                             )}
                           />
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name='taxType'
@@ -1798,15 +1789,71 @@ const ProductForm = ({
                       </CardContent>
                     </Card>
 
+                    {/* Inventory Section */}
+                    <Card className="lg:col-span-1 border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
+                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+                        <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
+                          <span className="text-orange">📦</span> {t('inventory')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-3 space-y-3">
+                        <div className="grid grid-cols-1 gap-4">
+                          <FormField
+                            control={form.control}
+                            name='countInStock'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="gap-1.5">
+                                  {t('quantity')} <span className="text-red-500">*</span>
+                                  <HelpTooltip content={t('help.inventory')} />
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input type='number' min="0" placeholder={t('enterQuantity')} {...field} className="pl-9 h-10" />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                      <span className="text-gray-500 text-sm">#</span>
+                                    </div>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name='quantityAlert'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm gap-1.5">
+                                  {t('quantityAlert')} <span className="text-red-500">*</span>
+                                  <HelpTooltip content={t('help.quantityAlert')} />
+                                </FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input type='number' min="0" placeholder={t('enterQuantityAlert')} {...field} className="pl-9 h-10" />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                      <span className="text-gray-500 text-sm">⚠️</span>
+                                    </div>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+
                     {/* Discount Section */}
-                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
+                    <Card className="lg:col-span-2 border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
                       <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
                         <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
                           <span className="text-orange">🏷️</span> {t('discount')}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="p-3 space-y-3">
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name='discountType'
@@ -1836,7 +1883,7 @@ const ProductForm = ({
                                 <FormLabel className="text-sm">{t('discountValue')}</FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' placeholder={t('enterDiscount')} {...field} className="pl-9 h-10" />
+                                    <Input type='number' min="0" placeholder={t('enterDiscount')} {...field} className="pl-9 h-10" />
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                       <span className="text-gray-500 text-sm">%</span>
                                     </div>
@@ -1864,7 +1911,10 @@ const ProductForm = ({
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-gray-50/50">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base font-medium text-navy">{t('published')}</FormLabel>
+                      <FormLabel className="text-base font-medium text-navy gap-2">
+                        {t('published')}
+                        <HelpTooltip content={t('help.isPublished')} />
+                      </FormLabel>
                       <div className="text-sm text-muted-foreground">
                         {t('makeProductVisible')}
                       </div>
@@ -1965,19 +2015,33 @@ const ProductForm = ({
             </CardContent>
           </Card>
 
-          <div className="flex flex-col sm:flex-row justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)} className="w-full sm:w-auto h-10">
-              {tCommon('cancel')}
-            </Button>
-            <Button
-              type='submit'
-              size='lg'
-              disabled={form.formState.isSubmitting}
-              className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
-            >
-              {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
-            </Button>
-          </div>
+          {!isModal && (
+            <div className="flex flex-col sm:flex-row justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)} className="w-full sm:w-auto h-10">
+                {tCommon('cancel')}
+              </Button>
+              <Button
+                type='submit'
+                size='lg'
+                disabled={form.formState.isSubmitting}
+                className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
+              >
+                {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
+              </Button>
+            </div>
+          )}
+          {isModal && (
+            <div className="flex justify-end gap-2">
+              <Button
+                type='submit'
+                size='lg'
+                disabled={form.formState.isSubmitting}
+                className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
+              >
+                {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
+              </Button>
+            </div>
+          )}
         </form>
         <BarcodeScannerDialog
           open={isScannerOpen}

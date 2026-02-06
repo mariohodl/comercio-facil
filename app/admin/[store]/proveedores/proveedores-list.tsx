@@ -5,6 +5,7 @@ import { IProveedor } from '@/lib/db/models/proveedor.model';
 
 
 import DeleteDialog from '@/components/shared/delete-dialog'
+// import CreateProviderModal from './create-provider-modal' // Reverted to page
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -36,6 +37,17 @@ const ProveedoresList = ({ store }: { store: string }) => {
   const [inputValue, setInputValue] = useState<string>('')
   const [data, setData] = useState<ProveedoresListDataProps>()
   const [isPending, startTransition] = useTransition()
+
+  const refreshData = () => {
+    startTransition(async () => {
+      const data = await getAllProveedoresForAdmin({
+        query: inputValue,
+        page,
+        storeId: store,
+      })
+      setData(data)
+    })
+  }
 
   const handlePageChange = (changeType: 'next' | 'prev') => {
     const newPage = changeType === 'next' ? page + 1 : page - 1
@@ -108,7 +120,7 @@ const ProveedoresList = ({ store }: { store: string }) => {
           </div>
 
           <Button asChild variant='default'>
-            <Link href='/admin/proveedores/nuevo-proveedor'>Crear proveedor</Link>
+            <Link href={`/admin/${store}/proveedores/nuevo-proveedor`}>Crear proveedor</Link>
           </Button>
         </div>
         <div>

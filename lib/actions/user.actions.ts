@@ -207,7 +207,16 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 
 		await user.save();
 
-		return { success: true, message: 'Store settings updated successfully' };
+		return {
+			success: true,
+			message: 'Store settings updated successfully',
+			data: {
+				companyId: company._id.toString(),
+				companyName: company.name,
+				storeId: store.slug,
+				storeName: store.name,
+			}
+		};
 	} catch (error) {
 		console.error('Error updating store settings:', error);
 		return { success: false, error: formatError(error) };

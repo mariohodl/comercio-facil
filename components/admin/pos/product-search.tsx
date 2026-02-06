@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { usePOSStore } from '@/hooks/use-pos-store'
 import { getAllProductsForAdmin } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
-import { Loader2, Search, Package } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { Loader2, Search, Package, ScanBarcode, ShoppingBag, X } from 'lucide-react'
 import { useDebounce } from '@/hooks/use-debounce'
 import ProductCard from './product-card'
 
@@ -18,12 +19,15 @@ interface ProductSearchProps {
 }
 
 export default function ProductSearch({ storeId, selectedCategory, onCategoryChange: _onCategoryChange }: ProductSearchProps) {
+    const { data: session } = useSession()
+    const locale = useLocale()
     const [query, setQuery] = useState('')
     const [products, setProducts] = useState<IProduct[]>([])
     const [loading, setLoading] = useState(false)
     const { cart } = usePOSStore()
     const debouncedQuery = useDebounce(query, 500)
     const t = useTranslations('pos')
+    const tCommon = useTranslations('common')
 
     const fetchProducts = useCallback(async (searchQuery: string, category: string = 'all') => {
         setLoading(true)
@@ -49,59 +53,109 @@ export default function ProductSearch({ storeId, selectedCategory, onCategoryCha
 
 
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+                e.preventDefault()
+                const searchInput = document.getElementById('product-search-input')
+                searchInput?.focus()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [])
+
     const filteredProducts = products
 
     // Get current date
-    const currentDate = new Date().toLocaleDateString('en-US', {
+    const currentDate = new Date().toLocaleDateString(locale, {
+        weekday: 'long',
         month: 'long',
         day: 'numeric',
-        year: 'numeric'
     })
 
     return (
-        <div className="flex flex-1 h-full flex-col space-y-3">
-            {/* Welcome Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="hidden sm:block">
-                    <h2 className="text-lg font-bold text-gray-900 leading-tight">
-                        {t('welcome')}, User
-                    </h2>
-                    <p className="text-[10px] text-gray-500">{currentDate}</p>
-                </div>
+        <div className="flex flex-1 h-full flex-col space-y-4">
+            {/* Header & Search Section */}
+            <div className="flex flex-col space-y-3">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    {/* Welcome Text */}
+                    <div className="min-w-max">
+                        <h2 className="text-lg font-bold tracking-tight text-gray-900">
+                            {t('welcome')}, {session?.user?.name?.split(' ')[0] || 'Vendedor'}
+                        </h2>
+                        <p className="text-xs text-gray-500 capitalize">{currentDate}</p>
+                    </div>
 
-                <div className="relative w-full sm:w-2/3">
-                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                    <Input
-                        autoFocus
-                        placeholder={t('searchPlaceholder')}
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        className="pl-9 h-10 lg:h-9 bg-white border-gray-200 rounded-lg shadow-sm text-sm"
-                    />
-                </div>
-            </div>
+                    {/* Search Bar */}
+                    <div className="flex-1 w-full lg:max-w-xl relative group">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2 text-gray-400 group-focus-within:text-orange-500 transition-colors duration-300">
+                            <Search className="h-4 w-4" />
+                        </div>
 
-            {/* Search */}
-            <div className="space-y-2">
-                {/* <div className="relative">
-                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                    <Input
-                        autoFocus
-                        placeholder={t('searchPlaceholder')}
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        className="pl-9 h-9 bg-white border-gray-200 rounded-lg shadow-sm text-sm"
-                    />
-                </div> */}
+                        <Input
+                            id="product-search-input"
+                            autoFocus
+                            placeholder={t('searchPlaceholder')}
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            className="pl-10 pr-24 h-10 bg-white border-gray-200 rounded-lg shadow-sm text-sm placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-orange-500/20 focus-visible:border-orange-500 transition-all duration-300 hover:border-gray-300"
+                        />
 
-                {/* Results Count */}
-                <div className="flex items-center justify-between text-xs text-gray-600">
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                            {query && (
+                                <button
+                                    onClick={() => setQuery('')}
+                                    className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
+                                    aria-label="Clear search"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            )}
+                            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-gray-200 ml-1">
+                                <div className="flex flex-col items-center justify-center p-1 bg-gray-50 rounded border border-gray-100" title={t('scanProduct')}>
+                                    <ScanBarcode className="h-3.5 w-3.5 text-gray-500" />
+                                </div>
+                                <kbd className="hidden sm:inline-flex h-6 items-center gap-1 rounded border border-gray-200 bg-gray-50 px-1.5 font-mono text-[10px] font-medium text-gray-500 shadow-sm">
+                                    <span className="text-[10px]">/</span>
+                                </kbd>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Cart Badge */}
                     {cart.length > 0 && (
-                        <Badge variant="secondary" className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5">
-                            {cart.length} {t('itemsInCart')}
-                        </Badge>
+                        <div className="hidden lg:block">
+                            <Badge variant="secondary" className="bg-orange-100 text-orange-700 hover:bg-orange-200 border-orange-200 px-3 py-1.5 flex items-center gap-2 transition-colors whitespace-nowrap">
+                                <ShoppingBag className="h-4 w-4" />
+                                <span className="font-medium">{cart.length} {t('itemsInCart')}</span>
+                            </Badge>
+                        </div>
                     )}
-                    <span>{filteredProducts.length} {t('productsFound')}</span>
+                </div>
+
+                {/* Mobile Cart Badge & Results Count */}
+                <div className="flex items-center justify-between px-1">
+                    <p className="text-xs font-medium text-gray-500">
+                        {loading ? (
+                            <span className="flex items-center gap-1 animate-pulse">
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                                {tCommon('loading')}
+                            </span>
+                        ) : (
+                            <span>{filteredProducts.length} {t('productsFound')}</span>
+                        )}
+                    </p>
+
+                    {cart.length > 0 && (
+                        <div className="lg:hidden">
+                            <Badge variant="secondary" className="bg-orange-100 text-orange-700 hover:bg-orange-200 border-orange-200 px-3 py-1 flex items-center gap-2 transition-colors">
+                                <ShoppingBag className="h-3.5 w-3.5" />
+                                <span className="font-medium text-xs">{cart.length} {t('itemsInCart')}</span>
+                            </Badge>
+                        </div>
+                    )}
                 </div>
             </div>
 

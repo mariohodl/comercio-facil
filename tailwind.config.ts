@@ -10,6 +10,9 @@ const config: Config = withUt({
 	],
 	theme: {
 		extend: {
+			screens: {
+				'nav': '1200px',
+			},
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',

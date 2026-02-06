@@ -1,6 +1,6 @@
 'use client'
 import useBrowsingHistory from '@/hooks/use-browsing-history'
-import React, { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ProductSlider from './product/product-slider'
 import { Separator } from '../ui/separator'
 import { cn } from '@/lib/utils'
@@ -40,7 +40,7 @@ function ProductList({
   hideDetails?: boolean
 }) {
   const { products } = useBrowsingHistory()
-  const [data, setData] = React.useState([])
+  const [data, setData] = useState([])
   useEffect(() => {
     const fetchProducts = async () => {
       const res = await fetch(

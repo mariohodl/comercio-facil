@@ -1,24 +1,20 @@
-export const APP_NAME = process.env.APP_NAME || 'Comercio Fácil'
+import { env } from '@/config'
+
+export const APP_NAME = env.NEXT_PUBLIC_APP_NAME
 export const SERVER_URL =
-	process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+	env.NEXT_PUBLIC_SERVER_URL || env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'onboarding@resend.dev'
-export const SENDER_NAME = process.env.SENDER_NAME || APP_NAME
+export const SENDER_EMAIL = env.EMAIL_FROM
+export const SENDER_NAME = env.NEXT_PUBLIC_APP_NAME
 
-export const APP_URL = process.env.APP_URL || 'http://localhost:3000'
-export const APP_DESCRIPTION =
-	process.env.APP_DESCRIPTION ||
-	'Distribuidor de occidente, el hacer tu comercio más facil nos motiva..'
-export const APP_SLOGAN = process.env.APP_SLOGAN || 'Centralice su Inventario, Optimice sus Ventas en Punto de Servicio (POS) y tome decisiones con Reportes en Tiempo Real.'
+export const APP_URL = env.NEXT_PUBLIC_APP_URL
+export const APP_DESCRIPTION = env.NEXT_PUBLIC_APP_DESCRIPTION
+export const APP_SLOGAN = env.NEXT_PUBLIC_APP_SLOGAN
 
-export const PAGE_SIZE = Number(process.env.PAGE_SIZE || 9)
-
-export const FREE_SHIPPING_MIN_PRICE = Number(
-	process.env.FREE_SHIPPING_MIN_PRICE || 35
-)
-
+export const PAGE_SIZE = env.PAGE_SIZE
+export const FREE_SHIPPING_MIN_PRICE = env.FREE_SHIPPING_MIN_PRICE
 export const APP_COPYRIGHT =
-	process.env.NEXT_PUBLIC_APP_COPYRIGHT ||
+	env.NEXT_PUBLIC_APP_COPYRIGHT ||
 	`Copyright © 2025 ${APP_NAME}. Todos los derechos reservados.`
 
 export const AVAILABLE_PAYMENT_METHODS = [
@@ -39,8 +35,7 @@ export const AVAILABLE_PAYMENT_METHODS = [
 	},
 ]
 
-export const DEFAULT_PAYMENT_METHOD =
-	process.env.DEFAULT_PAYMENT_METHOD || 'PayPal'
+export const DEFAULT_PAYMENT_METHOD = env.DEFAULT_PAYMENT_METHOD || 'PayPal'
 
 export const AVAILABLE_DELIVERY_DATES = [
 	{
@@ -160,6 +155,6 @@ export const AVAILABLE_CATEGORIES = [
 
 export const TAX_RATE = 0.16 as number
 
-export const UPLOADTHING_TOKEN = process.env.NODE_ENV === 'production'
-	? process.env.UPLOADTHING_TOKEN_PROD
-	: process.env.UPLOADTHING_TOKEN_DEV
+export const UPLOADTHING_TOKEN = env.NODE_ENV === 'production'
+	? env.UPLOADTHING_TOKEN_PROD
+	: env.UPLOADTHING_TOKEN_DEV

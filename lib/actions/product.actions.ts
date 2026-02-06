@@ -284,10 +284,12 @@ export async function getAllProductsForAdmin({
 	const queryFilter =
 		query && query !== 'all'
 			? {
-				name: {
-					$regex: query,
-					$options: 'i',
-				},
+				$or: [
+					{ name: { $regex: query, $options: 'i' } },
+					{ sku: { $regex: query, $options: 'i' } },
+					{ itemBarcode: { $regex: query, $options: 'i' } },
+					{ 'variants.barcode': { $regex: query, $options: 'i' } },
+				],
 			}
 			: {}
 	const categoryFilter = category && category !== 'all' ? { category } : {}
@@ -455,7 +457,6 @@ export async function createProduct(data: IProductInput) {
 			product.discountType,
 			product.discountValue
 		)
-		// console.log('discountPrice', discountPrice)
 
 		const newProduct = new Product({
 			...cleanedProduct,
@@ -467,6 +468,7 @@ export async function createProduct(data: IProductInput) {
 		return {
 			success: true,
 			message: 'Product created successfully',
+			product: JSON.parse(JSON.stringify(newProduct)) as IProduct
 		}
 	} catch (error) {
 		return { success: false, message: formatError(error) }
@@ -495,14 +497,15 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
 			product.discountValue
 		)
 
-		await Product.findByIdAndUpdate(product._id, {
+		const updatedProduct = await Product.findByIdAndUpdate(product._id, {
 			...cleanedProduct,
 			discountPrice, // Set calculated discount price
-		})
+		}, { new: true })
 		revalidatePath('/admin/products')
 		return {
 			success: true,
 			message: 'Product updated successfully',
+			product: JSON.parse(JSON.stringify(updatedProduct)) as IProduct
 		}
 	} catch (error) {
 		return { success: false, message: formatError(error) }

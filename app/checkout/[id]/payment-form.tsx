@@ -46,8 +46,6 @@ export default function OrderPaymentForm({
     expectedDeliveryDate,
     isPaid,
   } = order
-//   const { toast } = useToast()
-console.log('ORDER', order)
 
   if (isPaid) {
     redirect(`/account/orders/${order._id}`)
@@ -65,13 +63,13 @@ console.log('ORDER', order)
   const handleCreatePayPalOrder = async () => {
     const res = await createPayPalOrder(order._id)
     if (!res.success)
-      showSuccess(res.message, {duration: 3000, position: 'top-center', important: true})
+      showSuccess(res.message, { duration: 3000, position: 'top-center', important: true })
     return res.data
   }
   const handleApprovePayPalOrder = async (data: { orderID: string }) => {
     const res = await approvePayPalOrder(order._id, data)
 
-    showSuccess(res.message, {duration: 3000, position: 'top-center', important: true})
+    showSuccess(res.message, { duration: 3000, position: 'top-center', important: true })
   }
 
   const CheckoutSummary = () => (
@@ -199,7 +197,7 @@ console.log('ORDER', order)
             </div>
             <div className='col-span-2'>
               <p>
-                Fecha de entrega: 
+                Fecha de entrega:
                 {formatDateTime(expectedDeliveryDate).dateOnly}
               </p>
               <ul>

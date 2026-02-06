@@ -72,11 +72,13 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
         setIsLoading(true)
         try {
             const res = await updateStoreSettings(data)
-            if (res.success) {
+            if (res.success && res.data) {
                 await update({
                     user: {
-                        storeId: data.storeId,
-                        storeName: data.storeName,
+                        storeId: res.data.storeId,
+                        storeName: res.data.storeName,
+                        companyId: res.data.companyId,
+                        companyName: res.data.companyName,
                         isStore: true
                     }
                 })

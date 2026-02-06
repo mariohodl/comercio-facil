@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Trash2, Edit, Eye, Plus, Search } from 'lucide-react'
 import { IUser } from '@/lib/db/models/user.model'
@@ -35,14 +35,14 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
     const router = useRouter()
     const t = useTranslations('admin.users')
     const tCommon = useTranslations('common')
-    const [search, setSearch] = React.useState(searchTerm || '')
+    const [search, setSearch] = useState(searchTerm || '')
 
     // Modal state
-    const [isModalOpen, setIsModalOpen] = React.useState(false)
-    const [modalMode, setModalMode] = React.useState<'add' | 'edit' | 'view'>('add')
-    const [selectedUser, setSelectedUser] = React.useState<IUser | null>(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [modalMode, setModalMode] = useState<'add' | 'edit' | 'view'>('add')
+    const [selectedUser, setSelectedUser] = useState<IUser | null>(null)
 
-    const handleSearch = (e: React.FormEvent) => {
+    const handleSearch = (e: FormEvent) => {
         e.preventDefault()
         router.push(`/admin/${storeId}/users?page=1&query=${search}`)
     }
@@ -57,7 +57,7 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-2 md:px-0">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-navy">{t('userName')}</h1>
+                    <h1 className="text-2xl font-bold tracking-tight text-navy">{t('title')}</h1>
                     <p className="text-sm text-muted-foreground">{t('manageUsers')}</p>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import * as React from 'react'
+import { useState, Dispatch, SetStateAction } from 'react'
 import { CalendarIcon } from 'lucide-react'
 import { DateRange } from 'react-day-picker'
 
@@ -20,10 +20,10 @@ export function CalendarDateRangePicker({
   className,
 }: {
   defaultDate?: DateRange
-  setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>
+  setDate: Dispatch<SetStateAction<DateRange | undefined>>
   className?: string
 }) {
-  const [calendarDate, setCalendarDate] = React.useState<DateRange | undefined>(
+  const [calendarDate, setCalendarDate] = useState<DateRange | undefined>(
     defaultDate
   )
 

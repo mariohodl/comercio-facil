@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -47,8 +47,8 @@ interface UserModalProps {
 
 export function UserModal({ isOpen, onClose, storeId, user, mode }: UserModalProps) {
     const t = useTranslations('admin.users')
-    const [showPassword, setShowPassword] = React.useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
     const isAddMode = mode === 'add'
     const isViewMode = mode === 'view'
@@ -71,7 +71,7 @@ export function UserModal({ isOpen, onClose, storeId, user, mode }: UserModalPro
         } as any,
     })
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (isOpen && user) {
             form.reset({
                 name: user.name,

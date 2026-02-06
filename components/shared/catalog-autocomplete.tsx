@@ -129,6 +129,7 @@ export function CatalogAutocomplete({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
+                    type="button"
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
@@ -140,7 +141,10 @@ export function CatalogAutocomplete({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+            <PopoverContent
+                className="w-[var(--radix-popover-trigger-width)] p-0 z-[100] pointer-events-auto"
+                onOpenAutoFocus={(e) => e.preventDefault()}
+            >
                 <Command shouldFilter={false}>
                     <CommandInput
                         placeholder={`Search ${mode}...`}
@@ -159,6 +163,7 @@ export function CatalogAutocomplete({
                                     <p className="text-sm">No {mode} found.</p>
                                     {mode !== 'subCategory' && onCustomCreate && (
                                         <Button
+                                            type="button"
                                             variant="secondary"
                                             size="sm"
                                             className="w-full justify-start"
@@ -182,7 +187,12 @@ export function CatalogAutocomplete({
                                     value={option.name}
                                     onSelect={() => {
                                         onSelect(option)
-                                        showSuccess(`${mode.charAt(0).toUpperCase() + mode.slice(1)} "${option.name}" selected`)
+                                        setOpen(false)
+                                    }}
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        onSelect(option)
                                         setOpen(false)
                                     }}
                                 >

@@ -28,6 +28,7 @@ import {
 } from 'lucide-react'
 import Logo from '@/components/shared/header/logo'
 import { SheetClose } from '@/components/ui/sheet'
+import { usePurchaseFormStore } from '@/hooks/use-purchase-form-store'
 
 export function AdminNav({
   storeId,
@@ -135,22 +136,33 @@ export function AdminNav({
       ],
     },
     {
-      title: t('stock'),
+      title: t('purchases'),
       items: [
         {
-          title: t('manageStock'),
-          href: `/admin/${storeId}/stock/manage`,
+          title: t('purchases'),
+          href: `/admin/${storeId}/purchases`,
+          icon: List,
+          excludes: [`/admin/${storeId}/purchases/create`],
+        },
+        {
+          title: t('addPurchase'),
+          href: `/admin/${storeId}/purchases/create`,
+          icon: PlusSquare,
+        },
+        // {
+        //   title: t('purchaseOrder'),
+        //   href: `/admin/${storeId}/purchases/order`,
+        //   icon: FileText,
+        // },
+        // {
+        //   title: t('purchaseReturn'),
+        //   href: `/admin/${storeId}/purchases/return`,
+        //   icon: RotateCcw,
+        // },
+        {
+          title: t('suppliers'),
+          href: `/admin/${storeId}/proveedores`,
           icon: Package,
-        },
-        {
-          title: t('stockAdjustment'),
-          href: `/admin/${storeId}/stock/adjustment`,
-          icon: ArrowUpRight,
-        },
-        {
-          title: t('stockTransfer'),
-          href: `/admin/${storeId}/stock/transfer`,
-          icon: ArrowLeftRight,
         },
       ],
     },
@@ -183,6 +195,26 @@ export function AdminNav({
           href: `/admin/${storeId}/pos`,
           icon: Monitor,
           hasSubmenu: true,
+        },
+      ],
+    },
+    {
+      title: t('stock'),
+      items: [
+        {
+          title: t('manageStock'),
+          href: `/admin/${storeId}/stock/manage`,
+          icon: Package,
+        },
+        {
+          title: t('stockAdjustment'),
+          href: `/admin/${storeId}/stock/adjustment`,
+          icon: ArrowUpRight,
+        },
+        {
+          title: t('stockTransfer'),
+          href: `/admin/${storeId}/stock/transfer`,
+          icon: ArrowLeftRight,
         },
       ],
     },
@@ -246,7 +278,12 @@ export function AdminNav({
                   <NavLinkWrapper key={itemIndex} asChild>
                     <Link
                       href={item.href}
-                      onClick={handleItemClick}
+                      onClick={() => {
+                        handleItemClick();
+                        if (item.href.endsWith('/purchases/create')) {
+                          usePurchaseFormStore.getState().clearAll();
+                        }
+                      }}
                       className={cn(
                         'flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors',
                         isActive

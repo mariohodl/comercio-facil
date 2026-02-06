@@ -20,7 +20,6 @@ export const ourFileRouter = {
       // If you throw, the user will not be able to upload
       if (!session) throw new UploadThingError('Unauthorized')
       // const params = useSearchParams()
-      // console.log('PIDDD',params.get('id'))
 
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return { userId: session?.user?.id, productId: idValue }

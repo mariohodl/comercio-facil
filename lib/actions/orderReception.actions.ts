@@ -51,7 +51,6 @@ export async function createOrderReception(data: IOrderReceptionInput) {
 				console.log(result)
 			})
 			.catch((error) => {
-				console.log('Error-->', error)
 				throw new Error(formatError(error))
 			})
 
@@ -64,7 +63,6 @@ export async function createOrderReception(data: IOrderReceptionInput) {
 			data: JSON.parse(JSON.stringify(orderReception)),
 		}
 	} catch (error) {
-		console.log('Error-->', error)
 		throw new Error(formatError(error))
 	}
 }
