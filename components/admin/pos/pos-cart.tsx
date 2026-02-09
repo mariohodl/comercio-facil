@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { usePOSStore } from '@/hooks/use-pos-store'
+import { usePOSStore, FRACTIONAL_UNITS } from '@/hooks/use-pos-store'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { formatCurrency } from '@/lib/utils'
-import { Minus, Plus, Trash2, ShoppingBag, ShoppingCart, Printer, ScanLine, Check, ChevronsUpDown, Search } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ShoppingCart, Printer, ScanLine, Check, ChevronsUpDown, Search, CopyPlus } from 'lucide-react'
 import { Switch } from "@/components/ui/switch"
 import { toast } from 'sonner'
 import {
@@ -35,6 +35,64 @@ interface POSCartProps {
     storeId: string
 }
 
+function DecimalQuantityInput({ value, onChange, unit, max, onStockExceeded }: { value: number, onChange: (val: number) => void, unit: string, max: number, onStockExceeded?: () => void }) {
+    const [localValue, setLocalValue] = useState(value.toString())
+
+    useEffect(() => {
+        const parsedLocal = parseFloat(localValue)
+        if (parsedLocal !== value) {
+            setLocalValue(value.toString())
+        }
+    }, [value, localValue])
+
+    const handleBlur = () => {
+        let parsed = parseFloat(localValue)
+        if (isNaN(parsed) || parsed < 0.1) {
+            parsed = 0.1
+        }
+
+        parsed = Math.floor(parsed * 1000) / 1000
+
+        if (parsed > max) {
+            parsed = max
+            onStockExceeded?.()
+        }
+
+        onChange(parsed)
+        setLocalValue(parsed.toString())
+    }
+
+    return (
+        <div className="flex items-center gap-1.5">
+            <Input
+                type="text"
+                inputMode="decimal"
+                value={localValue}
+                onChange={(e) => {
+                    const val = e.target.value.replace(/,/g, '.')
+                    if (val === '' || val === '.' || /^\d*\.?\d*$/.test(val)) {
+                        setLocalValue(val)
+                        let parsed = parseFloat(val)
+                        if (!isNaN(parsed)) {
+                            parsed = Math.floor(parsed * 1000) / 1000
+                            if (parsed > max) {
+                                setLocalValue(max.toString())
+                                onChange(max)
+                                onStockExceeded?.()
+                            } else {
+                                onChange(parsed)
+                            }
+                        }
+                    }
+                }}
+                onBlur={handleBlur}
+                className="w-20 h-7 text-center text-xs font-bold bg-white border-blue-100 focus-visible:ring-1 focus-visible:ring-blue-400 p-0 shadow-inner"
+            />
+            <span className="text-[10px] font-bold text-blue-700 uppercase">{unit}</span>
+        </div>
+    )
+}
+
 export default function POSCart({ storeId }: POSCartProps) {
     const t = useTranslations('pos')
     const {
@@ -46,6 +104,7 @@ export default function POSCart({ storeId }: POSCartProps) {
         clearCart,
         setCart,
         addToCart,
+        duplicateItem,
         customerId: selectedCustomer,
         setCustomerId: setSelectedCustomer
     } = usePOSStore()
@@ -87,6 +146,11 @@ export default function POSCart({ storeId }: POSCartProps) {
         changeGiven: number
         isPaid: boolean
     } | null>(null)
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     const total = totalPrice()
     const subtotal = total
@@ -133,7 +197,7 @@ export default function POSCart({ storeId }: POSCartProps) {
                             {t('orders')}
                         </Button>
                         <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs px-2 py-0.5">
-                            #{orderNumber}
+                            #{mounted ? orderNumber : '......'}
                         </Badge>
                     </div>
                 </div>
@@ -254,89 +318,133 @@ export default function POSCart({ storeId }: POSCartProps) {
                     ) : (
                         <div className="p-3 space-y-2">
 
-                            {cart.map((item) => (
-                                <div
-                                    key={`${item.product}-${item.variantSku || 'base'}`}
-                                    className="flex items-start gap-2 p-2 bg-white rounded-lg border border-gray-100 hover:border-blue-200 transition-colors"
-                                >
-                                    <div className="flex-1 space-y-1">
-                                        <div className="flex items-start justify-between">
-                                            <div>
-                                                <p className="font-semibold text-xs text-gray-900 leading-tight">
-                                                    {item.name}
-                                                </p>
-                                                {item.variantDetails && (
-                                                    <p className="text-[10px] text-gray-500 mt-0.5">
-                                                        {item.variantDetails}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-5 w-5 text-gray-400 hover:text-red-600 -mt-0.5"
-                                                onClick={() => removeFromCart(item.product, item.variantSku)}
-                                            >
-                                                <Trash2 className="h-3 w-3" />
-                                            </Button>
-                                        </div>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-1.5">
-                                                <div className="flex items-center border border-gray-200 rounded">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-6 w-6 rounded-r-none hover:bg-gray-100"
-                                                        onClick={() => {
-                                                            if (item.quantity > 1) {
-                                                                updateQuantity(item.product, item.quantity - 1, item.variantSku)
-                                                            } else {
-                                                                removeFromCart(item.product, item.variantSku)
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Minus className="h-2.5 w-2.5" />
-                                                    </Button>
-                                                    <span className="w-8 text-center text-xs font-medium border-x border-gray-200">
-                                                        {item.quantity}
-                                                    </span>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-6 w-6 rounded-l-none hover:bg-gray-100"
-                                                        onClick={() => {
-                                                            if (item.quantity < item.countInStock) {
-                                                                updateQuantity(item.product, item.quantity + 1, item.variantSku)
-                                                            } else {
-                                                                toast.error(t('insufficientStock'), {
-                                                                    description: `${t('onlyUnitsAvailable', { count: item.countInStock })} ${item.unit}`
-                                                                })
-                                                            }
-                                                        }}
-                                                        disabled={item.quantity >= item.countInStock}
-                                                    >
-                                                        <Plus className="h-2.5 w-2.5" />
-                                                    </Button>
-                                                </div>
+                            {cart.map((item) => {
+                                const isFractional = FRACTIONAL_UNITS.includes(item.unit?.toLowerCase())
 
-                                                <div className="flex flex-col items-end">
-                                                    <span className="text-[10px] text-gray-500">
-                                                        × {formatCurrency(item.price)}
-                                                    </span>
-                                                    {item.countInStock <= 5 && (
-                                                        <span className="text-[9px] text-orange-600 font-medium">
-                                                            {item.countInStock - item.quantity} {item.unit} {t('left')}
-                                                        </span>
+                                return (
+                                    <div
+                                        key={item.cartItemId}
+                                        className="flex items-start gap-2 p-2 bg-white rounded-lg border border-gray-100 hover:border-blue-200 transition-colors"
+                                    >
+                                        <div className="flex-1 space-y-1">
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <p className="font-semibold text-xs text-gray-900 leading-tight">
+                                                        {item.name}
+                                                    </p>
+                                                    {item.variantDetails && (
+                                                        <p className="text-[10px] text-gray-500 mt-0.5">
+                                                            {item.variantDetails}
+                                                        </p>
                                                     )}
                                                 </div>
+                                                <div className="flex items-center gap-1">
+                                                    {isFractional && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-5 w-5 text-gray-400 hover:text-blue-600 -mt-0.5"
+                                                            onClick={() => duplicateItem(item.cartItemId)}
+                                                            title={t('duplicate')}
+                                                        >
+                                                            <CopyPlus className="h-3 w-3" />
+                                                        </Button>
+                                                    )}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-5 w-5 text-gray-400 hover:text-red-600 -mt-0.5"
+                                                        onClick={() => removeFromCart(item.cartItemId)}
+                                                    >
+                                                        <Trash2 className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
                                             </div>
-                                            <span className="font-bold text-xs text-gray-900">
-                                                {formatCurrency(item.price * item.quantity)}
-                                            </span>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-1.5">
+                                                    {(() => {
+                                                        const totalOthers = cart
+                                                            .filter((i) => i.cartItemId !== item.cartItemId && i.product === item.product && i.variantSku === (item.variantSku || undefined))
+                                                            .reduce((sum, i) => sum + i.quantity, 0);
+                                                        const maxForThisItem = Math.max(0, Math.floor((item.countInStock - totalOthers) * 1000) / 1000);
+
+                                                        if (isFractional) {
+                                                            return (
+                                                                <div className="flex items-center gap-1.5 border border-blue-200 bg-blue-50/50 rounded-md px-2 py-1 shadow-sm">
+                                                                    <DecimalQuantityInput
+                                                                        value={item.quantity}
+                                                                        onChange={(val) => updateQuantity(item.cartItemId, val)}
+                                                                        unit={item.unit}
+                                                                        max={maxForThisItem}
+                                                                        onStockExceeded={() => {
+                                                                            toast.error(t('insufficientStock'), {
+                                                                                description: `${t('onlyUnitsAvailable', { count: item.countInStock })} ${item.unit}`
+                                                                            })
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            )
+                                                        } else {
+                                                            return (
+                                                                <div className="flex items-center border border-gray-200 rounded">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className="h-6 w-6 rounded-r-none hover:bg-gray-100"
+                                                                        onClick={() => {
+                                                                            if (item.quantity > 1) {
+                                                                                updateQuantity(item.cartItemId, item.quantity - 1)
+                                                                            } else {
+                                                                                removeFromCart(item.cartItemId)
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <Minus className="h-2.5 w-2.5" />
+                                                                    </Button>
+                                                                    <span className="w-8 text-center text-xs font-medium border-x border-gray-200">
+                                                                        {item.quantity}
+                                                                    </span>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        className="h-6 w-6 rounded-l-none hover:bg-gray-100"
+                                                                        onClick={() => {
+                                                                            if (item.quantity < maxForThisItem) {
+                                                                                updateQuantity(item.cartItemId, item.quantity + 1)
+                                                                            } else {
+                                                                                toast.error(t('insufficientStock'), {
+                                                                                    description: `${t('onlyUnitsAvailable', { count: item.countInStock })} ${item.unit}`
+                                                                                })
+                                                                            }
+                                                                        }}
+                                                                        disabled={item.quantity >= maxForThisItem}
+                                                                    >
+                                                                        <Plus className="h-2.5 w-2.5" />
+                                                                    </Button>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    })()}
+
+                                                    <div className="flex flex-col items-end">
+                                                        <span className="text-[10px] text-gray-500">
+                                                            × {formatCurrency(item.price)}<span className="text-gray-400">/{item.unit}</span>
+                                                        </span>
+                                                        {item.countInStock <= 5 && (
+                                                            <span className="text-[9px] text-orange-600 font-medium">
+                                                                {item.countInStock - item.quantity} {item.unit} {t('left')}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <span className="font-bold text-xs text-gray-900">
+                                                    {formatCurrency(item.price * item.quantity)}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     )}
                 </ScrollArea>

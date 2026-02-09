@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, Minus, AlertCircle, Layers, AlertTriangle } from 'lucide-react'
 import { IProduct } from '@/lib/db/models/product.model'
-import { usePOSStore } from '@/hooks/use-pos-store'
+import { usePOSStore, FRACTIONAL_UNITS } from '@/hooks/use-pos-store'
 import { formatCurrency } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import VariantSelectorDialog from './variant-selector-dialog'
@@ -23,17 +23,42 @@ export default function ProductCard({ product }: ProductCardProps) {
     const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false)
 
     const hasVariants = product.variants && product.variants.length > 0
-    const isOutOfStock = product.countInStock <= 0
-    const isLowStock = product.countInStock <= product.quantityAlert && !isOutOfStock
-    const isCriticalStock = product.countInStock <= 3 && !isOutOfStock
+
+    // Calculate aggregate stock if has variants, otherwise use product stock
+    const effectiveStock = hasVariants
+        ? product.variants!.reduce((acc, v) => acc + (v.countInStock || 0), 0)
+        : product.countInStock
+
+    const isOutOfStock = effectiveStock <= 0
+    const isLowStock = effectiveStock <= (product.quantityAlert || 5) && !isOutOfStock
+    const isCriticalStock = effectiveStock <= 3 && !isOutOfStock
+
+    const unit = ((product as any).unitId?.abbreviation || product.unit || '').toLowerCase()
+    const isFractional = FRACTIONAL_UNITS.includes(unit)
 
     // Calculate total quantity of this product in cart (summing all variants)
     const cartItems = cart.filter(item => item.product === product._id)
-    const totalCartQty = cartItems.reduce((acc, item) => acc + item.quantity, 0)
+    const totalCartQty = Math.floor(cartItems.reduce((acc, item) => acc + item.quantity, 0) * 1000) / 1000
 
     // Price to display
-    const displayPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.listPrice
+    let displayPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.listPrice
+    let hasPriceRange = false
+
+    if (hasVariants) {
+        const variantPrices = product.variants!.map(v => v.discountPrice && v.discountPrice > 0 ? v.discountPrice : v.listPrice)
+        const minPrice = Math.min(...variantPrices)
+        const maxPrice = Math.max(...variantPrices)
+
+        displayPrice = minPrice
+        if (minPrice !== maxPrice) {
+            hasPriceRange = true
+        }
+    }
+
     const originalPrice = product.listPrice
+
+    // Get unit abbreviation if available, otherwise use full unit name
+    const displayUnit = (product as any).unitId?.name || product.unit
 
     const handleCardClick = () => {
         if (isOutOfStock) {
@@ -46,15 +71,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         if (hasVariants) {
             setIsVariantDialogOpen(true)
         } else {
-            if (totalCartQty >= product.countInStock) {
+            if (totalCartQty >= effectiveStock) {
                 toast.error(t('insufficientStock'), {
-                    description: `${t('onlyUnitsAvailable', { count: product.countInStock })} ${product.unit}`
+                    description: `${t('onlyUnitsAvailable', { count: effectiveStock })} ${product.unit}`
                 })
                 return
             }
             addToCart(product)
             if (isLowStock) {
-                const remaining = product.countInStock - totalCartQty - 1
+                const remaining = effectiveStock - totalCartQty - 1
                 toast.warning(t('stockWarning'), {
                     description: `${t('unitsRemaining', { count: remaining })} ${product.unit}`
                 })
@@ -67,26 +92,26 @@ export default function ProductCard({ product }: ProductCardProps) {
         if (hasVariants) {
             setIsVariantDialogOpen(true)
         } else {
-            if (totalCartQty >= product.countInStock) {
+            if (totalCartQty >= effectiveStock) {
                 toast.error(t('insufficientStock'), {
-                    description: `${t('onlyUnitsAvailable', { count: product.countInStock })} ${product.unit}`
+                    description: `${t('onlyUnitsAvailable', { count: effectiveStock })} ${product.unit}`
                 })
                 return
             }
 
             const item = cartItems[0]
             if (item) {
-                updateQuantity(product._id, item.quantity + 1)
+                updateQuantity(item.cartItemId, item.quantity + 1)
             } else {
                 addToCart(product)
             }
 
-            if (totalCartQty + 1 >= product.countInStock) {
+            if (totalCartQty + 1 >= effectiveStock) {
                 toast.warning(t('lastUnit'), {
-                    description: `${t('allUnitsAdded')} (${product.countInStock} ${product.unit})`
+                    description: `${t('allUnitsAdded')} (${effectiveStock} ${product.unit})`
                 })
             } else if (isLowStock) {
-                const remaining = product.countInStock - totalCartQty - 1
+                const remaining = effectiveStock - totalCartQty - 1
                 toast.warning(t('stockWarning'), {
                     description: `${t('unitsRemaining', { count: remaining })} ${product.unit}`
                 })
@@ -102,9 +127,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             const item = cartItems[0]
             if (item) {
                 if (item.quantity > 1) {
-                    updateQuantity(product._id, item.quantity - 1)
+                    updateQuantity(item.cartItemId, item.quantity - 1)
                 } else {
-                    removeFromCart(product._id)
+                    removeFromCart(item.cartItemId)
                 }
             }
         }
@@ -138,19 +163,18 @@ export default function ProductCard({ product }: ProductCardProps) {
                         {isLowStock && !hasVariants && (
                             <div className="absolute top-2 left-2 z-10">
                                 <Badge
-                                    variant="outline"
                                     className={`shadow-sm ${isCriticalStock ? 'bg-red-50 text-red-700 border-red-300 animate-pulse' : 'bg-orange-50 text-orange-700 border-orange-200'}`}
                                 >
                                     {isCriticalStock ? <AlertTriangle className="h-3 w-3 mr-1" /> : <AlertCircle className="h-3 w-3 mr-1" />}
-                                    {isCriticalStock ? `${product.countInStock} ${product.unit}` : t('lowStock')}
+                                    {isCriticalStock ? `${effectiveStock} ${product.unit}` : t('lowStock')}
                                 </Badge>
                             </div>
                         )}
 
                         {hasVariants && (
                             <div className="absolute top-2 left-2 z-10">
-                                <Badge variant="secondary" className="bg-white/90 text-gray-700 shadow-sm backdrop-blur-sm">
-                                    <Layers className="h-3 w-3 mr-1" />
+                                <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-blue-100 flex items-center gap-1 shadow-sm backdrop-blur-sm">
+                                    <Layers className="w-3 h-3" />
                                     {t('variants', { count: product.variants?.length || 0 })}
                                 </Badge>
                             </div>
@@ -194,21 +218,26 @@ export default function ProductCard({ product }: ProductCardProps) {
                         {/* Price & Actions Row */}
                         <div className="flex items-end justify-between mt-2">
                             <div className="flex flex-col">
-                                <span className="text-lg font-bold text-gray-900 leading-none">
-                                    {hasVariants ? (
-                                        <span className="text-sm font-normal text-gray-500 mr-1">{t('from')}</span>
-                                    ) : null}
-                                    {formatCurrency(displayPrice)}
+                                <div className="flex flex-col">
+                                    <div className="flex items-baseline gap-1">
+                                        {hasPriceRange && <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Desde</span>}
+                                        <span className="text-sm lg:text-base font-black text-slate-900 tracking-tight">
+                                            {formatCurrency(displayPrice)}
+                                        </span>
+                                    </div>
+                                    {originalPrice > displayPrice && !hasPriceRange && (
+                                        <span className="text-[10px] text-slate-400 line-through font-bold">
+                                            {formatCurrency(originalPrice)}
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="text-xs font-normal text-gray-500 ml-0.5">
+                                    {t('perUnit', { unit: displayUnit })}
                                 </span>
-                                {product.discountPrice && product.discountPrice > 0 ? (
-                                    <span className="text-xs text-gray-400 line-through mt-0.5">
-                                        {formatCurrency(originalPrice)}
-                                    </span>
-                                ) : null}
                             </div>
 
                             {/* Cart Controls for Simple Products */}
-                            {!hasVariants && !isOutOfStock && totalCartQty > 0 ? (
+                            {!hasVariants && !isOutOfStock && totalCartQty > 0 && !isFractional ? (
                                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5" onClick={(e) => e.stopPropagation()}>
                                     <Button
                                         size="icon"

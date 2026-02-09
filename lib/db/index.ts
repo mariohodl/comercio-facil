@@ -18,6 +18,7 @@ export const connectToDatabase = async (
 		await import('./models/store.model');
 		await import('./models/company.model');
 		await import('./models/warehouse.model');
+		await import('./models/attribute.model');
 	}
 
 	return cached.conn;

@@ -1,6 +1,7 @@
 'use server'
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
+import '@/lib/db/models/unit.model' // Import to register Unit schema for population
 import { PAGE_SIZE } from '@/lib/constants'
 import { revalidatePath } from 'next/cache'
 import { formatError } from '../utils'
@@ -288,6 +289,7 @@ export async function getAllProductsForAdmin({
 					{ name: { $regex: query, $options: 'i' } },
 					{ sku: { $regex: query, $options: 'i' } },
 					{ itemBarcode: { $regex: query, $options: 'i' } },
+					{ 'variants.sku': { $regex: query, $options: 'i' } },
 					{ 'variants.barcode': { $regex: query, $options: 'i' } },
 				],
 			}
@@ -312,6 +314,7 @@ export async function getAllProductsForAdmin({
 		...brandFilter,
 		...storeFilter,
 	})
+		.populate('unitId', 'abbreviation name')
 		.sort(order)
 		.skip(pageSize * (Number(page) - 1))
 		.limit(pageSize)

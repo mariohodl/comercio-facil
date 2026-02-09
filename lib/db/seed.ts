@@ -1,10 +1,10 @@
+import './env-config';
 import data from '@/lib/data';
 import User from './models/user.model';
 import Review from './models/review.model'
 import { connectToDatabase } from '.';
 import Product from './models/product.model';
 import { cwd } from 'process';
-import { loadEnvConfig } from '@next/env';
 import { IReviewInput } from '@/types'
 import Category from './models/category.model'
 import Brand from './models/brand.model'
@@ -17,8 +17,6 @@ import Store from './models/store.model'
 import Warehouse from './models/warehouse.model'
 import Customer from './models/customer.model'
 import Order from './models/order.model'
-
-loadEnvConfig(cwd());
 
 const main = async () => {
   try {
@@ -117,7 +115,10 @@ const main = async () => {
     await Attribute.deleteMany();
     const attributesToInsert = attributes.map(attr => ({
       ...attr,
-      store: createdStores[0].slug,
+      storeId: (attr as any).storeId || createdStores[0].slug,
+      isGlobal: (attr as any).isGlobal ?? true,
+      isApproved: (attr as any).isApproved ?? true,
+      industry: (attr as any).industry || 'general'
     }));
     const createdAttributes = await Attribute.insertMany(attributesToInsert);
 

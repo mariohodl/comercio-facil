@@ -20,6 +20,7 @@ import {
 import { getCategorySuggestions, getBrandSuggestions, getSubCategorySuggestions, getUnitSuggestions } from '@/lib/actions/catalog.actions'
 import { useDebounce } from '@/hooks/use-debounce'
 import { useToast } from '@/hooks/use-toast'
+import { useTranslations } from 'next-intl'
 
 interface Option {
     _id: string
@@ -56,6 +57,22 @@ export function CatalogAutocomplete({
     const [loading, setLoading] = useState(false)
     const debouncedQuery = useDebounce(query, 300)
 
+    const tCommon = useTranslations('common')
+    const tInventory = useTranslations('inventory')
+    const tProducts = useTranslations('products')
+
+    const getModeLabel = (m: string) => {
+        switch (m) {
+            case 'category': return tInventory('category') || 'Category';
+            case 'brand': return tInventory('brand') || 'Brand';
+            case 'subCategory': return tInventory('subCategory') || 'Subcategory';
+            case 'unit': return tProducts('unit') || 'Unit';
+            default: return m;
+        }
+    };
+
+    const normalize = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
     // Initially sync suggestions with initialOptions
     useEffect(() => {
         if (!query) {
@@ -67,7 +84,7 @@ export function CatalogAutocomplete({
         const fetchSuggestions = async () => {
             // Local filtering of initialOptions
             const localResults = initialOptions.filter(opt =>
-                opt.name.toLowerCase().includes(debouncedQuery.toLowerCase())
+                normalize(opt.name).includes(normalize(debouncedQuery))
             )
 
             // Perform server fetch
@@ -136,7 +153,7 @@ export function CatalogAutocomplete({
                     className="w-full justify-between h-10"
                 >
                     <span className="truncate">
-                        {value ? value : placeholder}
+                        {value ? value : (placeholder === "Select..." ? tProducts('select') : placeholder)}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -147,7 +164,7 @@ export function CatalogAutocomplete({
             >
                 <Command shouldFilter={false}>
                     <CommandInput
-                        placeholder={`Search ${mode}...`}
+                        placeholder={tCommon('searchPlaceholder', { item: getModeLabel(mode) })}
                         value={query}
                         onValueChange={setQuery}
                     />

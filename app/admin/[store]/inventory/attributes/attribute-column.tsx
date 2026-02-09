@@ -23,6 +23,20 @@ export const getColumns = (t: any, tCommon: any): ColumnDef<IAttribute>[] => [
     {
         accessorKey: 'name',
         header: t('name'),
+        cell: ({ row }) => {
+            const name = row.original.name
+            const isGlobal = row.original.isGlobal
+            return (
+                <div className="flex items-center gap-2">
+                    <span className="font-medium text-navy">{name}</span>
+                    {isGlobal && (
+                        <span className="px-1.5 py-0.5 rounded-md text-[10px] bg-blue-100 text-blue-600 font-bold uppercase tracking-tight border border-blue-200">
+                            Global
+                        </span>
+                    )}
+                </div>
+            )
+        }
     },
     {
         accessorKey: 'values',
@@ -33,15 +47,23 @@ export const getColumns = (t: any, tCommon: any): ColumnDef<IAttribute>[] => [
         },
     },
     {
-        accessorKey: 'createdAt',
-        header: tCommon('createdDate'),
+        accessorKey: 'isApproved',
+        header: tCommon('approved'),
         cell: ({ row }) => {
-            return <span>{format(new Date(row.original.createdAt), 'dd MMM yyyy')}</span>
+            const isApproved = row.original.isApproved
+            return (
+                <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${isApproved ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'
+                        }`}
+                >
+                    {isApproved ? tCommon('yes') : tCommon('no')}
+                </span>
+            )
         },
     },
     {
         accessorKey: 'status',
-        header: t('status'),
+        header: tCommon('status'),
         cell: ({ row }) => {
             const status = row.original.status
             return (
@@ -73,7 +95,7 @@ const CellAction: React.FC<CellActionProps> = ({ data }) => {
     const onDelete = async () => {
         try {
             setLoading(true)
-            const res = await deleteAttribute(data._id, data.store)
+            const res = await deleteAttribute(data._id, data.storeId || '')
             if (res.success) {
                 showSuccess(t('deletedSuccessfully'))
             } else {
@@ -89,7 +111,7 @@ const CellAction: React.FC<CellActionProps> = ({ data }) => {
     return (
         <>
             <AttributeDialog
-                storeId={data.store}
+                storeId={data.storeId || ''}
                 attribute={data}
                 open={open}
                 onOpenChange={setOpen}

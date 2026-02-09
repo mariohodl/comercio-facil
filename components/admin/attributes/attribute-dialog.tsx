@@ -85,7 +85,7 @@ export function AttributeDialog({
                 const res = await createAttribute({
                     name: values.name,
                     values: formattedValues,
-                    store: storeId,
+                    storeId: storeId,
                     status: values.status,
                 })
                 if (res.success) {

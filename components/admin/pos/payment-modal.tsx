@@ -106,7 +106,7 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                 body: JSON.stringify({
                     items: cart,
                     paymentMethod: isUnpaid ? 'Cash' : data.paymentMethod,
-                    paymentSplits: isUnpaid ? [] : [{ method: 'Cash', amount: total }],
+                    paymentSplits: isUnpaid ? [] : [{ method: data.paymentMethod === 'Split' ? 'Cash' : data.paymentMethod, amount: total }],
                     totalPrice: total,
                     receivedAmount: isUnpaid ? 0 : (data.receivedAmount || 0),
                     change: isUnpaid ? 0 : ((data.receivedAmount || 0) - total),
@@ -160,18 +160,29 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        {/* Hidden Payment Method Selection - For now defaulting to Cash UI but supporting Unpaid via button */}
-                        <div className="hidden">
+                        <div className="space-y-4">
                             <FormField
                                 control={form.control}
                                 name="paymentMethod"
                                 render={({ field }) => (
-                                    <Input {...field} value="Cash" />
+                                    <FormItem>
+                                        <FormLabel>{tPOS('paymentModal.paymentMethod') || 'Payment Method'}</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select method" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="Cash">{tPOS('ordersModal.paymentMethods.cash')}</SelectItem>
+                                                <SelectItem value="Card">{tPOS('ordersModal.paymentMethods.card')}</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
                                 )}
                             />
-                        </div>
 
-                        <div className="space-y-4">
                             <FormField
                                 control={form.control}
                                 name="fulfillmentType"
@@ -210,56 +221,60 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="receivedAmount"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{tPOS('paymentModal.amountReceived')}</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" step="0.01" {...field} className="text-lg font-bold" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <div className="grid grid-cols-4 gap-2">
-                                {[10, 20, 50, 100].map((amount) => (
-                                    <Button
-                                        key={amount}
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleQuickCash(amount)}
-                                    >
-                                        ${amount}
-                                    </Button>
-                                ))}
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleQuickCash(total)}
-                                    className="col-span-2"
-                                >
-                                    {tPOS('paymentModal.exact')} ({formatCurrency(total)})
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleQuickCash(Math.ceil(total))}
-                                    className="col-span-2"
-                                >
-                                    {tPOS('paymentModal.roundUp')} ({formatCurrency(Math.ceil(total))})
-                                </Button>
-                            </div>
-                            <div className="rounded-lg bg-muted p-4 text-center">
-                                <p className="text-sm text-muted-foreground">{tPOS('paymentModal.change')}</p>
-                                <p className={`text-2xl font-bold ${change < 0 ? 'text-destructive' : 'text-green-600'}`}>
-                                    {formatCurrency(change)}
-                                </p>
-                            </div>
+                            {paymentMethod === 'Cash' && (
+                                <>
+                                    <FormField
+                                        control={form.control}
+                                        name="receivedAmount"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{tPOS('paymentModal.amountReceived')}</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" step="0.01" {...field} className="text-lg font-bold" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {[10, 20, 50, 100].map((amount) => (
+                                            <Button
+                                                key={amount}
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleQuickCash(amount)}
+                                            >
+                                                ${amount}
+                                            </Button>
+                                        ))}
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleQuickCash(total)}
+                                            className="col-span-2"
+                                        >
+                                            {tPOS('paymentModal.exact')} ({formatCurrency(total)})
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleQuickCash(Math.ceil(total))}
+                                            className="col-span-2"
+                                        >
+                                            {tPOS('paymentModal.roundUp')} ({formatCurrency(Math.ceil(total))})
+                                        </Button>
+                                    </div>
+                                    <div className="rounded-lg bg-muted p-4 text-center">
+                                        <p className="text-sm text-muted-foreground">{tPOS('paymentModal.change')}</p>
+                                        <p className={`text-2xl font-bold ${change < 0 ? 'text-destructive' : 'text-green-600'}`}>
+                                            {formatCurrency(change)}
+                                        </p>
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <div className="flex flex-col gap-3 pt-4">

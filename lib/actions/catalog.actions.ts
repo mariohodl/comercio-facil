@@ -5,7 +5,7 @@ import Category from '@/lib/db/models/category.model';
 import SubCategory from '@/lib/db/models/sub-category.model';
 import Brand from '@/lib/db/models/brand.model';
 import Unit from '@/lib/db/models/unit.model';
-import { globalCatalog } from '@/lib/data';
+import data, { globalCatalog } from '@/lib/data';
 import { normalizeText } from '@/lib/catalog-utils';
 
 
@@ -99,27 +99,72 @@ export async function seedGlobalCatalog() {
                 }
 
                 // Upsert Units (Industry wide or General)
-                for (const unitName of catData.units) {
+                for (const unit of catData.units) {
+                    let unitName = '';
+                    let unitAbbrev = '';
+                    let unitStatus = true;
+
+                    if (typeof unit === 'string') {
+                        unitName = unit;
+                        unitAbbrev = unit.substring(0, 3).toLowerCase();
+                    } else {
+                        unitName = unit.name;
+                        unitAbbrev = unit.abbreviation;
+                        unitStatus = unit.status;
+                    }
+
                     // Units are mostly universal (Case-insensitive search with actual name)
                     const unitExists = await Unit.findOne({
-                        name: { $regex: new RegExp(`^${unitName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+                        $or: [
+                            { name: { $regex: new RegExp(`^${unitName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } },
+                            { abbreviation: { $regex: new RegExp(`^${unitAbbrev.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } }
+                        ],
                         isGlobal: true
                     });
                     try {
                         if (!unitExists) {
                             await Unit.create({
                                 name: unitName,
-                                abbreviation: unitName.substring(0, 3).toLowerCase(),
+                                abbreviation: unitAbbrev,
                                 industry: 'general', // Units should ideally be general
                                 isGlobal: true,
                                 isApproved: true,
-                                status: true
+                                status: unitStatus
                             });
                             results.units++;
                         }
                     } catch (error) {
                         // console.error(`Skipping unit ${unitName} due to error:`, error);
                     }
+                }
+            }
+        }
+
+        // Seed Units from data.ts
+        if (data && data.units) {
+            for (const unit of data.units) {
+                const unitExists = await Unit.findOne({
+                    $or: [
+                        { name: { $regex: new RegExp(`^${unit.name}$`, 'i') } },
+                        { abbreviation: { $regex: new RegExp(`^${unit.abbreviation}$`, 'i') } }
+                    ],
+                    isGlobal: true
+                });
+
+                try {
+                    if (!unitExists) {
+                        await Unit.create({
+                            name: unit.name,
+                            abbreviation: unit.abbreviation,
+                            industry: 'general',
+                            isGlobal: true,
+                            isApproved: true,
+                            status: unit.status
+                        });
+                        results.units++;
+                    }
+                } catch (error) {
+                    console.error(`Skipping unit ${unit.name} due to error:`, error);
                 }
             }
         }

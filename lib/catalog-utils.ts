@@ -62,6 +62,7 @@ export async function suggestCategories(query: string, industry: string) {
         isApproved: true,
         $or: [
             { categoryName: { $regex: normalized, $options: 'i' } },
+            { categorySlug: { $regex: normalized, $options: 'i' } },
             { synonyms: { $in: [new RegExp(normalized, 'i')] } }
         ]
     }).limit(100).lean();
@@ -81,7 +82,10 @@ export async function suggestSubCategories(query: string, categoryId?: string, i
     const normalized = normalizeText(query);
     const filter: any = {
         isApproved: true,
-        name: { $regex: normalized, $options: 'i' }
+        $or: [
+            { name: { $regex: normalized, $options: 'i' } },
+            { slug: { $regex: normalized, $options: 'i' } }
+        ]
     };
 
     if (categoryId) filter.parentCategory = categoryId;
@@ -103,6 +107,7 @@ export async function suggestBrands(query: string, industry: string) {
         isApproved: true,
         $or: [
             { name: { $regex: normalized, $options: 'i' } },
+            { slug: { $regex: normalized, $options: 'i' } },
             { synonyms: { $in: [new RegExp(normalized, 'i')] } }
         ]
     }).limit(100).lean();

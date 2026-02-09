@@ -24,7 +24,12 @@ export default function ProductSearch({ storeId, selectedCategory, onCategoryCha
     const [query, setQuery] = useState('')
     const [products, setProducts] = useState<IProduct[]>([])
     const [loading, setLoading] = useState(false)
+    const [mounted, setMounted] = useState(false)
     const { cart } = usePOSStore()
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
     const debouncedQuery = useDebounce(query, 500)
     const t = useTranslations('pos')
     const tCommon = useTranslations('common')
@@ -83,9 +88,9 @@ export default function ProductSearch({ storeId, selectedCategory, onCategoryCha
                     {/* Welcome Text */}
                     <div className="min-w-max">
                         <h2 className="text-lg font-bold tracking-tight text-gray-900">
-                            {t('welcome')}, {session?.user?.name?.split(' ')[0] || 'Vendedor'}
+                            {t('welcome')}, {mounted ? (session?.user?.name?.split(' ')[0] || 'Vendedor') : '...'}
                         </h2>
-                        <p className="text-xs text-gray-500 capitalize">{currentDate}</p>
+                        <p className="text-xs text-gray-500 capitalize">{mounted ? currentDate : '...'}</p>
                     </div>
 
                     {/* Search Bar */}

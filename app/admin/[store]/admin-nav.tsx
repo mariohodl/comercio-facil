@@ -192,7 +192,7 @@ export function AdminNav({
         },
         {
           title: t('pos'),
-          href: `/admin/${storeId}/pos`,
+          href: `/admin/pos/${storeId}`,
           icon: Monitor,
           hasSubmenu: true,
         },

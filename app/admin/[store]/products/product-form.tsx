@@ -64,7 +64,7 @@ const productDefaultValues: IProductInput =
       numReviews: 0,
       avgRating: 0,
       numSales: 0,
-      isPublished: false,
+      isPublished: true,
       productId: 0,
       tags: [],
       ratingDistribution: [],
@@ -101,7 +101,7 @@ const productDefaultValues: IProductInput =
       numReviews: 0,
       avgRating: 0,
       numSales: 0,
-      isPublished: false,
+      isPublished: true,
       productId: 0,
       tags: [],
       ratingDistribution: [],
@@ -289,7 +289,7 @@ const ProductForm = ({
     const discountValue = Number(newVariantData.discountValue) || 0
     const discountType = newVariantData.discountType
 
-    let calculatedDiscountPrice = 0
+    let calculatedDiscountPrice = listPrice
 
     if (discountType && discountValue > 0 && listPrice > 0) {
       if (discountType === 'Percentage') {
@@ -401,7 +401,7 @@ const ProductForm = ({
     const listPriceNum = Number(listPrice) || 0
     const discountValueNum = Number(discountValue) || 0
 
-    let calculatedDiscountPrice = 0
+    let calculatedDiscountPrice = listPriceNum
 
     if (discountType && discountValueNum > 0 && listPriceNum > 0) {
       if (discountType === 'Percentage') {
@@ -1082,7 +1082,12 @@ const ProductForm = ({
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                               {attributes.map((attr) => (
                                 <div key={attr._id} className="space-y-2">
-                                  <label className="text-xs font-medium text-gray-500 uppercase">{attr.name}</label>
+                                  <div className="flex items-center gap-2">
+                                    <label className="text-xs font-medium text-gray-500 uppercase">{attr.name}</label>
+                                    {(attr as any).isGlobal && (
+                                      <span className="px-1 py-0 rounded text-[8px] bg-blue-50 text-blue-600 font-bold border border-blue-100 uppercase">Global</span>
+                                    )}
+                                  </div>
                                   <Select
                                     value={builderAttributes[attr.name]?.[0] || ''}
                                     onValueChange={(value) => {
@@ -1657,34 +1662,33 @@ const ProductForm = ({
               )}
 
               {form.watch('productType') === 'Single Product' && (
-                <div className="space-y-6 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="space-y-4 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 items-start">
+                  {/* First Row: Pricing + Inventory */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
                     {/* Pricing Section */}
-                    <Card className="lg:col-span-2 border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
-                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
+                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-3">
                         <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
                           <span className="text-orange">💰</span> {t('pricing')}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="p-3 space-y-3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <CardContent className="p-4">
+                        <div className="grid grid-cols-3 gap-4">
                           <FormField
                             control={form.control}
                             name='costPerUnit'
                             render={({ field }) => (
-                              <FormItem className="flex-1">
-                                <FormLabel className="gap-1.5">
+                              <FormItem>
+                                <FormLabel className="text-sm flex items-center gap-1">
                                   {t('costPerUnit')} <span className="text-red-500">*</span>
                                   <HelpTooltip content={t('help.costPerUnit')} />
                                 </FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' step='0.01' min="0" placeholder={t('enterCost')} {...field} className="pl-9 h-10" />
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                      <span className="text-gray-500 text-sm">$</span>
-                                    </div>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                                    <Input type='number' step='0.01' min="0" placeholder="0" {...field} className="pl-9 h-10" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -1695,17 +1699,15 @@ const ProductForm = ({
                             control={form.control}
                             name='listPrice'
                             render={({ field }) => (
-                              <FormItem className="flex-1">
-                                <FormLabel className="gap-1.5">
+                              <FormItem>
+                                <FormLabel className="text-sm flex items-center gap-1">
                                   {t('listPrice')} <span className="text-red-500">*</span>
                                   <HelpTooltip content={t('help.listPrice')} />
                                 </FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' step='0.01' min="0" placeholder={t('enterListPrice')} {...field} className="pl-9 h-10" />
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                      <span className="text-gray-500 text-sm">$</span>
-                                    </div>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                                    <Input type='number' step='0.01' min="0" placeholder="0" {...field} className="pl-9 h-10" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -1716,71 +1718,25 @@ const ProductForm = ({
                             control={form.control}
                             name='discountPrice'
                             render={({ field }) => (
-                              <FormItem className="flex-1">
-                                <FormLabel className="gap-1.5">
+                              <FormItem>
+                                <FormLabel className="text-sm flex items-center gap-1">
                                   {t('discountPrice')}
                                   <HelpTooltip content={t('help.discountPrice')} />
                                 </FormLabel>
                                 <FormControl>
                                   <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
                                     <Input
                                       type='number'
                                       step='0.01'
                                       min="0"
-                                      placeholder={t('calculatedPrice')}
+                                      placeholder="0"
                                       {...field}
                                       disabled
-                                      className="bg-gray-50 pl-9"
+                                      className="pl-9 h-10 bg-gray-50 font-medium"
                                     />
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                      <span className="text-gray-500 text-sm">$</span>
-                                    </div>
                                   </div>
                                 </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name='taxType'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-sm">{t('taxType')}</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger className="h-10">
-                                      <SelectValue placeholder={t('select')} />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Exclusive">{t('exclusive')}</SelectItem>
-                                    <SelectItem value="Inclusive">{t('inclusive')}</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name='tax'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-sm">{t('tax')}</FormLabel>
-                                <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={String(field.value)}>
-                                  <FormControl>
-                                    <SelectTrigger className="h-10">
-                                      <SelectValue placeholder={t('select')} />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="0">0%</SelectItem>
-                                    <SelectItem value="16">16%</SelectItem>
-                                  </SelectContent>
-                                </Select>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -1790,29 +1746,27 @@ const ProductForm = ({
                     </Card>
 
                     {/* Inventory Section */}
-                    <Card className="lg:col-span-1 border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
-                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
+                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-3">
                         <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
                           <span className="text-orange">📦</span> {t('inventory')}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="p-3 space-y-3">
-                        <div className="grid grid-cols-1 gap-4">
+                      <CardContent className="p-4">
+                        <div className="grid grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name='countInStock'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="gap-1.5">
+                                <FormLabel className="text-sm flex items-center gap-1">
                                   {t('quantity')} <span className="text-red-500">*</span>
                                   <HelpTooltip content={t('help.inventory')} />
                                 </FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' min="0" placeholder={t('enterQuantity')} {...field} className="pl-9 h-10" />
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                      <span className="text-gray-500 text-sm">#</span>
-                                    </div>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">#</span>
+                                    <Input type='number' min="0" placeholder="0" {...field} className="pl-9 h-10 font-medium" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -1824,16 +1778,14 @@ const ProductForm = ({
                             name='quantityAlert'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-sm gap-1.5">
+                                <FormLabel className="text-sm flex items-center gap-1">
                                   {t('quantityAlert')} <span className="text-red-500">*</span>
                                   <HelpTooltip content={t('help.quantityAlert')} />
                                 </FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' min="0" placeholder={t('enterQuantityAlert')} {...field} className="pl-9 h-10" />
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                      <span className="text-gray-500 text-sm">⚠️</span>
-                                    </div>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 text-sm">⚠</span>
+                                    <Input type='number' min="0" placeholder="0" {...field} className="pl-9 h-10" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -1843,17 +1795,20 @@ const ProductForm = ({
                         </div>
                       </CardContent>
                     </Card>
+                  </div>
 
+                  {/* Second Row: Discount + Tax */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
                     {/* Discount Section */}
-                    <Card className="lg:col-span-2 border-neutral-200 shadow-sm overflow-hidden bg-white h-full">
-                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
+                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-3">
                         <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
                           <span className="text-orange">🏷️</span> {t('discount')}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="p-3 space-y-3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <CardContent className="p-4">
+                        <div className="grid grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name='discountType'
@@ -1883,12 +1838,67 @@ const ProductForm = ({
                                 <FormLabel className="text-sm">{t('discountValue')}</FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input type='number' min="0" placeholder={t('enterDiscount')} {...field} className="pl-9 h-10" />
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                      <span className="text-gray-500 text-sm">%</span>
-                                    </div>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                                      {form.watch('discountType') === 'Fixed' ? '$' : '%'}
+                                    </span>
+                                    <Input type='number' min="0" placeholder="0" {...field} className="pl-9 h-10" />
                                   </div>
                                 </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Tax Section */}
+                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
+                      <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-3">
+                        <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
+                          <span className="text-orange">📋</span> {t('tax')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name='taxType'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm">{t('taxType')}</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="h-10">
+                                      <SelectValue placeholder={t('select')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="Exclusive">{t('exclusive')}</SelectItem>
+                                    <SelectItem value="Inclusive">{t('inclusive')}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name='tax'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm">{t('taxRate')}</FormLabel>
+                                <Select onValueChange={(val) => field.onChange(Number(val))} defaultValue={String(field.value)}>
+                                  <FormControl>
+                                    <SelectTrigger className="h-10">
+                                      <SelectValue placeholder={t('select')} />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="0">0%</SelectItem>
+                                    <SelectItem value="16">16%</SelectItem>
+                                  </SelectContent>
+                                </Select>
                                 <FormMessage />
                               </FormItem>
                             )}

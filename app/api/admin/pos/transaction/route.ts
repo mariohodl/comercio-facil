@@ -6,12 +6,12 @@ import User from '@/lib/db/models/user.model'
 import CashRegisterSession from '@/lib/db/models/cash-register.model'
 import { POSOrderSchema } from '@/lib/validator'
 import { NextResponse } from 'next/server'
-import { ROL_SELLER, ROL_SUPER_ADMIN } from '@/lib/constants'
+import { ROL_SELLER, ROL_SUPER_ADMIN, ROL_ADMIN } from '@/lib/constants'
 
 export async function POST(req: Request) {
     try {
         const session = await auth()
-        if (!session || (session.user.role !== 'admin' && session.user.role !== ROL_SELLER && session.user.role !== ROL_SUPER_ADMIN)) {
+        if (!session || (session.user.role !== ROL_ADMIN && session.user.role !== ROL_SELLER && session.user.role !== ROL_SUPER_ADMIN)) {
             return NextResponse.json(
                 { message: 'Unauthorized' },
                 { status: 401 }
@@ -59,11 +59,41 @@ export async function POST(req: Request) {
                     { status: 404 }
                 )
             }
-            if (product.countInStock < item.quantity) {
-                return NextResponse.json(
-                    { message: `Insufficient stock for: ${item.name}` },
-                    { status: 400 }
-                )
+
+            if (item.variantSku) {
+                if (!product.variants || product.variants.length === 0) {
+                    return NextResponse.json(
+                        { message: `Product ${item.name} has no variants defined but variant SKU was provided` },
+                        { status: 400 }
+                    );
+                }
+                const variant = product.variants.find((v: any) => v.sku === item.variantSku);
+                if (!variant) {
+                    return NextResponse.json(
+                        { message: `Variant not found for product ${item.name} with SKU ${item.variantSku}` },
+                        { status: 404 }
+                    );
+                }
+                if (variant.countInStock < item.quantity) {
+                    return NextResponse.json(
+                        { message: `Insufficient stock for variant ${item.name} (${item.variantSku})` },
+                        { status: 400 }
+                    );
+                }
+                // Also check the main product's total stock (it should be aggregate)
+                if (product.countInStock < item.quantity) {
+                    return NextResponse.json(
+                        { message: `Insufficient total stock for product: ${item.name}` },
+                        { status: 400 }
+                    );
+                }
+            } else {
+                if (product.countInStock < item.quantity) {
+                    return NextResponse.json(
+                        { message: `Insufficient stock for: ${item.name}` },
+                        { status: 400 }
+                    )
+                }
             }
         }
 
@@ -109,9 +139,42 @@ export async function POST(req: Request) {
 
         // Update Stock
         for (const item of items) {
-            await Product.findByIdAndUpdate(item.product, {
-                $inc: { countInStock: -item.quantity, numSales: item.quantity },
-            })
+            if (item.variantSku) {
+                // Fetch product to get current variant stock
+                const product = await Product.findById(item.product);
+                if (product && product.variants) {
+                    const variant = product.variants.find((v: any) => v.sku === item.variantSku);
+                    if (variant) {
+                        const newVariantStock = Math.floor((variant.countInStock - item.quantity) * 1000) / 1000;
+                        const newParentStock = Math.floor((product.countInStock - item.quantity) * 1000) / 1000;
+                        const newSales = Math.floor((product.numSales + item.quantity) * 1000) / 1000;
+
+                        await Product.updateOne(
+                            { _id: item.product, "variants.sku": item.variantSku },
+                            {
+                                $set: {
+                                    "variants.$.countInStock": newVariantStock,
+                                    "countInStock": newParentStock,
+                                    "numSales": newSales
+                                }
+                            }
+                        );
+                    }
+                }
+            } else {
+                const product = await Product.findById(item.product);
+                if (product) {
+                    const newStock = Math.floor((product.countInStock - item.quantity) * 1000) / 1000;
+                    const newSales = Math.floor((product.numSales + item.quantity) * 1000) / 1000;
+
+                    await Product.findByIdAndUpdate(item.product, {
+                        $set: {
+                            countInStock: newStock,
+                            numSales: newSales
+                        }
+                    });
+                }
+            }
         }
 
         // Validated that stock update happens before this

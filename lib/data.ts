@@ -7,6 +7,7 @@ const uniqueStoreId = '7jDf45ff'
 const uniqueStoreName = 'Mi super tiendita'
 
 const categories = [
+	{ categoryName: 'General', categorySlug: 'general', status: true },
 	{ categoryName: 'Materiales', categorySlug: 'materiales', status: true },
 	{ categoryName: 'Herramientas', categorySlug: 'herramientas', status: true },
 	{ categoryName: 'Equipo', categorySlug: 'equipo', status: true },
@@ -15,6 +16,16 @@ const categories = [
 	{ categoryName: 'Pintura', categorySlug: 'pintura', status: true },
 	{ categoryName: 'Ferretería', categorySlug: 'ferreteria', status: true },
 	{ categoryName: 'Construcción', categorySlug: 'construccion', status: true },
+	// Veterinary Categories
+	{ categoryName: 'Veterinaria', categorySlug: 'veterinaria', status: true },
+	{ categoryName: 'Alimento para Mascotas', categorySlug: 'alimento-mascotas', status: true },
+	{ categoryName: 'Accesorios para Mascotas', categorySlug: 'accesorios-mascotas', status: true },
+	{ categoryName: 'Higiene y Cuidado', categorySlug: 'higiene-cuidado', status: true },
+	{ categoryName: 'Acuariofilia', categorySlug: 'acuariofilia', status: true },
+	{ categoryName: 'Pequeños Mamíferos', categorySlug: 'pequenos-mamiferos', status: true },
+	{ categoryName: 'Aves', categorySlug: 'aves', status: true },
+	{ categoryName: 'Reptiles', categorySlug: 'reptiles', status: true },
+	{ categoryName: 'Ropa', categorySlug: 'ropa', status: true },
 ];
 
 const subCategories = [
@@ -43,6 +54,44 @@ const subCategories = [
 	// Construcción
 	{ name: 'Acabados', slug: 'acabados', parentCategory: 'Construcción', code: 'CON-ACA', description: 'Pisos y azulejos', status: true },
 	{ name: 'Estructural', slug: 'estructural', parentCategory: 'Construcción', code: 'CON-EST', description: 'Vigas y castillos', status: true },
+	// Veterinaria
+	{ name: 'Medicamentos', slug: 'medicamentos', parentCategory: 'Veterinaria', code: 'VET-MED', description: 'Medicamentos generales', status: true },
+	{ name: 'Vacunas', slug: 'vacunas', parentCategory: 'Veterinaria', code: 'VET-VAC', description: 'Vacunas para mascotas', status: true },
+	{ name: 'Antiparasitarios', slug: 'antiparasitarios', parentCategory: 'Veterinaria', code: 'VET-ANT', description: 'Control de parásitos', status: true },
+	{ name: 'Suplementos', slug: 'suplementos', parentCategory: 'Veterinaria', code: 'VET-SUP', description: 'Vitaminas y suplementos', status: true },
+	// Alimento para Mascotas
+	{ name: 'Alimento Seco', slug: 'alimento-seco', parentCategory: 'Alimento para Mascotas', code: 'ALI-SEC', description: 'Croquetas y alimento seco', status: true },
+	{ name: 'Alimento Húmedo', slug: 'alimento-humedo', parentCategory: 'Alimento para Mascotas', code: 'ALI-HUM', description: 'Sobres y latas', status: true },
+	{ name: 'Premios', slug: 'premios', parentCategory: 'Alimento para Mascotas', code: 'ALI-PRE', description: 'Premios y carnazas', status: true },
+	{ name: 'Dietas Prescriptivas', slug: 'dietas-prescriptivas', parentCategory: 'Alimento para Mascotas', code: 'ALI-DIE', description: 'Alimento para condiciones especiales', status: true },
+	// Accesorios para Mascotas
+	{ name: 'Correas y Collares', slug: 'correas-collares', parentCategory: 'Accesorios para Mascotas', code: 'ACC-COR', description: 'Paseo y sujeción', status: true },
+	{ name: 'Juguetes', slug: 'juguetes', parentCategory: 'Accesorios para Mascotas', code: 'ACC-JUG', description: 'Juguetes variados', status: true },
+	{ name: 'Camas y Transportadoras', slug: 'camas-transportadoras', parentCategory: 'Accesorios para Mascotas', code: 'ACC-CAM', description: 'Descanso y transporte', status: true },
+	{ name: 'Ropa', slug: 'ropa', parentCategory: 'Accesorios para Mascotas', code: 'ACC-ROP', description: 'Ropa y disfraces', status: true },
+	// Higiene y Cuidado
+	{ name: 'Champús y Jabones', slug: 'champus-jabones', parentCategory: 'Higiene y Cuidado', code: 'HIG-CHA', description: 'Limpieza y baño', status: true },
+	{ name: 'Cepillos', slug: 'cepillos', parentCategory: 'Higiene y Cuidado', code: 'HIG-CEP', description: 'Cepillado y estética', status: true },
+	{ name: 'Arenas', slug: 'arenas', parentCategory: 'Higiene y Cuidado', code: 'HIG-ARE', description: 'Arena para gatos', status: true },
+	{ name: 'Eliminador de Olores', slug: 'eliminador-olores', parentCategory: 'Higiene y Cuidado', code: 'HIG-ELI', description: 'Sprays y polvos', status: true },
+	{ name: 'Pañales y Tapetes', slug: 'panales-tapetes', parentCategory: 'Higiene y Cuidado', code: 'HIG-PAN', description: 'Entrenamiento y limpieza', status: true },
+	// Acuariofilia
+	{ name: 'Peceras y Acuarios', slug: 'peceras-acuarios', parentCategory: 'Acuariofilia', code: 'ACU-PEC', description: 'Tanques y peceras', status: true },
+	{ name: 'Filtros y Bombas', slug: 'filtros-bombas', parentCategory: 'Acuariofilia', code: 'ACU-FIL', description: 'Filtración y oxigenación', status: true },
+	{ name: 'Alimento para Peces', slug: 'alimento-peces', parentCategory: 'Acuariofilia', code: 'ACU-ALI', description: 'Hojuelas y pellets', status: true },
+	{ name: 'Decoración', slug: 'decoracion-acuario', parentCategory: 'Acuariofilia', code: 'ACU-DEC', description: 'Plantas y adornos', status: true },
+	// Pequeños Mamíferos
+	{ name: 'Alimento Roedores', slug: 'alimento-roedores', parentCategory: 'Pequeños Mamíferos', code: 'MAM-ALI', description: 'Alimento para hamsters, conejos', status: true },
+	{ name: 'Jaulas y Hábitats', slug: 'jaulas-habitats', parentCategory: 'Pequeños Mamíferos', code: 'MAM-JAU', description: 'Casas y jaulas', status: true },
+	{ name: 'Sustratos', slug: 'sustratos', parentCategory: 'Pequeños Mamíferos', code: 'MAM-SUS', description: 'Viruta y lechos', status: true },
+	// Aves
+	{ name: 'Jaulas para Aves', slug: 'jaulas-aves', parentCategory: 'Aves', code: 'AVE-JAU', description: 'Jaulas y pajareras', status: true },
+	{ name: 'Alimento para Aves', slug: 'alimento-aves', parentCategory: 'Aves', code: 'AVE-ALI', description: 'Semillas y mezclas', status: true },
+	{ name: 'Juguetes para Aves', slug: 'juguetes-aves', parentCategory: 'Aves', code: 'AVE-JUG', description: 'Columpios y espejos', status: true },
+	// Veterinarian Specific
+	{ name: 'Material de Curación', slug: 'material-curacion', parentCategory: 'Veterinaria', code: 'VET-GUA', description: 'Gasas, vendas, guantes', status: true },
+	{ name: 'Instrumental', slug: 'instrumental', parentCategory: 'Veterinaria', code: 'VET-INS', description: 'Tijeras, pinzas', status: true },
+	{ name: 'Camisetas y Playeras', slug: 'camisetas-playeras', parentCategory: 'Ropa', code: 'ROP-CAM', description: 'Playeras y camisetas de todo tipo', status: true },
 ];
 
 const brands = [
@@ -57,17 +106,51 @@ const brands = [
 	{ name: 'DeWalt', image: 'https://static.cdnlogo.com/logos/d/72/dewalt.svg', status: true },
 	{ name: 'Makita', image: 'https://static.cdnlogo.com/logos/m/96/makita.svg', status: true },
 	{ name: 'Generico', image: 'https://placehold.co/200x200.png?text=Generico', status: true },
+	// Veterinary Brands
+	{ name: 'Royal Canin', image: 'https://logo.clearbit.com/royalcanin.com', status: true },
+	{ name: 'Pro Plan', image: 'https://logo.clearbit.com/purina.com', status: true },
+	{ name: 'Nupec', image: 'https://placehold.co/200x200.png?text=Nupec', status: true },
+	{ name: 'Bravecto', image: 'https://placehold.co/200x200.png?text=Bravecto', status: true },
+	{ name: 'NexGard', image: 'https://placehold.co/200x200.png?text=NexGard', status: true },
+	{ name: 'Bayer', image: 'https://logo.clearbit.com/bayer.com', status: true },
+	{ name: 'Virbac', image: 'https://logo.clearbit.com/virbac.com', status: true },
+	{ name: 'Kong', image: 'https://logo.clearbit.com/kongcompany.com', status: true },
+	{ name: 'Furminator', image: 'https://logo.clearbit.com/furminator.com', status: true },
+	{ name: 'Hill\'s Science Diet', image: 'https://logo.clearbit.com/hillspet.com', status: true },
+	{ name: 'Eukanuba', image: 'https://logo.clearbit.com/eukanuba.com', status: true },
+	{ name: 'Whiskas', image: 'https://logo.clearbit.com/whiskas.com', status: true },
+	{ name: 'Pedigree', image: 'https://logo.clearbit.com/pedigree.com', status: true },
+	{ name: 'Tetra', image: 'https://logo.clearbit.com/tetra-fish.com', status: true },
+	{ name: 'Wardley', image: 'https://placehold.co/200x200.png?text=Wardley', status: true },
+	{ name: 'Kaytee', image: 'https://logo.clearbit.com/kaytee.com', status: true },
+	{ name: 'Mazuri', image: 'https://logo.clearbit.com/mazuri.com', status: true },
+	{ name: 'Zoetis', image: 'https://logo.clearbit.com/zoetis.com', status: true },
+	{ name: 'Frontline', image: 'https://placehold.co/200x200.png?text=Frontline', status: true },
 ];
 
 const units = [
-	{ name: 'Piece', abbreviation: 'Pza', status: true },
-	{ name: 'Kilogram', abbreviation: 'Kg', status: true },
-	{ name: 'Meter', abbreviation: 'm', status: true },
-	{ name: 'Square Meter', abbreviation: 'm2', status: true },
-	{ name: 'Cubic Meter', abbreviation: 'm3', status: true },
-	{ name: 'Liter', abbreviation: 'L', status: true },
-	{ name: 'Box', abbreviation: 'Box', status: true },
-	{ name: 'Set', abbreviation: 'Set', status: true },
+	{ name: 'Pieza', abbreviation: 'pza', status: true },
+	{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+	{ name: 'Metro', abbreviation: 'm', status: true },
+	{ name: 'Metro Cuadrado', abbreviation: 'm²', status: true },
+	{ name: 'Metro Cúbico', abbreviation: 'm³', status: true },
+	{ name: 'Litro', abbreviation: 'L', status: true },
+	{ name: 'Caja', abbreviation: 'caja', status: true },
+	{ name: 'Juego', abbreviation: 'jgo', status: true },
+	{ name: 'Gramo', abbreviation: 'g', status: true },
+	{ name: 'Mililitro', abbreviation: 'ml', status: true },
+	{ name: 'Centímetro', abbreviation: 'cm', status: true },
+	{ name: 'Pulgada', abbreviation: 'in', status: true },
+	{ name: 'Pie', abbreviation: 'ft', status: true },
+	{ name: 'Yarda', abbreviation: 'yd', status: true },
+	{ name: 'Onza', abbreviation: 'oz', status: true },
+	{ name: 'Libra', abbreviation: 'lb', status: true },
+	{ name: 'Galón', abbreviation: 'gal', status: true },
+	{ name: 'Tonelada', abbreviation: 't', status: true },
+	{ name: 'Docena', abbreviation: 'doc', status: true },
+	{ name: 'Kit', abbreviation: 'kit', status: true },
+	{ name: 'Rollo', abbreviation: 'rollo', status: true },
+	{ name: 'Par', abbreviation: 'par', status: true },
 ];
 
 const users: IUserInput[] = [
@@ -363,7 +446,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -404,7 +487,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -445,7 +528,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -487,7 +570,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -528,7 +611,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -569,7 +652,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -610,7 +693,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -651,7 +734,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -692,7 +775,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -733,7 +816,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -774,7 +857,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -814,7 +897,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Single Product',
@@ -849,7 +932,7 @@ const products: IProductInput[] = [
 		store: uniqueStoreId,
 		warehouse: 'Warehouse 1',
 		subCategory: 'None',
-		unit: 'Piece',
+		unit: 'Pieza',
 		barcodeSymbology: 'Code 128',
 		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
 		productType: 'Variable Product',
@@ -894,19 +977,138 @@ const products: IProductInput[] = [
 			}
 		]
 	},
+	{
+		productId: 14,
+		name: 'Croquetas Pro Plan Adulto',
+		slug: toSlug('Croquetas Pro Plan Adulto'),
+		category: 'Alimento para Mascotas',
+		sku: `CRO-${uniqueStoreId.toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
+		images: [{ imgUrl: 'https://placehold.co/600x400.png?text=Pro+Plan+Adulto', imgKey: 'placeholder' }],
+		tags: ['best-seller', 'veterinaria'],
+		isPublished: true,
+		listPrice: 450.00,
+		discountPrice: 0,
+		brand: 'Pro Plan',
+		avgRating: 4.9,
+		numReviews: 120,
+		ratingDistribution: [
+			{ rating: 5, count: 100 },
+			{ rating: 4, count: 20 }
+		],
+		numSales: 350,
+		countInStock: 150,
+		description: 'Alimento balanceado para perros adultos de razas medianas y grandes.',
+		reviews: [],
+		store: uniqueStoreId,
+		warehouse: 'Warehouse 1',
+		subCategory: 'Alimento Seco',
+		unit: 'kg',
+		barcodeSymbology: 'EAN-13',
+		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
+		productType: 'Variable Product',
+		taxType: 'Inclusive',
+		tax: 0,
+		quantityAlert: 10,
+		costPerUnit: 300.00,
+		attributes: [
+			{ name: 'Peso', values: ['3kg', '13kg', '18kg'] }
+		],
+		variants: [
+			{
+				sku: `PRO-3KG-${Math.floor(1000 + Math.random() * 9000)}`,
+				costPerUnit: 300.00,
+				listPrice: 450.00,
+				countInStock: 50,
+				attributes: [{ name: 'Peso', value: '3kg' }]
+			},
+			{
+				sku: `PRO-13KG-${Math.floor(1000 + Math.random() * 9000)}`,
+				costPerUnit: 1100.00,
+				listPrice: 1550.00,
+				countInStock: 60,
+				attributes: [{ name: 'Peso', value: '13kg' }]
+			},
+			{
+				sku: `PRO-18KG-${Math.floor(1000 + Math.random() * 9000)}`,
+				costPerUnit: 1400.00,
+				listPrice: 1950.00,
+				countInStock: 40,
+				attributes: [{ name: 'Peso', value: '18kg' }]
+			}
+		]
+	},
+	{
+		productId: 15,
+		name: 'Playera Polo Clásica',
+		slug: toSlug('Playera Polo Clásica'),
+		category: 'Ropa',
+		sku: `POL-${uniqueStoreId.toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
+		images: [{ imgUrl: 'https://placehold.co/600x400.png?text=Playera+Polo', imgKey: 'placeholder' }],
+		tags: ['new-arrival'],
+		isPublished: true,
+		listPrice: 350.00,
+		discountPrice: 299.00,
+		brand: 'Generico',
+		avgRating: 4.5,
+		numReviews: 15,
+		ratingDistribution: [],
+		numSales: 10,
+		countInStock: 120,
+		description: 'Playera tipo polo de algodón piqué, disponible en múltiples colores.',
+		reviews: [],
+		store: uniqueStoreId,
+		warehouse: 'Warehouse 1',
+		subCategory: 'Camisetas y Playeras',
+		unit: 'Pieza',
+		barcodeSymbology: 'Code 128',
+		itemBarcode: Math.floor(100000000000 + Math.random() * 900000000000).toString(),
+		productType: 'Variable Product',
+		taxType: 'Exclusive',
+		tax: 16,
+		quantityAlert: 5,
+		costPerUnit: 150.00,
+		attributes: [
+			{ name: 'Color', values: ['Blanco', 'Negro', 'Azul'] },
+			{ name: 'Talla', values: ['S', 'M', 'L'] }
+		],
+		variants: [
+			{
+				sku: `POL-WHI-S-${Math.floor(1000 + Math.random() * 9000)}`,
+				costPerUnit: 150.00,
+				listPrice: 350.00,
+				countInStock: 20,
+				attributes: [{ name: 'Color', value: 'Blanco' }, { name: 'Talla', value: 'S' }]
+			},
+			{
+				sku: `POL-BLA-M-${Math.floor(1000 + Math.random() * 9000)}`,
+				costPerUnit: 150.00,
+				listPrice: 350.00,
+				countInStock: 25,
+				attributes: [{ name: 'Color', value: 'Negro' }, { name: 'Talla', value: 'M' }]
+			},
+			{
+				sku: `POL-BLU-L-${Math.floor(1000 + Math.random() * 9000)}`,
+				costPerUnit: 150.00,
+				listPrice: 350.00,
+				countInStock: 15,
+				attributes: [{ name: 'Color', value: 'Azul' }, { name: 'Talla', value: 'L' }]
+			}
+		]
+	},
 ]
 
 const attributes = [
-	{ name: 'Color', values: ['Rojo', 'Azul', 'Verde'], store: uniqueStoreId, status: true },
-	{ name: 'Talla', values: ['S', 'M', 'L', 'XL'], store: uniqueStoreId, status: true },
-	{ name: 'Material', values: ['Algodón', 'Poliéster', 'Lana'], store: uniqueStoreId, status: true },
-	{ name: 'Temporada', values: ['Verano', 'Invierno', 'Otoño', 'Primavera'], store: uniqueStoreId, status: true },
-	{ name: 'Género', values: ['Hombre', 'Mujer', 'Unisex'], store: uniqueStoreId, status: true },
-	{ name: 'Peso', values: ['Ligero', 'Medio', 'Pesado'], store: uniqueStoreId, status: true },
-	{ name: 'Dimensiones', values: ['Pequeño', 'Mediano', 'Grande'], store: uniqueStoreId, status: true },
-	{ name: 'Voltaje', values: ['110V', '220V'], store: uniqueStoreId, status: true },
-	{ name: 'Potencia', values: ['100W', '200W', '500W'], store: uniqueStoreId, status: true },
-	{ name: 'Capacidad', values: ['1L', '2L', '5L'], store: uniqueStoreId, status: true },
+	{ name: 'Color', values: ['Rojo', 'Azul', 'Verde', 'Naranja', 'Amarillo', 'Negro', 'Blanco', 'Gris'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Talla', values: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Material', values: ['Algodón', 'Poliéster', 'Lana', 'Mezclilla', 'Cuero'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Temporada', values: ['Verano', 'Invierno', 'Otoño', 'Primavera'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Género', values: ['Hombre', 'Mujer', 'Unisex', 'Niño', 'Niña'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Peso', values: ['1kg', '2kg', '5kg', '10kg', '15kg', '20kg', '25kg', '50kg'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Dimensiones', values: ['Pequeño', 'Mediano', 'Grande', 'Extra Grande'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Voltaje', values: ['110V', '220V', '12V', '5V'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Potencia', values: ['100W', '500W', '1000W', '1500W', '2000W'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Capacidad', values: ['250ml', '500ml', '1L', '2L', '5L', '10L', '20L'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
+	{ name: 'Sabor', values: ['Pollo', 'Res', 'Salmón', 'Cordero', 'Vainilla', 'Chocolate'], storeId: uniqueStoreId, isGlobal: true, isApproved: true, industry: 'general', status: true },
 ]
 
 const companies = [
@@ -992,7 +1194,12 @@ export const globalCatalog = [
 			{
 				name: 'Varios',
 				subcategories: ['General', 'Otros', 'Surtido'],
-				units: ['Pieza', 'Unidad', 'Servicio', 'Juego'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Unidad', abbreviation: 'ud', status: true },
+					{ name: 'Servicio', abbreviation: 'srv', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true }
+				],
 				brands: ['Genérico', 'Varios', 'Sin Marca']
 			}
 		]
@@ -1014,7 +1221,18 @@ export const globalCatalog = [
 					'Medicamentos para Diabetes',
 					'Medicamentos Respiratorios'
 				],
-				units: ['Tableta', 'Cápsula', 'Frasco', 'Ampolleta', 'Jeringa', 'Crema', 'Ungüento', 'Gotas', 'Supositorio', 'Parche'],
+				units: [
+					{ name: 'Tableta', abbreviation: 'tab', status: true },
+					{ name: 'Cápsula', abbreviation: 'cap', status: true },
+					{ name: 'Frasco', abbreviation: 'fco', status: true },
+					{ name: 'Ampolleta', abbreviation: 'amp', status: true },
+					{ name: 'Jeringa', abbreviation: 'jga', status: true },
+					{ name: 'Crema', abbreviation: 'crema', status: true },
+					{ name: 'Ungüento', abbreviation: 'ung', status: true },
+					{ name: 'Gotas', abbreviation: 'gts', status: true },
+					{ name: 'Supositorio', abbreviation: 'sup', status: true },
+					{ name: 'Parche', abbreviation: 'parche', status: true }
+				],
 				brands: ['Pfizer', 'Bayer', 'GSK', 'Sanofi', 'Novartis', 'Roche', 'AstraZeneca', 'Merck', 'Johnson & Johnson', 'Genérico', 'Similares', 'Farmacias del Ahorro']
 			},
 			{
@@ -1030,7 +1248,15 @@ export const globalCatalog = [
 					'Pañales para Adultos',
 					'Toallas Húmedas'
 				],
-				units: ['Pieza', 'Paquete', 'Tubo', 'Botella', 'Frasco', 'Barra', 'Sobre'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Tubo', abbreviation: 'tubo', status: true },
+					{ name: 'Botella', abbreviation: 'bot', status: true },
+					{ name: 'Frasco', abbreviation: 'fco', status: true },
+					{ name: 'Barra', abbreviation: 'barra', status: true },
+					{ name: 'Sobre', abbreviation: 'sobre', status: true }
+				],
 				brands: ['Colgate', 'Oral-B', 'Dove', 'Pantene', 'Head & Shoulders', 'Nivea', 'Rexona', 'Neutrogena', 'Always', 'Huggies', 'Pampers']
 			},
 			{
@@ -1045,7 +1271,12 @@ export const globalCatalog = [
 					'Guantes Médicos',
 					'Jeringas y Agujas'
 				],
-				units: ['Pieza', 'Paquete', 'Caja', 'Juego'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Caja', abbreviation: 'caja', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true }
+				],
 				brands: ['Omron', 'Accu-Chek', 'OneTouch', 'Band-Aid', '3M', 'Medline']
 			}
 		]
@@ -1065,7 +1296,15 @@ export const globalCatalog = [
 					'Conservas y Enlatados',
 					'Sopas y Caldos'
 				],
-				units: ['Kilogramo', 'Gramo', 'Litro', 'Mililitro', 'Pieza', 'Paquete', 'Lata'],
+				units: [
+					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+					{ name: 'Gramo', abbreviation: 'g', status: true },
+					{ name: 'Litro', abbreviation: 'L', status: true },
+					{ name: 'Mililitro', abbreviation: 'ml', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Lata', abbreviation: 'lata', status: true }
+				],
 				brands: ['Herdez', 'La Costeña', 'Knorr', 'McCormick', 'Cristal', 'Zwan', 'Great Value', 'Safeway']
 			},
 			{
@@ -1080,7 +1319,15 @@ export const globalCatalog = [
 					'Leche y Bebidas Lácteas',
 					'Tés y Cafés Preparados'
 				],
-				units: ['Mililitro', 'Litro', 'Botella', 'Lata', 'Six-pack', 'Caja', 'Garrafón'],
+				units: [
+					{ name: 'Mililitro', abbreviation: 'ml', status: true },
+					{ name: 'Litro', abbreviation: 'L', status: true },
+					{ name: 'Botella', abbreviation: 'bot', status: true },
+					{ name: 'Lata', abbreviation: 'lata', status: true },
+					{ name: 'Six-pack', abbreviation: '6pk', status: true },
+					{ name: 'Caja', abbreviation: 'caja', status: true },
+					{ name: 'Garrafón', abbreviation: 'garrafon', status: true }
+				],
 				brands: ['Coca-Cola', 'Pepsi', 'Jumex', 'Boing', 'Bonafont', 'Corona', 'Modelo', 'Heineken', 'Nestlé', 'Lala', 'Alpura']
 			},
 			{
@@ -1094,7 +1341,13 @@ export const globalCatalog = [
 					'Gomas y Caramelos',
 					'Helados y Postres Congelados'
 				],
-				units: ['Gramo', 'Paquete', 'Pieza', 'Caja', 'Bolsa'],
+				units: [
+					{ name: 'Gramo', abbreviation: 'g', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Caja', abbreviation: 'caja', status: true },
+					{ name: 'Bolsa', abbreviation: 'bolsa', status: true }
+				],
 				brands: ['Sabritas', 'Barcel', 'Gamesa', 'Marinela', 'Coca-Cola (snacks)', 'Nestlé', 'Hershey\'s', 'M&M\'s']
 			}
 		]
@@ -1113,7 +1366,13 @@ export const globalCatalog = [
 					'Escaleras y Andamios',
 					'Equipo de Seguridad'
 				],
-				units: ['Pieza', 'Juego', 'Set', 'Paquete', 'Metro'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true },
+					{ name: 'Set', abbreviation: 'set', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Metro', abbreviation: 'm', status: true }
+				],
 				brands: ['Truper', 'Urrea', 'Stanley', 'DeWalt', 'Bosch', 'Makita', 'Black & Decker', 'Milwaukee']
 			},
 			{
@@ -1128,7 +1387,15 @@ export const globalCatalog = [
 					'Material Eléctrico',
 					'Cerámica y Azulejo'
 				],
-				units: ['Kilogramo', 'Pieza', 'Metro', 'Litro', 'Galón', 'Saco', 'Tabla'],
+				units: [
+					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Metro', abbreviation: 'm', status: true },
+					{ name: 'Litro', abbreviation: 'L', status: true },
+					{ name: 'Galón', abbreviation: 'gal', status: true },
+					{ name: 'Saco', abbreviation: 'saco', status: true },
+					{ name: 'Tabla', abbreviation: 'tabla', status: true }
+				],
 				brands: ['Cemex', 'Apasco', 'Comex', 'Sherwin-Williams', 'Rotoplas', 'Kwikset', 'Leviton', 'Steren']
 			}
 		]
@@ -1148,7 +1415,12 @@ export const globalCatalog = [
 					'Trajes y Etiqueta',
 					'Ropa para Bebés'
 				],
-				units: ['Pieza', 'Par', 'Juego', 'Paquete'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Par', abbreviation: 'par', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true }
+				],
 				brands: ['Levi\'s', 'Nike', 'Adidas', 'Zara', 'H&M', 'Calvin Klein', 'Tommy Hilfiger', 'Under Armour']
 			},
 			{
@@ -1162,7 +1434,11 @@ export const globalCatalog = [
 					'Calzado para Niños',
 					'Accesorios para Calzado'
 				],
-				units: ['Par', 'Pieza', 'Juego'],
+				units: [
+					{ name: 'Par', abbreviation: 'par', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true }
+				],
 				brands: ['Nike', 'Adidas', 'Converse', 'Vans', 'Skechers', 'Steve Madden', 'Clarks', 'Timberland']
 			}
 		]
@@ -1182,7 +1458,12 @@ export const globalCatalog = [
 					'Cigarros y Tabaco',
 					'Revistas y Periódicos'
 				],
-				units: ['Pieza', 'Paquete', 'Lata', 'Botella'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Lata', abbreviation: 'lata', status: true },
+					{ name: 'Botella', abbreviation: 'bot', status: true }
+				],
 				brands: ['Coca-Cola', 'Pepsi', 'Mars', 'Snickers', 'Oxxo (marca propia)', '7-Eleven', 'Bimbo', 'Lays']
 			}
 		]
@@ -1201,7 +1482,13 @@ export const globalCatalog = [
 					'Reglas y Geometría',
 					'Papelería General'
 				],
-				units: ['Pieza', 'Paquete', 'Caja', 'Juego', 'Resma'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Caja', abbreviation: 'caja', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true },
+					{ name: 'Resma', abbreviation: 'resma', status: true }
+				],
 				brands: ['Bic', 'Paper Mate', 'Faber-Castell', 'Pelikan', 'Norma', 'Scribe', 'Crayola', 'Casio']
 			},
 			{
@@ -1215,7 +1502,13 @@ export const globalCatalog = [
 					'Presentaciones',
 					'Sellos y Tintas'
 				],
-				units: ['Pieza', 'Resma', 'Caja', 'Paquete', 'Juego'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Resma', abbreviation: 'resma', status: true },
+					{ name: 'Caja', abbreviation: 'caja', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true }
+				],
 				brands: ['HP', 'Epson', 'Canon', 'Post-it', 'Avery', 'Staples', 'Office Depot', 'Fellowes']
 			}
 		]
@@ -1234,7 +1527,13 @@ export const globalCatalog = [
 					'Cepillos y Aplicadores',
 					'Kits de Maquillaje'
 				],
-				units: ['Pieza', 'Kit', 'Paleta', 'Tubo', 'Frasco'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Kit', abbreviation: 'kit', status: true },
+					{ name: 'Paleta', abbreviation: 'paleta', status: true },
+					{ name: 'Tubo', abbreviation: 'tubo', status: true },
+					{ name: 'Frasco', abbreviation: 'fco', status: true }
+				],
 				brands: ['Maybelline', 'L\'Oréal', 'MAC', 'Revlon', 'NYX', 'Avon', 'Mary Kay', 'NARS']
 			},
 			{
@@ -1248,7 +1547,13 @@ export const globalCatalog = [
 					'Mascarillas',
 					'Contorno de Ojos'
 				],
-				units: ['Mililitro', 'Gramo', 'Tubo', 'Frasco', 'Pote'],
+				units: [
+					{ name: 'Mililitro', abbreviation: 'ml', status: true },
+					{ name: 'Gramo', abbreviation: 'g', status: true },
+					{ name: 'Tubo', abbreviation: 'tubo', status: true },
+					{ name: 'Frasco', abbreviation: 'fco', status: true },
+					{ name: 'Pote', abbreviation: 'pote', status: true }
+				],
 				brands: ['Neutrogena', 'Cetaphil', 'La Roche-Posay', 'Nivea', 'Olay', 'Bioderma', 'Vichy', 'CeraVe']
 			}
 		]
@@ -1267,7 +1572,12 @@ export const globalCatalog = [
 					'Cámaras y Fotografía',
 					'GPS y Navegación'
 				],
-				units: ['Pieza', 'Juego', 'Kit', 'Paquete'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true },
+					{ name: 'Kit', abbreviation: 'kit', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true }
+				],
 				brands: ['Apple', 'Samsung', 'Sony', 'LG', 'HP', 'Dell', 'Microsoft', 'Nintendo']
 			},
 			{
@@ -1281,7 +1591,12 @@ export const globalCatalog = [
 					'Adaptadores',
 					'Soporte y Brazos'
 				],
-				units: ['Pieza', 'Par', 'Juego', 'Paquete'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Par', abbreviation: 'par', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true }
+				],
 				brands: ['Belkin', 'Anker', 'Logitech', 'JBL', 'SanDisk', 'Seagate', 'Case Logic', 'OtterBox']
 			}
 		]
@@ -1301,7 +1616,12 @@ export const globalCatalog = [
 					'Juguetes para Bebés',
 					'Figuras de Acción'
 				],
-				units: ['Pieza', 'Juego', 'Set', 'Paquete'],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true },
+					{ name: 'Set', abbreviation: 'set', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true }
+				],
 				brands: ['LEGO', 'Mattel', 'Hasbro', 'Fisher-Price', 'Barbie', 'Hot Wheels', 'Nerf', 'Play-Doh']
 			}
 		]

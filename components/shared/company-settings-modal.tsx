@@ -27,7 +27,8 @@ import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
 
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
+import { LogOut } from 'lucide-react'
 
 interface CompanySettingsModalProps {
     isOpen: boolean
@@ -233,7 +234,16 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                             />
                         </div>
 
-                        <DialogFooter>
+                        <DialogFooter className="flex justify-between sm:justify-between">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => signOut({ callbackUrl: '/' })}
+                                className="text-muted-foreground hover:text-destructive"
+                            >
+                                <LogOut className="mr-2 h-4 w-4" />
+                                Cerrar Sesión
+                            </Button>
                             <Button type="submit" disabled={isLoading}>
                                 {isLoading ? 'Guardando...' : 'Guardar y Continuar'}
                             </Button>

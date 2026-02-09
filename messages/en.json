@@ -1,6 +1,7 @@
 {
     "common": {
         "search": "Search",
+        "searchPlaceholder": "Search {item}...",
         "cart": "Cart",
         "login": "Sign In",
         "logout": "Sign Out",
@@ -40,6 +41,10 @@
         "comingSoon": "This feature is coming soon.",
         "active": "Active",
         "inactive": "Inactive",
+        "status": "Status",
+        "approved": "Approved",
+        "yes": "Yes",
+        "no": "No",
         "goToPOS": "Go to POS",
         "success": "Success",
         "error": "Error",
@@ -126,6 +131,8 @@
         "unitsRemaining": "{count} units remaining",
         "stockWarning": "Stock warning",
         "left": "left",
+        "perUnit": "/{unit}",
+        "duplicate": "Duplicate",
         "ordersModal": {
             "title": "Orders",
             "unpaid": "Unpaid",
@@ -175,6 +182,7 @@
         },
         "paymentModal": {
             "title": "Complete Payment",
+            "paymentMethod": "Payment Method",
             "fulfillmentType": "Fulfillment Type",
             "amountReceived": "Amount Received (Cash)",
             "exact": "Exact",
@@ -291,6 +299,7 @@
         "enterListPrice": "Enter list price",
         "calculatedPrice": "Calculated price",
         "taxType": "Tax Type",
+        "taxRate": "Tax Rate",
         "exclusive": "Exclusive",
         "inclusive": "Inclusive",
         "discountType": "Discount Type",
@@ -904,5 +913,29 @@
             "itemsRequired": "Purchase must have at least one item",
             "invalidItemValues": "All items must have a quantity and cost greater than 0"
         }
+    },
+    "units": {
+        "Piece": "Piece",
+        "Kilogram": "Kilogram",
+        "Meter": "Meter",
+        "Square Meter": "Square Meter",
+        "Cubic Meter": "Cubic Meter",
+        "Liter": "Liter",
+        "Box": "Box",
+        "Set": "Set",
+        "Gram": "Gram",
+        "Milliliter": "Milliliter",
+        "Centimeter": "Centimeter",
+        "Inch": "Inch",
+        "Foot": "Foot",
+        "Yard": "Yard",
+        "Ounce": "Ounce",
+        "Pound": "Pound",
+        "Gallon": "Gallon",
+        "Ton": "Ton",
+        "Dozen": "Dozen",
+        "Kit": "Kit",
+        "Roll": "Roll",
+        "Pair": "Pair"
     }
 }

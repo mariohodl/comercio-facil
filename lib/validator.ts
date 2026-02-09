@@ -535,7 +535,9 @@ export const POSOrderSchema = z.object({
 			category: z.string(),
 			price: z.number(),
 			countInStock: z.number(),
-			quantity: z.number().min(1),
+			quantity: z.number().positive(),
+			variantSku: z.string().optional(),
+			variantDetails: z.string().optional(),
 		})
 	).min(1, 'Cart is empty'),
 	paymentMethod: z.enum(['Cash', 'Card', 'Split']),
@@ -607,7 +609,10 @@ export const UnitUpdateSchema = UnitInputSchema.extend({
 export const AttributeInputSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	values: z.array(z.string()).min(1, 'At least one value is required'),
-	store: z.string().min(1, 'Store is required'),
+	storeId: z.string().optional(),
+	isGlobal: z.boolean().optional(),
+	isApproved: z.boolean().optional(),
+	industry: z.string().optional(),
 	status: z.boolean().default(true),
 })
 

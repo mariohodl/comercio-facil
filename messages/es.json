@@ -1,6 +1,7 @@
 {
     "common": {
         "search": "Buscar",
+        "searchPlaceholder": "Buscar {item}...",
         "cart": "Carrito",
         "login": "Iniciar sesión",
         "logout": "Cerrar sesión",
@@ -40,6 +41,10 @@
         "comingSoon": "Esta función estará disponible pronto.",
         "active": "Activo",
         "inactive": "Inactivo",
+        "status": "Estado",
+        "approved": "Aprobado",
+        "yes": "Sí",
+        "no": "No",
         "goToPOS": "Ir a Punto de Venta (POS)",
         "submit": "Enviar",
         "success": "Éxito",
@@ -127,6 +132,8 @@
         "unitsRemaining": "Quedan {count} unidades",
         "stockWarning": "Advertencia de stock",
         "left": "restantes",
+        "perUnit": "/{unit}",
+        "duplicate": "Duplicar",
         "name": "Nombre",
         "namePlaceholder": "Ingresa el nombre",
         "phone": "Teléfono",
@@ -188,6 +195,7 @@
         },
         "paymentModal": {
             "title": "Completar Pago",
+            "paymentMethod": "Método de Pago",
             "fulfillmentType": "Tipo de Entrega",
             "amountReceived": "Monto Recibido (Efectivo)",
             "exact": "Exacto",
@@ -310,6 +318,7 @@
         "enterListPrice": "Ingresar precio de lista",
         "calculatedPrice": "Precio calculado",
         "taxType": "Tipo de Impuesto",
+        "taxRate": "Impuesto",
         "exclusive": "Exclusivo",
         "inclusive": "Inclusivo",
         "discountType": "Tipo de Descuento",
@@ -930,5 +939,29 @@
         "subTitle": "Página no encontrada",
         "description": "Lo sentimos, la página que buscas no existe o ha sido movida a otro lugar.",
         "backHome": "Volver al inicio"
+    },
+    "units": {
+        "Piece": "Pieza",
+        "Kilogram": "Kilogramo",
+        "Meter": "Metro",
+        "Square Meter": "Metro Cuadrado",
+        "Cubic Meter": "Metro Cúbico",
+        "Liter": "Litro",
+        "Box": "Caja",
+        "Set": "Juego",
+        "Gram": "Gramo",
+        "Milliliter": "Mililitro",
+        "Centimeter": "Centímetro",
+        "Inch": "Pulgada",
+        "Foot": "Pie",
+        "Yard": "Yarda",
+        "Ounce": "Onza",
+        "Pound": "Libra",
+        "Gallon": "Galón",
+        "Ton": "Tonelada",
+        "Dozen": "Docena",
+        "Kit": "Kit",
+        "Roll": "Rollo",
+        "Pair": "Par"
     }
 }
