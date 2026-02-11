@@ -1,81 +1,135 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 
-
-export function useBarcodeScanner(onScan: (barcode: string) => void, active: boolean = true) {
+/**
+ * Barcode Scanner Hook
+ * 
+ * Detects hardware barcode scanner input and prevents characters from entering wrong fields.
+ * Only the first character may briefly appear in a focused field before being cleaned up.
+ */
+export function useBarcodeScanner(
+    onScan: (barcode: string) => void,
+    active: boolean = true,
+    latency: number = 50
+) {
     const bufferRef = useRef<string>('')
     const lastKeyTimeRef = useRef<number>(0)
-    const isScanningRef = useRef<boolean>(false)
+    const scanModeRef = useRef<boolean>(false)
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-    useEffect(() => {
-        if (!active) return
+    const onScanRef = useRef(onScan)
+    onScanRef.current = onScan
 
-        const handleKeyDown = (event: KeyboardEvent) => {
-            const currentTime = Date.now()
-            const timeDiff = currentTime - lastKeyTimeRef.current
+    const resetState = useCallback(() => {
+        bufferRef.current = ''
+        lastKeyTimeRef.current = 0
+        scanModeRef.current = false
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current)
+            timeoutRef.current = null
+        }
+    }, [])
 
-            // Scanners usually send keys at < 10ms intervals. humans can type at 40-70ms for certain combinations.
-            const isFast = timeDiff > 0 && timeDiff < 35;
+    const handleKeyDown = useCallback((event: KeyboardEvent) => {
+        if (event.ctrlKey || event.altKey || event.metaKey) return
 
-            if (isFast || isScanningRef.current) {
+        const currentTime = Date.now()
+        const timeSinceLastKey = lastKeyTimeRef.current > 0 ? currentTime - lastKeyTimeRef.current : 0
+
+        // === ENTER/TAB - Scan completion ===
+        if (event.key === 'Enter' || event.key === 'Tab') {
+            const barcode = bufferRef.current.trim()
+
+            // For explicit completion (Enter/Tab), we still require a minimum length of 5 to avoid cutting off
+            if (barcode.length >= 5 && scanModeRef.current) {
                 event.preventDefault()
                 event.stopImmediatePropagation()
-                isScanningRef.current = true
 
-                if (bufferRef.current.length === 1) {
-                    const el = document.activeElement as HTMLInputElement | HTMLTextAreaElement
-                    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
-                        // Use a microtask to ensure we clear any value React just set
-                        setTimeout(() => {
-                            // Clear the entire input to prevent partial search matches
-                            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-                                window.HTMLInputElement.prototype, "value"
-                            )?.set || Object.getOwnPropertyDescriptor(
-                                window.HTMLTextAreaElement.prototype, "value"
-                            )?.set;
+                onScanRef.current(barcode)
+                resetState()
+                return
+            }
 
-                            nativeInputValueSetter?.call(el, "");
-                            el.dispatchEvent(new Event('input', { bubbles: true }))
-                            el.dispatchEvent(new Event('change', { bubbles: true }))
-                        }, 0)
+            resetState()
+            return
+        }
+
+        // Only process single printable characters
+        if (event.key.length !== 1) return
+
+        // Reset if too much time passed (human typing)
+        if (timeSinceLastKey > 150 && bufferRef.current.length > 0) {
+            resetState()
+        }
+
+        // === FIRST CHARACTER ===
+        if (bufferRef.current.length === 0) {
+            bufferRef.current = event.key
+            lastKeyTimeRef.current = currentTime
+            // Don't block - we can't detect scanner from first char alone
+            return
+        }
+
+        // === SECOND+ CHARACTER - Scanner Detection ===
+        // Hardware scanners typically send keys with < 50ms latency.
+        // But some wireless scanners or busy CPUs can gap up to 80-100ms.
+        // We use 'latency' param as a safe upper bound.
+
+        if (timeSinceLastKey < latency) {
+            if (!scanModeRef.current) {
+                // Enter scan mode
+                scanModeRef.current = true
+                const activeEl = document.activeElement
+                if (activeEl instanceof HTMLInputElement || activeEl instanceof HTMLTextAreaElement) {
+                    const val = activeEl.value
+                    const lastChar = bufferRef.current // This is the first char
+                    if (val.length > 0 && val.endsWith(lastChar)) {
+                        activeEl.value = val.slice(0, -lastChar.length)
+                        activeEl.dispatchEvent(new Event('input', { bubbles: true }))
                     }
                 }
             }
 
-            if (event.key === 'Enter') {
-                if (bufferRef.current.length > 2) {
-                    event.preventDefault()
-                    event.stopImmediatePropagation()
-
-                    const barcode = bufferRef.current
-
-                    onScan(barcode)
-                }
-                // Reset state
-                bufferRef.current = ''
-                isScanningRef.current = false
-                lastKeyTimeRef.current = 0
-                return
-            }
-
-            if (event.key.length > 1) return
-
-            // if it's been too long, it's a new interaction (human or new scan)
-            if (timeDiff > 100) {
-                bufferRef.current = ''
-                isScanningRef.current = false
-            }
+            // BLOCK this and all subsequent characters
+            event.preventDefault()
+            event.stopImmediatePropagation()
 
             bufferRef.current += event.key
             lastKeyTimeRef.current = currentTime
+
+            // Auto-complete for scanners without Enter suffix
+            if (timeoutRef.current) clearTimeout(timeoutRef.current)
+            timeoutRef.current = setTimeout(() => {
+                const barcode = bufferRef.current.trim()
+
+                // Wait for potentially longer barcodes to arrive.
+                // If we cut off too early (e.g. at 3 digits of a 13-digit code), we get "Product "024" not found".
+                // 100ms is safer for slower scanners/devices.
+                // And we require at least 5 characters to consider it a valid complete scan
+                // unless Enter was pressed (handled separately).
+                if (barcode.length >= 5 && scanModeRef.current) {
+                    onScanRef.current(barcode)
+                }
+                resetState()
+            }, 100)
+
+            return
         }
 
-        // Use capture phase (true) to intercept before React components see the event
+        // Too slow - human typing
+        resetState()
+
+    }, [resetState, latency])
+
+    useEffect(() => {
+        if (!active) return
+
         window.addEventListener('keydown', handleKeyDown, true)
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown, true)
+            resetState()
         }
-    }, [onScan, active])
+    }, [active, handleKeyDown, resetState])
 }

@@ -62,13 +62,9 @@ export default async function AdminLayout({
                             <Menu forAdmin />
                         </div>
                     </div>
-                    {/* Mobile Header Links */}
-                    <div className='nav:hidden border-t border-white/5'>
-                        <AdminHeader className='px-6 py-1.5' />
-                    </div>
                 </div>
 
-                <div className='flex pt-28 nav:pt-16'>
+                <div className='flex pt-16'>
                     {/* Desktop Sidebar */}
                     <aside className='hidden nav:block w-64 fixed left-0 top-16 bottom-0 z-10'>
                         <AdminNav

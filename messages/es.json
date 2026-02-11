@@ -364,7 +364,7 @@
         "pricingAndInventory": "Precios e Inventario",
         "identifiersAndMedia": "Identificadores y Multimedia",
         "regenerateSku": "Regenerar SKU",
-        "scanOrEnterBarcode": "Costo por unidad debe ser mayor a 0",
+        "scanOrEnterBarcode": "Escanear o ingresar código de barras",
         "uploadImage": "Subir Imagen",
         "noImagesUploaded": "No hay imágenes subidas",
         "variantAddedSuccessfully": "Variante agregada exitosamente",

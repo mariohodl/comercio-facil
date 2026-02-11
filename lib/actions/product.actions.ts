@@ -534,7 +534,6 @@ export async function deleteProductImg(productId: string, imgKey: string) {
 	await connectToDatabase()
 	try {
 		const uatiRes = await utapi.deleteFiles(imgKey)
-		// console.log('UATRE', uatiRes)
 		const product = await Product.updateOne({ _id: productId },
 			{ $pull: { images: { imgKey } } })
 		return { success: true, product: JSON.parse(JSON.stringify(product)) as IProduct }

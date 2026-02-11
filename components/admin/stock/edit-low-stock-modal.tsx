@@ -53,9 +53,6 @@ export default function EditLowStockModal({
     // Update form data when product changes
     useEffect(() => {
         if (product) {
-            console.log('Product warehouse:', product.warehouse)
-            console.log('Available warehouses:', warehouses.map(w => w.name))
-
             // Robust pre-filling:
             // 1. Try to use product.warehouse
             // 2. If missing or not in list, use first warehouse available

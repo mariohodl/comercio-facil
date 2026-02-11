@@ -422,6 +422,28 @@ const ProductForm = ({
 
   // Hardware Scanner Integration
   useBarcodeScanner((barcode) => {
+    // Clean up the first character that leaked into a focused input
+    const activeEl = document.activeElement
+    if (activeEl instanceof HTMLInputElement && activeEl.name !== 'itemBarcode') {
+      const firstChar = barcode.charAt(0)
+      const currentValue = activeEl.value
+
+      // If the value ends with the first char OR is exactly the first char, remove it
+      if (currentValue === firstChar || currentValue.endsWith(firstChar)) {
+        const cleanedValue = currentValue === firstChar ? '' : currentValue.slice(0, -1)
+
+        // For React-controlled inputs, we need to update via the form
+        const fieldName = activeEl.name
+        if (fieldName && form.getValues(fieldName as any) !== undefined) {
+          form.setValue(fieldName as any, cleanedValue)
+        } else {
+          // Fallback for non-form inputs
+          activeEl.value = cleanedValue
+          activeEl.dispatchEvent(new Event('input', { bubbles: true }))
+        }
+      }
+    }
+
     if (productType === 'Variable Product') {
       setNewVariantData(prev => ({ ...prev, barcode }))
       showSuccess(t('barcodeScannedSuccessfully') + ': ' + barcode)
@@ -1218,7 +1240,7 @@ const ProductForm = ({
                                 </div>
                               </div>
 
-                              <div className="space-y-2">
+                              <div className="space-y-2 hidden">
                                 <label className="text-xs font-medium text-gray-500 uppercase">{t('taxType')}</label>
                                 <Select
                                   value={newVariantData.taxType}
@@ -1853,7 +1875,7 @@ const ProductForm = ({
                     </Card>
 
                     {/* Tax Section */}
-                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white">
+                    <Card className="border-neutral-200 shadow-sm overflow-hidden bg-white hidden">
                       <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-3">
                         <CardTitle className="text-base font-semibold text-navy flex items-center gap-2">
                           <span className="text-orange">📋</span> {t('tax')}

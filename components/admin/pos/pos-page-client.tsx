@@ -33,14 +33,19 @@ export default function POSPageClient({
     const { data: session } = useSession()
     const { setCart, setCustomerId, userId, setUserId, clearCart, cart, totalPrice } = usePOSStore()
     const [selectedCategory, setSelectedCategory] = useState<string>('all')
+    const [query, setQuery] = useState('')
     const [calculatorOpen, setCalculatorOpen] = useState(false)
     const [ordersOpen, setOrdersOpen] = useState(false)
     const [isCartOpen, setIsCartOpen] = useState(false)
+    const [showCategories, setShowCategories] = useState(false)
     const [mounted, setMounted] = useState(false)
     const t = useTranslations('pos')
 
     useEffect(() => {
         setMounted(true)
+        if (window.innerWidth < 1024) {
+            setIsCartOpen(true)
+        }
     }, [])
 
     useEffect(() => {
@@ -58,26 +63,41 @@ export default function POSPageClient({
         if (!barcode.trim()) return
 
         try {
+            // 1. Search for products matching the barcode/sku via API
             const result = await getAllProductsForAdmin({
-                query: '',
+                query: barcode,
                 page: 1,
-                limit: 1000,
+                limit: 100, // Search more products to ensure we find the match
                 store: storeId,
             })
 
             let foundProduct: any = null
             let foundVariant: any = undefined
 
+            // 2. Look for an EXACT match in the results (Case Insensitive)
+            const searchCode = barcode.toLowerCase()
+
             for (const product of result.products) {
-                // Check main product barcode
-                if (product.itemBarcode === barcode) {
+                // Check main product matches
+                if (
+                    product.itemBarcode === barcode ||
+                    product.sku === barcode ||
+                    (product.itemBarcode?.toLowerCase() === searchCode) ||
+                    (product.sku?.toLowerCase() === searchCode)
+                ) {
                     foundProduct = product
                     break
                 }
 
-                // Check variants barcodes
+                // Check variant matches
                 if (product.variants && product.variants.length > 0) {
-                    const variant = product.variants.find((v: any) => v.barcode === barcode)
+                    const variant = product.variants.find((v: any) =>
+                        v.barcode === barcode ||
+                        v.sku === barcode ||
+                        v.barcode?.toLowerCase() === searchCode ||
+                        v.sku?.toLowerCase() === searchCode
+                    )
+
                     if (variant) {
                         foundProduct = product
                         foundVariant = variant
@@ -87,8 +107,21 @@ export default function POSPageClient({
             }
 
             if (foundProduct) {
+                // Check stock before adding
+                const stock = foundVariant ? foundVariant.countInStock : foundProduct.countInStock
+                if (stock <= 0) {
+                    toast.error(t('outOfStock', { product: foundProduct.name }))
+                    return
+                }
+
                 addToCart(foundProduct, foundVariant)
                 toast.success(t('addedToCart', { product: foundProduct.name }))
+
+                // Clear search and open cart on mobile
+                setQuery('')
+                if (window.innerWidth < 1024) {
+                    setIsCartOpen(true)
+                }
             } else {
                 toast.error(t('productNotFound', { sku: barcode }))
             }
@@ -96,10 +129,11 @@ export default function POSPageClient({
             console.error('Error searching product by barcode:', error)
             toast.error(t('errorSearching'))
         }
-    }, [storeId, addToCart, t])
+    }, [storeId, addToCart, t, setIsCartOpen, setQuery])
 
     // Listen for scanner everywhere on the POS page
-    useBarcodeScanner(handleBarcodeScan)
+    // Use a relaxed latency of 100ms for POS to support a wider range of scanners
+    useBarcodeScanner(handleBarcodeScan, true, 100)
 
     const handleOpenOrder = (order: any) => {
         const cartItems = order.items.map((item: any) => ({
@@ -223,23 +257,35 @@ export default function POSPageClient({
 
                     {/* Main Products Area */}
                     <div className='lg:col-span-8 bg-white lg:rounded-3xl lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:border lg:border-slate-200/80 p-3 lg:p-5 overflow-hidden flex flex-col h-full'>
-                        <div className="block lg:hidden mb-2">
-                            <CategorySidebar
-                                storeId={storeId}
-                                selectedCategory={selectedCategory}
-                                onCategoryChange={setSelectedCategory}
-                            />
-                        </div>
+                        {showCategories && (
+                            <div className="block lg:hidden mb-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <CategorySidebar
+                                    storeId={storeId}
+                                    selectedCategory={selectedCategory}
+                                    onCategoryChange={setSelectedCategory}
+                                />
+                            </div>
+                        )}
                         <ProductSearch
                             storeId={storeId}
                             selectedCategory={selectedCategory}
                             onCategoryChange={setSelectedCategory}
+                            showCategories={showCategories}
+                            onToggleCategories={() => setShowCategories(!showCategories)}
+                            query={query}
+                            onQueryChange={setQuery}
+                            onAddToCart={() => {
+                                setQuery('')
+                                if (window.innerWidth < 1024) {
+                                    setIsCartOpen(true)
+                                }
+                            }}
                         />
                     </div>
 
                     {/* Cart - Sidebar on desktop, Drawer on mobile */}
                     <div className='hidden lg:block lg:col-span-3 overflow-hidden h-full'>
-                        <POSCart storeId={storeId} />
+                        {mounted && <POSCart storeId={storeId} />}
                     </div>
                 </div>
 
@@ -249,12 +295,12 @@ export default function POSPageClient({
                         <SheetTrigger asChild>
                             <Button
                                 className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white shadow-2xl shadow-blue-500/30 flex items-center justify-between px-6 pointer-events-auto animate-in slide-in-from-bottom-4 duration-300"
-                                disabled={cartTotalCount === 0}
+                                disabled={!mounted || cartTotalCount === 0}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
                                         <ShoppingBag className="w-6 h-6" />
-                                        {cartTotalCount > 0 && (
+                                        {mounted && cartTotalCount > 0 && (
                                             <Badge className="absolute -top-2 -right-2 bg-orange text-white border-2 border-blue-600 h-5 min-w-5 flex items-center justify-center p-0 text-[10px] font-bold">
                                                 {cartTotalCount}
                                             </Badge>
@@ -262,18 +308,18 @@ export default function POSPageClient({
                                     </div>
                                     <div className="flex flex-col items-start">
                                         <span className="text-[10px] uppercase font-black tracking-widest leading-none opacity-70">{t('viewCart')}</span>
-                                        <span className="text-sm font-bold">{cartTotalCount} {t('itemsInCart')}</span>
+                                        <span className="text-sm font-bold">{mounted ? cartTotalCount : 0} {t('itemsInCart')}</span>
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end">
                                     <span className="text-[10px] uppercase font-black tracking-widest leading-none opacity-70">{t('total')}</span>
-                                    <span className="text-lg font-black tracking-tight">{formatCurrency(totalPrice())}</span>
+                                    <span className="text-lg font-black tracking-tight">{mounted ? formatCurrency(totalPrice()) : formatCurrency(0)}</span>
                                 </div>
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="bottom" className="h-[90vh] p-0 rounded-t-[2.5rem] border-none">
                             <div className="h-full overflow-hidden">
-                                <POSCart storeId={storeId} />
+                                {mounted && <POSCart storeId={storeId} />}
                             </div>
                         </SheetContent>
                     </Sheet>

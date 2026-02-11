@@ -15,9 +15,10 @@ import { toast } from 'sonner'
 
 interface ProductCardProps {
     product: IProduct
+    onAdd?: () => void
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, onAdd }: ProductCardProps) {
     const t = useTranslations('pos')
     const { addToCart, cart, updateQuantity, removeFromCart } = usePOSStore()
     const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false)
@@ -78,6 +79,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 return
             }
             addToCart(product)
+            onAdd?.()
             if (isLowStock) {
                 const remaining = effectiveStock - totalCartQty - 1
                 toast.warning(t('stockWarning'), {
@@ -102,8 +104,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             const item = cartItems[0]
             if (item) {
                 updateQuantity(item.cartItemId, item.quantity + 1)
+                onAdd?.()
             } else {
                 addToCart(product)
+                onAdd?.()
             }
 
             if (totalCartQty + 1 >= effectiveStock) {
