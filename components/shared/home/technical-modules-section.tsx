@@ -7,6 +7,7 @@ export function TechnicalModulesSection() {
             title: 'Gestión de Inventario',
             subtitle: 'Visibilidad 360° de su Stock',
             description: 'Transforme su inventario de un costo a un activo estratégico. Soporte para múltiples almacenes, lotes y números de serie con alertas dinámicas.',
+            image: '/images/inventory-mockup.png',
             icon: Package,
             color: 'text-blue-600',
             bg: 'bg-blue-50',
@@ -19,6 +20,7 @@ export function TechnicalModulesSection() {
             title: 'Punto de Venta (POS)',
             subtitle: 'Experiencia de Compra Superior',
             description: 'Eficiencia en entornos de alto tráfico. Integración nativa con lectores de códigos de barras y sincronización instantánea con el inventario.',
+            image: '/images/pos-mockup.png',
             icon: Monitor,
             color: 'text-orange-600',
             bg: 'bg-orange-50',
@@ -31,6 +33,7 @@ export function TechnicalModulesSection() {
             title: 'Business Intelligence',
             subtitle: 'Decisiones Basadas en Datos',
             description: 'Análisis exhaustivos de rentabilidad y productividad. Informes financieros exportables para una planeación fiscal eficiente.',
+            image: '/images/analytics-mockup.png',
             icon: PieChart,
             color: 'text-emerald-600',
             bg: 'bg-emerald-50',
@@ -115,60 +118,24 @@ export function TechnicalModulesSection() {
                             {/* Visual Content */}
                             <div className='flex-1 w-full'>
                                 <div className="relative group">
-                                    {/* Main Card */}
-                                    <div className={`relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br ${module.bgGradient} border border-gray-200/50 transform transition-all duration-700 group-hover:scale-[1.02] group-hover:shadow-3xl`}>
-                                        {/* Decorative elements */}
-                                        <div className={`absolute top-0 right-0 w-40 h-40 ${module.accentColor}/10 rounded-full blur-3xl`}></div>
-                                        <div className={`absolute bottom-0 left-0 w-32 h-32 ${module.accentColor}/10 rounded-full blur-2xl`}></div>
+                                    {/* Decoration behind the image */}
+                                    <div className={`absolute -inset-4 bg-gradient-to-br ${module.bgGradient} rounded-[3rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700`}></div>
 
-                                        <div className="absolute inset-0 flex items-center justify-center p-8">
-                                            {/* UI Mockup */}
-                                            <div className="w-full h-full bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-6 md:p-8 transform transition-transform duration-700 group-hover:scale-105 border border-gray-100">
-                                                {/* Header */}
-                                                <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-12 h-12 rounded-xl ${module.bg} flex items-center justify-center shadow-md`}>
-                                                            <module.icon className={`w-6 h-6 ${module.color}`} strokeWidth={2.5} />
-                                                        </div>
-                                                        <div>
-                                                            <div className="h-3 w-24 bg-gray-200 rounded-full"></div>
-                                                            <div className="h-2 w-16 bg-gray-100 rounded-full mt-2"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <div className="w-8 h-8 bg-gray-50 rounded-lg"></div>
-                                                        <div className="w-8 h-8 bg-gray-50 rounded-lg"></div>
-                                                    </div>
-                                                </div>
+                                    {/* Image Container */}
+                                    <div className={`relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-gray-200/50 transform transition-all duration-700 group-hover:scale-[1.02] group-hover:shadow-3xl bg-white`}>
+                                        <img
+                                            src={module.image}
+                                            alt={module.title}
+                                            className="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-110"
+                                        />
 
-                                                {/* Content Placeholder */}
-                                                <div className="space-y-4">
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div className={`h-24 rounded-xl bg-gradient-to-br ${module.bgGradient} border ${module.borderColor} p-4`}>
-                                                            <div className="h-2 w-12 bg-white/80 rounded-full mb-2"></div>
-                                                            <div className="h-4 w-16 bg-white/90 rounded-full"></div>
-                                                        </div>
-                                                        <div className={`h-24 rounded-xl bg-gradient-to-br ${module.bgGradient} border ${module.borderColor} p-4`}>
-                                                            <div className="h-2 w-12 bg-white/80 rounded-full mb-2"></div>
-                                                            <div className="h-4 w-16 bg-white/90 rounded-full"></div>
-                                                        </div>
-                                                    </div>
+                                        {/* Gradient Overlay for depth */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/10 to-transparent"></div>
+                                    </div>
 
-                                                    <div className="space-y-3">
-                                                        <div className="h-3 w-full bg-gray-100 rounded-full"></div>
-                                                        <div className="h-3 w-5/6 bg-gray-100 rounded-full"></div>
-                                                        <div className="h-3 w-4/6 bg-gray-100 rounded-full"></div>
-                                                    </div>
-
-                                                    <div className={`h-32 rounded-xl bg-gradient-to-br ${module.bgGradient} border ${module.borderColor}`}></div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Floating badge */}
-                                        <div className={`absolute -top-4 -right-4 w-20 h-20 rounded-2xl ${module.accentColor} flex items-center justify-center shadow-xl transform rotate-12 group-hover:rotate-0 transition-transform duration-500`}>
-                                            <module.icon className="w-10 h-10 text-white" strokeWidth={2} />
-                                        </div>
+                                    {/* Floating icon badge */}
+                                    <div className={`absolute -top-6 -right-6 w-24 h-24 rounded-3xl ${module.accentColor} flex items-center justify-center shadow-2xl transform rotate-12 group-hover:rotate-0 transition-all duration-500 z-10`}>
+                                        <module.icon className="w-12 h-12 text-white" strokeWidth={2} />
                                     </div>
                                 </div>
                             </div>

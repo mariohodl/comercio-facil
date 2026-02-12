@@ -6,10 +6,12 @@ import { MetricsSection } from '@/components/shared/home/metrics-section'
 import { TechnicalModulesSection } from '@/components/shared/home/technical-modules-section'
 import { ScalabilitySection } from '@/components/shared/home/scalability-section'
 import { FooterSection } from '@/components/shared/home/footer-section'
+import { PromoPopup } from '@/components/shared/home/promo-popup'
 
 export default async function HomePage() {
   return (
     <>
+      <PromoPopup />
       <HeroSection />
       <ProblemSection />
       <FeaturesSection />

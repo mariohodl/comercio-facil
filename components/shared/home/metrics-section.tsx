@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { TrendingUp, Users, Package, ShoppingCart } from 'lucide-react'
+import { TrendingUp, Clock, AlertTriangle, Zap, ShieldCheck } from 'lucide-react'
 
 export function MetricsSection() {
     const [isVisible, setIsVisible] = useState(false)
@@ -13,57 +13,61 @@ export function MetricsSection() {
     const metrics = [
         {
             icon: TrendingUp,
-            value: '250%',
-            label: 'Incremento en Ventas',
-            description: 'Promedio anual',
-            color: 'from-emerald-500 to-emerald-600',
-            bgColor: 'bg-emerald-50',
-            iconColor: 'text-emerald-600',
+            value: '3x',
+            label: 'Crecimiento de Utilidad',
+            description: 'Nuestros clientes triplican su margen operativo neto.',
+            color: 'text-emerald-400',
+            gradient: 'from-emerald-400 to-emerald-600',
+            bg: 'bg-emerald-400/10',
+            border: 'border-emerald-400/20'
         },
         {
-            icon: Users,
-            value: '10,000+',
-            label: 'Clientes Activos',
-            description: 'Y contando',
-            color: 'from-blue-500 to-blue-600',
-            bgColor: 'bg-blue-50',
-            iconColor: 'text-blue-600',
+            icon: Clock,
+            value: '15h',
+            label: 'Tiempo Recuperado',
+            description: 'Semanales libres de tareas administrativas manuales.',
+            color: 'text-blue-400',
+            gradient: 'from-blue-400 to-blue-600',
+            bg: 'bg-blue-400/10',
+            border: 'border-blue-400/20'
         },
         {
-            icon: Package,
-            value: '99.9%',
-            label: 'Precisión de Inventario',
-            description: 'Control total',
-            color: 'from-purple-500 to-purple-600',
-            bgColor: 'bg-purple-50',
-            iconColor: 'text-purple-600',
+            icon: AlertTriangle,
+            value: '-40%',
+            label: 'Reducción de Gastos',
+            description: 'Elimine fugas de capital y pérdidas por merma de stock.',
+            color: 'text-orange-400',
+            gradient: 'from-orange-400 to-orange-600',
+            bg: 'bg-orange-400/10',
+            border: 'border-orange-400/20'
         },
         {
-            icon: ShoppingCart,
-            value: '5M+',
-            label: 'Transacciones',
-            description: 'Procesadas mensualmente',
-            color: 'from-orange-500 to-orange-600',
-            bgColor: 'bg-orange-50',
-            iconColor: 'text-orange-600',
+            icon: Zap,
+            value: '+50%',
+            label: 'Eficiencia en Ventas',
+            description: 'Reduzca filas y atienda más clientes en menos tiempo.',
+            color: 'text-purple-400',
+            gradient: 'from-purple-400 to-purple-600',
+            bg: 'bg-purple-400/10',
+            border: 'border-purple-400/20'
         },
     ]
 
     return (
-        <section className='relative py-20 md:py-24 bg-gradient-to-br from-[#1976D2] via-[#1565C0] to-[#0D47A1] overflow-hidden'>
-            {/* Decorative background */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+        <section className='relative py-24 pb-12 bg-slate-950 overflow-hidden'>
+            {/* Ambient Background Lights */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[128px] pointer-events-none"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[128px] pointer-events-none"></div>
 
             <div className='container mx-auto px-4 relative z-10'>
                 {/* Header */}
-                <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                    <h2 className='text-3xl md:text-5xl font-extrabold text-white tracking-tight'>
-                        Resultados que <span className="text-[#FF9800]">Hablan por Sí Mismos</span>
+                <div className="text-center max-w-3xl mx-auto mb-20 space-y-6">
+                    <h2 className='text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight'>
+                        Resultados Reales en <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Cada Área de su Negocio</span>
                     </h2>
-                    <p className="text-lg md:text-xl text-blue-100 leading-relaxed">
-                        Miles de empresas confían en nosotros para transformar su operación
+                    <p className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto">
+                        No somos solo una herramienta, somos el aliado que optimiza su operación y maximiza su rentabilidad cada día.
                     </p>
                 </div>
 
@@ -72,31 +76,27 @@ export function MetricsSection() {
                     {metrics.map((metric, index) => (
                         <div
                             key={index}
-                            className={`group relative bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-500 hover:-translate-y-2 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'
-                                }`}
+                            className={`group relative p-8 rounded-3xl bg-slate-900/50 backdrop-blur-sm border border-slate-800 hover:border-slate-700 transition-all duration-500 hover:-translate-y-1 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}
                             style={{ animationDelay: `${index * 100}ms` }}
                         >
-                            {/* Glow effect */}
-                            <div className={`absolute -inset-0.5 bg-gradient-to-r ${metric.color} rounded-3xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-500`}></div>
-
                             <div className="relative">
                                 {/* Icon */}
-                                <div className={`w-14 h-14 rounded-2xl ${metric.bgColor} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                                    <metric.icon className={`w-7 h-7 ${metric.iconColor}`} strokeWidth={2.5} />
+                                <div className={`w-12 h-12 rounded-xl ${metric.bg} border ${metric.border} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                                    <metric.icon className={`w-6 h-6 ${metric.color}`} strokeWidth={2} />
                                 </div>
 
                                 {/* Value */}
-                                <div className={`text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r ${metric.color} mb-2`}>
+                                <div className={`text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight`}>
                                     {metric.value}
                                 </div>
 
                                 {/* Label */}
-                                <div className="text-white font-bold text-lg mb-1">
+                                <div className={`font-semibold text-lg ${metric.color} mb-2`}>
                                     {metric.label}
                                 </div>
 
                                 {/* Description */}
-                                <div className="text-blue-200 text-sm">
+                                <div className="text-slate-500 text-sm font-medium">
                                     {metric.description}
                                 </div>
                             </div>
@@ -104,31 +104,34 @@ export function MetricsSection() {
                     ))}
                 </div>
 
-                {/* Bottom decoration */}
-                <div className="mt-16 flex justify-center items-center gap-8 flex-wrap">
-                    <div className="flex items-center gap-3 text-white/80">
-                        <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                            <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
+                {/* Bottom Trust Indicators */}
+                <div className="mt-20 pt-10 border-t border-slate-800/50 flex flex-wrap justify-center gap-8 md:gap-16">
+                    <div className="flex items-center gap-3 group">
+                        <div className="p-2 rounded-full bg-slate-900 border border-slate-800 text-emerald-500 group-hover:text-emerald-400 transition-colors">
+                            <Zap className="w-5 h-5" />
                         </div>
-                        <span className="font-medium">Certificado ISO 27001</span>
+                        <div className="flex flex-col">
+                            <span className="text-white font-semibold text-sm">Modo Offline</span>
+                            <span className="text-slate-500 text-xs">Siga vendiendo sin internet</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-3 text-white/80">
-                        <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                            <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
+                    <div className="flex items-center gap-3 group">
+                        <div className="p-2 rounded-full bg-slate-900 border border-slate-800 text-blue-500 group-hover:text-blue-400 transition-colors">
+                            <ShieldCheck className="w-5 h-5" />
                         </div>
-                        <span className="font-medium">99.9% Uptime Garantizado</span>
+                        <div className="flex flex-col">
+                            <span className="text-white font-semibold text-sm">Sin Contratos</span>
+                            <span className="text-slate-500 text-xs">Cancele cuando quiera</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-3 text-white/80">
-                        <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                            <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                    <div className="flex items-center gap-3 group">
+                        <div className="p-2 rounded-full bg-slate-900 border border-slate-800 text-purple-500 group-hover:text-purple-400 transition-colors">
+                            <Clock className="w-5 h-5" />
                         </div>
-                        <span className="font-medium">Soporte 24/7</span>
+                        <div className="flex flex-col">
+                            <span className="text-white font-semibold text-sm">Soporte Local</span>
+                            <span className="text-slate-500 text-xs">Atención humana 24/7</span>
+                        </div>
                     </div>
                 </div>
             </div>

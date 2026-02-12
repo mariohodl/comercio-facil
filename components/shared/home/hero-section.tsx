@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react'
 
 export function HeroSection() {
     return (
-        <section className='relative overflow-hidden bg-gradient-to-b from-white via-blue-50/50 to-white pt-16 pb-32  md:pb-48'>
+        <section className='relative overflow-hidden bg-gradient-to-b from-white via-blue-50/50 to-white pt-16 pb-32  md:pb-30'>
             {/* Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-gradient-to-br from-blue-100/40 to-purple-100/40 blur-3xl"></div>
@@ -35,7 +35,7 @@ export function HeroSection() {
                     <div className='flex flex-col sm:flex-row items-center gap-4 pt-4 w-full justify-center'>
                         <Button size='lg' className='bg-[#FF9800] hover:bg-[#F57C00] text-white rounded-full px-8 py-7 text-lg font-bold shadow-lg shadow-orange-500/20 transition-all hover:scale-105 w-full sm:w-auto' asChild>
                             <Link href='/admin'>
-                                Solicitar Demo Empresarial <ArrowRight className='ml-2 h-5 w-5' />
+                                Comenzar Gratis<ArrowRight className='ml-2 h-5 w-5' />
                             </Link>
                         </Button>
                         <Button size='lg' variant="outline" className='rounded-full px-8 py-7 text-lg font-medium border-gray-200 hover:bg-gray-50 text-gray-700 w-full sm:w-auto' asChild>
@@ -45,19 +45,20 @@ export function HeroSection() {
                         </Button>
                     </div>
 
-                    <div className="pt-8 flex items-center gap-6 text-sm text-gray-500 font-medium">
-                        <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
-                            <span>Sin tarjeta de crédito</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
-                            <span>Instalación inmediata</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
-                            <span>Soporte 24/7</span>
-                        </div>
+                    <div className="pt-8 flex flex-wrap justify-center items-center gap-3 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+                        {[
+                            "Planes a su medida",
+                            "Instalación inmediata",
+                            "Soporte 24/7",
+                            "Seguridad Garantizada"
+                        ].map((text, i) => (
+                            <div key={i} className="flex items-center gap-2 px-4 py-2.5 bg-white/80 backdrop-blur-sm border border-gray-100 rounded-full shadow-sm text-gray-600 text-sm font-medium hover:bg-white hover:shadow-md hover:scale-105 hover:border-blue-100 transition-all duration-300 cursor-default group">
+                                <div className="rounded-full bg-green-50 p-0.5 group-hover:bg-green-100 transition-colors">
+                                    <CheckCircle2 className="w-4 h-4 text-green-600" strokeWidth={3} />
+                                </div>
+                                <span className="group-hover:text-gray-900 transition-colors">{text}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
