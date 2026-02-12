@@ -1,5 +1,6 @@
 'use client'
 import { redirect, useSearchParams } from 'next/navigation'
+import { useEffect } from 'react'
 import { CustomH2 } from '@/components/shared/CustomH2'
 import { CustomP } from '@/components/shared/CustomP'
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,7 @@ const signUpDefaultValues =
       password: '123456',
       confirmPassword: '123456',
       phone: '1234567890',
+      promoCode: '',
     }
     : {
       name: '',
@@ -39,6 +41,7 @@ const signUpDefaultValues =
       password: '',
       confirmPassword: '',
       phone: '',
+      promoCode: '',
     }
 
 export default function SignUpForm() {
@@ -46,9 +49,16 @@ export default function SignUpForm() {
     resolver: zodResolver(UserSignUpSchema),
     defaultValues: signUpDefaultValues,
   })
-  const { control, handleSubmit, formState: { errors } } = form
+  const { control, handleSubmit, formState: { errors }, setValue } = form
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const promoCode = searchParams.get('promo')
+
+  useEffect(() => {
+    if (promoCode) {
+      setValue('promoCode', promoCode)
+    }
+  }, [promoCode, setValue])
 
 
 
@@ -79,10 +89,17 @@ export default function SignUpForm() {
       <div>
         <CustomH2>Regístrate</CustomH2>
         <CustomP>Crea una nueva cuenta de {APP_NAME}.</CustomP>
+        {promoCode === 'EXITO2026' && (
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700 text-sm font-medium animate-in fade-in slide-in-from-top-2">
+            <span className="text-lg">🎁</span>
+            <span>¡Código <strong>EXITO2026</strong> aplicado! 3 meses extra gratis.</span>
+          </div>
+        )}
       </div>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <input type='hidden' name='callbackUrl' value={callbackUrl} />
+          <input type='hidden' {...form.register('promoCode')} />
           <div className='space-y-6'>
             <FormField
               control={control}

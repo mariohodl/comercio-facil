@@ -50,6 +50,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
 			password: userSignUp.password,
 			phone: userSignUp.phone,
 			confirmPassword: userSignUp.confirmPassword,
+			promoCode: userSignUp.promoCode,
 		});
 
 		await connectToDatabase();
@@ -70,6 +71,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
 			role: ROL_ADMIN, // Default to admin for new signups as they are creating a store/company
 			isStore: true, // Default to true as per requirement
 			emailVerified: false, // User needs to verify email
+			promoCode: user.promoCode,
 		});
 
 		// Send verification email
@@ -117,7 +119,14 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 		if (!company) {
 			const trialStartDate = new Date();
 			const trialEndDate = new Date();
-			trialEndDate.setMonth(trialEndDate.getMonth() + 1);
+
+			// Check for specialized promo code
+			let freeMonths = 1;
+			if (user.promoCode === 'EXITO2026') {
+				freeMonths = 4; // 3 extra months
+			}
+
+			trialEndDate.setMonth(trialEndDate.getMonth() + freeMonths);
 
 			// Create Company
 			company = await Company.create({
@@ -128,7 +137,7 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 				planStatus: PLAN_STATUS_FREE_TRIAL,
 				trialStartDate,
 				trialEndDate,
-				freeMonths: 1,
+				freeMonths,
 			});
 		} else {
 			// Update existing company name

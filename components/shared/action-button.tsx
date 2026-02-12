@@ -19,7 +19,7 @@ export default function ActionButton({
   size?: 'default' | 'sm' | 'lg'
 }) {
   const [isPending, startTransition] = useTransition()
-//   const { toast } = useToast()
+  //   const { toast } = useToast()
   return (
     <Button
       type='button'
@@ -30,11 +30,10 @@ export default function ActionButton({
       onClick={() =>
         startTransition(async () => {
           const res = await action()
-          console.log('res', res)
-        //   toast({
-        //     variant: res.success ? 'default' : 'destructive',
-        //     description: res.message,
-        //   })
+          //   toast({
+          //     variant: res.success ? 'default' : 'destructive',
+          //     description: res.message,
+          //   })
         })
       }
     >

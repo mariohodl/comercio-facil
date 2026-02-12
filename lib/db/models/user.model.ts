@@ -15,6 +15,7 @@ export interface IUser extends Document, IUserInput {
 	isDeleted: boolean;
 	deletedAt?: Date | null;
 	phone: string;
+	promoCode?: string;
 	business?: {
 		companyId: string;
 		stores: string[];
@@ -43,7 +44,8 @@ const userSchema = new Schema<IUser>(
 			stores: [{ type: Schema.Types.ObjectId as any, ref: 'Store' }],
 			warehouses: [{ type: Schema.Types.ObjectId as any, ref: 'Warehouse' }],
 			defaultStoreId: { type: Schema.Types.ObjectId as any, ref: 'Store' }
-		}
+		},
+		promoCode: { type: String },
 	},
 	{
 		timestamps: true,

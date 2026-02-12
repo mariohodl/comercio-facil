@@ -10,6 +10,7 @@ import User from './lib/db/models/user.model';
 import Store from './lib/db/models/store.model';
 import Company from './lib/db/models/company.model';
 import { ROL_ADMIN } from './lib/constants';
+import { cookies } from 'next/headers';
 
 import NextAuth, { type DefaultSession } from 'next-auth';
 import authConfig from './auth.config';
@@ -114,10 +115,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			// For all social providers (anything that's not credentials), we mark as verified
 			// and give them the admin role by default since they are signing up to create a store
 			await connectToDatabase();
+			const cookieStore = await cookies();
+			const promoCode = cookieStore.get('promo_code')?.value;
+
 			await User.findOneAndUpdate({ email: user.email }, {
 				emailVerified: true,
 				role: ROL_ADMIN,
 				isStore: true,
+				promoCode: promoCode || undefined,
 			});
 		},
 	},

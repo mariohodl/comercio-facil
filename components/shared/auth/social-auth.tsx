@@ -1,5 +1,6 @@
 'use client'
 import { useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   SignInWithGoogle,
@@ -57,13 +58,20 @@ const SocialButton = ({
 }
 
 const SocialAuth = () => {
+  const searchParams = useSearchParams()
+  const promoCode = searchParams.get('promo')
+
   useEffect(() => {
+    if (promoCode) {
+      document.cookie = `promo_code=${promoCode}; path=/; max-age=3600`;
+    }
+
     if (window.location.hash === '#_=_') {
       history.replaceState
         ? history.replaceState(null, '', window.location.href.split('#')[0])
         : (window.location.hash = '');
     }
-  }, []);
+  }, [promoCode]);
 
   return (
     <div className='flex flex-col sm:flex-row gap-3 w-full'>
