@@ -50,12 +50,19 @@ export default async function ProductDetailsPage(props: {
                     <Card>
                         <CardContent className="p-6">
                             <div className="relative w-full aspect-square mb-4 rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
-                                <Image
-                                    src={product.images && product.images.length > 0 ? product.images[0].imgUrl : '/placeholder.png'}
-                                    alt={product.name}
-                                    fill
-                                    className="object-contain p-4"
-                                />
+                                {product.images && product.images.length > 0 && product.images[0].imgUrl ? (
+                                    <Image
+                                        src={product.images[0].imgUrl}
+                                        alt={product.name}
+                                        fill
+                                        className="object-contain p-4"
+                                    />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-2">
+                                        <span className="text-4xl">📷</span>
+                                        <span className="text-xs font-medium uppercase tracking-widest">No Img</span>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

@@ -8,6 +8,9 @@ import { getActiveCategories } from '@/lib/actions/category.actions'
 import { getActiveBrands } from '@/lib/actions/brand.actions'
 import { getActiveUnits } from '@/lib/actions/unit.actions'
 import { getAttributesByStore } from '@/lib/actions/attribute.actions'
+import { getUserStores } from '@/lib/actions/store.actions'
+import { getUserWarehouses } from '@/lib/actions/warehouse.actions'
+import { getCompanyIndustry } from '@/lib/actions/catalog.actions'
 
 export const metadata: Metadata = {
   title: 'Edit Product',
@@ -32,9 +35,12 @@ const UpdateProduct = async (props: UpdateProductProps) => {
   const brands = await getActiveBrands()
   const units = await getActiveUnits()
   const attributes = await getAttributesByStore(store)
+  const stores = await getUserStores()
+  const warehouses = await getUserWarehouses()
+  const industry = await getCompanyIndustry()
 
   return (
-    <main className='max-w-6xl mx-auto p-4'>
+    <main className='max-w-7xl mx-auto'>
       <div className='flex mb-4'>
         <Link href={`/admin/${store}/products`}>Products</Link>
         <span className='mx-1'>›</span>
@@ -42,7 +48,19 @@ const UpdateProduct = async (props: UpdateProductProps) => {
       </div>
 
       <div className='my-8'>
-        <ProductForm type='Update' product={product} productId={product._id} categories={categories} brands={brands} units={units} attributes={attributes} storeId={store} />
+        <ProductForm
+          type='Update'
+          product={product}
+          productId={product._id}
+          categories={categories}
+          brands={brands}
+          units={units}
+          attributes={attributes}
+          storeId={store}
+          stores={stores}
+          warehouses={warehouses}
+          industry={industry}
+        />
       </div>
     </main>
   )

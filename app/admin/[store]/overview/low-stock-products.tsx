@@ -29,13 +29,17 @@ export default function LowStockProducts({ data, storeId }: LowStockProductsProp
                     {data.map((product) => (
                         <div key={product._id} className='group flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition-colors duration-200'>
                             <div className='flex items-center gap-3'>
-                                <div className='relative h-12 w-12 overflow-hidden rounded-xl border border-slate-100 shadow-sm'>
-                                    <Image
-                                        src={product.images[0]?.imgUrl || '/placeholder.png'}
-                                        alt={product.name}
-                                        fill
-                                        className='object-cover group-hover:scale-110 transition-transform duration-500'
-                                    />
+                                <div className='relative h-12 w-12 overflow-hidden rounded-xl border border-slate-100 shadow-sm bg-slate-50 flex items-center justify-center shrink-0'>
+                                    {product.images?.[0]?.imgUrl ? (
+                                        <Image
+                                            src={product.images[0].imgUrl}
+                                            alt={product.name}
+                                            fill
+                                            className='object-cover group-hover:scale-110 transition-transform duration-500'
+                                        />
+                                    ) : (
+                                        <span className='text-[8px] text-slate-400 font-bold uppercase tracking-tighter'>No Img</span>
+                                    )}
                                 </div>
                                 <div className="min-w-0">
                                     <p className='font-semibold text-slate-800 text-sm line-clamp-1 group-hover:text-orange transition-colors'>{product.name}</p>

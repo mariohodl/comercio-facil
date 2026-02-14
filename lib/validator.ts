@@ -3,7 +3,7 @@ import { formatNumberWithDecimal } from './utils'
 
 const MongoId = z
 	.string()
-	.regex(/^[0-9a-fA-F]{24}$/, { message: 'Invalid MongoDB ID' })
+	.regex(/^[0-9a-fA-F]{24}$/, { message: 'ID de MongoDB inválido' })
 
 // Common
 const Price = (field: string) =>
@@ -18,23 +18,23 @@ export const ReviewInputSchema = z.object({
 	product: MongoId,
 	user: MongoId,
 	isVerifiedPurchase: z.boolean(),
-	title: z.string().min(1, 'Title is required'),
-	comment: z.string().min(1, 'Comment is required'),
+	title: z.string().min(1, 'El título es obligatorio'),
+	comment: z.string().min(1, 'El comentario es obligatorio'),
 	rating: z.coerce
 		.number()
 		.int()
-		.min(1, 'Rating must be at least 1')
-		.max(5, 'Rating must be at most 5'),
+		.min(1, 'La calificación debe ser al menos 1')
+		.max(5, 'La calificación debe ser como máximo 5'),
 })
 export const ProductBaseSchema = z.object({
 	_id: z.string().optional(),
 	productId: z.coerce
 		.number()
 		.int()
-		.nonnegative('Number of sales must be a non-negative number'),
-	name: z.string().min(3, 'Name must be at least 3 characters'),
-	slug: z.string().min(3, 'Slug must be at least 3 characters'),
-	sku: z.string().min(1, 'SKU is required').regex(/^[a-zA-Z0-9-_]+$/, 'SKU can only contain letters, numbers, hyphens, and underscores'),
+		.nonnegative('El número de ventas debe ser un número no negativo'),
+	name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
+	slug: z.string().min(3, 'El slug debe tener al menos 3 caracteres'),
+	sku: z.string().min(1, 'El SKU es obligatorio').regex(/^[a-zA-Z0-9-_]+$/, 'El SKU solo puede contener letras, números, guiones y guiones bajos'),
 	images: z.array(z.object({
 		imgUrl: z.string(),
 		imgKey: z.string(),
@@ -46,23 +46,23 @@ export const ProductBaseSchema = z.object({
 	isPublished: z.boolean(),
 	listPrice: z.coerce
 		.number()
-		.nonnegative('List price must be a non-negative number'),
+		.nonnegative('El precio de lista debe ser un número no negativo'),
 	discountPrice: z.coerce
 		.number()
-		.nonnegative('Discount price must be a non-negative number')
+		.nonnegative('El precio de descuento debe ser un número no negativo')
 		.optional(),
 	countInStock: z.coerce
 		.number()
 		.int()
-		.nonnegative('Count in stock must be a non-negative number'),
+		.nonnegative('El stock debe ser un número no negativo'),
 	tags: z.array(z.string()).default([]),
 	avgRating: z.coerce
 		.number()
-		.nonnegative('Average rating must be a non-negative number'),
+		.nonnegative('La calificación promedio debe ser un número no negativo'),
 	numReviews: z.coerce
 		.number()
 		.int()
-		.nonnegative('Number of reviews must be a non-negative number'),
+		.nonnegative('El número de reseñas debe ser un número no negativo'),
 	ratingDistribution: z
 		.array(z.object({ rating: z.number(), count: z.number() }))
 		.max(5),
@@ -70,9 +70,9 @@ export const ProductBaseSchema = z.object({
 	numSales: z.coerce
 		.number()
 		.int()
-		.nonnegative('Number of sales must be a non-negative number'),
-	store: z.string().min(1, 'Store is required'),
-	warehouse: z.string().min(1, 'Warehouse is required'),
+		.nonnegative('El número de ventas debe ser un número no negativo'),
+	store: z.string().min(1, 'La tienda es obligatoria'),
+	warehouse: z.string().min(1, 'El almacén es obligatorio'),
 
 	// Hybrid Catalog References (Optional for backwards compatibility)
 	categoriaId: z.string().optional(),
@@ -81,10 +81,10 @@ export const ProductBaseSchema = z.object({
 	unitId: z.string().optional(),
 
 	// String representations
-	category: z.string().min(1, 'Category is required'),
-	subCategory: z.string().min(1, 'Subcategory is required'),
-	unit: z.string().min(1, 'Unit is required'),
-	brand: z.string().min(1, 'Brand is required'),
+	category: z.string().min(1, 'La categoría es obligatoria'),
+	subCategory: z.string().min(1, 'La subcategoría es obligatoria'),
+	unit: z.string().min(1, 'La unidad es obligatoria'),
+	brand: z.string().min(1, 'La marca es obligatoria'),
 
 	// Custom data flags
 	isCustomCategory: z.boolean().optional(),
@@ -92,13 +92,13 @@ export const ProductBaseSchema = z.object({
 
 	barcodeSymbology: z.string().optional(),
 	itemBarcode: z.string().optional(),
-	productType: z.string().min(1, 'Product type is required'),
+	productType: z.string().min(1, 'El tipo de producto es obligatorio'),
 	taxType: z.string().optional(),
-	tax: z.coerce.number().nonnegative('Tax must be a non-negative number').optional(),
+	tax: z.coerce.number().nonnegative('El impuesto debe ser un número no negativo').optional(),
 	discountType: z.string().optional(),
 	discountValue: z.coerce.number().optional(),
-	quantityAlert: z.coerce.number().int().nonnegative('Quantity alert must be a non-negative number'),
-	costPerUnit: z.coerce.number().nonnegative('Cost per unit must be a non-negative number'),
+	quantityAlert: z.coerce.number().int().nonnegative('La alerta de cantidad debe ser un número no negativo'),
+	costPerUnit: z.coerce.number().nonnegative('El costo por unidad debe ser un número no negativo'),
 	attributes: z.array(z.object({
 		name: z.string(),
 		values: z.array(z.string())
@@ -130,20 +130,42 @@ export const ProductInputSchema = ProductBaseSchema.superRefine((data, ctx) => {
 	if (data.productType === 'Single Product' && (!data.itemBarcode || data.itemBarcode.trim() === '')) {
 		ctx.addIssue({
 			code: z.ZodIssueCode.custom,
-			message: 'Item barcode is required',
+			message: 'El código de barras del ítem es obligatorio',
 			path: ['itemBarcode'],
 		})
+	}
+
+	if (data.isPublished) {
+		if (data.productType === 'Single Product' && data.listPrice <= 0) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: 'El precio debe ser mayor a 0 para publicar el producto',
+				path: ['listPrice'],
+			})
+		}
+
+		if (data.productType === 'Variable Product' && data.variants) {
+			data.variants.forEach((v, idx) => {
+				if (v.listPrice <= 0) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: 'El precio debe ser mayor a 0 para publicar el producto',
+						path: ['variants', idx, 'listPrice'],
+					})
+				}
+			})
+		}
 	}
 })
 
 // Order Item
 export const OrderItemSchema = z.object({
-	clientId: z.string().min(1, 'clientId is required'),
-	product: z.string().min(1, 'Product is required'),
-	name: z.string().min(1, 'Name is required'),
-	slug: z.string().min(1, 'Slug is required'),
-	category: z.string().min(1, 'Category is required'),
-	sku: z.string().min(1, 'SKU is required'),
+	clientId: z.string().min(1, 'El ID del cliente es obligatorio'),
+	product: z.string().min(1, 'El producto es obligatorio'),
+	name: z.string().min(1, 'El nombre es obligatorio'),
+	slug: z.string().min(1, 'El slug es obligatorio'),
+	category: z.string().min(1, 'La categoría es obligatoria'),
+	sku: z.string().min(1, 'El SKU es obligatorio'),
 	quantity: z
 		.number()
 		.int()
@@ -152,19 +174,19 @@ export const OrderItemSchema = z.object({
 		.number()
 		.int()
 		.nonnegative('Quantity must be a non-negative number'),
-	image: z.string().min(1, 'Image is required'),
+	image: z.string().min(1, 'La imagen es obligatoria'),
 	price: z.number().nonnegative('Price must be a non-negative number'),
 	color: z.string().optional(),
 	size: z.string().optional(),
 })
 export const ShippingAddressSchema = z.object({
-	fullName: z.string().min(1, 'Full name is required'),
-	street: z.string().min(1, 'Address is required'),
-	city: z.string().min(1, 'City is required'),
-	postalCode: z.string().min(1, 'Postal code is required'),
-	province: z.string().min(1, 'Province is required'),
-	phone: z.string().min(1, 'Phone number is required'),
-	country: z.string().min(1, 'Country is required'),
+	fullName: z.string().min(1, 'El nombre completo es obligatorio'),
+	street: z.string().min(1, 'La dirección es obligatoria'),
+	city: z.string().min(1, 'La ciudad es obligatoria'),
+	postalCode: z.string().min(1, 'El código postal es obligatorio'),
+	province: z.string().min(1, 'La provincia es obligatoria'),
+	phone: z.string().min(1, 'El número de teléfono es obligatorio'),
+	country: z.string().min(1, 'El país es obligatorio'),
 })
 
 export const OrderInputSchema = z.object({
@@ -180,9 +202,9 @@ export const OrderInputSchema = z.object({
 	fulfillmentStatus: z.enum(['PENDING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED']).default('PENDING'),
 	items: z
 		.array(OrderItemSchema)
-		.min(1, 'Order must contain at least one item'),
+		.min(1, 'El pedido debe contener al menos un artículo'),
 	shippingAddress: ShippingAddressSchema,
-	paymentMethod: z.string().min(1, 'Payment method is required'),
+	paymentMethod: z.string().min(1, 'El método de pago es obligatorio'),
 	paymentResult: z
 		.object({
 			id: z.string(),
@@ -203,7 +225,7 @@ export const OrderInputSchema = z.object({
 				today.setHours(0, 0, 0, 0); // Start of today
 				return value >= today;
 			},
-			'Expected delivery date must be today or in the future'
+			'La fecha de entrega esperada debe ser hoy o en el futuro'
 		),
 	isDelivered: z.boolean().default(false),
 	deliveredAt: z.date().optional(),
@@ -217,7 +239,7 @@ export const OrderInputSchema = z.object({
 export const CartSchema = z.object({
 	items: z
 		.array(OrderItemSchema)
-		.min(1, 'Order must contain at least one item'),
+		.min(1, 'El pedido debe contener al menos un artículo'),
 	itemsPrice: z.number(),
 
 	taxPrice: z.optional(z.number()),
@@ -235,7 +257,7 @@ const UserName = z
 	.string()
 	.min(2, { message: 'Username must be at least 2 characters' })
 	.max(50, { message: 'Username must be at most 50 characters' })
-const Email = z.string().min(1, 'Email is required').email('Email is invalid')
+const Email = z.string().min(1, 'El correo electrónico es obligatorio').email('Email is invalid')
 const Password = z.string().min(3, 'Password must be at least 3 characters')
 const UserRole = z.string().optional()
 const StoreId = z.string().optional()
@@ -243,23 +265,23 @@ const StoreId = z.string().optional()
 export const UserInputSchema = z.object({
 	name: UserName,
 	email: Email,
-	phone: z.string().min(1, 'Phone is required'),
+	phone: z.string().min(1, 'El teléfono es obligatorio'),
 	image: z.string().optional(),
 	emailVerified: z.boolean(),
 	role: UserRole,
 	password: Password,
-	paymentMethod: z.string().min(1, 'Payment method is required'),
+	paymentMethod: z.string().min(1, 'El método de pago es obligatorio'),
 	storeName: z.string().optional(),
 	storeId: z.string().optional(),
 	isStore: z.boolean(),
 	address: z.object({
-		fullName: z.string().min(1, 'Full name is required'),
-		street: z.string().min(1, 'Street is required'),
-		city: z.string().min(1, 'City is required'),
-		province: z.string().min(1, 'Province is required'),
-		postalCode: z.string().min(1, 'Postal code is required'),
-		country: z.string().min(1, 'Country is required'),
-		phone: z.string().min(1, 'Phone number is required'),
+		fullName: z.string().min(1, 'El nombre completo es obligatorio'),
+		street: z.string().min(1, 'La calle es obligatoria'),
+		city: z.string().min(1, 'La ciudad es obligatoria'),
+		province: z.string().min(1, 'La provincia es obligatoria'),
+		postalCode: z.string().min(1, 'El código postal es obligatorio'),
+		country: z.string().min(1, 'El país es obligatorio'),
+		phone: z.string().min(1, 'El número de teléfono es obligatorio'),
 	}),
 })
 export const UserSignInSchema = z.object({
@@ -269,7 +291,7 @@ export const UserSignInSchema = z.object({
 
 export const UserSignUpSchema = UserSignInSchema.extend({
 	name: UserName,
-	phone: z.string().min(1, 'Phone is required'),
+	phone: z.string().min(1, 'El teléfono es obligatorio'),
 	confirmPassword: Password,
 }).refine((data) => data.password === data.confirmPassword, {
 	message: "Passwords don't match",
@@ -284,7 +306,7 @@ export const StoreSettingsSchema = z.object({
 	warehouseLocation: z.string().min(3, 'Warehouse location must be at least 3 characters'),
 	taxId: z.string().optional(),
 	storeId: StoreId,
-	industry: z.string().min(1, 'Industry is required'),
+	industry: z.string().min(1, 'La industria es obligatoria'),
 	plan: z.enum(['BASIC', 'INTERMEDIATE', 'ADVANCED']).optional(),
 	planStatus: z.string().optional(),
 	trialEndDate: z.string().nullable().optional(),
@@ -301,9 +323,31 @@ export const ProductUpdateSchema = ProductBaseSchema.extend({
 	if (data.productType === 'Single Product' && (!data.itemBarcode || data.itemBarcode.trim() === '')) {
 		ctx.addIssue({
 			code: z.ZodIssueCode.custom,
-			message: 'Item barcode is required',
+			message: 'El código de barras del ítem es obligatorio',
 			path: ['itemBarcode'],
 		})
+	}
+
+	if (data.isPublished) {
+		if (data.productType === 'Single Product' && data.listPrice <= 0) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: 'El precio debe ser mayor a 0 para publicar el producto',
+				path: ['listPrice'],
+			})
+		}
+
+		if (data.productType === 'Variable Product' && data.variants) {
+			data.variants.forEach((v, idx) => {
+				if (v.listPrice <= 0) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: 'El precio debe ser mayor a 0 para publicar el producto',
+						path: ['variants', idx, 'listPrice'],
+					})
+				}
+			})
+		}
 	}
 })
 
@@ -317,12 +361,12 @@ export const UserUpdateSchema = z.object({
 export const StoreUserCreateSchema = z.object({
 	name: UserName,
 	email: Email,
-	phone: z.string().min(1, 'Phone is required'),
+	phone: z.string().min(1, 'El teléfono es obligatorio'),
 	password: Password,
 	confirmPassword: Password,
-	role: z.string().min(1, 'Role is required'),
+	role: z.string().min(1, 'El rol es obligatorio'),
 	status: z.boolean().default(true),
-	storeId: z.string().min(1, 'Store ID is required'),
+	storeId: z.string().min(1, 'El ID de la tienda es obligatorio'),
 }).refine((data) => data.password === data.confirmPassword, {
 	message: "Passwords don't match",
 	path: ['confirmPassword'],
@@ -335,7 +379,7 @@ export const StoreUserUpdateSchema = z.object({
 	phone: z.string().optional(),
 	password: z.string().optional(),
 	confirmPassword: z.string().optional(),
-	role: z.string().min(1, 'Role is required'),
+	role: z.string().min(1, 'El rol es obligatorio'),
 	status: z.boolean().default(true),
 	storeId: z.string().optional(),
 }).refine((data) => {
@@ -349,8 +393,8 @@ export const StoreUserUpdateSchema = z.object({
 })
 
 export const IOrderReceptionProduct = z.object({
-	name: z.string().min(1, 'Name is required'),
-	productId: z.string().min(1, 'Product ID is required'),
+	name: z.string().min(1, 'El nombre es obligatorio'),
+	productId: z.string().min(1, 'El ID del producto es obligatorio'),
 	countInStock: z.coerce
 		.number()
 		.int()
@@ -361,14 +405,14 @@ export const IOrderReceptionProduct = z.object({
 			(value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
 			'Price must have exactly two decimal places (e.g., 49.99)'
 		),
-	category: z.string().min(1, 'Category is required'),
+	category: z.string().min(1, 'La categoría es obligatoria'),
 })
 
 export const OrderReceptionSchema = z.object({
-	nameProvider: z.string().min(6, 'Name is required'),
-	clave: z.string().min(2, 'Clave is required'),
-	facturaNumber: z.string().min(1, 'Factura number is required'),
-	rfc: z.string().min(12, 'RFC is required'),
+	nameProvider: z.string().min(6, 'El nombre es obligatorio'),
+	clave: z.string().min(2, 'La clave es obligatoria'),
+	facturaNumber: z.string().min(1, 'El número de factura es obligatorio'),
+	rfc: z.string().min(12, 'El RFC es obligatorio'),
 	observations: z.string().optional(),
 	isPaid: z.boolean().optional(),
 	paidAt: z.date().optional(),
@@ -377,7 +421,7 @@ export const OrderReceptionSchema = z.object({
 	iva: z.coerce.number().optional(),
 	products: z
 		.array(IOrderReceptionProduct)
-		.min(1, 'Order must contain at least one item'),
+		.min(1, 'El pedido debe contener al menos un artículo'),
 	storeId: z.string().optional(),
 })
 
@@ -404,13 +448,13 @@ export const PurchaseAttachmentSchema = z.object({
 })
 
 export const PurchaseInputSchema = z.object({
-	supplierId: z.string().min(1, 'providerRequired').regex(/^[0-9a-fA-F]{24}$/, { message: 'providerRequired' }),
-	reference: z.string().min(1, 'referenceRequired'),
+	supplierId: z.string().min(1, 'El proveedor es obligatorio').regex(/^[0-9a-fA-F]{24}$/, { message: 'El proveedor es obligatorio' }),
+	reference: z.string().min(1, 'La referencia es obligatoria'),
 	purchaseDate: z.date(),
 	status: PurchaseStatusSchema,
 	type: PurchaseTypeSchema.default('Normal'),
-	items: z.array(PurchaseItemSchema).min(1, 'itemsRequired'),
-	totalAmount: z.coerce.number().positive('amountRequired'),
+	items: z.array(PurchaseItemSchema).min(1, 'Se requiere al menos un artículo'),
+	totalAmount: z.coerce.number().positive('El monto es obligatorio'),
 	paidAmount: z.coerce.number().nonnegative().default(0),
 	paymentStatus: PaymentStatusSchema,
 	notes: z.string().optional(),
@@ -511,9 +555,9 @@ export const ReportInputProduct = z.object({
 })
 
 export const ReportInputSchema = z.object({
-	title: z.string().min(6, 'Title report is required'),
-	type: z.string().min(3, 'Type of report is required'),
-	status: z.string().min(3, 'Status of report is required'),
+	title: z.string().min(6, 'El título del reporte es obligatorio'),
+	type: z.string().min(3, 'El tipo de reporte es obligatorio'),
+	status: z.string().min(3, 'El estado del reporte es obligatorio'),
 	storeId: z.string(),
 	allTotalValue: z.coerce.number(),
 	allSubTotalValue: z.coerce.number(),
@@ -539,7 +583,7 @@ export const POSOrderSchema = z.object({
 			variantSku: z.string().optional(),
 			variantDetails: z.string().optional(),
 		})
-	).min(1, 'Cart is empty'),
+	).min(1, 'El carrito está vacío'),
 	paymentMethod: z.enum(['Cash', 'Card', 'Split']),
 	totalPrice: z.number(),
 	receivedAmount: z.number().optional(), // For cash payments
@@ -561,8 +605,8 @@ export const POSOrderSchema = z.object({
 })
 
 export const CategoryInputSchema = z.object({
-	categoryName: z.string().min(1, 'Category name is required'),
-	categorySlug: z.string().min(1, 'Category slug is required'),
+	categoryName: z.string().min(1, 'El nombre de la categoría es obligatorio'),
+	categorySlug: z.string().min(1, 'El slug de la categoría es obligatorio'),
 	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })
@@ -572,9 +616,9 @@ export const CategoryUpdateSchema = CategoryInputSchema.extend({
 })
 
 export const SubCategoryInputSchema = z.object({
-	name: z.string().min(1, 'Name is required'),
+	name: z.string().min(1, 'El nombre es obligatorio'),
 	slug: z.string().optional(),
-	parentCategory: z.string().min(1, 'Parent category is required'),
+	parentCategory: z.string().min(1, 'La categoría padre es obligatoria'),
 	code: z.string().optional(),
 	storeId: z.string().optional(),
 	status: z.boolean().default(true),
@@ -585,8 +629,8 @@ export const SubCategoryUpdateSchema = SubCategoryInputSchema.extend({
 })
 
 export const BrandInputSchema = z.object({
-	name: z.string().min(1, 'Name is required'),
-	image: z.string().min(1, 'Image is required'),
+	name: z.string().min(1, 'El nombre es obligatorio'),
+	image: z.string().min(1, 'La imagen es obligatoria'),
 	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })
@@ -596,8 +640,8 @@ export const BrandUpdateSchema = BrandInputSchema.extend({
 })
 
 export const UnitInputSchema = z.object({
-	name: z.string().min(1, 'Name is required'),
-	abbreviation: z.string().min(1, 'Abbreviation is required'),
+	name: z.string().min(1, 'El nombre es obligatorio'),
+	abbreviation: z.string().min(1, 'La abreviatura es obligatoria'),
 	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })
@@ -607,8 +651,8 @@ export const UnitUpdateSchema = UnitInputSchema.extend({
 })
 
 export const AttributeInputSchema = z.object({
-	name: z.string().min(1, 'Name is required'),
-	values: z.array(z.string()).min(1, 'At least one value is required'),
+	name: z.string().min(1, 'El nombre es obligatorio'),
+	values: z.array(z.string()).min(1, 'Se requiere al menos un valor'),
 	storeId: z.string().optional(),
 	isGlobal: z.boolean().optional(),
 	isApproved: z.boolean().optional(),

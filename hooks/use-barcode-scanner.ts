@@ -34,19 +34,30 @@ export function useBarcodeScanner(
     const handleKeyDown = useCallback((event: KeyboardEvent) => {
         if (event.ctrlKey || event.altKey || event.metaKey) return
 
+        const activeEl = document.activeElement
+
+        // By default, we intercept scans globally (body, divs, etc.).
+        // However, for INPUT and TEXTAREA, we ignore them by default to avoid "eating" fast human typing.
+        // We only intercept in these fields if they explicitly have the 'data-barcode-capture' attribute.
+        const isInput = activeEl instanceof HTMLInputElement || activeEl instanceof HTMLTextAreaElement
+        const isCaptured = activeEl?.hasAttribute('data-barcode-capture')
+        const shouldIgnore = isInput && !isCaptured
+
         const currentTime = Date.now()
         const timeSinceLastKey = lastKeyTimeRef.current > 0 ? currentTime - lastKeyTimeRef.current : 0
 
         // === ENTER/TAB - Scan completion ===
         if (event.key === 'Enter' || event.key === 'Tab') {
-            const barcode = bufferRef.current.trim()
-
-            // For explicit completion (Enter/Tab), we still require a minimum length of 5 to avoid cutting off
-            if (barcode.length >= 5 && scanModeRef.current) {
+            if (scanModeRef.current) {
+                // ALWAYS block Enter/Tab if we were in scan mode to prevent form submission
                 event.preventDefault()
                 event.stopImmediatePropagation()
 
-                onScanRef.current(barcode)
+                const barcode = bufferRef.current.trim()
+                // Require at least 2 characters to consider it a valid barcode
+                if (barcode.length >= 2) {
+                    onScanRef.current(barcode)
+                }
                 resetState()
                 return
             }
@@ -58,8 +69,15 @@ export function useBarcodeScanner(
         // Only process single printable characters
         if (event.key.length !== 1) return
 
+        // If ignored, stop here to avoid detecting fast typing as a scan
+        if (shouldIgnore) {
+            resetState()
+            return
+        }
+
         // Reset if too much time passed (human typing)
-        if (timeSinceLastKey > 150 && bufferRef.current.length > 0) {
+        // Using a shorter threshold for human typing (150ms -> 100ms)
+        if (timeSinceLastKey > 100 && bufferRef.current.length > 0) {
             resetState()
         }
 
@@ -80,8 +98,10 @@ export function useBarcodeScanner(
             if (!scanModeRef.current) {
                 // Enter scan mode
                 scanModeRef.current = true
-                const activeEl = document.activeElement
-                if (activeEl instanceof HTMLInputElement || activeEl instanceof HTMLTextAreaElement) {
+
+                // Cleanup interception if we are indeed intercepting (not ignored)
+                // If ignored, we already returned above.
+                if (isInput) {
                     const val = activeEl.value
                     const lastChar = bufferRef.current // This is the first char
                     if (val.length > 0 && val.endsWith(lastChar)) {
@@ -91,7 +111,7 @@ export function useBarcodeScanner(
                 }
             }
 
-            // BLOCK this and all subsequent characters
+            // Block this and all subsequent characters
             event.preventDefault()
             event.stopImmediatePropagation()
 
@@ -103,12 +123,7 @@ export function useBarcodeScanner(
             timeoutRef.current = setTimeout(() => {
                 const barcode = bufferRef.current.trim()
 
-                // Wait for potentially longer barcodes to arrive.
-                // If we cut off too early (e.g. at 3 digits of a 13-digit code), we get "Product "024" not found".
-                // 100ms is safer for slower scanners/devices.
-                // And we require at least 5 characters to consider it a valid complete scan
-                // unless Enter was pressed (handled separately).
-                if (barcode.length >= 5 && scanModeRef.current) {
+                if (barcode.length >= 2 && scanModeRef.current) {
                     onScanRef.current(barcode)
                 }
                 resetState()

@@ -27,13 +27,17 @@ export default function TopSellingProducts({ data }: TopSellingProductsProps) {
                         <div key={index} className='group flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition-colors duration-200'>
                             <div className='flex items-center gap-3'>
                                 <div className="relative">
-                                    <div className='relative h-12 w-12 overflow-hidden rounded-xl border border-slate-100 shadow-sm'>
-                                        <Image
-                                            src={product.image}
-                                            alt={product.label}
-                                            fill
-                                            className='object-cover group-hover:scale-110 transition-transform duration-500'
-                                        />
+                                    <div className='relative h-12 w-12 overflow-hidden rounded-xl border border-slate-100 shadow-sm bg-slate-50 flex items-center justify-center shrink-0'>
+                                        {product.image ? (
+                                            <Image
+                                                src={product.image}
+                                                alt={product.label}
+                                                fill
+                                                className='object-cover group-hover:scale-110 transition-transform duration-500'
+                                            />
+                                        ) : (
+                                            <span className='text-[8px] text-slate-400 font-bold uppercase tracking-tighter'>No Img</span>
+                                        )}
                                     </div>
                                     <div className={cn(
                                         "absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shadow-lg border-2 border-white",

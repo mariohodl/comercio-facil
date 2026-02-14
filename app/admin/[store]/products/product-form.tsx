@@ -4,7 +4,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft, ChevronDown, X, Edit } from 'lucide-react'
+import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft, ChevronDown, X, Edit, Info } from 'lucide-react'
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
@@ -45,6 +45,7 @@ import Link from 'next/link'
 import { IStore } from '@/lib/db/models/store.model'
 import { IWarehouse } from '@/lib/db/models/warehouse.model'
 import { CatalogAutocomplete } from '@/components/shared/catalog-autocomplete'
+import PricingInfoModal from '@/components/shared/pricing-info-modal'
 
 const useDefaultValues = false;
 
@@ -101,7 +102,7 @@ const productDefaultValues: IProductInput =
       numReviews: 0,
       avgRating: 0,
       numSales: 0,
-      isPublished: true,
+      isPublished: false,
       productId: 0,
       tags: [],
       ratingDistribution: [],
@@ -157,6 +158,8 @@ const ProductForm = ({
   onSuccess,
 }: ProductFormProps) => {
   const router = useRouter()
+  const [showPricingInfo, setShowPricingInfo] = useState(false)
+
   const t = useTranslations('products')
   const tCommon = useTranslations('common')
 
@@ -455,6 +458,61 @@ const ProductForm = ({
   }, type === 'Create' || type === 'Update')
 
 
+  // Watch if all required inputs, prices and stock are filled, then auto set published to true
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      // Basic fields required for both types
+      const basicFieldsValid =
+        !!value.name && value.name.length >= 3 &&
+        !!value.store &&
+        !!value.warehouse &&
+        (!!value.category || !!value.categoriaId) &&
+        (!!value.subCategory || !!value.subCategoriaId) &&
+        (!!value.brand || !!value.brandId) &&
+        (!!value.unit || !!value.unitId) &&
+        !!value.sku
+
+      if (!basicFieldsValid) return
+
+      let isComplete = false
+
+      if (value.productType === 'Single Product') {
+        // Single Product Requirements
+        const hasBarcode = !!value.itemBarcode
+        const hasPrice = (Number(value.listPrice) || 0) > 0
+        const hasCost = (Number(value.costPerUnit) || 0) > 0
+        const hasStock = (Number(value.countInStock) || 0) > 0
+
+        if (hasBarcode && hasPrice && hasCost && hasStock) {
+          isComplete = true
+        }
+      } else if (value.productType === 'Variable Product') {
+        // Variable Product Requirements
+        const variants = value.variants || []
+        const hasVariants = variants.length > 0
+
+        if (hasVariants) {
+          // Check if all variants have price, cost and stock
+          const allVariantsValid = variants.every((v: any) =>
+            (Number(v.listPrice) || 0) > 0 &&
+            // (Number(v.costPerUnit) || 0) > 0 && 
+            (Number(v.countInStock) || 0) > 0
+          )
+
+          if (allVariantsValid) {
+            isComplete = true
+          }
+        }
+      }
+
+      // Only auto-publish if currently unpublished and complete
+      if (isComplete && !value.isPublished) {
+        form.setValue('isPublished', true, { shouldValidate: true })
+        // showToast(t('autoPublished') || 'Product auto-published', { duration: 3000 })
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form, t, showToast])
 
   async function onSubmit(values: IProductInput) {
     try {
@@ -625,6 +683,11 @@ const ProductForm = ({
       <Form {...form}>
         <form
           method='post'
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') {
+              e.preventDefault()
+            }
+          }}
           onSubmit={form.handleSubmit(onSubmit, (errors) => {
             showError(t('checkFormErrors'))
           })}
@@ -708,7 +771,7 @@ const ProductForm = ({
                     <FormItem>
                       <FormLabel className="text-sm">{t('productName')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder={t('enterProductName')} {...field} className="h-10" autoFocus />
+                        <Input placeholder={t('enterProductName')} {...field} className="h-10" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1027,6 +1090,7 @@ const ProductForm = ({
                         placeholder={t('enterProductDescription')}
                         className='resize-none min-h-[100px]'
                         {...field}
+
                       />
                     </FormControl>
                     <FormMessage />
@@ -1163,6 +1227,7 @@ const ProductForm = ({
                                   onChange={(e) => setNewVariantData(prev => ({ ...prev, countInStock: Number(e.target.value) }))}
                                   placeholder="0"
                                   className="h-10 font-medium"
+
                                 />
                               </div>
 
@@ -1178,6 +1243,7 @@ const ProductForm = ({
                                       onChange={(e) => setNewVariantData(prev => ({ ...prev, costPerUnit: Number(e.target.value) }))}
                                       placeholder="0.00"
                                       className="pl-7 h-10 font-medium"
+
                                     />
                                   </div>
                                 </div>
@@ -1192,6 +1258,7 @@ const ProductForm = ({
                                       onChange={(e) => setNewVariantData(prev => ({ ...prev, listPrice: Number(e.target.value) }))}
                                       placeholder="0.00"
                                       className="pl-7 h-10 font-medium"
+
                                     />
                                   </div>
                                 </div>
@@ -1561,7 +1628,7 @@ const ProductForm = ({
                                 <tr key={index} className="bg-white hover:bg-gray-50/50 transition-colors">
                                   <td className="px-6 py-4">
                                     <div className="flex items-start gap-4">
-                                      {variant.images && variant.images.length > 0 ? (
+                                      {variant.images && variant.images.length > 0 && variant.images[0].imgUrl ? (
                                         <div className="relative w-12 h-12 border rounded-md overflow-hidden shrink-0">
                                           <Image
                                             src={variant.images[0].imgUrl}
@@ -1571,8 +1638,8 @@ const ProductForm = ({
                                           />
                                         </div>
                                       ) : (
-                                        <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center shrink-0 text-gray-400">
-                                          <span className="text-xs">No Img</span>
+                                        <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center shrink-0 text-gray-400 border border-dashed border-gray-200">
+                                          <span className="text-[10px] font-medium uppercase">{tCommon('noImg') || 'No Img'}</span>
                                         </div>
                                       )}
                                       <div className="space-y-1">
@@ -1863,7 +1930,7 @@ const ProductForm = ({
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
                                       {form.watch('discountType') === 'Fixed' ? '$' : '%'}
                                     </span>
-                                    <Input type='number' min="0" placeholder="0" {...field} className="pl-9 h-10" />
+                                    <Input type='number' step='0.01' min="0" placeholder="0" {...field} className="pl-9 h-10" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -1943,9 +2010,17 @@ const ProductForm = ({
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-gray-50/50">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base font-medium text-navy gap-2">
+                      <FormLabel className="text-base font-medium text-navy flex items-center gap-2">
                         {t('published')}
-                        <HelpTooltip content={t('help.isPublished')} />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 text-orange hover:bg-orange/10"
+                          onClick={() => setShowPricingInfo(true)}
+                        >
+                          <Info className="h-4 w-4" />
+                        </Button>
                       </FormLabel>
                       <div className="text-sm text-muted-foreground">
                         {t('makeProductVisible')}
@@ -1953,8 +2028,25 @@ const ProductForm = ({
                     </div>
                     <FormControl>
                       <Switch
+
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={(val) => {
+                          const productType = form.getValues('productType')
+                          const price = form.getValues('listPrice')
+                          const variants = (form.getValues() as any).variants || []
+
+                          let hasZeroPrice = false
+                          if (productType === 'Single Product') {
+                            hasZeroPrice = price <= 0
+                          } else {
+                            hasZeroPrice = variants.length === 0 || variants.some((v: any) => v.listPrice <= 0)
+                          }
+
+                          if (val && hasZeroPrice) {
+                            setShowPricingInfo(true)
+                          }
+                          field.onChange(val)
+                        }}
                         className="data-[state=checked]:bg-orange"
                       />
                     </FormControl>
@@ -2085,7 +2177,9 @@ const ProductForm = ({
           }}
         />
       </Form>
-    </div >
+
+      <PricingInfoModal open={showPricingInfo} onOpenChange={setShowPricingInfo} />
+    </div>
   )
 }
 

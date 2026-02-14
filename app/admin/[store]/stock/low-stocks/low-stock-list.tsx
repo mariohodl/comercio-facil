@@ -254,13 +254,17 @@ const LowStockList = ({ store }: { store: string }) => {
                                         </TableCell>
                                         <TableCell>
                                             <div className='flex items-center gap-3 min-w-[200px]'>
-                                                <div className='relative w-10 h-10 rounded-md overflow-hidden border bg-gray-100 flex-shrink-0'>
-                                                    <Image
-                                                        src={product.images[0]?.imgUrl || '/placeholder.png'}
-                                                        alt={product.name}
-                                                        fill
-                                                        className='object-cover'
-                                                    />
+                                                <div className='relative w-10 h-10 rounded-md overflow-hidden border bg-gray-100 flex-shrink-0 flex items-center justify-center'>
+                                                    {product.images?.[0]?.imgUrl ? (
+                                                        <Image
+                                                            src={product.images[0].imgUrl}
+                                                            alt={product.name}
+                                                            fill
+                                                            className='object-cover'
+                                                        />
+                                                    ) : (
+                                                        <span className='text-[10px] text-muted-foreground font-medium uppercase'>No Img</span>
+                                                    )}
                                                 </div>
                                                 <span className='font-medium'>{product.name}</span>
                                             </div>

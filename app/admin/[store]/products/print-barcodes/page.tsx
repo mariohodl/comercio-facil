@@ -170,13 +170,17 @@ export default function PrintBarcodesPage() {
                                         onClick={() => handleAddProduct(product)}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className="relative h-8 w-8 rounded bg-gray-50 border overflow-hidden">
-                                                <Image
-                                                    src={product.images[0]?.imgUrl || '/placeholder.png'}
-                                                    alt={product.name}
-                                                    fill
-                                                    className="object-cover"
-                                                />
+                                            <div className="relative h-8 w-8 rounded bg-gray-50 border overflow-hidden flex items-center justify-center shrink-0">
+                                                {product.images?.[0]?.imgUrl ? (
+                                                    <Image
+                                                        src={product.images[0].imgUrl}
+                                                        alt={product.name}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                ) : (
+                                                    <span className="text-[6px] text-gray-400 font-bold uppercase">No Img</span>
+                                                )}
                                             </div>
                                             <span className="font-medium text-navy text-sm">{product.name}</span>
                                         </div>
@@ -205,13 +209,17 @@ export default function PrintBarcodesPage() {
                                             <TableRow key={product._id} className="hover:bg-gray-50/30 transition-colors">
                                                 <TableCell className="font-medium">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="relative h-10 w-10 overflow-hidden rounded-md border bg-gray-50 flex-shrink-0">
-                                                            <Image
-                                                                src={product.images[0]?.imgUrl || '/placeholder.png'}
-                                                                alt={product.name}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
+                                                        <div className="relative h-10 w-10 overflow-hidden rounded-md border bg-gray-50 flex-shrink-0 flex items-center justify-center">
+                                                            {product.images?.[0]?.imgUrl ? (
+                                                                <Image
+                                                                    src={product.images[0].imgUrl}
+                                                                    alt={product.name}
+                                                                    fill
+                                                                    className="object-cover"
+                                                                />
+                                                            ) : (
+                                                                <span className="text-[8px] text-gray-400 font-bold uppercase">No Img</span>
+                                                            )}
                                                         </div>
                                                         <span className="text-navy font-semibold text-sm line-clamp-1">{product.name}</span>
                                                     </div>

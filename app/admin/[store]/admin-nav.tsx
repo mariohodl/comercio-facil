@@ -136,37 +136,6 @@ export function AdminNav({
       ],
     },
     {
-      title: t('purchases'),
-      items: [
-        {
-          title: t('purchases'),
-          href: `/admin/${storeId}/purchases`,
-          icon: List,
-          excludes: [`/admin/${storeId}/purchases/create`],
-        },
-        {
-          title: t('addPurchase'),
-          href: `/admin/${storeId}/purchases/create`,
-          icon: PlusSquare,
-        },
-        // {
-        //   title: t('purchaseOrder'),
-        //   href: `/admin/${storeId}/purchases/order`,
-        //   icon: FileText,
-        // },
-        // {
-        //   title: t('purchaseReturn'),
-        //   href: `/admin/${storeId}/purchases/return`,
-        //   icon: RotateCcw,
-        // },
-        {
-          title: t('suppliers'),
-          href: `/admin/${storeId}/proveedores`,
-          icon: Package,
-        },
-      ],
-    },
-    {
       title: t('sales'),
       items: [
         {
@@ -198,6 +167,38 @@ export function AdminNav({
         },
       ],
     },
+    {
+      title: t('purchases'),
+      items: [
+        {
+          title: t('purchases'),
+          href: `/admin/${storeId}/purchases`,
+          icon: List,
+          excludes: [`/admin/${storeId}/purchases/create`],
+        },
+        {
+          title: t('addPurchase'),
+          href: `/admin/${storeId}/purchases/create`,
+          icon: PlusSquare,
+        },
+        // {
+        //   title: t('purchaseOrder'),
+        //   href: `/admin/${storeId}/purchases/order`,
+        //   icon: FileText,
+        // },
+        // {
+        //   title: t('purchaseReturn'),
+        //   href: `/admin/${storeId}/purchases/return`,
+        //   icon: RotateCcw,
+        // },
+        {
+          title: t('suppliers'),
+          href: `/admin/${storeId}/proveedores`,
+          icon: Package,
+        },
+      ],
+    },
+
     {
       title: t('stock'),
       items: [

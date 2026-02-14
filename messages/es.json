@@ -66,6 +66,7 @@
         "maxFileSize": "Tamaño Máx",
         "uploadSuccess": "Carga exitosa",
         "uploadError": "Error al subir",
+        "noImg": "Sin Img",
         "dateRanges": {
             "today": "Hoy",
             "yesterday": "Ayer",
@@ -250,7 +251,7 @@
         "price": "Precio",
         "listPrice": "Precio de Lista",
         "sellingPrice": "Precio de Venta",
-        "costPerUnit": "Costo del Proveedor",
+        "costPerUnit": "Costo de Proveedor",
         "unit": "Unidad",
         "quantity": "Cantidad",
         "inStock": "En Stock",

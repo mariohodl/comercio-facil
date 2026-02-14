@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Plus, Minus, AlertCircle, Layers, AlertTriangle } from 'lucide-react'
+import { Plus, Minus, AlertCircle, Layers, AlertTriangle, ScanBarcode, Package } from 'lucide-react'
 import { IProduct } from '@/lib/db/models/product.model'
 import { usePOSStore, FRACTIONAL_UNITS } from '@/hooks/use-pos-store'
 import { formatCurrency } from '@/lib/utils'
@@ -142,7 +142,7 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
     return (
         <>
             <Card
-                className={`group relative overflow-hidden border-gray-100 bg-white shadow-sm hover:shadow-lg transition-all duration-300 ${isOutOfStock ? 'opacity-75' : 'cursor-pointer hover:border-gray-300'}`}
+                className={`group relative overflow-hidden border-gray-100 bg-white shadow-sm hover:shadow-lg transition-all duration-300 ${isOutOfStock ? 'opacity-75' : 'cursor-pointer hover:border-gray-300 p-0'}`}
                 onClick={handleCardClick}
             >
                 <CardContent className="p-0">
@@ -203,41 +203,50 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
                     </div>
 
                     {/* Details Section */}
-                    <div className="p-3">
-                        {/* Category & SKU */}
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                            <span className="uppercase tracking-wider font-medium truncate max-w-[60%]">
+                    <div className="px-3 py-1">
+                        {/* Brand & Category Row */}
+                        <div className="flex items-center gap-1.5 mb-0.5 overflow-hidden whitespace-nowrap">
+                            <span className="text-[9px] font-black text-blue-600/80 uppercase tracking-widest shrink-0">
                                 {product.category}
                             </span>
-                            <span className="font-mono opacity-80 truncate max-w-[35%]">
-                                {product.sku}
-                            </span>
+                            {product.brand && (
+                                <>
+                                    <div className="w-0.5 h-0.5 rounded-full bg-slate-300 shrink-0" />
+                                    <span className="text-[9px] font-bold text-slate-500 uppercase truncate">
+                                        {product.brand}
+                                    </span>
+                                </>
+                            )}
                         </div>
 
                         {/* Name */}
-                        <h3 className="font-semibold text-gray-900 leading-tight line-clamp-2 h-10 mb-2 group-hover:text-blue-600 transition-colors">
+                        <h3 className="font-semibold text-gray-900 leading-tight line-clamp-2 h-9 mb-1 group-hover:text-blue-600 transition-colors text-xs lg:text-sm">
                             {product.name}
                         </h3>
 
                         {/* Price & Actions Row */}
-                        <div className="flex items-end justify-between mt-2">
+                        <div className="flex items-end justify-between mt-1">
                             <div className="flex flex-col">
-                                <div className="flex flex-col">
-                                    <div className="flex items-baseline gap-1">
-                                        {hasPriceRange && <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Desde</span>}
-                                        <span className="text-sm lg:text-base font-black text-slate-900 tracking-tight">
-                                            {formatCurrency(displayPrice)}
-                                        </span>
-                                    </div>
-                                    {originalPrice > displayPrice && !hasPriceRange && (
-                                        <span className="text-[10px] text-slate-400 line-through font-bold">
+                                <div className="flex items-baseline gap-1 flex-wrap">
+                                    {hasPriceRange && <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Desde</span>}
+                                    <span className="text-sm lg:text-base font-black text-slate-900 tracking-tight">
+                                        {formatCurrency(displayPrice)}
+                                    </span>
+                                    <span className="text-[9px] font-bold text-slate-400/70">
+                                        {t('perUnit', { unit: displayUnit })}
+                                    </span>
+                                </div>
+
+                                {originalPrice > displayPrice && !hasPriceRange && (
+                                    <div className="flex items-center gap-1.5 -mt-0.5">
+                                        <span className="text-[10px] text-slate-400 line-through decoration-slate-300 font-medium">
                                             {formatCurrency(originalPrice)}
                                         </span>
-                                    )}
-                                </div>
-                                <span className="text-xs font-normal text-gray-500 ml-0.5">
-                                    {t('perUnit', { unit: displayUnit })}
-                                </span>
+                                        <span className="text-[9px] bg-red-50 text-red-600 px-1 rounded-sm font-black uppercase">
+                                            -{Math.round((1 - displayPrice / originalPrice) * 100)}%
+                                        </span>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Cart Controls for Simple Products */}
@@ -263,6 +272,20 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
                             ) : (
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${!isOutOfStock ? 'bg-gray-100 text-gray-600 group-hover:bg-blue-600 group-hover:text-white' : 'bg-gray-50 text-gray-300'}`}>
                                     {hasVariants ? <Layers className="w-4 h-4" /> : <Plus className="w-5 h-5" />}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Technical Info Row (SKU & Barcode) */}
+                        <div className="mt-2 py-1 border-t border-gray-100 flex items-center justify-center gap-4 text-[9px] text-gray-400 font-mono">
+                            <div className="flex items-center gap-1 shrink-0">
+                                <Package className="w-3 h-3 opacity-60" />
+                                <span className="truncate">{product.sku}</span>
+                            </div>
+                            {product.itemBarcode && (
+                                <div className="flex items-center gap-1 shrink-0 border-l border-gray-100 pl-3">
+                                    <ScanBarcode className="w-3 h-3 opacity-60" />
+                                    <span className="truncate">{product.itemBarcode}</span>
                                 </div>
                             )}
                         </div>

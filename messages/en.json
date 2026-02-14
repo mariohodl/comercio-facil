@@ -65,6 +65,7 @@
         "maxFileSize": "Max Size",
         "uploadSuccess": "Upload successful",
         "uploadError": "Upload error",
+        "noImg": "No Img",
         "dateRanges": {
             "today": "Today",
             "yesterday": "Yesterday",

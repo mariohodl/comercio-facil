@@ -1027,17 +1027,18 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                     <div className="grid gap-4 py-4">
                         <div className="flex items-center gap-4">
                             {/* Image placeholder */}
-                            {selectedProduct?.images && selectedProduct.images.length > 0 ? (
-                                <div className="h-24 w-24 rounded-lg overflow-hidden border border-gray-100 bg-white">
-                                    <img
+                            {selectedProduct?.images && selectedProduct.images.length > 0 && selectedProduct.images[0].imgUrl ? (
+                                <div className="h-24 w-24 rounded-lg overflow-hidden border border-gray-100 bg-white shrink-0">
+                                    <Image
                                         src={selectedProduct.images[0].imgUrl}
                                         alt={selectedProduct.name}
-                                        className="h-full w-full object-cover"
+                                        fill
+                                        className="object-cover"
                                     />
                                 </div>
                             ) : (
-                                <div className="h-24 w-24 bg-gray-100 rounded-lg flex items-center justify-center">
-                                    <ShoppingCart className="h-10 w-10 text-gray-400" />
+                                <div className="h-24 w-24 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 border border-dashed border-gray-200">
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase">No Img</span>
                                 </div>
                             )}
                             <div className="space-y-1">
