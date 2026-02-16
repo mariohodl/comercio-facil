@@ -76,8 +76,8 @@ export function useBarcodeScanner(
         }
 
         // Reset if too much time passed (human typing)
-        // Using a shorter threshold for human typing (150ms -> 100ms)
-        if (timeSinceLastKey > 100 && bufferRef.current.length > 0) {
+        // Using 150ms threshold - more forgiving for slower mobile Bluetooth scanners
+        if (timeSinceLastKey > 150 && bufferRef.current.length > 0) {
             resetState()
         }
 
@@ -119,6 +119,7 @@ export function useBarcodeScanner(
             lastKeyTimeRef.current = currentTime
 
             // Auto-complete for scanners without Enter suffix
+            // Using 250ms for mobile Bluetooth scanners which can have higher latency
             if (timeoutRef.current) clearTimeout(timeoutRef.current)
             timeoutRef.current = setTimeout(() => {
                 const barcode = bufferRef.current.trim()
@@ -127,7 +128,7 @@ export function useBarcodeScanner(
                     onScanRef.current(barcode)
                 }
                 resetState()
-            }, 100)
+            }, 250)
 
             return
         }

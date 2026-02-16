@@ -425,6 +425,8 @@ const ProductForm = ({
 
   // Hardware Scanner Integration
   useBarcodeScanner((barcode) => {
+    console.log('[BARCODE SCAN] Received:', barcode, 'Length:', barcode.length)
+
     // Clean up the first character that leaked into a focused input
     const activeEl = document.activeElement
     if (activeEl instanceof HTMLInputElement && activeEl.name !== 'itemBarcode') {
@@ -455,6 +457,22 @@ const ProductForm = ({
       setBarcodeScanned(true)
       showSuccess(t('barcodeScannedSuccessfully') + ': ' + barcode)
     }
+
+    // Re-focus the trap input after successful scan for mobile compatibility
+    setTimeout(() => {
+      if (barcodeTrapRef.current && document.activeElement !== barcodeTrapRef.current) {
+        const currentActive = document.activeElement
+        const isFormInput = currentActive instanceof HTMLInputElement ||
+          currentActive instanceof HTMLTextAreaElement ||
+          currentActive instanceof HTMLSelectElement
+        if (!isFormInput) {
+          console.log('[BARCODE TRAP] Re-focusing trap input')
+          barcodeTrapRef.current.focus()
+        } else {
+          console.log('[BARCODE TRAP] Skipping refocus, form input is active:', currentActive)
+        }
+      }
+    }, 100)
   }, type === 'Create' || type === 'Update')
 
   // Mobile Scanner Support: Hidden input trap
@@ -749,6 +767,8 @@ const ProductForm = ({
         data-barcode-capture
         aria-hidden="true"
         tabIndex={-1}
+        readOnly
+        value=""
         style={{
           position: 'absolute',
           width: 1,
@@ -760,10 +780,19 @@ const ProductForm = ({
           whiteSpace: 'nowrap',
           borderWidth: 0,
           opacity: 0,
+          pointerEvents: 'none',
         }}
-        onInput={(e) => {
-          // Clear any characters that leaked into the trap
-          (e.target as HTMLInputElement).value = ''
+        onFocus={() => {
+          // Ensure trap is always empty when focused
+          if (barcodeTrapRef.current) {
+            barcodeTrapRef.current.value = ''
+          }
+        }}
+        onBlur={() => {
+          // Clear on blur as well
+          if (barcodeTrapRef.current) {
+            barcodeTrapRef.current.value = ''
+          }
         }}
       />
 
