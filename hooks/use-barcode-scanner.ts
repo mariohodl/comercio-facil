@@ -76,8 +76,8 @@ export function useBarcodeScanner(
         }
 
         // Reset if too much time passed (human typing)
-        // Using 150ms threshold - more forgiving for slower mobile Bluetooth scanners
-        if (timeSinceLastKey > 150 && bufferRef.current.length > 0) {
+        // We use 300ms to be very safe for mobile Bluetooth scanners which can be "bursty"
+        if (timeSinceLastKey > 300 && bufferRef.current.length > 0) {
             resetState()
         }
 
@@ -85,57 +85,45 @@ export function useBarcodeScanner(
         if (bufferRef.current.length === 0) {
             bufferRef.current = event.key
             lastKeyTimeRef.current = currentTime
-            // Don't block - we can't detect scanner from first char alone
             return
         }
 
         // === SECOND+ CHARACTER - Scanner Detection ===
         // Hardware scanners typically send keys with < 50ms latency.
-        // But some wireless scanners or busy CPUs can gap up to 80-100ms.
-        // We use 'latency' param as a safe upper bound.
-
+        // But mobile Bluetooth scanners or busy CPUs can gap up to 100-150ms.
         if (timeSinceLastKey < latency) {
             if (!scanModeRef.current) {
-                // Enter scan mode
                 scanModeRef.current = true
 
-                // Cleanup interception if we are indeed intercepting (not ignored)
-                // If ignored, we already returned above.
                 if (isInput) {
-                    const val = activeEl.value
-                    const lastChar = bufferRef.current // This is the first char
+                    const val = (activeEl as HTMLInputElement).value
+                    const lastChar = bufferRef.current
                     if (val.length > 0 && val.endsWith(lastChar)) {
-                        activeEl.value = val.slice(0, -lastChar.length)
+                        (activeEl as HTMLInputElement).value = val.slice(0, -lastChar.length)
                         activeEl.dispatchEvent(new Event('input', { bubbles: true }))
                     }
                 }
             }
 
-            // Block this and all subsequent characters
             event.preventDefault()
             event.stopImmediatePropagation()
 
             bufferRef.current += event.key
             lastKeyTimeRef.current = currentTime
 
-            // Auto-complete for scanners without Enter suffix
-            // Using 250ms for mobile Bluetooth scanners which can have higher latency
             if (timeoutRef.current) clearTimeout(timeoutRef.current)
             timeoutRef.current = setTimeout(() => {
                 const barcode = bufferRef.current.trim()
-
                 if (barcode.length >= 2 && scanModeRef.current) {
                     onScanRef.current(barcode)
                 }
                 resetState()
-            }, 250)
+            }, Math.max(latency * 2, 250))
 
             return
         }
 
-        // Too slow - human typing
         resetState()
-
     }, [resetState, latency])
 
     useEffect(() => {

@@ -425,7 +425,10 @@ const ProductForm = ({
 
   // Hardware Scanner Integration
   useBarcodeScanner((barcode) => {
-    console.log('[BARCODE SCAN] Received:', barcode, 'Length:', barcode.length)
+    // Debug alert for mobile testing
+    if (typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      alert(`Barcode: ${barcode} (${barcode.length} chars)`)
+    }
 
     // Clean up the first character that leaked into a focused input
     const activeEl = document.activeElement
@@ -457,86 +460,9 @@ const ProductForm = ({
       setBarcodeScanned(true)
       showSuccess(t('barcodeScannedSuccessfully') + ': ' + barcode)
     }
+  }, type === 'Create' || type === 'Update', 120)
 
-    // Re-focus the trap input after successful scan for mobile compatibility
-    setTimeout(() => {
-      if (barcodeTrapRef.current && document.activeElement !== barcodeTrapRef.current) {
-        const currentActive = document.activeElement
-        const isFormInput = currentActive instanceof HTMLInputElement ||
-          currentActive instanceof HTMLTextAreaElement ||
-          currentActive instanceof HTMLSelectElement
-        if (!isFormInput) {
-          console.log('[BARCODE TRAP] Re-focusing trap input')
-          barcodeTrapRef.current.focus()
-        } else {
-          console.log('[BARCODE TRAP] Skipping refocus, form input is active:', currentActive)
-        }
-      }
-    }, 100)
-  }, type === 'Create' || type === 'Update')
 
-  // Mobile Scanner Support: Hidden input trap
-  // On mobile browsers, Bluetooth scanner keydown events only fire when an input is focused.
-  // This invisible input auto-captures focus when no other form input is active,
-  // so the scanner always has a receiver on mobile devices.
-  const barcodeTrapRef = useRef<HTMLInputElement>(null)
-
-  const refocusTrap = useCallback(() => {
-    const activeEl = document.activeElement
-    const isFormInput = activeEl instanceof HTMLInputElement ||
-      activeEl instanceof HTMLTextAreaElement ||
-      activeEl instanceof HTMLSelectElement ||
-      activeEl?.getAttribute('role') === 'combobox' ||
-      activeEl?.closest('[role="dialog"]') ||
-      activeEl?.closest('[data-radix-popper-content-wrapper]')
-
-    // Only steal focus if nothing important is focused
-    if (!isFormInput && barcodeTrapRef.current) {
-      barcodeTrapRef.current.focus()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (type !== 'Create' && type !== 'Update') return
-
-    // Focus trap on initial mount
-    const timer = setTimeout(refocusTrap, 500)
-
-    // Re-focus trap when user clicks outside form inputs
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      const isInteractive = target.closest('input, textarea, select, button, a, [role="combobox"], [role="dialog"], [data-radix-popper-content-wrapper]')
-      if (!isInteractive) {
-        setTimeout(refocusTrap, 100)
-      }
-    }
-
-    // Re-focus trap when user blurs out of all inputs
-    const handleFocusOut = (e: FocusEvent) => {
-      // Small delay to check if focus moved to another input or left all inputs
-      setTimeout(() => {
-        const newActive = document.activeElement
-        const isStillInInput = newActive instanceof HTMLInputElement ||
-          newActive instanceof HTMLTextAreaElement ||
-          newActive instanceof HTMLSelectElement ||
-          newActive?.getAttribute('role') === 'combobox' ||
-          newActive?.closest('[role="dialog"]') ||
-          newActive?.closest('[data-radix-popper-content-wrapper]')
-        if (!isStillInInput) {
-          refocusTrap()
-        }
-      }, 200)
-    }
-
-    document.addEventListener('click', handleClick, true)
-    document.addEventListener('focusout', handleFocusOut, true)
-
-    return () => {
-      clearTimeout(timer)
-      document.removeEventListener('click', handleClick, true)
-      document.removeEventListener('focusout', handleFocusOut, true)
-    }
-  }, [type, refocusTrap])
 
 
   // Watch if all required inputs, prices and stock are filled, then auto set published to true
@@ -761,40 +687,7 @@ const ProductForm = ({
         </div>
       )}
 
-      {/* Hidden barcode trap input for mobile scanner support */}
-      <input
-        ref={barcodeTrapRef}
-        data-barcode-capture
-        aria-hidden="true"
-        tabIndex={-1}
-        readOnly
-        value=""
-        style={{
-          position: 'absolute',
-          width: 1,
-          height: 1,
-          padding: 0,
-          margin: -1,
-          overflow: 'hidden',
-          clip: 'rect(0, 0, 0, 0)',
-          whiteSpace: 'nowrap',
-          borderWidth: 0,
-          opacity: 0,
-          pointerEvents: 'none',
-        }}
-        onFocus={() => {
-          // Ensure trap is always empty when focused
-          if (barcodeTrapRef.current) {
-            barcodeTrapRef.current.value = ''
-          }
-        }}
-        onBlur={() => {
-          // Clear on blur as well
-          if (barcodeTrapRef.current) {
-            barcodeTrapRef.current.value = ''
-          }
-        }}
-      />
+
 
       <Form {...form}>
         <form
@@ -1126,7 +1019,12 @@ const ProductForm = ({
                             <Input
                               placeholder={t('enterBarcode')}
                               {...field}
+                              ref={(el) => {
+                                field.ref(el)
+                                barcodeInputRef.current = el
+                              }}
                               readOnly={barcodeScanned}
+                              data-barcode-capture
                               className={`h-10 ${barcodeScanned ? 'bg-muted cursor-not-allowed' : ''}`}
                               onChange={(e) => {
                                 const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
