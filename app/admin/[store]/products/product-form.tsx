@@ -423,6 +423,8 @@ const ProductForm = ({
     }
   }, [listPrice, discountType, discountValue, form])
 
+  const barcodeInputRef = useRef<HTMLInputElement>(null)
+
   // Hardware Scanner Integration
   useBarcodeScanner((barcode) => {
     // Debug alert for mobile testing

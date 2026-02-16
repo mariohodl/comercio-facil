@@ -90,10 +90,12 @@ export default function BarcodeScannerDialog({
         }
     }
 
-    // Reset error when dialog opens
-    if (!open && error && cameraAvailable) {
-        setError(null)
-    }
+    // Reset error when dialog closes
+    useEffect(() => {
+        if (!open && error && cameraAvailable) {
+            setError(null)
+        }
+    }, [open, error, cameraAvailable])
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
