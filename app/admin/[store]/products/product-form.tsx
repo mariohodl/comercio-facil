@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft, ChevronDown, X, Edit, Info } from 'lucide-react'
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 import BarcodeScannerDialog from '@/components/shared/barcode-scanner'
@@ -457,6 +457,69 @@ const ProductForm = ({
     }
   }, type === 'Create' || type === 'Update')
 
+  // Mobile Scanner Support: Hidden input trap
+  // On mobile browsers, Bluetooth scanner keydown events only fire when an input is focused.
+  // This invisible input auto-captures focus when no other form input is active,
+  // so the scanner always has a receiver on mobile devices.
+  const barcodeTrapRef = useRef<HTMLInputElement>(null)
+
+  const refocusTrap = useCallback(() => {
+    const activeEl = document.activeElement
+    const isFormInput = activeEl instanceof HTMLInputElement ||
+      activeEl instanceof HTMLTextAreaElement ||
+      activeEl instanceof HTMLSelectElement ||
+      activeEl?.getAttribute('role') === 'combobox' ||
+      activeEl?.closest('[role="dialog"]') ||
+      activeEl?.closest('[data-radix-popper-content-wrapper]')
+
+    // Only steal focus if nothing important is focused
+    if (!isFormInput && barcodeTrapRef.current) {
+      barcodeTrapRef.current.focus()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (type !== 'Create' && type !== 'Update') return
+
+    // Focus trap on initial mount
+    const timer = setTimeout(refocusTrap, 500)
+
+    // Re-focus trap when user clicks outside form inputs
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const isInteractive = target.closest('input, textarea, select, button, a, [role="combobox"], [role="dialog"], [data-radix-popper-content-wrapper]')
+      if (!isInteractive) {
+        setTimeout(refocusTrap, 100)
+      }
+    }
+
+    // Re-focus trap when user blurs out of all inputs
+    const handleFocusOut = (e: FocusEvent) => {
+      // Small delay to check if focus moved to another input or left all inputs
+      setTimeout(() => {
+        const newActive = document.activeElement
+        const isStillInInput = newActive instanceof HTMLInputElement ||
+          newActive instanceof HTMLTextAreaElement ||
+          newActive instanceof HTMLSelectElement ||
+          newActive?.getAttribute('role') === 'combobox' ||
+          newActive?.closest('[role="dialog"]') ||
+          newActive?.closest('[data-radix-popper-content-wrapper]')
+        if (!isStillInInput) {
+          refocusTrap()
+        }
+      }, 200)
+    }
+
+    document.addEventListener('click', handleClick, true)
+    document.addEventListener('focusout', handleFocusOut, true)
+
+    return () => {
+      clearTimeout(timer)
+      document.removeEventListener('click', handleClick, true)
+      document.removeEventListener('focusout', handleFocusOut, true)
+    }
+  }, [type, refocusTrap])
+
 
   // Watch if all required inputs, prices and stock are filled, then auto set published to true
   useEffect(() => {
@@ -679,6 +742,30 @@ const ProductForm = ({
           </div>
         </div>
       )}
+
+      {/* Hidden barcode trap input for mobile scanner support */}
+      <input
+        ref={barcodeTrapRef}
+        data-barcode-capture
+        aria-hidden="true"
+        tabIndex={-1}
+        style={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          padding: 0,
+          margin: -1,
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          whiteSpace: 'nowrap',
+          borderWidth: 0,
+          opacity: 0,
+        }}
+        onInput={(e) => {
+          // Clear any characters that leaked into the trap
+          (e.target as HTMLInputElement).value = ''
+        }}
+      />
 
       <Form {...form}>
         <form
