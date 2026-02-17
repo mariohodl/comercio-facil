@@ -2,9 +2,9 @@
 import { redirect, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { CustomH2 } from '@/components/shared/CustomH2'
-import { CustomP } from '@/components/shared/CustomP'
 import Link from 'next/link'
+import { Mail, Lock, ArrowRight, Loader2, KeyRound } from 'lucide-react'
+import { useState } from 'react'
 import {
   Form,
   FormControl,
@@ -38,6 +38,7 @@ export default function CredentialsSignInForm() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<IUserSignIn>({
     resolver: zodResolver(UserSignInSchema),
     defaultValues: signInDefaultValues,
@@ -46,6 +47,7 @@ export default function CredentialsSignInForm() {
   const { control, handleSubmit } = form
 
   const onSubmit = async (data: IUserSignIn) => {
+    setIsLoading(true)
     try {
       await signInWithCredentials({
         email: data.email,
@@ -69,29 +71,42 @@ export default function CredentialsSignInForm() {
       if (isRedirectError(error)) {
         throw error
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <section className=''>
-      <div>
-        <CustomH2>Ingresar</CustomH2>
-        <CustomP>Accede a tu cuenta de {APP_NAME} usando tu correo y contraseña.</CustomP>
+    <section className='animate-in fade-in slide-in-from-bottom-4 duration-500'>
+      <div className='mb-8 text-left'>
+        <h1 className='text-3xl font-bold tracking-tight text-gray-900 mb-2'>¡Bienvenido!</h1>
+        <p className='text-muted-foreground italic'>
+          Inicia sesión para gestionar tu negocio en <span className='font-semibold text-orange'>{APP_NAME}</span>.
+        </p>
       </div>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <input type='hidden' name='callbackUrl' value={callbackUrl} />
-          <div className='space-y-6'>
+          <div className='space-y-5'>
             <FormField
               control={control}
               name='email'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Correo<span className='text-red-800'>*</span></FormLabel>
+                  <FormLabel className='text-xs font-semibold uppercase tracking-wider text-gray-500'>Correo Electrónico</FormLabel>
                   <FormControl>
-                    <Input placeholder='Ingresar correo' {...field} />
+                    <div className='relative group'>
+                      <div className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors group-focus-within:text-orange'>
+                        <Mail className='w-4 h-4' />
+                      </div>
+                      <Input
+                        placeholder='ejemplo@correo.com'
+                        {...field}
+                        className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 transition-all shadow-sm'
+                      />
+                    </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-xs' />
                 </FormItem>
               )}
             />
@@ -101,27 +116,51 @@ export default function CredentialsSignInForm() {
               name='password'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Contraseña<span className='text-red-800'>*</span></FormLabel>
+                  <div className='flex items-center justify-between'>
+                    <FormLabel className='text-xs font-semibold uppercase tracking-wider text-gray-500'>Contraseña</FormLabel>
+                    <Link
+                      href='/forgot-password'
+                      className='text-xs font-medium text-orange hover:text-orange-600 transition-colors'
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
                   <FormControl>
-                    <Input
-                      type='password'
-                      placeholder='Ingresar contraseña'
-                      {...field}
-                    />
+                    <div className='relative group'>
+                      <div className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors group-focus-within:text-orange'>
+                        <KeyRound className='w-4 h-4' />
+                      </div>
+                      <Input
+                        type='password'
+                        placeholder='••••••••'
+                        {...field}
+                        className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 transition-all shadow-sm'
+                      />
+                    </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-xs' />
                 </FormItem>
               )}
             />
 
-            <div>
-              <Button type='submit'>Entrar</Button>
-            </div>
-            <div className='text-sm'>
-              Al ingresar, estás aceptando las {' '}
-              <Link href='/page/conditions-of-use'>Condiciones de Uso</Link> y{' '}
-              <Link href='/page/privacy-policy'>Aviso de Privacidad.</Link> de{' '}
-              {APP_NAME}
+            <div className='pt-2'>
+              <Button
+                type='submit'
+                disabled={isLoading}
+                className='w-full h-11 bg-orange hover:bg-orange-600 text-white font-bold text-base transition-all transform active:scale-[0.98] shadow-md hover:shadow-lg'
+              >
+                {isLoading ? (
+                  <div className='flex items-center gap-2'>
+                    <Loader2 className='w-4 h-4 animate-spin' />
+                    <span>Iniciando...</span>
+                  </div>
+                ) : (
+                  <div className='flex items-center gap-2'>
+                    <span>Entrar ahora</span>
+                    <ArrowRight className='w-4 h-4' />
+                  </div>
+                )}
+              </Button>
             </div>
           </div>
         </form>

@@ -14,6 +14,8 @@ import { revalidatePath } from 'next/cache'
 import { PAGE_SIZE } from '../constants'
 import { UserSignUpSchema, UserUpdateSchema, StoreSettingsSchema, StoreUserCreateSchema, StoreUserUpdateSchema } from '../validator'
 import { ROL_CUSTOMER, ROL_ADMIN, PLAN_BASIC, PLAN_STATUS_FREE_TRIAL } from '@/lib/constants'
+import { sendPasswordResetEmail } from '@/lib/email/verification'
+import PasswordResetToken from '../db/models/password-reset-token.model'
 
 import { z } from 'zod'
 
@@ -607,5 +609,69 @@ export async function getCompanyLogoUpdateInfo() {
 		}
 	} catch (error) {
 		return { success: false, message: formatError(error) }
+	}
+}
+
+export async function requestPasswordReset(email: string) {
+	try {
+		await connectToDatabase();
+		const user = await User.findOne({ email, isDeleted: { $ne: true } });
+
+		if (!user) {
+			// Don't reveal if user doesn't exist for security
+			return { success: true, message: 'Si el correo existe, recibirás un enlace de recuperación.' };
+		}
+
+		// Use await import to avoid dynamic import issues if any
+		const { sendPasswordResetEmail } = await import('@/lib/email/verification');
+		const result = await sendPasswordResetEmail(user.email, user.name);
+		return result;
+	} catch (error) {
+		console.error('Error in requestPasswordReset:', error);
+		return { success: false, error: 'Ocurrió un error al procesar tu solicitud.' };
+	}
+}
+
+export async function resetPassword(data: any) {
+	try {
+		const { token, email, password, confirmPassword } = data;
+
+		if (password !== confirmPassword) {
+			return { success: false, error: 'Las contraseñas no coinciden.' };
+		}
+
+		if (password.length < 3) {
+			return { success: false, error: 'La contraseña debe tener al menos 3 caracteres.' };
+		}
+
+		await connectToDatabase();
+
+		// Validate token
+		const resetToken = await PasswordResetToken.findOne({
+			email,
+			token,
+			expiresAt: { $gt: new Date() },
+		});
+
+		if (!resetToken) {
+			return { success: false, error: 'El enlace ha expirado o no es válido.' };
+		}
+
+		// Update user password
+		const user = await User.findOne({ email });
+		if (!user) {
+			return { success: false, error: 'Usuario no encontrado.' };
+		}
+
+		user.password = await bcrypt.hash(password, 5);
+		await user.save();
+
+		// Delete token
+		await PasswordResetToken.deleteOne({ _id: resetToken._id });
+
+		return { success: true, message: 'Tu contraseña ha sido actualizada con éxito.' };
+	} catch (error) {
+		console.error('Error in resetPassword:', error);
+		return { success: false, error: 'Ocurrió un error al restablecer tu contraseña.' };
 	}
 }

@@ -49,7 +49,7 @@ export default async function SignIn(props: {
             <CredentialsSignInForm />
           </div>
           <SeparatorWithOr />
-          <div className='mt-6'>
+          <div className='mt-2'>
             <SocialAuth />
           </div>
 

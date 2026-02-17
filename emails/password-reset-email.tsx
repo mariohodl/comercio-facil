@@ -11,18 +11,18 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
-interface VerificationEmailProps {
-    verificationCode: string;
+interface PasswordResetEmailProps {
+    resetLink: string;
     userName?: string;
 }
 
-export const VerificationEmail = ({
-    verificationCode,
+export const PasswordResetEmail = ({
+    resetLink,
     userName = 'Usuario',
-}: VerificationEmailProps) => (
+}: PasswordResetEmailProps) => (
     <Html>
         <Head />
-        <Preview>Verifica tu cuenta - Comercio Fácil</Preview>
+        <Preview>Restablece tu contraseña - Comercio Fácil</Preview>
         <Body style={main}>
             <Container style={container}>
                 <Section style={header}>
@@ -31,17 +31,20 @@ export const VerificationEmail = ({
                 <Section style={content}>
                     <Heading style={h2}>¡Hola {userName}!</Heading>
                     <Text style={text}>
-                        Gracias por registrarte en Comercio Fácil. Para completar tu registro,
-                        por favor verifica tu correo electrónico usando el siguiente código:
+                        Has solicitado restablecer tu contraseña en Comercio Fácil.
+                        Haz clic en el siguiente botón para elegir una nueva contraseña:
                     </Text>
-                    <Section style={codeContainer}>
-                        <Text style={code}>{verificationCode}</Text>
+                    <Section style={buttonContainer}>
+                        <Button style={button} href={resetLink}>
+                            Restablecer contraseña
+                        </Button>
                     </Section>
                     <Text style={text}>
-                        Este código expirará en <strong>24 horas</strong>.
+                        Este enlace expirará en <strong>1 hora</strong> por motivos de seguridad.
                     </Text>
                     <Text style={text}>
-                        Si no solicitaste esta verificación, puedes ignorar este correo.
+                        Si no solicitaste este cambio, puedes ignorar este correo de forma segura.
+                        Tu contraseña actual no cambiará hasta que accedas al enlace y crees una nueva.
                     </Text>
                 </Section>
                 <Section style={footer}>
@@ -54,7 +57,7 @@ export const VerificationEmail = ({
     </Html>
 );
 
-export default VerificationEmail;
+export default PasswordResetEmail;
 
 const main = {
     backgroundColor: '#f6f9fc',
@@ -102,21 +105,21 @@ const text = {
     margin: '16px 0',
 };
 
-const codeContainer = {
-    background: '#f4f4f5',
-    borderRadius: '8px',
-    margin: '32px 0',
-    padding: '24px',
+const buttonContainer = {
     textAlign: 'center' as const,
+    margin: '32px 0',
 };
 
-const code = {
-    color: '#0f172a',
-    fontSize: '36px',
+const button = {
+    backgroundColor: '#f97316',
+    borderRadius: '5px',
+    color: '#fff',
+    fontSize: '16px',
     fontWeight: 'bold',
-    letterSpacing: '8px',
-    margin: '0',
-    fontFamily: 'monospace',
+    textDecoration: 'none',
+    textAlign: 'center' as const,
+    display: 'block',
+    padding: '12px 24px',
 };
 
 const footer = {

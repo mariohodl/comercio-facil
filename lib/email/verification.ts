@@ -2,9 +2,12 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
 import VerificationEmail from '@/emails/verification-email';
+import PasswordResetEmail from '@/emails/password-reset-email';
 import { connectToDatabase } from '../db';
 import VerificationToken from '../db/models/verification-token.model';
+import PasswordResetToken from '../db/models/password-reset-token.model';
 import crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -25,8 +28,8 @@ export async function sendVerificationEmail(email: string, userName?: string) {
         // Generate verification code
         const verificationCode = generateVerificationCode();
 
-        // Create token in database (expires in 10 minutes)
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+        // Create token in database (expires in 24 hours)
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         // Delete any existing tokens for this email
         await VerificationToken.deleteMany({ email });
@@ -116,6 +119,74 @@ export async function verifyEmailCode(email: string, code: string) {
     } catch (error) {
         console.error('Error in verifyEmailCode:', error);
         return { success: false, error: 'Failed to verify code' };
+    }
+}
+
+/**
+ * Send password reset email
+ */
+export async function sendPasswordResetEmail(email: string, userName?: string) {
+    try {
+        await connectToDatabase();
+
+        // Generate token
+        const token = uuidv4();
+
+        // Expire in 1 hour
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+        // Delete existing tokens
+        await PasswordResetToken.deleteMany({ email });
+
+        // Save new token
+        await PasswordResetToken.create({
+            email,
+            token,
+            expiresAt,
+        });
+
+        const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+
+        const isDev = process.env.NODE_ENV === 'development';
+        const isTestingDomain = process.env.EMAIL_FROM?.includes('resend.dev') || !process.env.EMAIL_FROM;
+
+        try {
+            const { error } = await resend.emails.send({
+                from: process.env.EMAIL_FROM || 'Comercio Fácil <onboarding@resend.dev>',
+                to: email,
+                subject: 'Restablece tu contraseña - Comercio Fácil',
+                react: PasswordResetEmail({ resetLink, userName }),
+            });
+
+            if (error) {
+                console.error('Resend API Error:', error);
+                if (error.message?.includes('Testing domain') || error.message?.includes('can only send')) {
+                    console.log('RESET LINK:', resetLink);
+                    return {
+                        success: true,
+                        message: 'Reset link created (check server console)',
+                        devMode: true
+                    };
+                }
+                return { success: false, error: 'Failed to send reset email' };
+            }
+
+            return { success: true, message: 'Reset email sent successfully' };
+        } catch (emailError) {
+            console.error('Error sending reset email:', emailError);
+            if (isDev || isTestingDomain) {
+                console.log('RESET LINK:', resetLink);
+                return {
+                    success: true,
+                    message: 'Reset link created (check server console)',
+                    devMode: true
+                };
+            }
+            return { success: false, error: 'Failed to send reset email' };
+        }
+    } catch (error) {
+        console.error('Error in sendPasswordResetEmail:', error);
+        return { success: false, error: 'Internal server error' };
     }
 }
 

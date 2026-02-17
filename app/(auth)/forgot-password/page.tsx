@@ -1,0 +1,58 @@
+import { Metadata } from 'next'
+import Link from 'next/link'
+import { ChevronLeft } from 'lucide-react'
+import ForgotPasswordForm from './forgot-password-form'
+import { APP_NAME } from '@/lib/constants'
+import Image from 'next/image'
+
+export const metadata: Metadata = {
+    title: 'Recuperar contraseña - Comercio Fácil',
+    description: 'Solicita un enlace para restablecer tu contraseña.',
+}
+
+export default function ForgotPasswordPage() {
+    return (
+        <section className='flex w-full min-h-screen'>
+            <article className='w-full lg:w-1/2 px-6 md:px-16 lg:px-28 py-10 lg:py-20 flex flex-col justify-center'>
+                <div className='w-full max-w-md mx-auto'>
+                    <div className='flex justify-center mb-10'>
+                        <Link href="/">
+                            <Image
+                                src="/images/app-logo.png"
+                                alt={APP_NAME}
+                                width={300}
+                                height={100}
+                                priority
+                                className="hover:opacity-80 transition-opacity"
+                            />
+                        </Link>
+                    </div>
+
+                    <div>
+                        <ForgotPasswordForm />
+                    </div>
+
+                    <div className='mt-8 text-center'>
+                        <Link
+                            href='/sign-in'
+                            className='inline-flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-orange transition-colors group'
+                        >
+                            <ChevronLeft className='w-4 h-4 transition-transform group-hover:-translate-x-1' />
+                            Volver al inicio de sesión
+                        </Link>
+                    </div>
+                </div>
+            </article>
+
+            <div className='hidden lg:block w-1/2 relative'>
+                <Image
+                    src={'/images/register-img.jpg'}
+                    alt={'register'}
+                    className='object-cover'
+                    fill
+                    priority
+                />
+            </div>
+        </section>
+    )
+}

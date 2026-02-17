@@ -48,7 +48,7 @@ export default async function SignUpPage(props: {
             <SignUpForm />
           </div>
           <SeparatorWithOr />
-          <div className='mt-6'>
+          <div className='mt-2'>
             <SocialAuth />
           </div>
 

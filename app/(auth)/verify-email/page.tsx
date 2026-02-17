@@ -147,7 +147,7 @@ export default function VerifyEmailPage() {
                                 autoFocus
                             />
                             <p className='text-xs text-gray-500 mt-2'>
-                                El código expira en 10 minutos
+                                El código expira en 24 horas
                             </p>
                         </div>
 
