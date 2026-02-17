@@ -30,6 +30,8 @@ import { z } from 'zod'
 import { useSession, signOut } from 'next-auth/react'
 import { LogOut } from 'lucide-react'
 
+import { useTranslations } from 'next-intl'
+
 interface CompanySettingsModalProps {
     isOpen: boolean
     userId: string
@@ -41,6 +43,8 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
     const { showSuccess, showError } = useToast()
     const router = useRouter()
     const { update } = useSession()
+    const t = useTranslations('settings')
+    const tCommon = useTranslations('common')
 
     // Generate random 8-character alphanumeric store ID
     const generateStoreId = () => {
@@ -83,15 +87,15 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                         isStore: true
                     }
                 })
-                showSuccess('Company settings updated successfully')
+                showSuccess(t('saveSuccess'))
                 setOpen(false)
                 router.push(`/admin/${data.storeId}/overview`)
             } else {
-                showError(res.error || 'Something went wrong')
+                showError(t('saveError'))
             }
         } catch (error) {
             console.error(error)
-            showError('Something went wrong')
+            showError(tCommon('unexpectedError'))
         } finally {
             setIsLoading(false)
         }
@@ -101,9 +105,9 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
         <Dialog open={open} onOpenChange={() => { }}>
             <DialogContent className="sm:max-w-[425px] md:max-w-[600px] lg:max-w-[700px]" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
                 <DialogHeader>
-                    <DialogTitle>Configuración de la Empresa</DialogTitle>
+                    <DialogTitle>{t('companySettingsTitle')}</DialogTitle>
                     <DialogDescription>
-                        Por favor completa los datos de tu empresa, sucursal principal y almacén para continuar.
+                        {t('setupInstructions')}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -113,9 +117,9 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                             name="companyName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Nombre de la Empresa</FormLabel>
+                                    <FormLabel>{t('fields.companyName')}</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Mi Empresa S.A. de C.V." {...field} />
+                                        <Input placeholder={t('placeholders.companyName')} {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -127,9 +131,9 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 name="storeName"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Sucursal Principal</FormLabel>
+                                        <FormLabel>{t('fields.storeName')}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Sucursal Centro" {...field} />
+                                            <Input placeholder={t('placeholders.storeName')} {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -140,9 +144,9 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 name="storeLocation"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Ubicación Sucursal</FormLabel>
+                                        <FormLabel>{t('fields.storeLocation')}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Av. Reforma 123" {...field} />
+                                            <Input placeholder={t('placeholders.storeLocation')} {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -156,9 +160,9 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 name="warehouseName"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Almacén Principal</FormLabel>
+                                        <FormLabel>{t('fields.warehouseName')}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Almacén General" {...field} />
+                                            <Input placeholder={t('placeholders.warehouseName')} {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -169,9 +173,9 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 name="warehouseLocation"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Ubicación Almacén</FormLabel>
+                                        <FormLabel>{t('fields.warehouseLocation')}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Calle Industrial 456" {...field} />
+                                            <Input placeholder={t('placeholders.warehouseLocation')} {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -185,7 +189,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 name="industry"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Giro de la Empresa</FormLabel>
+                                        <FormLabel>{t('fields.industry')}</FormLabel>
                                         <FormControl>
                                             <select
                                                 {...field}
@@ -224,7 +228,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 name="storeId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>ID de la Sucursal (Generado)</FormLabel>
+                                        <FormLabel>{t('fields.storeIdGenerated')}</FormLabel>
                                         <FormControl>
                                             <Input {...field} readOnly className="bg-gray-100" />
                                         </FormControl>
@@ -242,10 +246,10 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 className="text-muted-foreground hover:text-destructive"
                             >
                                 <LogOut className="mr-2 h-4 w-4" />
-                                Cerrar Sesión
+                                {tCommon('signOut')}
                             </Button>
                             <Button type="submit" disabled={isLoading}>
-                                {isLoading ? 'Guardando...' : 'Guardar y Continuar'}
+                                {isLoading ? tCommon('saving') : t('saveContinue')}
                             </Button>
                         </DialogFooter>
                     </form>

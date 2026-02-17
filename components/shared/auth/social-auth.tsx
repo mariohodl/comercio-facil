@@ -43,7 +43,7 @@ const SocialButton = ({
       <Button
         type="submit"
         disabled={pending}
-        className={`w-full h-10 shadow-lg flex items-center justify-center gap-3 ${bgColor} ${hoverColor} ${textColor} border-0 transition-all duration-300 hover:shadow-xl hover:scale-105 active:scale-95 font-bold text-base group relative overflow-hidden`}
+        className={`w-full h-11 shadow-sm flex items-center justify-center gap-3 ${bgColor} ${hoverColor} ${textColor} border border-gray-100 transition-all duration-300 hover:shadow-md hover:scale-[1.02] active:scale-95 font-bold text-base group relative overflow-hidden rounded-xl`}
       >
         <span className="relative z-10 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center">
           {typeof Icon === 'function' ? <Icon /> : Icon}

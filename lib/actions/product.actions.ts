@@ -9,6 +9,7 @@ import { ProductInputSchema, ProductUpdateSchema } from '../validator'
 import { IProductInput } from '@/types'
 import { z } from 'zod'
 import { utapi } from '@/app/api/uploadthing/core'
+import { getTranslations } from 'next-intl/server'
 
 /**
  * Calculate discount price based on price, discount type, and discount value
@@ -454,6 +455,38 @@ export async function createProduct(data: IProductInput) {
 			}
 		});
 
+		// Check for duplicate barcode in the same store
+		const barcodesToCheck: string[] = []
+		if (cleanedProduct.itemBarcode) barcodesToCheck.push(cleanedProduct.itemBarcode)
+		if (cleanedProduct.variants && cleanedProduct.variants.length > 0) {
+			cleanedProduct.variants.forEach((v: any) => {
+				if (v.barcode) barcodesToCheck.push(v.barcode)
+			})
+		}
+
+		if (barcodesToCheck.length > 0) {
+			// Check for duplicates within the same submission
+			if (barcodesToCheck.length > new Set(barcodesToCheck).size) {
+				const t = await getTranslations('products')
+				return { success: false, message: t('barcodeAlreadyExists') }
+			}
+
+			const duplicateProduct = await Product.findOne({
+				store: cleanedProduct.store,
+				$or: [
+					{ itemBarcode: { $in: barcodesToCheck } },
+					{ 'variants.barcode': { $in: barcodesToCheck } },
+				],
+			})
+			if (duplicateProduct) {
+				const t = await getTranslations('products')
+				return {
+					success: false,
+					message: t('barcodeAlreadyExists'),
+				}
+			}
+		}
+
 		// Calculate discount price if discount is provided
 		const discountPrice = calculateDiscountPrice(
 			product.listPrice,
@@ -492,6 +525,39 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
 				cleanedProduct[field] = undefined;
 			}
 		});
+
+		// Check for duplicate barcode in the same store (excluding this product)
+		const barcodesToCheck: string[] = []
+		if (cleanedProduct.itemBarcode) barcodesToCheck.push(cleanedProduct.itemBarcode)
+		if (cleanedProduct.variants && cleanedProduct.variants.length > 0) {
+			cleanedProduct.variants.forEach((v: any) => {
+				if (v.barcode) barcodesToCheck.push(v.barcode)
+			})
+		}
+
+		if (barcodesToCheck.length > 0) {
+			// Check for duplicates within the same submission
+			if (barcodesToCheck.length > new Set(barcodesToCheck).size) {
+				const t = await getTranslations('products')
+				return { success: false, message: t('barcodeAlreadyExists') }
+			}
+
+			const duplicateProduct = await Product.findOne({
+				_id: { $ne: product._id },
+				store: cleanedProduct.store,
+				$or: [
+					{ itemBarcode: { $in: barcodesToCheck } },
+					{ 'variants.barcode': { $in: barcodesToCheck } },
+				],
+			})
+			if (duplicateProduct) {
+				const t = await getTranslations('products')
+				return {
+					success: false,
+					message: t('barcodeAlreadyExists'),
+				}
+			}
+		}
 
 		// Calculate discount price if discount is provided
 		const discountPrice = calculateDiscountPrice(

@@ -69,7 +69,7 @@ function DecimalQuantityInput({ value, onChange, unit, max, onStockExceeded }: {
                 inputMode="decimal"
                 value={localValue}
                 onChange={(e) => {
-                    const val = e.target.value.replace(/,/g, '.')
+                    const val = e.target.value.replace(/,/g, '.').replace(/^0+(?=\d)/, '')
                     if (val === '' || val === '.' || /^\d*\.?\d*$/.test(val)) {
                         setLocalValue(val)
                         let parsed = parseFloat(val)

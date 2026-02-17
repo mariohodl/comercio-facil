@@ -29,7 +29,7 @@ export function HeroSection() {
                     </h1>
 
                     <p className='text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed'>
-                        Centralice su Inventario, Optimice sus Ventas en Punto de Servicio (POS) y tome decisiones con Reportes en Tiempo Real.
+                        Tome el control total y haga crecer su negocio: unifique el inventario, agilice sus ventas en el POS y conozca su negocio a fondo con datos siempre actualizados.
                     </p>
 
                     <div className='flex flex-col sm:flex-row items-center gap-4 pt-4 w-full justify-center'>

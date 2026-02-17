@@ -38,7 +38,7 @@ export default async function RootLayout({
       <body
         className={`${NunitoFont.className}`}
       >
-        <Toaster />
+        <Toaster position="top-right" />
         <NextIntlClientProvider messages={messages}>
           <ClientProviders>{children}</ClientProviders>
         </NextIntlClientProvider>

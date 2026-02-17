@@ -706,8 +706,8 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                                                     inputMode="numeric"
                                                                     value={field.quantity}
                                                                     onChange={(e) => {
-                                                                        const val = e.target.value.replace(/[^\d]/g, '')
-                                                                        updateItemQuantity(index, Number(val) || 1)
+                                                                        const val = e.target.value.replace(/[^\d]/g, '').replace(/^0+(?=\d)/, '')
+                                                                        updateItemQuantity(index, Number(val) || 0)
                                                                     }}
                                                                     className="h-9 border-gray-200 focus:bg-white bg-gray-50/50 text-center font-medium w-24 mx-auto"
                                                                 />
@@ -718,11 +718,14 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                                                     inputMode="decimal"
                                                                     value={field.costPrice}
                                                                     onChange={(e) => {
-                                                                        const val = e.target.value.replace(/[^\d.]/g, '')
+                                                                        let val = e.target.value.replace(/[^\d.]/g, '')
                                                                         // Allow only one decimal point
                                                                         const parts = val.split('.')
-                                                                        const sanitized = parts[0] + (parts.length > 1 ? '.' + parts[1] : '')
-                                                                        updateItemCost(index, Number(sanitized) > 0 ? Number(sanitized) : 1)
+                                                                        val = parts[0] + (parts.length > 1 ? '.' + parts[1] : '')
+                                                                        // Strip leading zeros
+                                                                        val = val.replace(/^0+(?=\d)/, '')
+
+                                                                        updateItemCost(index, Number(val) > 0 ? Number(val) : 0)
                                                                     }}
                                                                     className="h-9 border-gray-200 focus:bg-white bg-gray-50/50 text-center font-medium w-32 mx-auto"
                                                                 />
@@ -1028,7 +1031,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                         <div className="flex items-center gap-4">
                             {/* Image placeholder */}
                             {selectedProduct?.images && selectedProduct.images.length > 0 && selectedProduct.images[0].imgUrl ? (
-                                <div className="h-24 w-24 rounded-lg overflow-hidden border border-gray-100 bg-white shrink-0">
+                                <div className="relative h-24 w-24 rounded-lg overflow-hidden border border-gray-100 bg-white shrink-0">
                                     <Image
                                         src={selectedProduct.images[0].imgUrl}
                                         alt={selectedProduct.name}
@@ -1085,12 +1088,13 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                             max={modalQuantity}
                                             value={modalFreeQuantity}
                                             onChange={(e) => {
-                                                const val = Number(e.target.value)
+                                                const val = e.target.value.replace(/^0+(?=\d)/, '')
+                                                const numericVal = Number(val)
                                                 // Prevent setting value > modalQuantity
-                                                if (val > modalQuantity) return
+                                                if (numericVal > modalQuantity) return
 
-                                                setModalFreeQuantity(val)
-                                                if (val > 0) setShowFreeQtyError(false)
+                                                setModalFreeQuantity(numericVal)
+                                                if (numericVal > 0) setShowFreeQtyError(false)
                                             }}
                                             className={cn("text-center font-bold border-orange/20 focus:border-orange bg-white w-24", showFreeQtyError && "border-red-500 focus:border-red-500")}
                                         />

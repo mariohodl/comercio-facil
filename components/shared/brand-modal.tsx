@@ -42,6 +42,7 @@ interface BrandModalProps {
 export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandModalProps) {
     const { showSuccess, showError, showToast } = useToast()
     const t = useTranslations('products')
+    const tCommon = useTranslations('common')
     const isEditMode = !!brand
     const lastUploadedRef = useRef<{ name: string; size: number } | null>(null)
 
@@ -82,15 +83,19 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
             }
 
             if (result.success) {
-                showSuccess(result.message)
+                showSuccess(isEditMode ? t('updateSuccess') : t('createSuccess'))
+
+                if (!isEditMode && result.brandId) {
+                    // Optionally handle brandId if needed, though not directly used here for reset/close
+                }
                 form.reset()
                 onClose()
                 onSuccess?.()
             } else {
-                showError(result.message)
+                showError(result.error || t('unexpectedError'))
             }
         } catch (_error) {
-            showError('An error occurred. Please try again.')
+            showError(t('unexpectedError'))
         }
     }
 
@@ -105,7 +110,7 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-xl font-semibold">
-                            {isEditMode ? 'Edit Brand' : 'Add Brand'}
+                            {isEditMode ? t('editBrand' as any) || 'Edit Brand' : t('addBrand' as any) || 'Add Brand'}
                         </DialogTitle>
                     </div>
                 </DialogHeader>
@@ -145,7 +150,7 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                                                             <div className="mb-2">
                                                                 <span className="text-2xl text-gray-300">+</span>
                                                             </div>
-                                                            <p className="text-sm font-medium mb-2">Add Image</p>
+                                                            <p className="text-sm font-medium mb-2">{t('addImages')}</p>
                                                             <UploadButton
                                                                 endpoint="imageUploader"
                                                                 onBeforeUploadBegin={async (files) => {
@@ -159,7 +164,7 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                                                                         }
                                                                         lastUploadedRef.current = { name: files[0].name, size: files[0].size };
                                                                     }
-                                                                    showToast(t('compressingImages') || 'Compressing image...', { duration: 2000 });
+                                                                    showToast(t('compressingImages'), { duration: 2000 });
                                                                     const compressedFiles = await Promise.all(
                                                                         files.map(async (file) => {
                                                                             return await compressImage(file);
@@ -171,18 +176,18 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                                                                     if (res && res.length > 0) {
                                                                         const url = res[0].ufsUrl || res[0].url;
                                                                         field.onChange(url)
-                                                                        showSuccess(t('imageUploadedSuccessfully') || 'Image uploaded successfully')
+                                                                        showSuccess(t('imageUploadedSuccessfully'))
                                                                     }
                                                                 }}
                                                                 onUploadError={(error: Error) => {
-                                                                    showError(`ERROR! ${error.message}`)
+                                                                    showError(`${tCommon('error')}: ${error.message}`)
                                                                 }}
                                                                 appearance={{
                                                                     button: "bg-orange hover:bg-orange-dark text-white text-xs px-2 py-1 h-auto w-auto",
                                                                     allowedContent: "hidden"
                                                                 }}
                                                                 content={{
-                                                                    button: "Upload Image"
+                                                                    button: t('uploadImage') as any
                                                                 }}
                                                             />
                                                             <p className="text-[10px] text-muted-foreground mt-1">
@@ -206,11 +211,11 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>
-                                                Brand <span className="text-red-500">*</span>
+                                                {t('brand')} <span className="text-red-500">*</span>
                                             </FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    placeholder="Enter brand name"
+                                                    placeholder={t('enterProductName')}
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -224,7 +229,7 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                                     name="status"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-row items-center justify-between">
-                                            <FormLabel>Status</FormLabel>
+                                            <FormLabel>{tCommon('status')}</FormLabel>
                                             <FormControl>
                                                 <Switch
                                                     checked={field.value}
@@ -244,7 +249,7 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                                 onClick={handleClose}
                                 className="bg-navy text-white hover:bg-navy/90"
                             >
-                                Cancel
+                                {tCommon('cancel')}
                             </Button>
                             <Button
                                 type="submit"
@@ -252,10 +257,10 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                                 className="bg-orange hover:bg-orange-dark text-white"
                             >
                                 {form.formState.isSubmitting
-                                    ? 'Saving...'
+                                    ? tCommon('saving')
                                     : isEditMode
-                                        ? 'Update Brand'
-                                        : 'Add Brand'}
+                                        ? t('updateProduct')
+                                        : t('addProduct')}
                             </Button>
                         </div>
                     </form>

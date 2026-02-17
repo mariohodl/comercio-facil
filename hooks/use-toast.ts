@@ -5,12 +5,12 @@ import { toast } from 'sonner'
 interface ToastOptions {
 	duration?: number
 	position?:
-		| 'top-left'
-		| 'top-right'
-		| 'bottom-left'
-		| 'bottom-right'
-		| 'top-center'
-		| 'bottom-center'
+	| 'top-left'
+	| 'top-right'
+	| 'bottom-left'
+	| 'bottom-right'
+	| 'top-center'
+	| 'bottom-center'
 	important?: boolean
 }
 
@@ -57,6 +57,7 @@ export const useToast = () => {
 			loading,
 			success,
 			error,
+			position: 'top-right',
 			...options,
 		})
 	}

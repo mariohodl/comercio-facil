@@ -184,7 +184,6 @@ const ProductList = ({ store }: { store: string }) => {
                     <Table>
                         <TableHeader className='bg-gray-50'>
                             <TableRow>
-                                <TableHead className='whitespace-nowrap'>{t('sku')}</TableHead>
                                 <TableHead className='min-w-[200px]'>{t('productName')}</TableHead>
                                 <TableHead className='whitespace-nowrap'>{t('category')}</TableHead>
                                 <TableHead className='whitespace-nowrap'>{t('brand')}</TableHead>
@@ -212,9 +211,6 @@ const ProductList = ({ store }: { store: string }) => {
                             ) : (
                                 data?.products.map((product) => (
                                     <TableRow key={product._id}>
-                                        <TableCell className='font-medium text-gray-500 whitespace-nowrap'>
-                                            {product.sku}
-                                        </TableCell>
                                         <TableCell>
                                             <div className='flex items-center gap-3 min-w-[200px]'>
                                                 <div className='relative w-10 h-10 rounded-md overflow-hidden border bg-gray-100 flex-shrink-0 flex items-center justify-center'>

@@ -36,7 +36,11 @@ interface CategoryModalProps {
     storeId: string
 }
 
+import { useTranslations } from 'next-intl'
+
 export function CategoryModal({ open, onClose, category, onSuccess, storeId }: CategoryModalProps) {
+    const t = useTranslations('categoryModal')
+    const tCommon = useTranslations('common')
     const { showSuccess, showError } = useToast()
     const isEditMode = !!category
     const [showSuggestions, setShowSuggestions] = useState(false)
@@ -84,19 +88,16 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
             }
 
             if (result.success) {
-                showSuccess(result.message)
+                showSuccess(isEditMode ? t('updateSuccess') : t('createSuccess'))
 
                 if (!isEditMode && result.categoryId) {
                     setCreatedCategory({
                         id: result.categoryId,
                         name: result.categoryName
                     })
-                    // Don't close immediately if suggested, or close usage of this form and open suggestions?
-                    // User might want to create another category.
-                    // The common pattern is: Close this form, open suggestion form.
                     form.reset()
-                    onClose() // Close the category modal
-                    setShowSuggestions(true) // Open suggestions modal
+                    onClose()
+                    setShowSuggestions(true)
                 } else {
                     form.reset()
                     onClose()
@@ -106,7 +107,7 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
                 showError(result.message)
             }
         } catch (_error) {
-            showError('An error occurred. Please try again.')
+            showError(tCommon('unexpectedError'))
         }
     }
 
@@ -121,7 +122,7 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-xl font-semibold">
-                            {isEditMode ? 'Edit Category' : 'Add Category'}
+                            {isEditMode ? t('editTitle') : t('addTitle')}
                         </DialogTitle>
                     </div>
                 </DialogHeader>
@@ -134,11 +135,11 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                                        Category <span className="text-red-500">*</span>
+                                        {t('nameLabel')} <span className="text-red-500">*</span>
                                     </FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="Enter category name"
+                                            placeholder={t('namePlaceholder')}
                                             {...field}
                                             onChange={(e) => {
                                                 field.onChange(e)
@@ -157,11 +158,11 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                                        Category Slug <span className="text-red-500">*</span>
+                                        {t('slugLabel')} <span className="text-red-500">*</span>
                                     </FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="category-slug"
+                                            placeholder={t('slugPlaceholder')}
                                             {...field}
                                             onChange={(e) => {
                                                 const sanitized = toSlug(e.target.value)
@@ -180,7 +181,7 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
                             render={({ field }) => (
                                 <FormItem className="flex flex-row items-center justify-between">
                                     <FormLabel>
-                                        Status <span className="text-red-500">*</span>
+                                        {t('statusLabel')} <span className="text-red-500">*</span>
                                     </FormLabel>
                                     <FormControl>
                                         <Switch
@@ -199,7 +200,7 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
                                 onClick={handleClose}
                                 className="bg-navy text-white hover:bg-navy/90"
                             >
-                                Cancel
+                                {tCommon('cancel')}
                             </Button>
                             <Button
                                 type="submit"
@@ -207,32 +208,32 @@ export function CategoryModal({ open, onClose, category, onSuccess, storeId }: C
                                 className="bg-orange hover:bg-orange-dark text-white"
                             >
                                 {form.formState.isSubmitting
-                                    ? 'Saving...'
+                                    ? tCommon('saving')
                                     : isEditMode
-                                        ? 'Update Category'
-                                        : 'Add Category'}
+                                        ? t('updateCategory')
+                                        : t('addCategory')}
                             </Button>
                         </div>
                     </form>
                 </Form>
+                {/* Suggestions dialog */}
+                {createdCategory && (
+                    <SuggestedSubCategoriesDialog
+                        open={showSuggestions}
+                        onOpenChange={(open) => {
+                            setShowSuggestions(open)
+                            if (!open) {
+                                onSuccess?.()
+                                setCreatedCategory(null)
+                            }
+                        }}
+                        categoryName={createdCategory.name}
+                        categoryId={createdCategory.id}
+                        storeId={storeId}
+                    />
+                )}
             </DialogContent>
 
-            {createdCategory && (
-                <SuggestedSubCategoriesDialog
-                    open={showSuggestions}
-                    onOpenChange={(open) => {
-                        setShowSuggestions(open)
-                        if (!open) {
-                            // When suggestions dialog closes, trigger parent onSuccess
-                            onSuccess?.()
-                            setCreatedCategory(null)
-                        }
-                    }}
-                    categoryName={createdCategory.name}
-                    categoryId={createdCategory.id}
-                    storeId={storeId}
-                />
-            )}
         </Dialog>
     )
 }

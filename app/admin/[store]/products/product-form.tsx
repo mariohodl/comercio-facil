@@ -229,7 +229,7 @@ const ProductForm = ({
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    showToast(t('compressingImages') || 'Compressing images...', { duration: 2000 });
+    showToast(t('compressingImages'), { duration: 2000 });
 
     const compressedFiles = await Promise.all(
       files.map(async (file) => await compressImage(file))
@@ -525,14 +525,14 @@ const ProductForm = ({
 
   async function onSubmit(values: IProductInput) {
     try {
-      showToast(tCommon('loading') || 'Processing...', { duration: 0 });
+      showToast(tCommon('loading'), { duration: 0 });
       let finalValues = { ...values }
 
       // Handle main images upload
       const mainImagesPending = (values.images as any[]).filter(img => img.file).map(img => img.file as File);
       if (mainImagesPending.length > 0) {
         const uploadRes = await startUpload(mainImagesPending);
-        if (!uploadRes) throw new Error("Main image upload failed");
+        if (!uploadRes) throw new Error(t('imageUploadFailed'));
 
         let uploadIdx = 0;
         finalValues.images = (values.images as any[]).map(img => {
@@ -556,7 +556,7 @@ const ProductForm = ({
           if (variantImagesPending.length === 0) return variant;
 
           const uploadRes = await startUpload(variantImagesPending);
-          if (!uploadRes) throw new Error(`Variant image upload failed for SKU: ${variant.sku}`);
+          if (!uploadRes) throw new Error(`${t('imageUploadFailed')} (SKU: ${variant.sku})`);
 
           let uploadIdx = 0;
           return {
@@ -641,7 +641,7 @@ const ProductForm = ({
         }
       }
     } catch (error: any) {
-      showError(error.message || "An error occurred");
+      showError(error.message || tCommon('unexpectedError'));
     }
   }
 
@@ -1141,11 +1141,15 @@ const ProductForm = ({
                         defaultValue={field.value}
                         className="flex flex-col space-y-1"
                       >
-                        <div className="flex items-center space-x-3 space-y-0">
-                          <RadioGroupItem value="Single Product" id="single" className="text-orange border-orange" />
-                          <FormLabel htmlFor="single" className="font-normal">{t('singleProduct')}</FormLabel>
-                          <RadioGroupItem value="Variable Product" id="variable" className="text-orange border-orange ml-4" />
-                          <FormLabel htmlFor="variable" className="font-normal">{t('variableProduct')}</FormLabel>
+                        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Single Product" id="single" className="text-orange border-orange" />
+                            <FormLabel htmlFor="single" className="font-normal cursor-pointer">{t('singleProduct')}</FormLabel>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Variable Product" id="variable" className="text-orange border-orange" />
+                            <FormLabel htmlFor="variable" className="font-normal cursor-pointer">{t('variableProduct')}</FormLabel>
+                          </div>
                         </div>
                       </RadioGroup>
                     </FormControl>
@@ -1780,7 +1784,7 @@ const ProductForm = ({
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="p-4">
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <FormField
                             control={form.control}
                             name='costPerUnit'
@@ -1858,7 +1862,7 @@ const ProductForm = ({
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="p-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name='countInStock'
@@ -1913,7 +1917,7 @@ const ProductForm = ({
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="p-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name='discountType'
@@ -1965,7 +1969,7 @@ const ProductForm = ({
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="p-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name='taxType'

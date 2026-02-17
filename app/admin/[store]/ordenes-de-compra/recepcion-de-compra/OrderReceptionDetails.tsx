@@ -56,9 +56,13 @@ type FormFields = {
 //   price: 155,
 //   category: 'Res'}
 
+import { useTranslations } from 'next-intl'
+
 const OrderReceptionDetails = () => {
   const { showSuccess, showError } = useToast()
   const router = useRouter()
+  const t = useTranslations('orderReception')
+  const tCommon = useTranslations('common')
   const [proveedoresData, setProveedoresData] = useState([])
   const [productsData, setProductsData] = useState([])
   const [productsPreAdded, setProductsPreAdded] = useState<Array<ProductPreAddedType>>([])
@@ -108,22 +112,11 @@ const OrderReceptionDetails = () => {
 
 
   useEffect(() => {
-    // if(nameProviderWatcher?.length < 3) {
-    //   setFilteredProveedoresData([])
-    //   setAutoCompleteReady(true)
-    //   setAutosuggestProveedoresSelected(undefined)
-    //   setValue('nameProvider', '')
-    //   setValue('clave', '')
-    //   setValue('rfc', '')
-    //   setValue('facturaNumber', '')
-    //   return  
-    // }
     if (nameProviderWatcher?.length > 2 && proveedoresData?.length > 0) {
       const results = proveedoresData?.filter((item: any) => {
         return item?.nameProvider?.toLowerCase().includes(nameProviderWatcher?.toLowerCase())
       })
       if (results.length > 0) {
-        //assign results to the autoCompleteData
         setTimeout(() => {
           setFilteredProveedoresData(results)
         }
@@ -143,8 +136,6 @@ const OrderReceptionDetails = () => {
         return item?.name?.toLowerCase().includes(productToAddNameWatcher?.toLowerCase())
       })
       if (results.length > 0) {
-        //assign results to the autoCompleteData
-
         setTimeout(() => {
           setFilteredProductsData(results)
         }
@@ -161,17 +152,17 @@ const OrderReceptionDetails = () => {
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     let isAtLeastOneError = false
     if (nameProviderWatcher.length < 3) {
-      showError('Ingresa un nombre de proveedor válido!')
+      showError(t('invalidProviderName'))
       isAtLeastOneError = true
     }
 
     if (RFCWatcher.length < 8) {
-      showError('Ingresa un RFC válido!')
+      showError(t('invalidRFC'))
       isAtLeastOneError = true
     }
 
     if (facturaWatcher.length < 4) {
-      showError('Ingresa un Número de factura válido!')
+      showError(t('invalidInvoiceNumber'))
       isAtLeastOneError = true
     }
 
@@ -179,7 +170,6 @@ const OrderReceptionDetails = () => {
       return
     }
 
-    // validations about the total and subtotal amount are needed here and in the backend before saaving to DB
     const orderReceptionData = {
       ...data,
       subtotal: Number(calculateTotalPriceOfProducts(productsPreAdded, false, false)),
@@ -190,16 +180,16 @@ const OrderReceptionDetails = () => {
     createOrderReception(orderReceptionData)
       .then((res) => {
         if (res?.success) {
-          showSuccess('Recepcion de compra creada correctamente')
+          showSuccess(t('createSuccess'))
           setTimeout(() => {
             router.push('/admin/ordenes-de-compra')
           }, 500)
         } else {
-          showError('Error al crear Recepcion de compra')
+          showError(t('createError'))
         }
       })
       .catch((err) => {
-        showError('Error al crear Recepcion de compra')
+        showError(tCommon('unexpectedError'))
       })
 
   }
@@ -255,22 +245,22 @@ const OrderReceptionDetails = () => {
     const productToAddQuantityWatcherDDD = Number(productToAddQuantityWatcher)
 
     if (productToAddNameWatcher.length < 5) {
-      showError('Ingresa un nombre de producto válido!')
+      showError(t('invalidProductName'))
       isAtLeastOneError = true
     }
 
     if (productToAddCategoryWatcher.length === 0) {
-      showError('Selecciona una categoría de producto!')
+      showError(t('invalidProductCategory'))
       isAtLeastOneError = true
     }
 
     if (productToAddPriceWatcherDDD <= 0 || typeof (productToAddPriceWatcherDDD) !== 'number') {
-      showError('Precio debe ser un valor numérico válido!')
+      showError(t('invalidProductPrice'))
       isAtLeastOneError = true
     }
 
     if (productToAddQuantityWatcherDDD <= 0 || typeof (productToAddQuantityWatcherDDD) !== 'number') {
-      showError('Cantidad debe ser un valor numérico válido!')
+      showError(t('invalidProductQuantity'))
       isAtLeastOneError = true
     }
 
@@ -282,7 +272,7 @@ const OrderReceptionDetails = () => {
       name: productToAddNameWatcher,
       productId: String(productToAddProductIdWatcher),
       category: !!productToAddCategoryWatcher ? productToAddCategoryWatcher : '',
-      price: productToAddPriceWatcherDDD, //adding the same price, if we need to compute here an incremented price, we'll do it later
+      price: productToAddPriceWatcherDDD,
       listPrice: productToAddPriceWatcherDDD,
       discountPrice: 0,
       countInStock: productToAddQuantityWatcherDDD,
@@ -309,8 +299,6 @@ const OrderReceptionDetails = () => {
 
     setAutosuggestProductSelected(undefined)
     setFilteredProductsData([])
-
-    // setValue('productToAddProductId', 435643) //agregar el numero consiguente dada la suma de pdps registratos y agregados en array
   }
 
   const getHighetsProductId = (arr: IProduct[]) => {
@@ -385,7 +373,6 @@ const OrderReceptionDetails = () => {
       <div className='flex flex-col'>
         <div className='border-2 border-gray-300 rounded-md py-2 m-3 relative'>
           <div className='flex items-center mx-3'>
-            {/* <ItemValueDisplay index={index} control={control} /> */}
             <div className='m-3 w-1/2'>
               <MKInput
                 label="Nombre del producto"
@@ -441,13 +428,6 @@ const OrderReceptionDetails = () => {
                 typeInput='number'
               />
             </div>
-            {/* {
-                index > 0 && (
-                  <div className='w-6 h-6 bg-primary cursor-pointer flex flex-center flex-wrap items-center rounded-full absolute right-0 top-0'>
-                    <span className='ml-2 text-white' onClick={() => onRemoveProduct(index)}>x</span>
-                  </div>
-                )
-              } */}
 
           </div>
           <div className='flex items-center mx-3'>
@@ -461,7 +441,7 @@ const OrderReceptionDetails = () => {
           </div>
           {
             <div className='flex justify-center'>
-              <p className='underline cursor-pointer' onClick={handleOnAddProduct}>Agregar producto</p>
+              <p className='underline cursor-pointer' onClick={handleOnAddProduct}>{t('addProduct')}</p>
             </div>
           }
 

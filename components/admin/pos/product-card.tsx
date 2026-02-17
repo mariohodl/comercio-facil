@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Plus, Minus, AlertCircle, Layers, AlertTriangle, ScanBarcode, Package } from 'lucide-react'
+import { Plus, Minus, AlertCircle, Layers, AlertTriangle, ScanBarcode, Package, ImageOff } from 'lucide-react'
 import { IProduct } from '@/lib/db/models/product.model'
 import { usePOSStore, FRACTIONAL_UNITS } from '@/hooks/use-pos-store'
 import { formatCurrency } from '@/lib/utils'
@@ -148,12 +148,22 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
                 <CardContent className="p-0">
                     {/* Image Section */}
                     <div className="relative aspect-square w-full overflow-hidden bg-gray-50">
-                        <Image
-                            src={product.images[0]?.imgUrl || '/placeholder.png'}
-                            alt={product.name}
-                            fill
-                            className={`object-cover transition-transform duration-500 ${!isOutOfStock && 'group-hover:scale-105'}`}
-                        />
+                        {product.images[0]?.imgUrl ? (
+                            <Image
+                                src={product.images[0].imgUrl}
+                                alt={product.name}
+                                fill
+                                className={`object-cover transition-transform duration-500 ${!isOutOfStock && 'group-hover:scale-105'}`}
+                            />
+                        ) : (
+                            <div className="flex items-center justify-center w-full h-full bg-gray-50 p-4">
+                                <div className="flex items-center justify-center w-full h-full border border-gray-100 bg-gray-100/50 rounded-2xl group-hover:bg-gray-100 transition-all duration-300">
+                                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                                        {t('noImg')}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Overlays */}
                         {isOutOfStock && (
@@ -205,22 +215,21 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
                     {/* Details Section */}
                     <div className="px-3 py-1">
                         {/* Brand & Category Row */}
-                        <div className="flex items-center gap-1.5 mb-0.5 overflow-hidden whitespace-nowrap">
-                            <span className="text-[9px] font-black text-blue-600/80 uppercase tracking-widest shrink-0">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mb-1">
+                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-wider">
                                 {product.category}
                             </span>
                             {product.brand && (
-                                <>
-                                    <div className="w-0.5 h-0.5 rounded-full bg-slate-300 shrink-0" />
-                                    <span className="text-[9px] font-bold text-slate-500 uppercase truncate">
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-1 h-1 rounded-full bg-slate-300 hidden sm:block" />
+                                    <span className="text-[10px] font-semibold text-slate-500 uppercase">
                                         {product.brand}
                                     </span>
-                                </>
+                                </div>
                             )}
                         </div>
 
-                        {/* Name */}
-                        <h3 className="font-semibold text-gray-900 leading-tight line-clamp-2 h-9 mb-1 group-hover:text-blue-600 transition-colors text-xs lg:text-sm">
+                        <h3 className="font-bold text-gray-900 leading-tight line-clamp-2 h-8 mb-1 group-hover:text-blue-600 transition-colors text-xs lg:text-sm">
                             {product.name}
                         </h3>
 
@@ -276,19 +285,13 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
                             )}
                         </div>
 
-                        {/* Technical Info Row (SKU & Barcode) */}
-                        <div className="mt-2 py-1 border-t border-gray-100 flex items-center justify-center gap-4 text-[9px] text-gray-400 font-mono">
-                            <div className="flex items-center gap-1 shrink-0">
-                                <Package className="w-3 h-3 opacity-60" />
-                                <span className="truncate">{product.sku}</span>
+                        {/* Technical Info Row (Barcode Only) */}
+                        {product.itemBarcode && (
+                            <div className="mt-2 py-1.5 border-t border-gray-100 flex items-center justify-center gap-1 text-[10px] text-gray-400 font-mono">
+                                <ScanBarcode className="w-3 h-3 opacity-60" />
+                                <span className="truncate">{product.itemBarcode}</span>
                             </div>
-                            {product.itemBarcode && (
-                                <div className="flex items-center gap-1 shrink-0 border-l border-gray-100 pl-3">
-                                    <ScanBarcode className="w-3 h-3 opacity-60" />
-                                    <span className="truncate">{product.itemBarcode}</span>
-                                </div>
-                            )}
-                        </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>

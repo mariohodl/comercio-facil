@@ -49,6 +49,7 @@
         "submit": "Enviar",
         "success": "Éxito",
         "error": "Error",
+        "unexpectedError": "Ocurrió un error inesperado",
         "areYouSure": "¿Estás seguro?",
         "subtotal": "Subtotal",
         "tax": "Impuesto",
@@ -127,6 +128,7 @@
         "createCustomer": "Crear Cliente",
         "roundoff": "Redondear",
         "insufficientStock": "Stock insuficiente",
+        "noImg": "Sin Imagen",
         "onlyUnitsAvailable": "Solo hay {count} unidades disponibles",
         "lastUnit": "Última unidad",
         "allUnitsAdded": "Has agregado todas las unidades disponibles",
@@ -333,12 +335,14 @@
         "addImages": "Agregar Imágenes",
         "submitting": "Enviando...",
         "barcodeScannedSuccessfully": "Código de barras escaneado exitosamente",
+        "barcodeAlreadyExists": "Este código de barras ya está registrado en esta tienda por otro producto.",
         "productIdRequired": "Se requiere ID de producto para eliminar imágenes",
         "imageDeletedSuccessfully": "Imagen eliminada exitosamente",
         "failedToDeleteImage": "Error al eliminar imagen",
         "checkFormErrors": "Por favor revise el formulario en busca de errores. Los campos obligatorios están marcados con *.",
         "createNewProduct": "Crear nuevo producto",
         "loadingForm": "Cargando formulario...",
+        "imageUploadFailed": "Error al subir la imagen",
         "variantAttributes": "Atributos de Variante",
         "generatedVariants": "Variantes Generadas",
         "variants": "Variantes",
@@ -742,6 +746,9 @@
         "subtitle": "Administra tu configuración en el portal",
         "saveSuccess": "Configuración guardada exitosamente",
         "saveError": "Error al guardar la configuración",
+        "companySettingsTitle": "Configuración de la Empresa",
+        "setupInstructions": "Por favor completa los datos de tu empresa, sucursal principal y almacén para continuar.",
+        "saveContinue": "Guardar y Continuar",
         "sections": {
             "profile": "Perfil",
             "store": "Configuración de Tienda",
@@ -762,7 +769,9 @@
             "warehouseLocation": "Ubicación del Almacén",
             "planStatus": "Estado",
             "trialEndDate": "Fecha de Fin de Prueba",
-            "subscriptionEndDate": "Fecha de Fin de Suscripción"
+            "subscriptionEndDate": "Fecha de Fin de Suscripción",
+            "industry": "Giro de la Empresa",
+            "storeIdGenerated": "ID de la Sucursal (Generado)"
         },
         "placeholders": {
             "companyName": "Ingresa el nombre de tu empresa",
@@ -964,5 +973,36 @@
         "Kit": "Kit",
         "Roll": "Rollo",
         "Pair": "Par"
+    },
+    "orderReception": {
+        "invalidProviderName": "Ingresa un nombre de proveedor válido!",
+        "invalidRFC": "Ingresa un RFC válido!",
+        "invalidInvoiceNumber": "Ingresa un Número de factura válido!",
+        "createSuccess": "Recepcion de compra creada correctamente",
+        "createError": "Error al crear Recepcion de compra",
+        "invalidProductName": "Ingresa un nombre de producto válido!",
+        "invalidProductCategory": "Selecciona una categoría de producto!",
+        "invalidProductPrice": "Precio debe ser un valor numérico válido!",
+        "invalidProductQuantity": "Cantidad debe ser un valor numérico válido!",
+        "addProduct": "Agregar producto"
+    },
+    "categoryModal": {
+        "editTitle": "Editar Categoría",
+        "addTitle": "Agregar Categoría",
+        "nameLabel": "Categoría",
+        "slugLabel": "Slug de Categoría",
+        "namePlaceholder": "Ingresa el nombre de la categoría",
+        "slugPlaceholder": "slug-de-categoria",
+        "statusLabel": "Estado",
+        "addCategory": "Agregar Categoría",
+        "updateCategory": "Actualizar Categoría",
+        "createSuccess": "Categoría creada exitosamente",
+        "updateSuccess": "Categoría actualizada exitosamente"
+    },
+    "cart": {
+        "addedToCart": "Agregado al carrito",
+        "addToCart": "Agregar al carrito",
+        "buyNow": "Comprar ahora",
+        "quantity": "Cantidad"
     }
 }

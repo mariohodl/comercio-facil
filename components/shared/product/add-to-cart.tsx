@@ -15,6 +15,8 @@ import { OrderItem } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { useTranslations } from 'next-intl'
+
 export default function AddToCart({
   item,
   minimal = false,
@@ -22,6 +24,7 @@ export default function AddToCart({
   item: OrderItem
   minimal?: boolean
 }) {
+  const t = useTranslations('cart')
   const router = useRouter()
   const {
     showSuccess,
@@ -37,13 +40,13 @@ export default function AddToCart({
       onClick={() => {
         try {
           addItem(item, 1)
-          showSuccess('Added to cart', {duration: 3000, position: 'top-center', important: true})
+          showSuccess(t('addedToCart'), { duration: 3000, position: 'top-center', important: true })
         } catch (error: any) {
-            showError(error.message, {duration: 3000, position: 'top-center', important: true})
+          showError(error.message, { duration: 3000, position: 'top-center', important: true })
         }
       }}
     >
-      Agregar a carrito
+      {t('addToCart')}
     </Button>
   ) : (
     <div className='w-full space-y-2'>
@@ -52,7 +55,7 @@ export default function AddToCart({
         onValueChange={(i) => setQuantity(Number(i))}
       >
         <SelectTrigger className=''>
-          <SelectValue>Cantidad: {quantity}</SelectValue>
+          <SelectValue>{t('quantity')}: {quantity}</SelectValue>
         </SelectTrigger>
         <SelectContent position='popper'>
           {Array.from({ length: item.countInStock }).map((_, i) => (
@@ -71,11 +74,11 @@ export default function AddToCart({
             const itemId = await addItem(item, quantity)
             router.push(`/cart/${itemId}`)
           } catch (error: any) {
-            showError(error.message, {duration: 3000, position: 'top-center', important: true})
+            showError(error.message, { duration: 3000, position: 'top-center', important: true })
           }
         }}
       >
-        Agregar a carrito
+        {t('addToCart')}
       </Button>
       <Button
         variant='secondary'
@@ -84,12 +87,12 @@ export default function AddToCart({
             addItem(item, quantity)
             router.push(`/checkout`)
           } catch (error: any) {
-            showError(error.message, {duration: 3000, position: 'top-center', important: true})
+            showError(error.message, { duration: 3000, position: 'top-center', important: true })
           }
         }}
         className='w-full rounded-full '
       >
-        Comprar ahora
+        {t('buyNow')}
       </Button>
     </div>
   )

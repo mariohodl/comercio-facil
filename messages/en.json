@@ -48,6 +48,7 @@
         "goToPOS": "Go to POS",
         "success": "Success",
         "error": "Error",
+        "unexpectedError": "An unexpected error occurred",
         "areYouSure": "Are you sure?",
         "subtotal": "Subtotal",
         "tax": "Tax",
@@ -126,6 +127,7 @@
         "createCustomer": "Create Customer",
         "roundoff": "Round off",
         "insufficientStock": "Insufficient stock",
+        "noImg": "No Image",
         "onlyUnitsAvailable": "Only {count} units available",
         "lastUnit": "Last unit",
         "allUnitsAdded": "You've added all available units",
@@ -320,6 +322,8 @@
         "checkFormErrors": "Please check the form for errors. Required fields are marked with *.",
         "createNewProduct": "Create new product",
         "loadingForm": "Loading form...",
+        "imageUploadFailed": "Image upload failed",
+        "barcodeAlreadyExists": "This barcode is already registered in this store by another product.",
         "variantAttributes": "Variant Attributes",
         "generatedVariants": "Generated Variants",
         "variants": "Variants",
@@ -722,7 +726,10 @@
         "title": "Settings",
         "subtitle": "Manage your settings on portal",
         "saveSuccess": "Settings saved successfully",
-        "saveError": "Failed to save settings",
+        "saveError": "Error saving settings",
+        "companySettingsTitle": "Company Settings",
+        "setupInstructions": "Please complete your company, main store, and warehouse details to continue.",
+        "saveContinue": "Save and Continue",
         "sections": {
             "profile": "Profile",
             "store": "Store Settings",
@@ -743,7 +750,9 @@
             "warehouseLocation": "Warehouse Location",
             "planStatus": "Status",
             "trialEndDate": "Trial End Date",
-            "subscriptionEndDate": "Subscription End Date"
+            "subscriptionEndDate": "Subscription End Date",
+            "industry": "Company Industry",
+            "storeIdGenerated": "Store ID (Generated)"
         },
         "placeholders": {
             "companyName": "Enter your company name",
@@ -938,5 +947,36 @@
         "Kit": "Kit",
         "Roll": "Roll",
         "Pair": "Pair"
+    },
+    "orderReception": {
+        "invalidProviderName": "Please enter a valid provider name!",
+        "invalidRFC": "Please enter a valid RFC!",
+        "invalidInvoiceNumber": "Please enter a valid invoice number!",
+        "createSuccess": "Order reception created successfully",
+        "createError": "Error creating order reception",
+        "invalidProductName": "Please enter a valid product name!",
+        "invalidProductCategory": "Please select a product category!",
+        "invalidProductPrice": "Price must be a valid numeric value!",
+        "invalidProductQuantity": "Quantity must be a valid numeric value!",
+        "addProduct": "Add product"
+    },
+    "categoryModal": {
+        "editTitle": "Edit Category",
+        "addTitle": "Add Category",
+        "nameLabel": "Category",
+        "slugLabel": "Category Slug",
+        "namePlaceholder": "Enter category name",
+        "slugPlaceholder": "category-slug",
+        "statusLabel": "Status",
+        "addCategory": "Add Category",
+        "updateCategory": "Update Category",
+        "createSuccess": "Category created successfully",
+        "updateSuccess": "Category updated successfully"
+    },
+    "cart": {
+        "addedToCart": "Added to cart",
+        "addToCart": "Add to cart",
+        "buyNow": "Buy Now",
+        "quantity": "Quantity"
     }
 }
