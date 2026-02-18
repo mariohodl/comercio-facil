@@ -1,17 +1,18 @@
 import { test as base } from '@playwright/test';
 import { AuthPage } from './pages/auth.page';
+import { CompanySetupPage } from './pages/company-setup.page';
 
-type AppFixtures = {
+type MyFixtures = {
     authPage: AuthPage;
-    //Reminder for later: add other page objects here as the project grows
-    // dashboardPage: DashboardPage;
-    // productPage: ProductPage;
+    companySetupPage: CompanySetupPage;
 };
 
-export const test = base.extend<AppFixtures>({
+export const test = base.extend<MyFixtures>({
     authPage: async ({ page }, use) => {
-        const authPage = new AuthPage(page);
-        await use(authPage);
+        await use(new AuthPage(page));
+    },
+    companySetupPage: async ({ page }, use) => {
+        await use(new CompanySetupPage(page));
     },
 });
 

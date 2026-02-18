@@ -747,6 +747,7 @@
         "saveSuccess": "Configuración guardada exitosamente",
         "saveError": "Error al guardar la configuración",
         "companySettingsTitle": "Configuración de la Empresa",
+        "welcomeTitle": "¡Hola {name}! Bienvenido a Comercio Fácil.",
         "setupInstructions": "Por favor completa los datos de tu empresa, sucursal principal y almacén para continuar.",
         "saveContinue": "Guardar y Continuar",
         "sections": {
@@ -756,17 +757,17 @@
             "billing": "Facturación y Plan"
         },
         "profileDescription": "Administra la información del perfil de tu empresa",
-        "storeDescription": "Configura los detalles y ubicación de tu tienda",
+        "storeDescription": "Configura los detalles y dirección de tu tienda",
         "warehouseDescription": "Administra la información de tu almacén",
         "billingDescription": "Ver y administrar tu plan de suscripción",
         "fields": {
             "companyName": "Nombre de la Empresa",
             "taxId": "RFC (ID Fiscal)",
             "storeName": "Nombre de la Tienda",
-            "storeLocation": "Ubicación de la Tienda",
+            "storeLocation": "Dirección de la Tienda",
             "storeId": "ID de la Tienda",
             "warehouseName": "Nombre del Almacén",
-            "warehouseLocation": "Ubicación del Almacén",
+            "warehouseLocation": "Dirección del Almacén",
             "planStatus": "Estado",
             "trialEndDate": "Fecha de Fin de Prueba",
             "subscriptionEndDate": "Fecha de Fin de Suscripción",
@@ -777,10 +778,10 @@
             "companyName": "Ingresa el nombre de tu empresa",
             "taxId": "Ingresa tu RFC",
             "storeName": "Ingresa el nombre de la tienda",
-            "storeLocation": "Ingresa la ubicación de la tienda",
+            "storeLocation": "Ingresa la dirección de la tienda",
             "storeId": "Identificador de tienda",
             "warehouseName": "Ingresa el nombre del almacén",
-            "warehouseLocation": "Ingresa la ubicación del almacén"
+            "warehouseLocation": "Ingresa la dirección del almacén"
         },
         "storeIdHelp": "El ID de la tienda no se puede cambiar una vez establecido",
         "planStatuses": {
