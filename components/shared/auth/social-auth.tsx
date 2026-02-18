@@ -26,14 +26,16 @@ const SocialButton = ({
   provider,
   bgColor,
   hoverColor,
-  textColor = "text-white"
+  textColor = "text-white",
+  borderColor = "border-gray-100"
 }: {
   action: () => Promise<void>,
   icon: any,
   provider: string,
   bgColor: string,
   hoverColor: string,
-  textColor?: string
+  textColor?: string,
+  borderColor?: string
 }) => {
   const { pending } = useFormStatus()
   const t = useTranslations('auth')
@@ -43,12 +45,12 @@ const SocialButton = ({
       <Button
         type="submit"
         disabled={pending}
-        className={`w-full h-11 shadow-sm flex items-center justify-center gap-3 ${bgColor} ${hoverColor} ${textColor} border border-gray-100 transition-all duration-300 hover:shadow-md hover:scale-[1.02] active:scale-95 font-bold text-base group relative overflow-hidden rounded-xl`}
+        className={`w-full h-11 shadow-sm flex items-center justify-center gap-3 ${bgColor} ${hoverColor} ${textColor} border ${borderColor} transition-all duration-300 hover:shadow-md hover:scale-[1.02] active:scale-95 font-bold text-base group relative overflow-hidden rounded-xl`}
       >
         <span className="relative z-10 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center">
           {typeof Icon === 'function' ? <Icon /> : Icon}
         </span>
-        <span className="relative z-10 hidden sm:inline font-bold">
+        <span className="relative z-10 font-bold">
           {pending ? '...' : provider}
         </span>
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
@@ -80,9 +82,11 @@ const SocialAuth = () => {
         icon={GoogleIcon}
         provider="Google"
         bgColor="bg-white"
-        hoverColor="hover:bg-gray-50"
-        textColor="text-gray-800"
+        hoverColor="hover:bg-slate-50"
+        textColor="text-slate-700"
+        borderColor="border-slate-300 shadow-sm hover:shadow-md hover:border-slate-400"
       />
+      {/* 
       <SocialButton
         action={SignInWithFacebook}
         icon={<Facebook size={24} fill="white" />}
@@ -98,7 +102,8 @@ const SocialAuth = () => {
         bgColor="bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737]"
         hoverColor="hover:opacity-90"
         textColor="text-white"
-      />
+      /> 
+      */}
     </div>
   )
 }
