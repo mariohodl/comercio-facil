@@ -29,11 +29,17 @@ jobs:
     - name: Run Playwright tests
       run: pnpm run test
       env:
-        MONGODB_URI: mongodb://localhost:27017/test
         NODE_ENV: test
+        MONGODB_URI: mongodb://localhost:27017/test
         SKIP_EMAILS: true
-        NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+        AUTH_SECRET: ${{ secrets.AUTH_SECRET || 'static_secret_for_tests_only' }}
         NEXTAUTH_URL: http://localhost:3000
+        NEXT_PUBLIC_APP_NAME: "Comercio Fácil Test"
+        NEXT_PUBLIC_APP_SLOGAN: "Test Slogan"
+        NEXT_PUBLIC_APP_DESCRIPTION: "Test Description"
+        SUPER_ADMIN: "admin@test.com"
+        RESEND_API_KEY: "re_test_key"
+        EMAIL_FROM: "test@example.com"
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
