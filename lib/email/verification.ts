@@ -11,41 +11,30 @@ import { v4 as uuidv4 } from 'uuid';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-/**
- * Generate a 6-digit verification code
- */
+
 function generateVerificationCode(): string {
     return crypto.randomInt(100000, 999999).toString();
 }
 
-/**
- * Send verification email to user
- */
+
 export async function sendVerificationEmail(email: string, userName?: string) {
     try {
         await connectToDatabase();
 
-        // Generate verification code
         const verificationCode = generateVerificationCode();
 
-        // Create token in database (expires in 24 hours)
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-        // Delete any existing tokens for this email
         await VerificationToken.deleteMany({ email });
 
-        // Create new token
         await VerificationToken.create({
             email,
             token: verificationCode,
             expiresAt,
         });
 
-        // Check if we're in development or using testing domain
         const isDev = process.env.NODE_ENV === 'development';
         const isTestingDomain = process.env.EMAIL_FROM?.includes('resend.dev') || !process.env.EMAIL_FROM;
 
-        // Check if we should skip sending emails (e.g. in tests)
         if (process.env.SKIP_EMAILS === 'true') {
             console.log(`[SKIP_EMAILS] Skipping verification email to ${email}. Code: ${verificationCode}`);
             return {
@@ -55,7 +44,6 @@ export async function sendVerificationEmail(email: string, userName?: string) {
             };
         }
 
-        // Try to send email via Resend
         try {
             const { data, error } = await resend.emails.send({
                 from: process.env.EMAIL_FROM || 'Comercio Fácil <onboarding@resend.dev>',
@@ -84,7 +72,6 @@ export async function sendVerificationEmail(email: string, userName?: string) {
         } catch (emailError) {
             console.error('Error sending email:', emailError);
 
-            // In development or testing domain, still return success
             if (isDev || isTestingDomain) {
 
                 return {
@@ -102,14 +89,11 @@ export async function sendVerificationEmail(email: string, userName?: string) {
     }
 }
 
-/**
- * Verify the code provided by user
- */
+
 export async function verifyEmailCode(email: string, code: string) {
     try {
         await connectToDatabase();
 
-        // Find valid token
         const token = await VerificationToken.findOne({
             email,
             token: code,
@@ -120,7 +104,6 @@ export async function verifyEmailCode(email: string, code: string) {
             return { success: false, error: 'Invalid or expired verification code' };
         }
 
-        // Delete the used token
         await VerificationToken.deleteOne({ _id: token._id });
 
         return { success: true, message: 'Email verified successfully' };
@@ -130,23 +113,16 @@ export async function verifyEmailCode(email: string, code: string) {
     }
 }
 
-/**
- * Send password reset email
- */
+
 export async function sendPasswordResetEmail(email: string, userName?: string) {
     try {
         await connectToDatabase();
 
-        // Generate token
         const token = uuidv4();
 
-        // Expire in 1 hour
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-
-        // Delete existing tokens
         await PasswordResetToken.deleteMany({ email });
 
-        // Save new token
         await PasswordResetToken.create({
             email,
             token,
@@ -155,11 +131,9 @@ export async function sendPasswordResetEmail(email: string, userName?: string) {
 
         const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
-        // Check if we're in development or using testing domain
         const isDev = process.env.NODE_ENV === 'development';
         const isTestingDomain = process.env.EMAIL_FROM?.includes('resend.dev') || !process.env.EMAIL_FROM;
 
-        // Check if we should skip sending emails (e.g. in tests)
         if (process.env.SKIP_EMAILS === 'true') {
             console.log(`[SKIP_EMAILS] Skipping password reset email to ${email}. Link: ${resetLink}`);
             return {
@@ -209,9 +183,6 @@ export async function sendPasswordResetEmail(email: string, userName?: string) {
     }
 }
 
-/**
- * Resend verification code
- */
 export async function resendVerificationCode(email: string, userName?: string) {
     return await sendVerificationEmail(email, userName);
 }

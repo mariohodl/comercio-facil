@@ -3,10 +3,7 @@ import SubCategory from './db/models/sub-category.model';
 import Brand from './db/models/brand.model';
 import Unit from './db/models/unit.model';
 
-/**
- * Normalizes a string for comparison by removing accents, 
- * converting to lowercase, and trimming.
- */
+
 export function normalizeText(text: string): string {
     return text
         .toLowerCase()
@@ -15,9 +12,6 @@ export function normalizeText(text: string): string {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
-/**
- * Finds an existing category using normalization and synonyms.
- */
 export async function findNormalizedCategory(name: string, industry: string = 'general') {
     const normalized = normalizeText(name);
 
@@ -31,9 +25,6 @@ export async function findNormalizedCategory(name: string, industry: string = 'g
     });
 }
 
-/**
- * Finds an existing brand using normalization and synonyms.
- */
 export async function findNormalizedBrand(name: string, industry: string = 'general') {
     const normalized = normalizeText(name);
 
@@ -47,9 +38,6 @@ export async function findNormalizedBrand(name: string, industry: string = 'gene
     });
 }
 
-/**
- * Suggests categories based on user input.
- */
 export async function suggestCategories(query: string, industry: string) {
     if (!query || query.length < 2) return [];
 
@@ -68,9 +56,6 @@ export async function suggestCategories(query: string, industry: string) {
     }).limit(100).lean();
 }
 
-/**
- * Suggests subcategories for a given category or industry.
- */
 export async function suggestSubCategories(query: string, categoryId?: string, industry?: string) {
     if (!query || query.length < 2) {
         const filter: any = { isApproved: true };
@@ -94,9 +79,6 @@ export async function suggestSubCategories(query: string, categoryId?: string, i
     return await SubCategory.find(filter).limit(100).lean();
 }
 
-/**
- * Suggests brands based on user input.
- */
 export async function suggestBrands(query: string, industry: string) {
     if (!query || query.length < 2) return [];
 
@@ -113,9 +95,6 @@ export async function suggestBrands(query: string, industry: string) {
     }).limit(100).lean();
 }
 
-/**
- * Suggests units based on user input.
- */
 export async function suggestUnits(query: string, industry: string = 'general') {
     if (!query || query.length < 2) return [];
 
