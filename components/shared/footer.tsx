@@ -1,8 +1,7 @@
 'use client'
 
 import { ArrowUp } from 'lucide-react'
-// import { Button } from '../ui/button'
-// import Link from 'next/link'
+import Link from 'next/link'
 import { APP_NAME } from '@/lib/constants'
 import { CustomH3 } from './CustomH3'
 import { CustomP } from './CustomP'
@@ -39,9 +38,12 @@ export default function Footer() {
             <CustomP classNames="!text-black !text-[20px] font-extralight ml-1">Whatsapp o Llamadas</CustomP>
           </div>
         </div>
-        <div className='pt-3 flex justify-center text-sm text-gray-500 border-t border-dashed'>
+        <div className='pt-3 flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-gray-500 border-t border-dashed'>
           <p>Copyright © {currentYear}, {APP_NAME}, Inc.</p>
-          {/* 123, Main Street, Anytown, CA, Zip 12345 | +1 (123) 456-7890 */}
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:underline">Privacidad</Link>
+            <Link href="/data-deletion" className="hover:underline">Eliminación de Datos</Link>
+          </div>
         </div>
       </div>
     </footer>
