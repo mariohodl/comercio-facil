@@ -28,7 +28,7 @@ import { useRouter } from 'next/navigation'
 import { z } from 'zod'
 
 import { useSession, signOut } from 'next-auth/react'
-import { LogOut } from 'lucide-react'
+import { LogOut, Building2, Save, Loader2 } from 'lucide-react'
 
 import { useTranslations } from 'next-intl'
 
@@ -42,9 +42,11 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
     const [isLoading, setIsLoading] = useState(false)
     const { showSuccess, showError } = useToast()
     const router = useRouter()
-    const { update } = useSession()
+    const { data: session, update } = useSession()
     const t = useTranslations('settings')
     const tCommon = useTranslations('common')
+
+    const userName = session?.user?.name || ''
 
     // Generate random 8-character alphanumeric store ID
     const generateStoreId = () => {
@@ -103,157 +105,213 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
 
     return (
         <Dialog open={open} onOpenChange={() => { }}>
-            <DialogContent className="sm:max-w-[425px] md:max-w-[600px] lg:max-w-[700px]" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
-                <DialogHeader>
-                    <DialogTitle>{t('companySettingsTitle')}</DialogTitle>
-                    <DialogDescription>
-                        {t('setupInstructions')}
-                    </DialogDescription>
-                </DialogHeader>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="companyName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{t('fields.companyName')}</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder={t('placeholders.companyName')} {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="storeName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t('fields.storeName')}</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder={t('placeholders.storeName')} {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="storeLocation"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t('fields.storeLocation')}</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder={t('placeholders.storeLocation')} {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+            <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+                <div className="bg-orange p-5 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                            <Building2 className="w-5 h-5" />
+                            {userName ? t('welcomeTitle', { name: userName }) : t('companySettingsTitle')}
+                        </DialogTitle>
+                        <DialogDescription className="text-orange-50 text-xs font-medium">
+                            {t('setupInstructions')}
+                        </DialogDescription>
+                    </DialogHeader>
+                </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                <div className="p-6 bg-white">
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
                                 control={form.control}
-                                name="warehouseName"
+                                name="companyName"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{t('fields.warehouseName')}</FormLabel>
+                                        <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.companyName')}</FormLabel>
                                         <FormControl>
-                                            <Input placeholder={t('placeholders.warehouseName')} {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="warehouseLocation"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t('fields.warehouseLocation')}</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder={t('placeholders.warehouseLocation')} {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="industry"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t('fields.industry')}</FormLabel>
-                                        <FormControl>
-                                            <select
+                                            <Input
+                                                data-testid="setup-company-name-input"
+                                                placeholder={t('placeholders.companyName')}
                                                 {...field}
-                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                            >
-                                                <option value="general">General</option>
-                                                <option value="farmacia">Farmacia</option>
-                                                <option value="abarrotes">Abarrotes</option>
-                                                <option value="ferreteria">Ferretería</option>
-                                                <option value="ropa">Ropa y Calzado</option>
-                                                <option value="tienda-de-conveniencia">Tienda de Conveniencia</option>
-                                                <option value="papeleria">Papelería</option>
-                                                <option value="cosmeticos">Cosméticos y Belleza</option>
-                                                <option value="electronica">Electrónica y Computación</option>
-                                                <option value="jugueteria">Juguetería</option>
-                                                <option value="libreria">Librería</option>
-                                                <option value="mascotas">Mascotas y Veterinaria</option>
-                                                <option value="deportes">Artículos Deportivos</option>
-                                                <option value="alimentos-preparados">Restaurante / Alimentos Preparados</option>
-                                                <option value="panaderia">Panadería y Pastelería</option>
-                                                <option value="carniceria">Carnicería</option>
-                                                <option value="frutas-verduras">Frutas y Verduras</option>
-                                                <option value="automotriz">Automotriz y Autopartes</option>
-                                                <option value="muebleria">Mueblería y Hogar</option>
-                                                <option value="tecnologia">Tecnología y Gadgets</option>
-                                                <option value="regalos">Tienda de Regalos</option>
-                                                <option value="joyeria">Joyería y Relojería</option>
-                                            </select>
+                                                className="h-10 border-gray-200 focus:border-orange bg-gray-50/30 transition-all shadow-sm"
+                                            />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs" />
                                     </FormItem>
                                 )}
                             />
-                            <FormField
-                                control={form.control}
-                                name="storeId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t('fields.storeIdGenerated')}</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} readOnly className="bg-gray-100" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
 
-                        <DialogFooter className="flex justify-between sm:justify-between">
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                onClick={() => signOut({ callbackUrl: '/' })}
-                                className="text-muted-foreground hover:text-destructive"
-                            >
-                                <LogOut className="mr-2 h-4 w-4" />
-                                {tCommon('signOut')}
-                            </Button>
-                            <Button type="submit" disabled={isLoading}>
-                                {isLoading ? tCommon('saving') : t('saveContinue')}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="storeName"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.storeName')}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    data-testid="setup-store-name-input"
+                                                    placeholder={t('placeholders.storeName')}
+                                                    {...field}
+                                                    className="h-10 border-gray-200 focus:border-orange bg-gray-50/30 transition-all shadow-sm"
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-xs" />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="storeLocation"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.storeLocation')}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    data-testid="setup-store-location-input"
+                                                    placeholder={t('placeholders.storeLocation')}
+                                                    {...field}
+                                                    className="h-10 border-gray-200 focus:border-orange bg-gray-50/30 transition-all shadow-sm"
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-xs" />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="warehouseName"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.warehouseName')}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    data-testid="setup-warehouse-name-input"
+                                                    placeholder={t('placeholders.warehouseName')}
+                                                    {...field}
+                                                    className="h-10 border-gray-200 focus:border-orange bg-gray-50/30 transition-all shadow-sm"
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-xs" />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="warehouseLocation"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.warehouseLocation')}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    data-testid="setup-warehouse-location-input"
+                                                    placeholder={t('placeholders.warehouseLocation')}
+                                                    {...field}
+                                                    className="h-10 border-gray-200 focus:border-orange bg-gray-50/30 transition-all shadow-sm"
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-xs" />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-2">
+                                <FormField
+                                    control={form.control}
+                                    name="industry"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.industry')}</FormLabel>
+                                            <FormControl>
+                                                <select
+                                                    {...field}
+                                                    data-testid="setup-industry-select"
+                                                    className="flex h-10 w-full rounded-md border border-gray-200 bg-gray-50/30 px-3 py-2 text-sm transition-all focus:border-orange focus:outline-none focus:ring-1 focus:ring-orange/20 shadow-sm"
+                                                >
+                                                    <option value="general">General</option>
+                                                    {/* ... rest of options ... */}
+                                                    <option value="farmacia">Farmacia</option>
+                                                    <option value="abarrotes">Abarrotes</option>
+                                                    <option value="ferreteria">Ferretería</option>
+                                                    <option value="ropa">Ropa y Calzado</option>
+                                                    <option value="tienda-de-conveniencia">Tienda de Conveniencia</option>
+                                                    <option value="papeleria">Papelería</option>
+                                                    <option value="cosmeticos">Cosméticos y Belleza</option>
+                                                    <option value="electronica">Electrónica y Computación</option>
+                                                    <option value="jugueteria">Juguetería</option>
+                                                    <option value="libreria">Librería</option>
+                                                    <option value="mascotas">Mascotas y Veterinaria</option>
+                                                    <option value="deportes">Artículos Deportivos</option>
+                                                    <option value="alimentos-preparados">Restaurante / Alimentos Preparados</option>
+                                                    <option value="panaderia">Panadería y Pastelería</option>
+                                                    <option value="carniceria">Carnicería</option>
+                                                    <option value="frutas-verduras">Frutas y Verduras</option>
+                                                    <option value="automotriz">Automotriz y Autopartes</option>
+                                                    <option value="muebleria">Mueblería y Hogar</option>
+                                                    <option value="tecnologia">Tecnología y Gadgets</option>
+                                                    <option value="regalos">Tienda de Regalos</option>
+                                                    <option value="joyeria">Joyería y Relojería</option>
+                                                </select>
+                                            </FormControl>
+                                            <FormMessage className="text-xs" />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="storeId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.storeIdGenerated')}</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    readOnly
+                                                    className="h-10 border-gray-200 bg-gray-100/50 cursor-not-allowed font-mono text-[10px] tracking-widest text-gray-500"
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-xs" />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <DialogFooter className="pt-4 border-t border-gray-100 flex flex-row gap-3 justify-between items-center sm:justify-between">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                    className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors font-medium flex items-center gap-2"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    <span className="">{tCommon('signOut')}</span>
+                                </Button>
+                                <Button
+                                    data-testid="setup-submit-button"
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="h-10 px-6 bg-orange hover:bg-orange-600 text-white font-bold text-sm transition-all transform active:scale-[0.98] shadow-md hover:shadow-lg flex items-center gap-2"
+                                >
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            {tCommon('saving')}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="w-4 h-4" />
+                                            {t('saveContinue')}
+                                        </>
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </div>
             </DialogContent>
         </Dialog>
     )
