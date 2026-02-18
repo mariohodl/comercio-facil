@@ -22,6 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignInSchema } from '@/lib/validator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { APP_NAME } from '@/lib/constants'
+import { toast } from 'sonner'
 
 const signInDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -49,10 +50,15 @@ export default function CredentialsSignInForm() {
   const onSubmit = async (data: IUserSignIn) => {
     setIsLoading(true)
     try {
-      await signInWithCredentials({
+      const result = await signInWithCredentials({
         email: data.email,
         password: data.password,
       })
+
+      if (result?.error) {
+        toast.error('Credenciales inválidas')
+        return
+      }
 
       const session = await getSession()
 
@@ -71,6 +77,7 @@ export default function CredentialsSignInForm() {
       if (isRedirectError(error)) {
         throw error
       }
+      toast.error('Error al iniciar sesión')
     } finally {
       setIsLoading(false)
     }
@@ -100,6 +107,7 @@ export default function CredentialsSignInForm() {
                         <Mail className='w-4 h-4' />
                       </div>
                       <Input
+                        data-testid="sign-in-email-input"
                         placeholder='ejemplo@correo.com'
                         {...field}
                         className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 transition-all shadow-sm'
@@ -131,6 +139,7 @@ export default function CredentialsSignInForm() {
                         <KeyRound className='w-4 h-4' />
                       </div>
                       <Input
+                        data-testid="sign-in-password-input"
                         type='password'
                         placeholder='••••••••'
                         {...field}
@@ -145,6 +154,7 @@ export default function CredentialsSignInForm() {
 
             <div className='pt-2'>
               <Button
+                data-testid="sign-in-submit-button"
                 type='submit'
                 disabled={isLoading}
                 className='w-full h-11 bg-orange hover:bg-orange-600 text-white font-bold text-base transition-all transform active:scale-[0.98] shadow-md hover:shadow-lg'

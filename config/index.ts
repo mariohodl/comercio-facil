@@ -74,7 +74,7 @@ const clientEnv = {
 const _clientEnv = clientSchema.safeParse(clientEnv);
 const _serverEnv = isServer ? serverSchema.safeParse(process.env) : { success: true, data: {} };
 
-if (!_clientEnv.success || !_serverEnv.success) {
+if ((!_clientEnv.success || !_serverEnv.success) && process.env.NODE_ENV !== 'test') {
 	const errors = {
 		...(!_clientEnv.success ? _clientEnv.error.format() : {}),
 		...(!_serverEnv.success ? (_serverEnv as any).error.format() : {}),

@@ -9,7 +9,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:fix": "next lint --fix"
+    "lint:fix": "next lint --fix",
+    "test": "playwright test",
+    "test:unit": "playwright test tests/unit",
+    "test:e2e": "playwright test tests/e2e",
+    "test:ui": "playwright test --ui"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.8.0",
@@ -79,6 +83,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@paypal/react-paypal-js": "^8.8.2",
+    "@playwright/test": "^1.58.2",
     "@react-email/components": "^0.0.34",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
@@ -86,18 +91,20 @@
     "@types/react-dom": "^19",
     "add": "^2.0.6",
     "badge": "^1.0.3",
+    "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "15.1.0",
     "i": "^0.3.7",
     "npm": "^11.2.0",
     "npx": "^10.2.2",
     "postcss": "^8.5.3",
+    "prettier": "^3.8.1",
     "react-email": "^3.0.7",
     "resend": "^4.2.0",
     "shadcn": "^2.7.0",
     "table": "^6.9.0",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
-  },
-  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
+  }
 }

@@ -105,6 +105,7 @@ export default function ResetPasswordForm() {
                                             <Lock className='w-4 h-4' />
                                         </div>
                                         <Input
+                                            data-testid="reset-password-new-password-input"
                                             type='password'
                                             placeholder='••••••••'
                                             {...field}
@@ -131,6 +132,7 @@ export default function ResetPasswordForm() {
                                             <KeyRound className='w-4 h-4' />
                                         </div>
                                         <Input
+                                            data-testid="reset-password-confirm-password-input"
                                             type='password'
                                             placeholder='••••••••'
                                             {...field}
@@ -144,6 +146,7 @@ export default function ResetPasswordForm() {
                     />
 
                     <Button
+                        data-testid="reset-password-submit-button"
                         type='submit'
                         disabled={isLoading}
                         className='w-full h-11 bg-orange hover:bg-orange-600 text-white font-bold text-base transition-all transform active:scale-[0.98] shadow-md hover:shadow-lg'

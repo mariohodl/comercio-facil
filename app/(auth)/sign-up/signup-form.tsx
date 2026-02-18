@@ -121,6 +121,7 @@ export default function SignUpForm() {
                         <User className='w-4 h-4' />
                       </div>
                       <Input
+                        data-testid="sign-up-name-input"
                         placeholder='Juan Pérez'
                         {...field}
                         className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 shadow-sm transition-all'
@@ -145,6 +146,7 @@ export default function SignUpForm() {
                           <Mail className='w-4 h-4' />
                         </div>
                         <Input
+                          data-testid="sign-up-email-input"
                           placeholder='juan@ejemplo.com'
                           {...field}
                           className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 shadow-sm transition-all'
@@ -168,6 +170,7 @@ export default function SignUpForm() {
                           <Phone className='w-4 h-4' />
                         </div>
                         <Input
+                          data-testid="sign-up-phone-input"
                           placeholder='55 1234 5678'
                           {...field}
                           className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 shadow-sm transition-all'
@@ -193,6 +196,7 @@ export default function SignUpForm() {
                           <Lock className='w-4 h-4' />
                         </div>
                         <Input
+                          data-testid="sign-up-password-input"
                           type='password'
                           placeholder='••••••••'
                           {...field}
@@ -216,6 +220,7 @@ export default function SignUpForm() {
                           <ShieldCheck className='w-4 h-4' />
                         </div>
                         <Input
+                          data-testid="sign-up-confirm-password-input"
                           type='password'
                           placeholder='••••••••'
                           {...field}
@@ -231,6 +236,7 @@ export default function SignUpForm() {
 
             <div className='pt-4'>
               <Button
+                data-testid="sign-up-submit-button"
                 type='submit'
                 disabled={isLoading}
                 className='w-full h-11 bg-orange hover:bg-orange-600 text-white font-bold text-base transition-all transform active:scale-[0.98] shadow-md hover:shadow-lg'

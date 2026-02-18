@@ -45,7 +45,15 @@ export async function sendVerificationEmail(email: string, userName?: string) {
         const isDev = process.env.NODE_ENV === 'development';
         const isTestingDomain = process.env.EMAIL_FROM?.includes('resend.dev') || !process.env.EMAIL_FROM;
 
-
+        // Check if we should skip sending emails (e.g. in tests)
+        if (process.env.SKIP_EMAILS === 'true') {
+            console.log(`[SKIP_EMAILS] Skipping verification email to ${email}. Code: ${verificationCode}`);
+            return {
+                success: true,
+                message: 'Verification code created (SKIP_EMAILS mode)',
+                devMode: true
+            };
+        }
 
         // Try to send email via Resend
         try {
@@ -147,8 +155,19 @@ export async function sendPasswordResetEmail(email: string, userName?: string) {
 
         const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
+        // Check if we're in development or using testing domain
         const isDev = process.env.NODE_ENV === 'development';
         const isTestingDomain = process.env.EMAIL_FROM?.includes('resend.dev') || !process.env.EMAIL_FROM;
+
+        // Check if we should skip sending emails (e.g. in tests)
+        if (process.env.SKIP_EMAILS === 'true') {
+            console.log(`[SKIP_EMAILS] Skipping password reset email to ${email}. Link: ${resetLink}`);
+            return {
+                success: true,
+                message: 'Reset link created (SKIP_EMAILS mode)',
+                devMode: true
+            };
+        }
 
         try {
             const { error } = await resend.emails.send({

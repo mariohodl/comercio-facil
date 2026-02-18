@@ -9,6 +9,10 @@ import OrderReceiptEmail from './orden-recibida'
 const resend = new Resend(process.env.RESEND_API_KEY as string)
 
 export const sendPurchaseReceipt = async ({ order }: { order: IOrder }) => {
+  if (process.env.SKIP_EMAILS === 'true') {
+    console.log(`[SKIP_EMAILS] Skipping purchase receipt to ${(order.user as { email: string }).email}`)
+    return
+  }
   await resend.emails.send({
     from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
     to: (order.user as { email: string }).email,
@@ -17,6 +21,10 @@ export const sendPurchaseReceipt = async ({ order }: { order: IOrder }) => {
   })
 }
 export const sendOrderReceptionSavedEmail = async ({ order }: { order: IOrderReception }) => {
+  if (process.env.SKIP_EMAILS === 'true') {
+    console.log(`[SKIP_EMAILS] Skipping order reception notification to mariohodl21@gmail.com`)
+    return
+  }
   await resend.emails.send({
     from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
     to: ['mariohodl21@gmail.com'],
@@ -26,6 +34,10 @@ export const sendOrderReceptionSavedEmail = async ({ order }: { order: IOrderRec
 }
 
 export const sendAskReviewOrderItems = async ({ order }: { order: IOrder }) => {
+  if (process.env.SKIP_EMAILS === 'true') {
+    console.log(`[SKIP_EMAILS] Skipping review request to ${(order.user as { email: string }).email}`)
+    return
+  }
   const oneDayFromNow = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString()
   await resend.emails.send({
     from: `${SENDER_NAME} <${SENDER_EMAIL}>`,

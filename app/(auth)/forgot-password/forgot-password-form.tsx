@@ -92,6 +92,7 @@ export default function ForgotPasswordForm() {
                                             <Mail className='w-4 h-4' />
                                         </div>
                                         <Input
+                                            data-testid="forgot-password-email-input"
                                             placeholder='tu@ejemplo.com'
                                             {...field}
                                             className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 shadow-sm transition-all'
@@ -104,6 +105,7 @@ export default function ForgotPasswordForm() {
                     />
 
                     <Button
+                        data-testid="forgot-password-submit-button"
                         type='submit'
                         disabled={isLoading}
                         className='w-full h-11 bg-orange hover:bg-orange-600 text-white font-bold text-base transition-all transform active:scale-[0.98] shadow-md hover:shadow-lg rounded-xl'
