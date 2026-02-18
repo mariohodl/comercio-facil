@@ -12,19 +12,22 @@ jobs:
       mongodb:
         image: mongo:latest
         ports:
-          - 27017:27107
+          - 27017:27017
     steps:
     - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 9
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-        cache: 'npm'
+        cache: 'pnpm'
     - name: Install dependencies
-      run: npm install
+      run: pnpm install
     - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      run: pnpm exec playwright install --with-deps
     - name: Run Playwright tests
-      run: npm run test
+      run: pnpm run test
       env:
         MONGODB_URI: mongodb://localhost:27017/test
         NODE_ENV: test
