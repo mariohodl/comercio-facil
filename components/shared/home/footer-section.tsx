@@ -89,9 +89,9 @@ export function FooterSection() {
                     <div className="space-y-4">
                         <h4 className="font-bold text-white">Legal</h4>
                         <ul className="space-y-2 text-sm text-gray-500">
-                            <li><Link href="#" className="hover:text-blue-400 transition-colors">Privacidad</Link></li>
+                            <li><Link href="/privacy" className="hover:text-blue-400 transition-colors">Privacidad</Link></li>
+                            <li><Link href="/data-deletion" className="hover:text-blue-400 transition-colors">Eliminación de Datos</Link></li>
                             <li><Link href="#" className="hover:text-blue-400 transition-colors">Términos</Link></li>
-                            <li><Link href="#" className="hover:text-blue-400 transition-colors">Seguridad</Link></li>
                         </ul>
                     </div>
                 </div>
