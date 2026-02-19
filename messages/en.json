@@ -19,6 +19,7 @@
         "next": "Next",
         "previous": "Previous",
         "loading": "Loading...",
+        "searching": "Searching...",
         "noResults": "No results found",
         "myAccount": "My Account",
         "myOrders": "My Orders",
@@ -569,6 +570,9 @@
         "categories": "Categories",
         "subCategories": "Sub Categories",
         "manageBrands": "Manage your brands",
+        "brandCreated": "Brand created successfully",
+        "brandUpdated": "Brand updated successfully",
+        "brandDeleted": "Brand deleted successfully",
         "manageCategories": "Manage your categories",
         "manageSubCategories": "Manage your sub categories",
         "manageUnits": "Manage your units",
@@ -582,6 +586,10 @@
         "categorySlug": "Category Slug",
         "subCategoryName": "Sub Category Name",
         "subCategory": "Sub Category",
+        "selectCategoryFirst": "Select a category first to create a subcategory",
+        "noItemFound": "No {item} found",
+        "createNew": "Create new \"{name}\"",
+        "itemCreated": "{item} \"{name}\" created",
         "variantAttributes": "Variant Attributes",
         "image": "Image",
         "noImg": "No Img",
@@ -978,5 +986,18 @@
         "addToCart": "Add to cart",
         "buyNow": "Buy Now",
         "quantity": "Quantity"
+    },
+    "brandModal": {
+        "title": "Brand",
+        "addBrand": "Add Brand",
+        "editBrand": "Edit Brand",
+        "addTitle": "Add Brand",
+        "editTitle": "Edit Brand",
+        "brandLabel": "Brand",
+        "brandPlaceholder": "Enter brand name",
+        "createSuccess": "Brand created successfully",
+        "updateSuccess": "Brand updated successfully",
+        "addProduct": "Add Brand",
+        "updateProduct": "Update Brand"
     }
 }

@@ -631,7 +631,6 @@ export const SubCategoryUpdateSchema = SubCategoryInputSchema.extend({
 
 export const BrandInputSchema = z.object({
 	name: z.string().min(1, 'El nombre es obligatorio'),
-	image: z.string().min(1, 'La imagen es obligatoria'),
 	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })

@@ -38,73 +38,112 @@ export async function findNormalizedBrand(name: string, industry: string = 'gene
     });
 }
 
-export async function suggestCategories(query: string, industry: string) {
+export async function suggestCategories(query: string, industry: string, storeId?: string) {
     if (!query || query.length < 2) return [];
 
     const normalized = normalizeText(query);
 
-    // Using regex for simple autocomplete if Atlas Search is not configured
-    // For production, Atlas Search ($search) is recommended as per user request
     return await Category.find({
         industry,
-        isApproved: true,
-        $or: [
-            { categoryName: { $regex: normalized, $options: 'i' } },
-            { categorySlug: { $regex: normalized, $options: 'i' } },
-            { synonyms: { $in: [new RegExp(normalized, 'i')] } }
+        $and: [
+            {
+                $or: [
+                    { isApproved: true },
+                    ...(storeId ? [{ storeId }] : [])
+                ]
+            },
+            {
+                $or: [
+                    { categoryName: { $regex: normalized, $options: 'i' } },
+                    { categorySlug: { $regex: normalized, $options: 'i' } },
+                    { synonyms: { $in: [new RegExp(normalized, 'i')] } }
+                ]
+            }
         ]
     }).limit(100).lean();
 }
 
-export async function suggestSubCategories(query: string, categoryId?: string, industry?: string) {
+export async function suggestSubCategories(query: string, categoryId?: string, industry?: string, storeId?: string) {
+    const baseFilter: any = {
+        $or: [
+            { isApproved: true },
+            ...(storeId ? [{ storeId }] : [])
+        ]
+    };
+    if (categoryId) baseFilter.parentCategory = categoryId;
+    if (industry) baseFilter.industry = industry;
+
     if (!query || query.length < 2) {
-        const filter: any = { isApproved: true };
-        if (categoryId) filter.parentCategory = categoryId;
-        if (industry) filter.industry = industry;
-        return await SubCategory.find(filter).limit(100).lean();
+        return await SubCategory.find(baseFilter).limit(100).lean();
     }
 
     const normalized = normalizeText(query);
-    const filter: any = {
-        isApproved: true,
-        $or: [
-            { name: { $regex: normalized, $options: 'i' } },
-            { slug: { $regex: normalized, $options: 'i' } }
+    const finalFilter: any = {
+        $and: [
+            {
+                $or: [
+                    { isApproved: true },
+                    ...(storeId ? [{ storeId }] : [])
+                ]
+            },
+            {
+                $or: [
+                    { name: { $regex: normalized, $options: 'i' } },
+                    { slug: { $regex: normalized, $options: 'i' } }
+                ]
+            }
         ]
     };
+    if (categoryId) finalFilter.parentCategory = categoryId;
+    if (industry) finalFilter.industry = industry;
 
-    if (categoryId) filter.parentCategory = categoryId;
-    if (industry) filter.industry = industry;
-
-    return await SubCategory.find(filter).limit(100).lean();
+    return await SubCategory.find(finalFilter).limit(100).lean();
 }
 
-export async function suggestBrands(query: string, industry: string) {
+export async function suggestBrands(query: string, industry: string, storeId?: string) {
     if (!query || query.length < 2) return [];
 
     const normalized = normalizeText(query);
 
     return await Brand.find({
         industry,
-        isApproved: true,
-        $or: [
-            { name: { $regex: normalized, $options: 'i' } },
-            { slug: { $regex: normalized, $options: 'i' } },
-            { synonyms: { $in: [new RegExp(normalized, 'i')] } }
+        $and: [
+            {
+                $or: [
+                    { isApproved: true },
+                    ...(storeId ? [{ storeId }] : [])
+                ]
+            },
+            {
+                $or: [
+                    { name: { $regex: normalized, $options: 'i' } },
+                    { slug: { $regex: normalized, $options: 'i' } },
+                    { synonyms: { $in: [new RegExp(normalized, 'i')] } }
+                ]
+            }
         ]
     }).limit(100).lean();
 }
 
-export async function suggestUnits(query: string, industry: string = 'general') {
+export async function suggestUnits(query: string, industry: string = 'general', storeId?: string) {
     if (!query || query.length < 2) return [];
 
     const normalized = normalizeText(query);
 
     return await Unit.find({
-        isApproved: true,
-        $or: [
-            { name: { $regex: normalized, $options: 'i' } },
-            { abbreviation: { $regex: normalized, $options: 'i' } }
+        $and: [
+            {
+                $or: [
+                    { isApproved: true },
+                    ...(storeId ? [{ storeId }] : [])
+                ]
+            },
+            {
+                $or: [
+                    { name: { $regex: normalized, $options: 'i' } },
+                    { abbreviation: { $regex: normalized, $options: 'i' } }
+                ]
+            }
         ]
     }).limit(100).lean();
 }

@@ -1,7 +1,7 @@
 import { Schema, model, models, Document } from 'mongoose'
 
 export interface IBrand extends Document {
-    _id: string
+    _id: any
     name: string
     slug: string
     industry: string
@@ -9,7 +9,6 @@ export interface IBrand extends Document {
     usageCount: number
     isApproved: boolean
     isGlobal: boolean
-    image?: string
     storeId?: string
     status: boolean
     createdAt: Date
@@ -50,10 +49,6 @@ const brandSchema = new Schema<IBrand>(
         isGlobal: {
             type: Boolean,
             default: false
-        },
-        image: {
-            type: String,
-            required: false,
         },
         storeId: {
             type: String,

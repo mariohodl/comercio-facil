@@ -41,7 +41,6 @@ import {
     Settings
 } from 'lucide-react'
 import { format } from 'date-fns'
-import Image from 'next/image'
 import { IBrand } from '@/lib/db/models/brand.model'
 import { getAllBrands, deleteBrand } from '@/lib/actions/brand.actions'
 import { BrandModal } from '@/components/shared/brand-modal'
@@ -112,7 +111,7 @@ export default function BrandList({ store }: { store: string }) {
         try {
             const result = await deleteBrand(brandToDelete)
             if (result.success) {
-                showSuccess(result.message)
+                showSuccess(t('brandDeleted'))
                 fetchBrands()
             } else {
                 showError(result.message)
@@ -227,17 +226,7 @@ export default function BrandList({ store }: { store: string }) {
                                             <Checkbox />
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div className="relative h-10 w-10 rounded-md border overflow-hidden bg-gray-50">
-                                                    <Image
-                                                        src={brand.image}
-                                                        alt={brand.name}
-                                                        fill
-                                                        className="object-contain p-1"
-                                                    />
-                                                </div>
-                                                <span className="font-medium">{brand.name}</span>
-                                            </div>
+                                            <span className="font-medium">{brand.name}</span>
                                         </TableCell>
                                         <TableCell>
                                             {format(new Date(brand.createdAt), 'dd MMM yyyy')}
