@@ -38,6 +38,7 @@ interface CatalogAutocompleteProps {
     industry?: string
     mode?: 'category' | 'brand' | 'subCategory' | 'unit'
     categoryId?: string
+    storeId?: string
 }
 
 export function CatalogAutocomplete({
@@ -49,6 +50,7 @@ export function CatalogAutocomplete({
     industry = 'general',
     mode = 'category',
     categoryId,
+    storeId,
 }: CatalogAutocompleteProps) {
     const { showSuccess } = useToast()
     const [open, setOpen] = useState(false)
@@ -93,16 +95,16 @@ export function CatalogAutocomplete({
                 let res: any;
                 switch (mode) {
                     case 'category':
-                        res = await getCategorySuggestions(debouncedQuery, industry);
+                        res = await getCategorySuggestions(debouncedQuery, industry, storeId);
                         break;
                     case 'brand':
-                        res = await getBrandSuggestions(debouncedQuery, industry);
+                        res = await getBrandSuggestions(debouncedQuery, industry, storeId);
                         break;
                     case 'subCategory':
-                        res = await getSubCategorySuggestions(debouncedQuery, categoryId, industry);
+                        res = await getSubCategorySuggestions(debouncedQuery, categoryId, industry, storeId);
                         break;
                     case 'unit':
-                        res = await getUnitSuggestions(debouncedQuery, industry);
+                        res = await getUnitSuggestions(debouncedQuery, industry, storeId);
                         break;
                     default:
                         res = { success: false };
@@ -136,7 +138,7 @@ export function CatalogAutocomplete({
         }
 
         fetchSuggestions()
-    }, [debouncedQuery, industry, mode, initialOptions, categoryId])
+    }, [debouncedQuery, industry, mode, initialOptions, categoryId, storeId])
 
     const selectedOption = useMemo(() => {
         return suggestions.find((s) => s.name === value)
@@ -173,26 +175,39 @@ export function CatalogAutocomplete({
                             {loading ? (
                                 <div className="flex items-center justify-center p-4">
                                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    <span>Searching...</span>
+                                    <span>{tCommon('searching')}</span>
                                 </div>
                             ) : (
                                 <div className="space-y-2">
-                                    <p className="text-sm">No {mode} found.</p>
-                                    {mode !== 'subCategory' && onCustomCreate && (
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            size="sm"
-                                            className="w-full justify-start"
-                                            onClick={() => {
-                                                onCustomCreate(query)
-                                                showSuccess(`${mode.charAt(0).toUpperCase() + mode.slice(1)} "${query}" created`)
-                                                setOpen(false)
-                                            }}
-                                        >
-                                            <Plus className="h-4 w-4 mr-2" />
-                                            Create new "{query}"
-                                        </Button>
+                                    <p className="text-sm">
+                                        {tInventory('noItemFound', { item: getModeLabel(mode) })}
+                                    </p>
+                                    {onCustomCreate && (
+                                        <div className="w-full">
+                                            {mode === 'subCategory' && !categoryId ? (
+                                                <p className="text-xs text-muted-foreground italic mt-2">
+                                                    {tInventory('selectCategoryFirst')}
+                                                </p>
+                                            ) : (
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    className="w-full justify-start mt-2"
+                                                    onClick={() => {
+                                                        onCustomCreate(query)
+                                                        showSuccess(tInventory('itemCreated', {
+                                                            item: getModeLabel(mode),
+                                                            name: query
+                                                        }))
+                                                        setOpen(false)
+                                                    }}
+                                                >
+                                                    <Plus className="h-4 w-4 mr-2" />
+                                                    {tInventory('createNew', { name: query })}
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             )}

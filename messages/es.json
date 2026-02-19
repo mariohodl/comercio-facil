@@ -19,6 +19,7 @@
         "next": "Siguiente",
         "previous": "Anterior",
         "loading": "Cargando...",
+        "searching": "Buscando...",
         "noResults": "No se encontraron resultados",
         "myAccount": "Mi Cuenta",
         "myOrders": "Mis Órdenes",
@@ -588,6 +589,9 @@
         "categories": "Categorías",
         "subCategories": "Subcategorías",
         "manageBrands": "Administrar tus marcas",
+        "brandCreated": "Marca creada exitosamente",
+        "brandUpdated": "Marca actualizada exitosamente",
+        "brandDeleted": "Marca eliminada exitosamente",
         "manageCategories": "Las categorías se podrán utilizar en productos una vez aprobadas.",
         "manageSubCategories": "Las subcategorías se podrán utilizar en productos una vez aprobadas.",
         "manageUnits": "Administrar tus unidades",
@@ -601,6 +605,10 @@
         "categorySlug": "Slug de Categoría",
         "subCategoryName": "Nombre de Subcategoría",
         "subCategory": "Subcategoría",
+        "selectCategoryFirst": "Seleccione una categoría primero para crear una subcategoría",
+        "noItemFound": "No se encontró {item}",
+        "createNew": "Crear nuevo \"{name}\"",
+        "itemCreated": "{item} \"{name}\" creado",
         "variantAttributes": "Atributos de Variante",
         "image": "Imagen",
         "noImg": "Sin Img",
@@ -1005,5 +1013,18 @@
         "addToCart": "Agregar al carrito",
         "buyNow": "Comprar ahora",
         "quantity": "Cantidad"
+    },
+    "brandModal": {
+        "title": "Marca",
+        "addBrand": "Agregar Marca",
+        "editBrand": "Editar Marca",
+        "addTitle": "Agregar Marca",
+        "editTitle": "Editar Marca",
+        "brandLabel": "Marca",
+        "brandPlaceholder": "Ingresar nombre de la marca",
+        "createSuccess": "Marca creada exitosamente",
+        "updateSuccess": "Marca actualizada exitosamente",
+        "addProduct": "Agregar Marca",
+        "updateProduct": "Actualizar Marca"
     }
 }

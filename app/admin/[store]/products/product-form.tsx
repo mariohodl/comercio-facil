@@ -46,6 +46,7 @@ import { IStore } from '@/lib/db/models/store.model'
 import { IWarehouse } from '@/lib/db/models/warehouse.model'
 import { CatalogAutocomplete } from '@/components/shared/catalog-autocomplete'
 import PricingInfoModal from '@/components/shared/pricing-info-modal'
+import { quickCreateCategory, quickCreateBrand, quickCreateUnit, quickCreateSubCategory } from '@/lib/actions/quick-creation.actions'
 
 const useDefaultValues = false;
 
@@ -864,6 +865,7 @@ const ProductForm = ({
                           initialOptions={categoryOptions}
                           industry={industry}
                           mode="category"
+                          storeId={storeId}
                           placeholder={t('select')}
                           onSelect={(option) => {
                             if (option) {
@@ -875,13 +877,21 @@ const ProductForm = ({
                               setSubCategories([])
                             }
                           }}
-                          onCustomCreate={(name) => {
-                            field.onChange(name)
-                            form.setValue('categoriaId', undefined)
-                            form.setValue('isCustomCategory', true)
-                            // Reset subcategory
-                            form.setValue('subCategory', '')
-                            setSubCategories([])
+                          onCustomCreate={async (name) => {
+                            const res = await quickCreateCategory(name, storeId)
+                            if (res.success && res.item) {
+                              field.onChange(res.item.categoryName)
+                              form.setValue('categoriaId', res.item._id)
+                              form.setValue('isCustomCategory', false)
+                              // Reset subcategory
+                              form.setValue('subCategory', '')
+                              setSubCategories([])
+                            } else {
+                              // Fallback to custom string if creation fails
+                              field.onChange(name)
+                              form.setValue('categoriaId', undefined)
+                              form.setValue('isCustomCategory', true)
+                            }
                           }}
                         />
                       </FormControl>
@@ -902,11 +912,28 @@ const ProductForm = ({
                           industry={industry}
                           mode="subCategory"
                           categoryId={selectedCategoryId}
+                          storeId={storeId}
                           placeholder={t('select')}
                           onSelect={(option) => {
                             if (option) {
                               field.onChange(option.name)
                               form.setValue('subCategoriaId', option._id)
+                            }
+                          }}
+                          onCustomCreate={async (name) => {
+                            if (!selectedCategoryId) {
+                              // If no category selected/created yet, just set string
+                              field.onChange(name)
+                              form.setValue('subCategoriaId', undefined)
+                              return
+                            }
+                            const res = await quickCreateSubCategory(name, selectedCategoryId, storeId)
+                            if (res.success && res.item) {
+                              field.onChange(res.item.name)
+                              form.setValue('subCategoriaId', res.item._id)
+                            } else {
+                              field.onChange(name)
+                              form.setValue('subCategoriaId', undefined)
                             }
                           }}
                         />
@@ -930,6 +957,7 @@ const ProductForm = ({
                           initialOptions={brandOptions}
                           industry={industry}
                           mode="brand"
+                          storeId={storeId}
                           placeholder={t('select')}
                           onSelect={(option) => {
                             if (option) {
@@ -938,10 +966,17 @@ const ProductForm = ({
                               form.setValue('isCustomBrand', false)
                             }
                           }}
-                          onCustomCreate={(name) => {
-                            field.onChange(name)
-                            form.setValue('brandId', undefined)
-                            form.setValue('isCustomBrand', true)
+                          onCustomCreate={async (name) => {
+                            const res = await quickCreateBrand(name, storeId)
+                            if (res.success && res.item) {
+                              field.onChange(res.item.name)
+                              form.setValue('brandId', res.item._id)
+                              form.setValue('isCustomBrand', false)
+                            } else {
+                              field.onChange(name)
+                              form.setValue('brandId', undefined)
+                              form.setValue('isCustomBrand', true)
+                            }
                           }}
                         />
                       </FormControl>
@@ -961,6 +996,7 @@ const ProductForm = ({
                           initialOptions={unitOptions}
                           industry={industry}
                           mode="unit"
+                          storeId={storeId}
                           placeholder={t('select')}
                           onSelect={(option) => {
                             if (option) {
@@ -968,9 +1004,15 @@ const ProductForm = ({
                               form.setValue('unitId', option._id)
                             }
                           }}
-                          onCustomCreate={(name) => {
-                            field.onChange(name)
-                            form.setValue('unitId', undefined)
+                          onCustomCreate={async (name) => {
+                            const res = await quickCreateUnit(name, storeId)
+                            if (res.success && res.item) {
+                              field.onChange(res.item.name)
+                              form.setValue('unitId', res.item._id)
+                            } else {
+                              field.onChange(name)
+                              form.setValue('unitId', undefined)
+                            }
                           }}
                         />
                       </FormControl>

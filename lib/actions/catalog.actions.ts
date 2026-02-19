@@ -240,44 +240,44 @@ export async function consolidateGlobalCatalog() {
 }
 
 // Server action to get suggestions for the UI.
-export async function getCategorySuggestions(query: string, industry: string = 'general') {
+export async function getCategorySuggestions(query: string, industry: string = 'general', storeId?: string) {
     try {
         await connectToDatabase();
         const { suggestCategories } = await import('@/lib/catalog-utils');
-        const suggestions = await suggestCategories(query, industry);
+        const suggestions = await suggestCategories(query, industry, storeId);
         return { success: true, suggestions: JSON.parse(JSON.stringify(suggestions)) };
     } catch (error: any) {
         return { success: false, error: error.message };
     }
 }
 
-export async function getBrandSuggestions(query: string, industry: string = 'general') {
+export async function getBrandSuggestions(query: string, industry: string = 'general', storeId?: string) {
     try {
         await connectToDatabase();
         const { suggestBrands } = await import('@/lib/catalog-utils');
-        const suggestions = await suggestBrands(query, industry);
+        const suggestions = await suggestBrands(query, industry, storeId);
         return { success: true, suggestions: JSON.parse(JSON.stringify(suggestions)) };
     } catch (error: any) {
         return { success: false, error: error.message };
     }
 }
 
-export async function getSubCategorySuggestions(query: string, categoryId?: string, industry?: string) {
+export async function getSubCategorySuggestions(query: string, categoryId?: string, industry?: string, storeId?: string) {
     try {
         await connectToDatabase();
         const { suggestSubCategories } = await import('@/lib/catalog-utils');
-        const suggestions = await suggestSubCategories(query, categoryId, industry);
+        const suggestions = await suggestSubCategories(query, categoryId, industry, storeId);
         return { success: true, suggestions: JSON.parse(JSON.stringify(suggestions)) };
     } catch (error: any) {
         return { success: false, error: error.message };
     }
 }
 
-export async function getUnitSuggestions(query: string, industry: string = 'general') {
+export async function getUnitSuggestions(query: string, industry: string = 'general', storeId?: string) {
     try {
         await connectToDatabase();
         const { suggestUnits } = await import('@/lib/catalog-utils');
-        const suggestions = await suggestUnits(query, industry);
+        const suggestions = await suggestUnits(query, industry, storeId);
         return { success: true, suggestions: JSON.parse(JSON.stringify(suggestions)) };
     } catch (error: any) {
         return { success: false, error: error.message };
