@@ -29,6 +29,7 @@ import {
 import Logo from '@/components/shared/header/logo'
 import { SheetClose } from '@/components/ui/sheet'
 import { usePurchaseFormStore } from '@/hooks/use-purchase-form-store'
+import GuidedHighlighter from '@/components/shared/guided-highlighter'
 
 export function AdminNav({
   storeId,
@@ -36,7 +37,10 @@ export function AdminNav({
   className,
   companyName,
   isMobile,
-  userRole
+  userRole,
+  hasProducts,
+  hasPurchases,
+  hasSales
 }: {
   storeId: string
   storeName?: string
@@ -44,9 +48,24 @@ export function AdminNav({
   companyName?: string
   isMobile?: boolean
   userRole?: string
+  hasProducts?: boolean
+  hasPurchases?: boolean
+  hasSales?: boolean
 }) {
   const pathname = usePathname()
   const t = useTranslations('admin.nav')
+  const tOnboarding = useTranslations('admin.onboarding')
+  const [mounted, setMounted] = React.useState(false)
+
+
+  const [visited, setVisited] = React.useState({ purchases: false, sales: false })
+
+  React.useEffect(() => {
+    setMounted(true)
+    const p = localStorage.getItem(`onboarding_purchases_visited_${storeId}`)
+    const s = localStorage.getItem(`onboarding_sales_visited_${storeId}`)
+    setVisited({ purchases: !!p, sales: !!s })
+  }, [storeId])
 
   const handleItemClick = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
@@ -88,15 +107,15 @@ export function AdminNav({
       title: t('inventory'),
       items: [
         {
+          title: t('createProduct'),
+          href: `/admin/${storeId}/products/create`,
+          icon: PlusSquare,
+        },
+        {
           title: t('products'),
           href: `/admin/${storeId}/products`,
           icon: Box,
           excludes: [`/admin/${storeId}/products/create`],
-        },
-        {
-          title: t('createProduct'),
-          href: `/admin/${storeId}/products/create`,
-          icon: PlusSquare,
         },
         {
           title: t('lowStocks'),
@@ -139,6 +158,12 @@ export function AdminNav({
       title: t('sales'),
       items: [
         {
+          title: t('pos'),
+          href: `/admin/pos/${storeId}`,
+          icon: Monitor,
+          hasSubmenu: true,
+        },
+        {
           title: t('sales'),
           href: `/admin/${storeId}/sales`,
           icon: ShoppingCart,
@@ -158,12 +183,6 @@ export function AdminNav({
           title: t('quotation'),
           href: `/admin/${storeId}/sales/quotations`,
           icon: FileOutput,
-        },
-        {
-          title: t('pos'),
-          href: `/admin/pos/${storeId}`,
-          icon: Monitor,
-          hasSubmenu: true,
         },
       ],
     },
@@ -199,26 +218,26 @@ export function AdminNav({
       ],
     },
 
-    {
-      title: t('stock'),
-      items: [
-        {
-          title: t('manageStock'),
-          href: `/admin/${storeId}/stock/manage`,
-          icon: Package,
-        },
-        {
-          title: t('stockAdjustment'),
-          href: `/admin/${storeId}/stock/adjustment`,
-          icon: ArrowUpRight,
-        },
-        {
-          title: t('stockTransfer'),
-          href: `/admin/${storeId}/stock/transfer`,
-          icon: ArrowLeftRight,
-        },
-      ],
-    },
+    // {
+    //   title: t('stock'),
+    //   items: [
+    //     {
+    //       title: t('manageStock'),
+    //       href: `/admin/${storeId}/stock/manage`,
+    //       icon: Package,
+    //     },
+    //     {
+    //       title: t('stockAdjustment'),
+    //       href: `/admin/${storeId}/stock/adjustment`,
+    //       icon: ArrowUpRight,
+    //     },
+    //     {
+    //       title: t('stockTransfer'),
+    //       href: `/admin/${storeId}/stock/transfer`,
+    //       icon: ArrowLeftRight,
+    //     },
+    //   ],
+    // },
   ]
 
   // Filter sections based on role
@@ -237,7 +256,7 @@ export function AdminNav({
 
   return (
     <nav className={cn(
-      'w-full h-full overflow-y-auto bg-white border-r border-gray-200 pb-10',
+      'w-full h-full overflow-y-auto overflow-x-hidden bg-white border-r border-gray-200 pb-10',
       className
     )}>
       <div className='p-4 space-y-6 mt-6'>
@@ -262,6 +281,7 @@ export function AdminNav({
             </Link>
           </NavLinkWrapper>
         </div>
+
         {navSections.map((section, index) => (
           <div key={index}>
             <h4 className='text-navy font-bold mb-2 px-2 text-sm uppercase tracking-wider'>
@@ -275,6 +295,50 @@ export function AdminNav({
                   (!item.excludes || !item.excludes.some(path => pathname.startsWith(path)))
                 const Icon = item.icon
 
+                const isCreateProductLink = item.href.endsWith('/products/create')
+                const isCreatePurchaseLink = item.href.endsWith('/purchases/create')
+                const isPosLink = item.href.includes('/pos/')
+
+                // Determine which step is current
+                const currentStep = !hasProducts
+                  ? 'products'
+                  : (!hasPurchases && !visited.purchases)
+                    ? 'purchases'
+                    : (!hasSales && !visited.sales)
+                      ? 'sales'
+                      : null
+
+                const isHighlightedLink =
+                  (currentStep === 'products' && isCreateProductLink) ||
+                  (currentStep === 'purchases' && isCreatePurchaseLink) ||
+                  (currentStep === 'sales' && isPosLink)
+
+                const shouldShowHighlight = mounted && isHighlightedLink && !isActive
+
+                const rowContent = (
+                  <div className='flex items-center gap-3 w-full'>
+                    <Icon className={cn('w-5 h-5', isActive ? 'text-orange' : 'text-gray-500')} />
+                    <span>{item.title}</span>
+                  </div>
+                )
+
+                const highlightMessage = currentStep === 'products'
+                  ? tOnboarding('highlights.createProduct')
+                  : currentStep === 'purchases'
+                    ? tOnboarding('highlights.addPurchase')
+                    : tOnboarding('highlights.goToPos')
+
+                const innerContent = shouldShowHighlight ? (
+                  <GuidedHighlighter
+                    show={true}
+                    message={highlightMessage}
+                    position="bottom"
+                    className="flex-1 w-full"
+                  >
+                    {rowContent}
+                  </GuidedHighlighter>
+                ) : rowContent
+
                 return (
                   <NavLinkWrapper key={itemIndex} asChild>
                     <Link
@@ -283,19 +347,25 @@ export function AdminNav({
                         handleItemClick();
                         if (item.href.endsWith('/purchases/create')) {
                           usePurchaseFormStore.getState().clearAll();
+                          if (hasProducts) {
+                            localStorage.setItem(`onboarding_purchases_visited_${storeId}`, 'true')
+                          }
+                        }
+                        if (item.href.includes('/pos/')) {
+                          if (hasProducts) {
+                            localStorage.setItem(`onboarding_sales_visited_${storeId}`, 'true')
+                          }
                         }
                       }}
                       className={cn(
-                        'flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors',
+                        'flex items-center justify-between px-3 py-2.5 rounded-md text-sm font-medium transition-colors w-full relative',
                         isActive
                           ? 'bg-orange-50 text-orange border-r-4 border-orange'
-                          : 'text-navy hover:bg-gray-100'
+                          : 'text-navy hover:bg-gray-100',
+                        shouldShowHighlight && 'bg-orange-50/80 shadow-md shadow-orange-100 z-[50]'
                       )}
                     >
-                      <div className='flex items-center gap-3'>
-                        <Icon className={cn('w-5 h-5', isActive ? 'text-orange' : 'text-gray-500')} />
-                        <span>{item.title}</span>
-                      </div>
+                      {innerContent}
                       {item.hasSubmenu && (
                         <ChevronRight className='w-4 h-4 text-gray-400' />
                       )}

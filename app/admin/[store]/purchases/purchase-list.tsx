@@ -38,6 +38,7 @@ import { useState, useEffect, useTransition, useCallback } from 'react'
 import { formatCurrency } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { getAllPurchases } from '@/lib/actions/purchase.actions'
+import GuidedHighlighter from '@/components/shared/guided-highlighter'
 
 type PurchaseListDataProps = {
     purchases: any[]
@@ -48,6 +49,7 @@ type PurchaseListDataProps = {
 const PurchaseList = ({ store }: { store: string }) => {
     const t = useTranslations('purchases')
     const tCommon = useTranslations('common')
+    const tOnboarding = useTranslations('admin.onboarding')
     const [page, setPage] = useState<number>(1)
     const [inputValue, setInputValue] = useState<string>('')
     const [status, setStatus] = useState<string>('all')
@@ -143,14 +145,20 @@ const PurchaseList = ({ store }: { store: string }) => {
                             <RefreshCw className='w-4 h-4' />
                         </Button>
                     </div>
-                    <Button asChild className='bg-orange hover:bg-orange-dark text-white flex-1 sm:flex-none shadow-md transition-all active:scale-95'>
-                        <Link
-                            href={`/admin/${store}/purchases/create`}
-                            onClick={() => usePurchaseFormStore.getState().clearAll()}
-                        >
-                            <Plus className='w-4 h-4 mr-2' /> {t('addPurchase')}
-                        </Link>
-                    </Button>
+                    <GuidedHighlighter
+                        show={data?.totalPurchases === 0}
+                        message={tOnboarding('highlights.addPurchase')}
+                        position="bottom"
+                    >
+                        <Button asChild className='bg-orange hover:bg-orange-dark text-white flex-1 sm:flex-none shadow-md transition-all active:scale-95'>
+                            <Link
+                                href={`/admin/${store}/purchases/create`}
+                                onClick={() => usePurchaseFormStore.getState().clearAll()}
+                            >
+                                <Plus className='w-4 h-4 mr-2' /> {t('addPurchase')}
+                            </Link>
+                        </Button>
+                    </GuidedHighlighter>
                 </div>
             </div>
 

@@ -24,7 +24,8 @@ import {
     Image as ImageIcon,
     X,
     FileText,
-    UploadCloud
+    UploadCloud,
+    Info
 } from 'lucide-react'
 import Image from 'next/image'
 import { format } from 'date-fns'
@@ -267,7 +268,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
         })
     }
 
-    // --- Product Modal Logic ---
+    const [showHelp, setShowHelp] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
     const [modalQuantity, setModalQuantity] = useState(1)
@@ -414,6 +415,59 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-8">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+                        {/* Help / How it works section */}
+                        <div className="lg:col-span-3 mb-2">
+                            <div className={cn(
+                                "transition-all duration-300 overflow-hidden border rounded-xl",
+                                showHelp ? "bg-blue-50 border-blue-100 shadow-sm" : "bg-white/50 border-gray-100 hover:border-blue-200"
+                            )}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowHelp(!showHelp)}
+                                    className="w-full flex items-center justify-between p-3 text-left group"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className={cn(
+                                            "p-1.5 rounded-lg transition-colors",
+                                            showHelp ? "bg-blue-600 text-white shadow-md shadow-blue-200" : "bg-gray-100 text-gray-400"
+                                        )}>
+                                            <Info className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-black text-navy text-sm tracking-tight">{t('howItWorks.title')}</h3>
+                                            {!showHelp && <p className="text-xs text-slate-400 font-medium line-clamp-1">{t('howItWorks.description')}</p>}
+                                        </div>
+                                    </div>
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-100/50 px-3 py-1.5 rounded-full">
+                                        {showHelp ? tCommon('hide') : tCommon('show')}
+                                    </div>
+                                </button>
+
+                                {showHelp && (
+                                    <div className="px-4 pb-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <p className="text-sm text-slate-600 leading-relaxed border-t border-blue-100 pt-4 font-medium">
+                                            {t('howItWorks.description')}
+                                        </p>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                                            {[1, 2, 3, 4].map(i => (
+                                                <div key={i} className="bg-white p-3.5 rounded-xl border border-blue-100/50 shadow-sm space-y-2.5">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black shadow-sm">
+                                                            {i}
+                                                        </span>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">{tCommon('step')} {i}</span>
+                                                    </div>
+                                                    <p className="text-xs md:text-[13px] text-navy font-bold leading-snug">
+                                                        {t(`howItWorks.steps.step${i}`)}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Main Info Card */}
                         <Card className="lg:col-span-2 shadow-sm border-gray-100 overflow-hidden">
                             <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-3 md:p-4">
@@ -441,6 +495,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                                             <Button
                                                                 variant="outline"
                                                                 role="combobox"
+                                                                data-testid="purchase-supplier-select"
                                                                 className={cn(
                                                                     "w-full justify-between bg-gray-50/50",
                                                                     !field.value && "text-muted-foreground"
@@ -1007,6 +1062,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                 </Button>
                                 <Button
                                     type="submit"
+                                    data-testid="purchase-submit-button"
                                     className="flex-[2] bg-navy text-white hover:bg-navy-600 h-10 md:h-12 rounded-xl shadow-lg shadow-navy/20 active:scale-95 transition-all text-sm md:text-base font-bold"
                                     disabled={isPending}
                                 >
@@ -1016,10 +1072,10 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                         </div>
                     </div>
                 </form>
-            </Form>
+            </Form >
 
             {/* Product Add Modal */}
-            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+            < Dialog open={modalOpen} onOpenChange={setModalOpen} >
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>{t('addProduct')}</DialogTitle>
@@ -1060,6 +1116,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                     type="number"
                                     min="1"
                                     value={modalQuantity}
+                                    data-testid="purchase-modal-quantity-input"
                                     onChange={(e) => setModalQuantity(Math.max(1, Number(e.target.value)))}
                                     className="text-center font-bold"
                                 />
@@ -1071,6 +1128,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                     min="0.01"
                                     step="0.01"
                                     value={modalCost}
+                                    data-testid="purchase-modal-cost-input"
                                     onChange={(e) => setModalCost(Math.max(0.01, Number(e.target.value)))}
                                     className="text-center font-bold"
                                 />
@@ -1151,10 +1209,10 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setModalOpen(false)}>{tCommon('cancel')}</Button>
-                        <Button onClick={handleConfirmAddProduct}>{tCommon('add')}</Button>
+                        <Button data-testid="purchase-modal-add-button" onClick={handleConfirmAddProduct}>{tCommon('add')}</Button>
                     </DialogFooter>
                 </DialogContent>
-            </Dialog>
+            </Dialog >
             <ProductModal
                 open={isProductModalOpen}
                 onClose={() => setIsProductModalOpen(false)}

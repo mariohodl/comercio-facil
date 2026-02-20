@@ -10,13 +10,27 @@ import { Menu as MenuIcon } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import CompanySettingsModal from '@/components/shared/company-settings-modal'
 import { AppLogo } from '@/components/shared/AppLogo'
+import { hasProducts } from '@/lib/actions/product.actions'
+import { hasPurchases } from '@/lib/actions/purchase.actions'
+import { hasSales } from '@/lib/actions/order.actions'
 
 export default async function AdminLayout({
     children,
+    params,
 }: {
     children: React.ReactNode
+    params: Promise<{ store: string }>
 }) {
     const session = await auth()
+    const { store: storeId } = await params
+
+    // Fetch onboarding status
+    const [hasProductsStatus, hasPurchasesStatus, hasSalesStatus] = await Promise.all([
+        storeId ? hasProducts(storeId) : Promise.resolve(false),
+        storeId ? hasPurchases(storeId) : Promise.resolve(false),
+        storeId ? hasSales(storeId) : Promise.resolve(false)
+    ])
+
     return (
         <>
             <div className='flex flex-col min-h-screen bg-gray-50/50'>
@@ -32,11 +46,14 @@ export default async function AdminLayout({
                                 </SheetTrigger>
                                 <SheetContent side="left" className="p-0 w-72">
                                     <AdminNav
-                                        storeId={session?.user?.storeId || ''}
+                                        storeId={storeId}
                                         storeName={session?.user?.storeName || ''}
                                         companyName={session?.user?.companyName || ''}
                                         isMobile={true}
                                         userRole={session?.user?.role}
+                                        hasProducts={hasProductsStatus}
+                                        hasPurchases={hasPurchasesStatus}
+                                        hasSales={hasSalesStatus}
                                     />
                                 </SheetContent>
                             </Sheet>
@@ -68,10 +85,13 @@ export default async function AdminLayout({
                     {/* Desktop Sidebar */}
                     <aside className='hidden nav:block w-64 fixed left-0 top-16 bottom-0 z-10'>
                         <AdminNav
-                            storeId={session?.user?.storeId || ''}
+                            storeId={storeId}
                             storeName={session?.user?.storeName || ''}
                             companyName={session?.user?.companyName || ''}
                             userRole={session?.user?.role}
+                            hasProducts={hasProductsStatus}
+                            hasPurchases={hasPurchasesStatus}
+                            hasSales={hasSalesStatus}
                         />
                     </aside>
 

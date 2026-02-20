@@ -19,6 +19,7 @@
         "next": "Next",
         "previous": "Previous",
         "loading": "Loading...",
+        "step": "Step",
         "searching": "Searching...",
         "noResults": "No results found",
         "myAccount": "My Account",
@@ -460,6 +461,8 @@
         "dashboard": {
             "welcome": "Welcome, Admin",
             "ordersToday": "You have {count} Orders, Today",
+            "showGuide": "View Guide",
+            "showDashboard": "View Reports",
             "totalSales": "Total Sales",
             "totalSalesReturn": "Total Sales Return",
             "totalPurchase": "Total Purchase",
@@ -506,6 +509,34 @@
             "customerSupplier": "Customer/Supplier",
             "status": "Status",
             "total": "Total"
+        },
+        "onboarding": {
+            "welcomeTitle": "Welcome to Comercio Fácil!",
+            "welcomeDescription": "We're excited to have you here. Let's get your store up and running in just a few minutes.",
+            "getStarted": "Get Started",
+            "checklistTitle": "Getting Started Checklist",
+            "checklistDescription": "Set up the core aspects of your store and get ready to make your first sale.",
+            "step1Title": "List your products",
+            "step1Description": "Add the items you want to sell to your catalog.",
+            "step1Button": "Add Product",
+            "step2Title": "Supply your inventory (Log Purchases)",
+            "step2Description": "Make sure your products have stock and are published to see and sell them in the Point of Sale (POS).",
+            "step2Button": "Add Purchase",
+            "step3Title": "Start selling in the POS",
+            "step3Description": "Use the Point of Sale to complete your first transaction.",
+            "step3Button": "Go to POS",
+            "skipForNow": "Skip for now",
+            "step": "Step",
+            "nextStep": "Next Step",
+            "allStepsCompleted": "All set!",
+            "allStepsDescription": "You've completed the initial setup. You can now start managing your business with all the tools.",
+            "highlights": {
+                "createProduct": "Start here! Create your first product.",
+                "addProduct": "Start here! Add your first product.",
+                "saveProduct": "Great! Now save your product to continue.",
+                "addPurchase": "Now let's add some stock to your inventory.",
+                "goToPos": "Ready to sell! Go to the Point of Sale."
+            }
         },
         "users": {
             "title": "Users",
@@ -897,6 +928,16 @@
         "itemizedList": "Itemized List",
         "importantNotes": "Important Notes",
         "noNotes": "No additional notes provided for this purchase.",
+        "howItWorks": {
+            "title": "How does this page work?",
+            "description": "This page allows you to record the entry of merchandise into your inventory. When creating a purchase, the stock of the selected products will automatically increase.",
+            "steps": {
+                "step1": "Select a Supplier and verify the purchase date.",
+                "step2": "Search and add the products you are receiving. You can use a barcode scanner.",
+                "step3": "Adjust the quantities and real purchase costs to keep your profit margin updated.",
+                "step4": "Record how much you paid for this purchase to keep track of your accounts payable."
+            }
+        },
         "store": "Store",
         "freeQuantity": "Free / Warranty Quantity",
         "freeCountHint": "of {count} items are free",

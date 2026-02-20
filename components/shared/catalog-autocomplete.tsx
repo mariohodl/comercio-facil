@@ -39,6 +39,7 @@ interface CatalogAutocompleteProps {
     mode?: 'category' | 'brand' | 'subCategory' | 'unit'
     categoryId?: string
     storeId?: string
+    'data-testid'?: string
 }
 
 export function CatalogAutocomplete({
@@ -51,6 +52,7 @@ export function CatalogAutocomplete({
     mode = 'category',
     categoryId,
     storeId,
+    'data-testid': testId,
 }: CatalogAutocompleteProps) {
     const { showSuccess } = useToast()
     const [open, setOpen] = useState(false)
@@ -153,6 +155,7 @@ export function CatalogAutocomplete({
                     role="combobox"
                     aria-expanded={open}
                     className="w-full justify-between h-10"
+                    data-testid={testId}
                 >
                     <span className="truncate">
                         {value ? value : (placeholder === "Select..." ? tProducts('select') : placeholder)}
