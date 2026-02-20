@@ -44,6 +44,7 @@ import { formatCurrency } from '@/lib/utils'
 import DeleteDialog from '@/components/shared/delete-dialog'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
+import GuidedHighlighter from '@/components/shared/guided-highlighter'
 
 type ProductListDataProps = {
     products: IProduct[]
@@ -56,6 +57,7 @@ type ProductListDataProps = {
 const ProductList = ({ store }: { store: string }) => {
     const t = useTranslations('products')
     const tCommon = useTranslations('common')
+    const tOnboarding = useTranslations('admin.onboarding')
     const [page, setPage] = useState<number>(1)
     const [inputValue, setInputValue] = useState<string>('')
     const [category, setCategory] = useState<string>('all')
@@ -128,11 +130,17 @@ const ProductList = ({ store }: { store: string }) => {
                             <RefreshCw className='w-4 h-4' />
                         </Button>
                     </div>
-                    <Button asChild className='bg-orange hover:bg-orange-dark text-white flex-1 sm:flex-none'>
-                        <Link href={`/admin/${store}/products/create`}>
-                            <Plus className='w-4 h-4 mr-2' /> {t('addProduct')}
-                        </Link>
-                    </Button>
+                    <GuidedHighlighter
+                        show={data?.totalProducts === 0}
+                        message={tOnboarding('highlights.addProduct')}
+                        position="bottom"
+                    >
+                        <Button asChild className='bg-orange hover:bg-orange-dark text-white flex-1 sm:flex-none'>
+                            <Link href={`/admin/${store}/products/create`}>
+                                <Plus className='w-4 h-4 mr-2' /> {t('addProduct')}
+                            </Link>
+                        </Button>
+                    </GuidedHighlighter>
                     <Button variant='default' className='bg-navy hover:bg-navy-dark text-white flex-1 sm:flex-none'>
                         <Import className='w-4 h-4 mr-2' /> {t('importProduct')}
                     </Button>

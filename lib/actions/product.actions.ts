@@ -609,3 +609,14 @@ export async function deleteProductImg(productId: string, imgKey: string) {
 }
 
 //   export async function createOrUpdateManyProducts(){}
+
+export async function hasProducts(storeId: string) {
+	try {
+		await connectToDatabase()
+		const count = await Product.countDocuments({ store: storeId })
+		return count > 0
+	} catch (error) {
+		console.error('Error checking if store has products:', error)
+		return false
+	}
+}

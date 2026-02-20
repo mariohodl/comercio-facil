@@ -150,7 +150,7 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="lg" className="w-full text-lg" disabled={cart.length === 0}>
+                <Button size="lg" data-testid="pos-pay-trigger-button" className="w-full text-lg" disabled={cart.length === 0}>
                     {tPOS('add')} {formatCurrency(total)}
                 </Button>
             </DialogTrigger>
@@ -278,7 +278,7 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                         </div>
 
                         <div className="flex flex-col gap-3 pt-4">
-                            <Button type="submit" size="lg" className="w-full text-lg" disabled={form.formState.isSubmitting}>
+                            <Button type="submit" data-testid="pos-complete-payment-button" size="lg" className="w-full text-lg" disabled={form.formState.isSubmitting}>
                                 {form.formState.isSubmitting && (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 )}

@@ -46,6 +46,7 @@ import { IStore } from '@/lib/db/models/store.model'
 import { IWarehouse } from '@/lib/db/models/warehouse.model'
 import { CatalogAutocomplete } from '@/components/shared/catalog-autocomplete'
 import PricingInfoModal from '@/components/shared/pricing-info-modal'
+import GuidedHighlighter from '@/components/shared/guided-highlighter'
 import { quickCreateCategory, quickCreateBrand, quickCreateUnit, quickCreateSubCategory } from '@/lib/actions/quick-creation.actions'
 
 const useDefaultValues = false;
@@ -163,6 +164,7 @@ const ProductForm = ({
 
   const t = useTranslations('products')
   const tCommon = useTranslations('common')
+  const tOnboarding = useTranslations('admin.onboarding')
 
   // Safely deduplicate units and brands from props to prevent UI crashes
 
@@ -751,7 +753,7 @@ const ProductForm = ({
                       <FormLabel className="gap-1.5">{t('warehouse')} <span className="text-red-500">*</span><HelpTooltip content={t('help.warehouse')} /></FormLabel>
                       <Select key={field.value} onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-10" data-testid="product-warehouse-select">
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
@@ -783,7 +785,7 @@ const ProductForm = ({
                     <FormItem>
                       <FormLabel className="text-sm">{t('productName')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder={t('enterProductName')} {...field} className="h-10" />
+                        <Input data-testid="product-name-input" placeholder={t('enterProductName')} {...field} className="h-10" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -823,7 +825,7 @@ const ProductForm = ({
                         <div className="flex flex-col sm:flex-row gap-2">
                           <div className="w-full flex-1">
                             <FormControl>
-                              <Input placeholder={t('enterBarcode')} {...field} className="h-10" />
+                              <Input data-testid="product-sku-input" placeholder={t('enterBarcode')} {...field} className="h-10" />
                             </FormControl>
                           </div>
                           <Button
@@ -861,6 +863,7 @@ const ProductForm = ({
                       <FormLabel className="text-sm">{t('category')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <CatalogAutocomplete
+                          data-testid="product-category-select"
                           value={field.value || ''}
                           initialOptions={categoryOptions}
                           industry={industry}
@@ -907,6 +910,7 @@ const ProductForm = ({
                       <FormLabel className="text-sm">{t('subCategory')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <CatalogAutocomplete
+                          data-testid="product-subcategory-select"
                           value={field.value || ''}
                           initialOptions={subCategoryOptions}
                           industry={industry}
@@ -953,6 +957,7 @@ const ProductForm = ({
                       <FormLabel className="text-sm">{t('brand')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <CatalogAutocomplete
+                          data-testid="product-brand-select"
                           value={field.value || ''}
                           initialOptions={brandOptions}
                           industry={industry}
@@ -992,6 +997,7 @@ const ProductForm = ({
                       <FormLabel className="text-sm">{t('unit')} <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <CatalogAutocomplete
+                          data-testid="product-unit-select"
                           value={field.value || ''}
                           initialOptions={unitOptions}
                           industry={industry}
@@ -1061,6 +1067,7 @@ const ProductForm = ({
                         <div className="flex-1 min-w-0">
                           <FormControl>
                             <Input
+                              data-testid="product-barcode-input"
                               placeholder={t('enterBarcode')}
                               {...field}
                               ref={(el) => {
@@ -1839,7 +1846,7 @@ const ProductForm = ({
                                 <FormControl>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
-                                    <Input type='number' step='0.01' min="0" placeholder="0" {...field} className="pl-9 h-10" />
+                                    <Input data-testid="product-cost-input" type='number' step='0.01' min="0" placeholder="0" {...field} className="pl-9 h-10" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -1858,7 +1865,7 @@ const ProductForm = ({
                                 <FormControl>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
-                                    <Input type='number' step='0.01' min="0" placeholder="0" {...field} className="pl-9 h-10" />
+                                    <Input data-testid="product-price-input" type='number' step='0.01' min="0" placeholder="0" {...field} className="pl-9 h-10" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -1917,7 +1924,7 @@ const ProductForm = ({
                                 <FormControl>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">#</span>
-                                    <Input type='number' min="0" placeholder="0" {...field} className="pl-9 h-10 font-medium" />
+                                    <Input data-testid="product-stock-input" type='number' min="0" placeholder="0" {...field} className="pl-9 h-10 font-medium" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -2206,26 +2213,40 @@ const ProductForm = ({
               <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)} className="w-full sm:w-auto h-10">
                 {tCommon('cancel')}
               </Button>
-              <Button
-                type='submit'
-                size='lg'
-                disabled={form.formState.isSubmitting}
-                className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
+              <GuidedHighlighter
+                show={type === 'Create'}
+                message={tOnboarding('highlights.saveProduct')}
+                position="top"
               >
-                {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
-              </Button>
+                <Button
+                  type='submit'
+                  size='lg'
+                  disabled={form.formState.isSubmitting}
+                  data-testid='product-submit-button'
+                  className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
+                >
+                  {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
+                </Button>
+              </GuidedHighlighter>
             </div>
           )}
           {isModal && (
             <div className="flex justify-end gap-2">
-              <Button
-                type='submit'
-                size='lg'
-                disabled={form.formState.isSubmitting}
-                className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
+              <GuidedHighlighter
+                show={type === 'Create'}
+                message={tOnboarding('highlights.saveProduct')}
+                position="top"
               >
-                {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
-              </Button>
+                <Button
+                  type='submit'
+                  size='lg'
+                  disabled={form.formState.isSubmitting}
+                  data-testid='product-submit-button-modal'
+                  className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
+                >
+                  {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
+                </Button>
+              </GuidedHighlighter>
             </div>
           )}
         </form>

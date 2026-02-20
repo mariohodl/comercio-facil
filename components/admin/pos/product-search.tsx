@@ -145,6 +145,7 @@ export default function ProductSearch({
                         <Input
                             id="product-search-input"
                             autoFocus
+                            data-testid="pos-product-search"
                             placeholder={t('searchPlaceholder')}
                             value={query}
                             onChange={(e) => onQueryChange(e.target.value)}

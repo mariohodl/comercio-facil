@@ -8,7 +8,7 @@ import POSCart from '@/components/admin/pos/pos-cart'
 import CategorySidebar from '@/components/admin/pos/category-sidebar'
 import CalculatorModal from '@/components/admin/pos/calculator-modal'
 import OrdersModal from '@/components/admin/pos/orders-modal'
-import { Clock, ShoppingCart, Calculator, Store, Zap, ShoppingBag } from 'lucide-react'
+import { Clock, ShoppingCart, Calculator, Store, Zap, ShoppingBag, LayoutDashboard } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -205,6 +205,20 @@ export default function POSPageClient({
                             </div>
 
                             <div className='flex items-center gap-1 lg:gap-2 border-l border-slate-100 pl-1 lg:pl-3'>
+                                {session?.user?.role === 'Admin' && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        asChild
+                                        className="h-8 lg:h-9 text-slate-600 hover:text-navy hover:bg-slate-100 font-bold px-2 lg:px-3.5 rounded-lg transition-all"
+                                    >
+                                        <Link href={`/admin/${storeId}/overview`}>
+                                            <LayoutDashboard className="h-4 w-4 text-orange" />
+                                            <span className="hidden xl:inline text-[10px] uppercase tracking-wide ml-2">Admin</span>
+                                        </Link>
+                                    </Button>
+                                )}
+
                                 <Button
                                     variant="ghost"
                                     size="sm"

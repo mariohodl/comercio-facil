@@ -2,7 +2,7 @@
 import React from 'react'
 import { usePathname, useParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { Search, Bell, Plus, ChevronRight, Home } from 'lucide-react'
+import { Search, Bell, Plus, ChevronRight, Home, ShoppingCart } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -77,8 +77,15 @@ export function AdminHeader({
 
 
 
-      {/* Right side: Quick Actions & Notifications */}
       <div className="flex items-center gap-2 ml-auto">
+        {/* POS Access Button */}
+        <Button variant="outline" size="sm" asChild className="hidden sm:flex h-9 border-white/20 bg-white/5 hover:bg-white/10 text-white hover:text-white gap-2 rounded-lg transition-all active:scale-95 px-4 group border border-dashed">
+          <Link href={`/admin/pos/${store}`}>
+            <ShoppingCart className="w-4 h-4 text-orange group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-bold uppercase tracking-tight">{tCommon('goToPOS') || 'Vender'}</span>
+          </Link>
+        </Button>
+
         {/* Search icon for mobile/tablet */}
         <Button variant="ghost" size="icon" className="lg:hidden h-9 w-9 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg shrink-0">
           <Search className="w-5 h-5" />

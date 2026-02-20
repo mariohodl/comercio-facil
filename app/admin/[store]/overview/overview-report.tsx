@@ -18,7 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { calculatePastDate, formatCurrency } from '@/lib/utils'
+import { calculatePastDate, formatCurrency, cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
 import { useParams } from 'next/navigation'
@@ -37,6 +37,8 @@ import RecentTransactionsTable from './recent-transactions-table'
 import TopCustomers from './top-customers'
 import TopCategoriesChart from './top-categories-chart'
 import OrderStatisticsChart from './order-statistics-chart'
+import OnboardingModal from './onboarding-modal'
+import GettingStartedChecklist from './getting-started-checklist'
 
 export default function OverviewReport() {
   const { store } = useParams()
@@ -50,10 +52,16 @@ export default function OverviewReport() {
   const [data, setData] = useState<{ [key: string]: any }>()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, startTransition] = useTransition()
+  const [showChecklist, setShowChecklist] = useState(false)
+
   useEffect(() => {
     if (date && store) {
       startTransition(async () => {
-        setData(await getOrderSummary(date, store as string))
+        const summary = await getOrderSummary(date, store as string)
+        setData(summary)
+        // Automatically show checklist if store is empty
+        const empty = summary.productsCount === 0 && summary.ordersCount === 0 && summary.purchasesCount === 0
+        if (empty) setShowChecklist(true)
       })
     }
   }, [date, store])
@@ -82,6 +90,8 @@ export default function OverviewReport() {
       </div>
     )
 
+  const isEmptyState = data.productsCount === 0 && data.ordersCount === 0 && data.purchasesCount === 0
+
   // Prepare chart data combining sales and purchases for the first chart
   const combinedChartData = data.salesChartData.map((saleItem: { date: string; totalSales: number }) => {
     const purchaseItem = data.purchaseChartData.find((p: { date: string; totalPurchases: number }) => p.date === saleItem.date)
@@ -94,170 +104,199 @@ export default function OverviewReport() {
 
   return (
     <div className='space-y-6'>
-      <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-2 py-2'>
-        <div>
+      <OnboardingModal storeId={store as string} />
+
+      <div className={cn(
+        'flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-2 py-2',
+        isEmptyState && 'mb-0 pb-0'
+      )}>
+        <div className="flex flex-col">
           <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>{t('welcome')}</h1>
-          <p className='text-xs font-semibold text-slate-400 uppercase tracking-widest'>{t('ordersToday', { count: data.ordersCount })}</p>
+          <div className="flex items-center gap-3">
+            {!isEmptyState && !showChecklist && (
+              <p className='text-xs font-semibold text-slate-400 uppercase tracking-widest'>{t('ordersToday', { count: data.ordersCount })}</p>
+            )}
+            <button
+              onClick={() => setShowChecklist(!showChecklist)}
+              className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-orange hover:text-orange-dark transition-colors"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-orange animate-pulse" />
+              {showChecklist ? t('showDashboard') : t('showGuide')}
+            </button>
+          </div>
         </div>
-        <CalendarDateRangePicker defaultDate={date} setDate={setDate} className="w-full md:w-auto" />
+        {!isEmptyState && !showChecklist && (
+          <CalendarDateRangePicker defaultDate={date} setDate={setDate} className="w-full md:w-auto" />
+        )}
       </div>
 
-      {/* Row 1: Main Summary Cards */}
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <SummaryCard
-          title={t('totalSales')}
-          value={formatCurrency(data.totalSales)}
-          icon={FileText}
-          percentage={22}
-          className='bg-orange-50 border-orange-100'
-          iconClassName='bg-orange-100 text-orange-600'
+      {showChecklist ? (
+        <GettingStartedChecklist
+          storeId={store as string}
+          hasProducts={data.productsCount > 0}
+          hasPurchases={data.purchasesCount > 0}
+          hasSales={data.ordersCount > 0}
         />
-        <SummaryCard
-          title={t('totalSalesReturn')}
-          value={formatCurrency(0)}
-          icon={RefreshCw}
-          percentage={-22}
-          className='bg-navy text-white border-navy-dark'
-          iconClassName='bg-navy-dark text-white'
-        />
-        <SummaryCard
-          title={t('totalPurchase')}
-          value={formatCurrency(data.totalPurchases)}
-          icon={Gift}
-          percentage={22}
-          className='bg-emerald-50 border-emerald-100'
-          iconClassName='bg-emerald-100 text-emerald-600'
-        />
-        <SummaryCard
-          title={t('totalPurchaseReturn')}
-          value={formatCurrency(0)}
-          icon={ShieldCheck}
-          percentage={22}
-          className='bg-blue-50 border-blue-100'
-          iconClassName='bg-blue-100 text-blue-600'
-        />
-      </div>
+      ) : (
+        <>
+          {/* Row 1: Main Summary Cards */}
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <SummaryCard
+              title={t('totalSales')}
+              value={formatCurrency(data.totalSales)}
+              icon={FileText}
+              percentage={22}
+              className='bg-orange-50 border-orange-100'
+              iconClassName='bg-orange-100 text-orange-600'
+            />
+            <SummaryCard
+              title={t('totalSalesReturn')}
+              value={formatCurrency(0)}
+              icon={RefreshCw}
+              percentage={-22}
+              className='bg-navy text-white border-navy-dark'
+              iconClassName='bg-navy-dark text-white'
+            />
+            <SummaryCard
+              title={t('totalPurchase')}
+              value={formatCurrency(data.totalPurchases)}
+              icon={Gift}
+              percentage={22}
+              className='bg-emerald-50 border-emerald-100'
+              iconClassName='bg-emerald-100 text-emerald-600'
+            />
+            <SummaryCard
+              title={t('totalPurchaseReturn')}
+              value={formatCurrency(0)}
+              icon={ShieldCheck}
+              percentage={22}
+              className='bg-blue-50 border-blue-100'
+              iconClassName='bg-blue-100 text-blue-600'
+            />
+          </div>
 
-      {/* Row 2: Secondary Metrics */}
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <SummaryCard
-          title={t('profit')}
-          value={formatCurrency(data.totalSales - data.totalPurchases)}
-          icon={Layers}
-          percentage={35}
-          className="bg-white border-slate-50"
-          iconClassName="bg-cyan-50 text-cyan-600"
-        />
-        <SummaryCard
-          title={t('invoiceDue')}
-          value={formatCurrency(data.invoiceDue)}
-          icon={Clock}
-          percentage={35}
-          className="bg-white border-slate-50"
-          iconClassName="bg-teal-50 text-teal-600"
-        />
-        <SummaryCard
-          title={t('totalExpenses')}
-          value={formatCurrency(data.totalPurchases)}
-          icon={Wallet}
-          percentage={41}
-          className="bg-white border-slate-50"
-          iconClassName="bg-amber-50 text-amber-600"
-        />
-        <SummaryCard
-          title={t('totalPaymentReturns')}
-          value={formatCurrency(0)}
-          icon={Hash}
-          percentage={-20}
-          className="bg-white border-slate-50"
-          iconClassName="bg-indigo-50 text-indigo-600"
-        />
-      </div>
+          {/* Row 2: Secondary Metrics */}
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <SummaryCard
+              title={t('profit')}
+              value={formatCurrency(data.totalSales - data.totalPurchases)}
+              icon={Layers}
+              percentage={35}
+              className="bg-white border-slate-50"
+              iconClassName="bg-cyan-50 text-cyan-600"
+            />
+            <SummaryCard
+              title={t('invoiceDue')}
+              value={formatCurrency(data.invoiceDue)}
+              icon={Clock}
+              percentage={35}
+              className="bg-white border-slate-50"
+              iconClassName="bg-teal-50 text-teal-600"
+            />
+            <SummaryCard
+              title={t('totalExpenses')}
+              value={formatCurrency(data.totalPurchases)}
+              icon={Wallet}
+              percentage={41}
+              className="bg-white border-slate-50"
+              iconClassName="bg-amber-50 text-amber-600"
+            />
+            <SummaryCard
+              title={t('totalPaymentReturns')}
+              value={formatCurrency(0)}
+              icon={Hash}
+              percentage={-20}
+              className="bg-white border-slate-50"
+              iconClassName="bg-indigo-50 text-indigo-600"
+            />
+          </div>
 
-      {/* Row 3: New Sections - Top Selling, Low Stock, Recent Sales */}
-      <div className='grid gap-4 md:grid-cols-3'>
-        <TopSellingProducts data={data.topSalesProducts} />
-        <LowStockProducts data={data.lowStockProducts} storeId={store as string} />
-        <RecentSalesList data={data.latestOrders} />
-      </div>
+          {/* Row 3: New Sections - Top Selling, Low Stock, Recent Sales */}
+          <div className='grid gap-4 md:grid-cols-3'>
+            <TopSellingProducts data={data.topSalesProducts} />
+            <LowStockProducts data={data.lowStockProducts} storeId={store as string} />
+            <RecentSalesList data={data.latestOrders} />
+          </div>
 
-      {/* Row 4: Sales Statics & Recent Transactions */}
-      <div className='grid gap-4 md:grid-cols-2'>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between'>
-            <CardTitle className='text-base'>{t('salesStatics')}</CardTitle>
-            <div className='flex gap-2'>
-              {/* Filter buttons */}
+          {/* Row 4: Sales Statics & Recent Transactions */}
+          <div className='grid gap-4 md:grid-cols-2'>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between'>
+                <CardTitle className='text-base'>{t('salesStatics')}</CardTitle>
+                <div className='flex gap-2'>
+                  {/* Filter buttons */}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className='flex items-center gap-4 mb-4'>
+                  <div>
+                    <p className='text-2xl font-bold text-emerald-500'>{formatCurrency(data.totalSales)}</p>
+                    <p className='text-xs text-muted-foreground'>{t('revenue')}</p>
+                  </div>
+                  <div>
+                    <p className='text-2xl font-bold text-red-500'>{formatCurrency(data.totalPurchases)}</p>
+                    <p className='text-xs text-muted-foreground'>{t('expense')}</p>
+                  </div>
+                </div>
+                <SalesStaticsChart data={combinedChartData} />
+              </CardContent>
+            </Card>
+            <RecentTransactionsTable data={data.recentTransactions} />
+          </div>
+
+          {/* Row 5: Top Customers, Top Categories, Order Statistics */}
+          <div className='grid gap-4 md:grid-cols-3'>
+            <TopCustomers data={data.topCustomers} />
+            <TopCategoriesChart data={data.topSalesCategories} />
+            <OrderStatisticsChart data={data.orderStats} />
+          </div>
+
+          {/* Row 6: Original Chart & Overall Info (Keeping these as requested or maybe move them down) */}
+          <div className='grid gap-4 md:grid-cols-3'>
+            <Card className='col-span-2'>
+              <CardHeader className='flex flex-row items-center justify-between'>
+                <CardTitle className='text-base'>{t('salesPurchaseOverview')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SalesPurchaseChart data={combinedChartData} />
+              </CardContent>
+            </Card>
+
+            <div className='space-y-4'>
+              <Card>
+                <CardHeader>
+                  <CardTitle className='text-base'>{t('overallInformation')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className='grid grid-cols-3 gap-4 text-center'>
+                    <div>
+                      <div className='mb-2 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600'>
+                        <Users className='h-5 w-5' />
+                      </div>
+                      <p className='text-xs text-muted-foreground'>{t('suppliers')}</p>
+                      <p className='font-bold'>{data.suppliersCount}</p>
+                    </div>
+                    <div>
+                      <div className='mb-2 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 text-orange-600'>
+                        <Users className='h-5 w-5' />
+                      </div>
+                      <p className='text-xs text-muted-foreground'>{t('customer')}</p>
+                      <p className='font-bold'>{data.usersCount}</p>
+                    </div>
+                    <div>
+                      <div className='mb-2 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-600'>
+                        <ShoppingCart className='h-5 w-5' />
+                      </div>
+                      <p className='text-xs text-muted-foreground'>{t('orders')}</p>
+                      <p className='font-bold'>{data.ordersCount}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className='flex items-center gap-4 mb-4'>
-              <div>
-                <p className='text-2xl font-bold text-emerald-500'>{formatCurrency(data.totalSales)}</p>
-                <p className='text-xs text-muted-foreground'>{t('revenue')}</p>
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-red-500'>{formatCurrency(data.totalPurchases)}</p>
-                <p className='text-xs text-muted-foreground'>{t('expense')}</p>
-              </div>
-            </div>
-            <SalesStaticsChart data={combinedChartData} />
-          </CardContent>
-        </Card>
-        <RecentTransactionsTable data={data.recentTransactions} />
-      </div>
-
-      {/* Row 5: Top Customers, Top Categories, Order Statistics */}
-      <div className='grid gap-4 md:grid-cols-3'>
-        <TopCustomers data={data.topCustomers} />
-        <TopCategoriesChart data={data.topSalesCategories} />
-        <OrderStatisticsChart data={data.orderStats} />
-      </div>
-
-      {/* Row 6: Original Chart & Overall Info (Keeping these as requested or maybe move them down) */}
-      <div className='grid gap-4 md:grid-cols-3'>
-        <Card className='col-span-2'>
-          <CardHeader className='flex flex-row items-center justify-between'>
-            <CardTitle className='text-base'>{t('salesPurchaseOverview')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SalesPurchaseChart data={combinedChartData} />
-          </CardContent>
-        </Card>
-
-        <div className='space-y-4'>
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-base'>{t('overallInformation')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='grid grid-cols-3 gap-4 text-center'>
-                <div>
-                  <div className='mb-2 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600'>
-                    <Users className='h-5 w-5' />
-                  </div>
-                  <p className='text-xs text-muted-foreground'>{t('suppliers')}</p>
-                  <p className='font-bold'>{data.suppliersCount}</p>
-                </div>
-                <div>
-                  <div className='mb-2 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 text-orange-600'>
-                    <Users className='h-5 w-5' />
-                  </div>
-                  <p className='text-xs text-muted-foreground'>{t('customer')}</p>
-                  <p className='font-bold'>{data.usersCount}</p>
-                </div>
-                <div>
-                  <div className='mb-2 mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-600'>
-                    <ShoppingCart className='h-5 w-5' />
-                  </div>
-                  <p className='text-xs text-muted-foreground'>{t('orders')}</p>
-                  <p className='font-bold'>{data.ordersCount}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

@@ -243,3 +243,14 @@ export async function getPurchaseById(id: string) {
         return null
     }
 }
+
+export async function hasPurchases(storeId: string) {
+    try {
+        await connectToDatabase()
+        const count = await Purchase.countDocuments({ storeId })
+        return count > 0
+    } catch (error) {
+        console.error('Error checking if store has purchases:', error)
+        return false
+    }
+}

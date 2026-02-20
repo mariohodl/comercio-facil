@@ -251,6 +251,10 @@ export async function getOrderSummary(date: DateRange, storeId: string) {
 		},
 	})
 
+	const purchasesCount = await OrderReception.countDocuments({
+		storeId
+	})
+
 	const totalPurchasesResult = await OrderReception.aggregate([
 		{
 			$match: {
@@ -360,6 +364,7 @@ export async function getOrderSummary(date: DateRange, storeId: string) {
 		totalPurchases,
 		invoiceDue,
 		suppliersCount,
+		purchasesCount,
 		purchaseChartData: JSON.parse(JSON.stringify(await getPurchaseChartData(date, storeId))),
 		lowStockProducts: JSON.parse(JSON.stringify(await getLowStockProducts(storeId))),
 		recentTransactions: JSON.parse(JSON.stringify(await getRecentTransactions(date, storeId))),
@@ -887,5 +892,16 @@ export async function getPOSOrders({
 	return {
 		data: JSON.parse(JSON.stringify(orders)),
 		totalPages: Math.ceil(ordersCount / limit),
+	}
+}
+
+export async function hasSales(storeId: string) {
+	try {
+		await connectToDatabase()
+		const count = await Order.countDocuments({ storeId })
+		return count > 0
+	} catch (error) {
+		console.error('Error checking if store has sales:', error)
+		return false
 	}
 }

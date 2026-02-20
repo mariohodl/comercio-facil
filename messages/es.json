@@ -19,6 +19,7 @@
         "next": "Siguiente",
         "previous": "Anterior",
         "loading": "Cargando...",
+        "step": "Paso",
         "searching": "Buscando...",
         "noResults": "No se encontraron resultados",
         "myAccount": "Mi Cuenta",
@@ -479,6 +480,8 @@
         "dashboard": {
             "welcome": "Bienvenido, Admin",
             "ordersToday": "Tienes {count} Órdenes, Hoy",
+            "showGuide": "Ver Guía",
+            "showDashboard": "Ver Reportes",
             "totalSales": "Ventas Totales",
             "totalSalesReturn": "Devolución de Ventas Total",
             "totalPurchase": "Compra Total",
@@ -525,6 +528,34 @@
             "customerSupplier": "Cliente/Proveedor",
             "status": "Estado",
             "total": "Total"
+        },
+        "onboarding": {
+            "welcomeTitle": "¡Bienvenido a Comercio Fácil!",
+            "welcomeDescription": "Estamos emocionados de tenerte aquí. Vamos a poner en marcha tu tienda en solo unos minutos.",
+            "getStarted": "Comenzar",
+            "checklistTitle": "Guía de Inicio Rápido",
+            "checklistDescription": "Configura los aspectos fundamentales de tu tienda y prepárate para realizar tu primera venta.",
+            "step1Title": "Crea tus productos",
+            "step1Description": "Agrega los artículos que quieres vender a tu catálogo.",
+            "step1Button": "Agregar Producto",
+            "step2Title": "Surtir inventario (Registrar compra)",
+            "step2Description": "Asegúrate de que tus productos tengan stock y estén publicados para poder verlos y venderlos en el Punto de Venta (POS).",
+            "step2Button": "Agregar Compra",
+            "step3Title": "Vender en el POS",
+            "step3Description": "Usa el Punto de Venta para completar tu primera transacción.",
+            "step3Button": "Ir al POS",
+            "skipForNow": "Saltar por ahora",
+            "step": "Paso",
+            "nextStep": "Siguiente Paso",
+            "allStepsCompleted": "¡Todo listo!",
+            "allStepsDescription": "Has completado la configuración inicial. Ahora puedes empezar a gestionar tu negocio con todas las herramientas.",
+            "highlights": {
+                "createProduct": "¡Empieza aquí! Crea tu primer producto.",
+                "addProduct": "¡Empieza aquí! Crea tu primer producto.",
+                "saveProduct": "¡Genial! Ahora guarda tu producto para continuar.",
+                "addPurchase": "Ahora vamos a agregar existencias a tu inventario.",
+                "goToPos": "¡Listo para vender! Ve al Punto de Venta."
+            }
         },
         "users": {
             "title": "Usuarios",
@@ -918,6 +949,16 @@
         "itemizedList": "Lista Detallada",
         "importantNotes": "Notas Importantes",
         "noNotes": "No se proporcionaron notas adicionales para esta compra.",
+        "howItWorks": {
+            "title": "¿Cómo funciona esta página?",
+            "description": "Esta página te permite registrar la entrada de mercancía a tu inventario. Al crear una compra, el stock de los productos seleccionados aumentará automáticamente.",
+            "steps": {
+                "step1": "Selecciona un Proveedor y verifica la fecha de la compra.",
+                "step2": "Busca y agrega los productos que estás recibiendo. Puedes usar un escáner de códigos de barras.",
+                "step3": "Ajusta las cantidades y los costos reales de compra para mantener tu margen de ganancia actualizado.",
+                "step4": "Registra cuánto pagaste por esta compra para llevar un control de tus cuentas por pagar."
+            }
+        },
         "store": "Tienda",
         "freeQuantity": "Cantidad Bonificada / Garantía",
         "freeCountHint": "de {count} artículos son bonificados",

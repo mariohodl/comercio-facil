@@ -143,6 +143,7 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
         <>
             <Card
                 className={`group relative overflow-hidden border-gray-100 bg-white shadow-sm hover:shadow-lg transition-all duration-300 ${isOutOfStock ? 'opacity-75' : 'cursor-pointer hover:border-gray-300 p-0'}`}
+                data-testid={`pos-product-card-${product._id}`}
                 onClick={handleCardClick}
             >
                 <CardContent className="p-0">
