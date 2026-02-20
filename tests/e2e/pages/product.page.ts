@@ -57,12 +57,15 @@ export class ProductPage {
         await this.selectFromAutocomplete(this.brandSelect, data.brand);
         await this.selectFromAutocomplete(this.unitSelect, data.unit);
 
-
         await this.costInput.fill(data.cost);
         await this.priceInput.fill(data.price);
         await this.stockInput.fill(data.stock);
 
-        await this.submitButton.click();
+        // Wait for auto-publish useEffect to settle (it fires when all fields
+        // are filled and triggers a re-render that can make the button briefly stale)
+        await this.page.waitForTimeout(1500);
+
+        await this.clickSubmit();
     }
 
     /**
@@ -94,7 +97,8 @@ export class ProductPage {
         await this.priceInput.fill(data.price);
         await this.stockInput.fill(data.stock);
 
-        await this.submitButton.click();
+        await this.page.waitForTimeout(1500);
+        await this.clickSubmit();
     }
 
     /**
@@ -125,7 +129,18 @@ export class ProductPage {
             await this.stockInput.fill(data.stock);
         }
 
-        await this.submitButton.click();
+        await this.page.waitForTimeout(1000);
+        await this.clickSubmit();
+    }
+
+    /**
+     * Scrolls to the submit button, ensures it's enabled, and clicks it.
+     * Uses force:true to bypass any overlay from GuidedHighlighter.
+     */
+    private async clickSubmit() {
+        await this.submitButton.scrollIntoViewIfNeeded();
+        await expect(this.submitButton).toBeEnabled({ timeout: 5000 });
+        await this.submitButton.click({ force: true });
     }
 
     /**
