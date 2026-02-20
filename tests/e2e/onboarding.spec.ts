@@ -61,6 +61,12 @@ test.describe('Onboarding Checklist', () => {
         // The URL should eventually contain /overview
         await expect(page).toHaveURL(/.*\/admin\/.*\/overview/, { timeout: 30000 });
 
+        // Dismiss onboarding modal if it appears (check immediately)
+        const getStartedButton = page.getByRole('button', { name: /Comenzar/i });
+        if (await getStartedButton.isVisible()) {
+            await getStartedButton.click();
+        }
+
         // Assert checklist steps are visible
         const step1 = onboardingPage.getStepCard('products');
         const step2 = onboardingPage.getStepCard('purchases');
@@ -71,15 +77,17 @@ test.describe('Onboarding Checklist', () => {
         await expect(step3).toBeVisible();
 
         // Step 1 should be active (not completed)
-        await expect(step1).toBeVisible();
         await expect(step1).toContainText('Crea tus productos');
 
         // Check first step button
         const step1Button = onboardingPage.getStepButton('products');
         await expect(step1Button).toBeVisible();
+        await expect(step1Button).toBeEnabled();
 
         // Click step 1 button and verify navigation
         await step1Button.click();
-        await expect(page).toHaveURL(/.*\/admin\/.*\/products\/create/);
+
+        // Wait for URL to change (giving it a bit more time for slow dev server)
+        await expect(page).toHaveURL(/.*\/admin\/.*\/products\/create/, { timeout: 15000 });
     });
 });

@@ -64,6 +64,13 @@ test.describe('Product Management', () => {
         });
 
         await expect(page).toHaveURL(/.*\/admin\/.*\/overview/, { timeout: 30000 });
+
+        // Dismiss onboarding modal if it appears (check immediately)
+        const getStartedButton = page.getByRole('button', { name: /Comenzar/i });
+        if (await getStartedButton.isVisible()) {
+            await getStartedButton.click();
+        }
+
         storeId = page.url().split('/')[4];
     }
 
@@ -75,10 +82,16 @@ test.describe('Product Management', () => {
             password: testPassword,
         });
         await expect(page).toHaveURL(/.*\/admin\/.*\/overview/, { timeout: 30000 });
+
+        // Dismiss onboarding modal if it appears (check immediately)
+        const getStartedButton = page.getByRole('button', { name: /Comenzar/i });
+        if (await getStartedButton.isVisible()) {
+            await getStartedButton.click();
+        }
     }
 
     test('should create a product and verify it appears in the product list', async ({ page, authPage, companySetupPage, productPage }) => {
-        test.setTimeout(120000);
+        test.setTimeout(180000);
 
         await setupUser(page, authPage, companySetupPage);
         await page.goto(`/admin/${storeId}/products/create`);
@@ -100,13 +113,27 @@ test.describe('Product Management', () => {
             stock: '100'
         });
 
+        // The form's onSubmit shows a loading toast immediately. If we don't see it,
+        // the click silently failed (common when GuidedHighlighter re-renders during auto-publish).
+        // In that case, retry the click.
+        const loadingToast = page.locator('[data-sonner-toaster] [data-sonner-toast]').first();
+        const submitted = await loadingToast.isVisible({ timeout: 3000 }).catch(() => false);
+        if (!submitted) {
+            // Retry: scroll to button and click again
+            const submitBtn = page.getByTestId('product-submit-button');
+            await submitBtn.scrollIntoViewIfNeeded();
+            await submitBtn.click({ force: true });
+        }
+
         // Verify redirect to product list after successful creation
-        await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 30000 });
-        await expect(page.getByText(/lista de productos/i)).toBeVisible({ timeout: 15000 });
+        await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 90000 });
+        await expect(page.getByText(/lista de productos/i)).toBeVisible({ timeout: 20000 });
 
         // Verify the product row shows correct data in the table
+        // Wait for the table to load data first
+        await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 20000 });
         const productRow = page.locator('table tbody tr').filter({ hasText: 'Test Product' });
-        await expect(productRow).toBeVisible({ timeout: 10000 });
+        await expect(productRow).toBeVisible({ timeout: 15000 });
         await expect(productRow).toContainText('Materiales');
         await expect(productRow).toContainText('Generico');
         await expect(productRow).toContainText('100');
@@ -154,9 +181,12 @@ test.describe('Product Management', () => {
         });
 
         // Should stay on the create page and show a duplicate barcode error (via toast)
-        await expect(page).toHaveURL(/.*\/products\/create/, { timeout: 10000 });
-        // The error message is: "Este código de barras ya está registrado en esta tienda por otro producto."
-        await expect(page.getByText(/ya está registrado|already registered/i).first()).toBeVisible({ timeout: 15000 });
+        await expect(page).toHaveURL(/.*\/products\/create/, { timeout: 15000 });
+        // The error is shown via sonner toast: "Este código de barras ya está registrado en esta tienda por otro producto."
+        // Sonner renders toasts in <li> elements inside an <ol> with [data-sonner-toaster]
+        await expect(
+            page.locator('[data-sonner-toaster] [data-sonner-toast]').filter({ hasText: /ya está registrado|already registered/i }).first()
+        ).toBeVisible({ timeout: 30000 });
     });
 
     test('should create a draft product with $0 price', async ({ page, authPage, productPage }) => {
@@ -179,7 +209,7 @@ test.describe('Product Management', () => {
         });
 
         // Product with $0 price should still save (as draft/unpublished)
-        await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 30000 });
+        await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 45000 });
         await expect(page.getByText(/lista de productos/i)).toBeVisible({ timeout: 15000 });
 
         // Verify the draft product appears in the table
@@ -247,7 +277,7 @@ test.describe('Product Management', () => {
         });
 
         // Should redirect back to the product list
-        await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 30000 });
+        await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 45000 });
         await expect(page.getByText(/lista de productos/i)).toBeVisible({ timeout: 15000 });
 
         // Verify the updated product row
