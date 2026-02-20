@@ -156,5 +156,5 @@ export const AVAILABLE_CATEGORIES = [
 export const TAX_RATE = 0.16 as number
 
 export const UPLOADTHING_TOKEN = env.NODE_ENV === 'production'
-	? env.UPLOADTHING_TOKEN_PROD
+	? (env.UPLOADTHING_TOKEN_PROD || env.UPLOADTHING_TOKEN_DEV)
 	: env.UPLOADTHING_TOKEN_DEV
