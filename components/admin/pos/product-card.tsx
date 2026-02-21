@@ -181,7 +181,7 @@ export default function ProductCard({ product, onAdd }: ProductCardProps) {
                                     className={`shadow-sm ${isCriticalStock ? 'bg-red-50 text-red-700 border-red-300 animate-pulse' : 'bg-orange-50 text-orange-700 border-orange-200'}`}
                                 >
                                     {isCriticalStock ? <AlertTriangle className="h-3 w-3 mr-1" /> : <AlertCircle className="h-3 w-3 mr-1" />}
-                                    {isCriticalStock ? `${effectiveStock} ${product.unit}` : t('lowStock')}
+                                    {isCriticalStock ? effectiveStock === 1 ? t('unitsAvailableOne') : t('unitsAvailableMany', { count: effectiveStock }) : t('lowStock')}
                                 </Badge>
                             </div>
                         )}

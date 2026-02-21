@@ -444,8 +444,13 @@ async function getOrderStatistics(date: DateRange, storeId: string) {
 }
 
 async function getLowStockProducts(store: string) {
-	const products = await Product.find({ store, countInStock: { $lte: 10 } })
-		.select('name countInStock images _id category price')
+	const products = await Product.find({
+		store,
+		$expr: {
+			$lte: [{ $toDouble: '$countInStock' }, { $toDouble: { $ifNull: ['$quantityAlert', 0] } }]
+		}
+	})
+		.select('name countInStock images _id category price quantityAlert')
 		.limit(5)
 		.sort({ countInStock: 1 })
 	return products

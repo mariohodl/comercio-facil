@@ -187,7 +187,7 @@ export default function POSCart({ storeId }: POSCartProps) {
                         <CardTitle className="text-base">{t('orderList')}</CardTitle>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button
+                        {/* <Button
                             variant="secondary"
                             size="sm"
                             className="bg-white/20 hover:bg-white/30 text-white border-0 h-7 text-xs"
@@ -195,7 +195,7 @@ export default function POSCart({ storeId }: POSCartProps) {
                         >
                             <ShoppingCart className="h-3 w-3 mr-1.5" />
                             {t('orders')}
-                        </Button>
+                        </Button> */}
                         <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs px-2 py-0.5">
                             #{mounted ? orderNumber : '......'}
                         </Badge>

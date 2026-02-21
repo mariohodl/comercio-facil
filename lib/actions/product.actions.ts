@@ -370,23 +370,27 @@ export async function getLowStockProductsForAdmin({
 	const brandFilter = brand && brand !== 'all' ? { brand } : {}
 	const storeFilter = store && store !== 'all' ? { store } : {}
 
-	let stockFilter = {}
+	let stockFilter: any = {}
 	if (type === 'low') {
 		stockFilter = {
 			$expr: {
 				$and: [
-					{ $gt: ['$countInStock', 0] },
-					{ $lte: ['$countInStock', '$quantityAlert'] },
+					{ $gt: [{ $toDouble: '$countInStock' }, 0] },
+					{ $lte: [{ $toDouble: '$countInStock' }, { $toDouble: { $ifNull: ['$quantityAlert', 0] } }] },
 				],
 			},
 		}
 	} else if (type === 'out') {
-		stockFilter = { countInStock: 0 }
+		stockFilter = {
+			$expr: {
+				$lte: [{ $toDouble: '$countInStock' }, 0]
+			}
+		}
 	} else {
 		// 'all' type - shows both low stock and out of stock
 		stockFilter = {
 			$expr: {
-				$lte: ['$countInStock', '$quantityAlert'],
+				$lte: [{ $toDouble: '$countInStock' }, { $toDouble: { $ifNull: ['$quantityAlert', 0] } }],
 			},
 		}
 	}

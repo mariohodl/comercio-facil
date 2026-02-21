@@ -165,56 +165,52 @@ export default function POSPageClient({
     return (
         <div className='h-screen max-h-screen overflow-hidden bg-[#f8fafc] flex flex-col'>
             {/* Header */}
-            <div className='bg-white border-b border-gray-200/80 shadow-sm sticky top-0 z-30 shrink-0'>
-                <div className='px-4 lg:px-8 py-2'>
+            <div className='bg-[#0f172a] border-b border-slate-900 shadow-sm sticky top-0 z-30 shrink-0'>
+                <div className='px-4 lg:px-6 py-2.5'>
                     <div className='flex items-center justify-between'>
-                        <div className='flex items-center gap-3 lg:gap-5'>
-                            <div className="flex items-center justify-center w-8 h-8 lg:w-10 lg:h-10 rounded-xl bg-gradient-to-br from-navy to-slate-800 text-white shadow-lg shadow-navy/10 group">
-                                <Store className="w-4 h-4 lg:w-5 lg:h-5 group-hover:scale-110 transition-transform" />
+                        <div className='flex items-center gap-3'>
+                            <div className="flex items-center justify-center w-8 h-8 rounded-md bg-white/10 text-white border border-white/5">
+                                <Store className="w-4 h-4" />
                             </div>
-                            <div className="flex flex-col">
-                                <h1 className='text-sm lg:text-xl font-black text-[#0f172a] tracking-tight leading-tight'>
+                            <div className="flex flex-col justify-center">
+                                <h1 className='text-sm lg:text-base font-bold text-white tracking-tight leading-none mb-0.5'>
                                     {mounted ? (session?.user?.storeName || t('title')) : t('title')}
                                 </h1>
-                                <div className="hidden sm:flex items-center gap-2 mt-0.5">
-                                    <div className="flex items-center gap-1.5 bg-orange/10 border border-orange/20 px-2 py-0 rounded-full">
-                                        <Zap className="w-2.5 h-2.5 text-orange fill-orange" />
-                                        <span className="text-[8px] lg:text-[9px] uppercase font-black text-orange tracking-widest leading-none">
+                                <div className="hidden sm:flex items-center gap-2">
+                                    <div className="flex items-center gap-1.5">
+                                        <Zap className="w-3 h-3 text-orange fill-orange" />
+                                        <span className="text-[9px] uppercase font-bold text-orange tracking-widest leading-none">
                                             {t('title')}
                                         </span>
                                     </div>
-                                    <span className="text-[8px] lg:text-[9px] font-bold text-slate-400 border-l border-slate-200 pl-2">
+                                    <span className="text-[10px] font-medium text-slate-400 border-l border-slate-700 pl-2">
                                         Terminal #01
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className='flex items-center gap-2 lg:gap-5'>
-                            <div className="hidden lg:flex items-center gap-4 border-r border-slate-100 pr-5">
-                                <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200/60 px-3 py-1 rounded-xl shadow-inner-sm">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" title="Sistema Online" />
-                                        <Clock className="h-3.5 w-3.5 text-slate-400" />
-                                    </div>
-                                    <span className="font-mono text-xs font-black text-slate-700 tabular-nums">
+                        <div className='flex items-center gap-3 lg:gap-4'>
+                            <div className="hidden lg:flex items-center">
+                                <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 px-3 py-1 rounded-md">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" title="Sistema Online" />
+                                    <span className="font-mono text-xs font-medium text-slate-300 tabular-nums">
                                         {mounted ? new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false }) : '--:--'}
                                     </span>
                                 </div>
-
                             </div>
 
-                            <div className='flex items-center gap-1 lg:gap-2 border-l border-slate-100 pl-1 lg:pl-3'>
+                            <div className='flex items-center gap-2 lg:border-l lg:border-slate-800 lg:pl-4'>
                                 {session?.user?.role === 'Admin' && (
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         asChild
-                                        className="h-8 lg:h-9 text-slate-600 hover:text-navy hover:bg-slate-100 font-bold px-2 lg:px-3.5 rounded-lg transition-all"
+                                        className="h-8 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-medium px-3 rounded-md transition-colors border border-transparent hover:border-white/10"
                                     >
                                         <Link href={`/admin/${storeId}/overview`}>
-                                            <LayoutDashboard className="h-4 w-4 text-orange" />
-                                            <span className="hidden xl:inline text-[10px] uppercase tracking-wide ml-2">Admin</span>
+                                            <LayoutDashboard className="h-3.5 w-3.5 text-orange" />
+                                            <span className="hidden xl:inline text-[11px] uppercase tracking-wider ml-1.5">Admin</span>
                                         </Link>
                                     </Button>
                                 )}
@@ -222,26 +218,26 @@ export default function POSPageClient({
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 lg:h-9 text-slate-600 hover:text-orange hover:bg-orange/5 font-bold px-2 lg:px-3.5 rounded-lg border border-transparent hover:border-orange/20 transition-all"
+                                    className="h-8 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-medium px-3 rounded-md transition-colors border border-transparent hover:border-white/10 group"
                                     onClick={() => setCalculatorOpen(true)}
                                     title={t('calculator')}
                                 >
-                                    <Calculator className="h-4 w-4 lg:h-4.5 lg:w-4.5" />
-                                    <span className="hidden xl:inline text-[10px] uppercase tracking-wide ml-2">{t('calculator')}</span>
+                                    <Calculator className="h-3.5 w-3.5 text-slate-400 group-hover:text-white transition-colors" />
+                                    <span className="hidden xl:inline text-[11px] uppercase tracking-wider ml-1.5">{t('calculator')}</span>
                                 </Button>
 
                                 <Button
-                                    variant="ghost"
+                                    variant="default"
                                     size="sm"
                                     onClick={() => setOrdersOpen(true)}
-                                    className="h-8 lg:h-9 text-slate-600 hover:text-navy hover:bg-slate-100 font-bold px-2 lg:px-3.5 rounded-lg transition-all"
+                                    className="h-8 bg-orange hover:bg-orange/90 text-white font-bold px-3 rounded-md transition-all shadow-sm"
                                 >
-                                    <ShoppingCart className="h-4 w-4" />
-                                    <span className="hidden xl:inline text-[10px] uppercase tracking-wide ml-2">{t('orders')}</span>
+                                    <ShoppingCart className="h-3.5 w-3.5" />
+                                    <span className="hidden xl:inline text-[11px] uppercase tracking-wider ml-1.5">{t('orders')}</span>
                                 </Button>
                             </div>
 
-                            <div className="h-8 w-[1px] bg-slate-100 hidden sm:block" />
+                            <div className="h-6 w-[1px] bg-slate-800 hidden sm:block mx-1" />
 
                             <div className="pl-1">
                                 {userButton}

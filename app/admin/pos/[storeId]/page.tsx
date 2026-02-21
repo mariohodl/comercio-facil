@@ -7,5 +7,5 @@ export default async function POSPage({ params }: { params: Promise<{ storeId: s
     // Await params for Next.js 15 compatibility
     const { storeId } = await params
 
-    return <POSPageClient storeId={storeId} userButton={<UserButton showNav={false} />} />
+    return <POSPageClient storeId={storeId} userButton={<UserButton showNav={false} variant="dark" />} />
 }

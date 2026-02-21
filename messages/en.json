@@ -134,6 +134,8 @@
         "lastUnit": "Last unit",
         "allUnitsAdded": "You've added all available units",
         "unitsRemaining": "{count} units remaining",
+        "unitsAvailableMany": "Only {count} left available",
+        "unitsAvailableOne": "Only 1 left available",
         "stockWarning": "Stock warning",
         "left": "left",
         "perUnit": "/{unit}",
