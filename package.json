@@ -5,6 +5,7 @@
   "scripts": {
     "email": "email dev",
     "seed": "tsx ./lib/db/seed.ts",
+    "seed:prod": "tsx ./lib/db/seed-prod.ts",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
