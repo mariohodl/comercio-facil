@@ -449,7 +449,7 @@ export const PurchaseAttachmentSchema = z.object({
 })
 
 export const PurchaseInputSchema = z.object({
-	supplierId: z.string().min(1, 'El proveedor es obligatorio').regex(/^[0-9a-fA-F]{24}$/, { message: 'El proveedor es obligatorio' }),
+	supplierId: z.string().optional().nullable().or(z.literal('internal')),
 	reference: z.string().min(1, 'La referencia es obligatoria'),
 	purchaseDate: z.date(),
 	status: PurchaseStatusSchema,

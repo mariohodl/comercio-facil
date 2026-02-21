@@ -912,7 +912,11 @@
         "editPurchase": "Editar Compra",
         "purchaseDetails": "Detalles de Compra",
         "supplier": "Proveedor",
+        "help": {
+            "supplier": "Selecciona un proveedor de tu lista para llevar un control de cuentas por pagar, o elige 'Compra Directa' si realizaste la compra directamente sin un proveedor registrado."
+        },
         "selectSupplier": "Seleccionar Proveedor",
+        "internalSupplier": "Compra Directa (Sin Proveedor)",
         "purchaseDate": "Fecha de Compra",
         "notes": "Notas",
         "items": "Artículos",
@@ -955,7 +959,7 @@
             "title": "¿Cómo funciona esta página?",
             "description": "Esta página te permite registrar la entrada de mercancía a tu inventario. Al crear una compra, el stock de los productos seleccionados aumentará automáticamente.",
             "steps": {
-                "step1": "Selecciona un Proveedor y verifica la fecha de la compra.",
+                "step1": "Selecciona un Proveedor (créalo previamente en su sección si no existe) y la fecha de compra.",
                 "step2": "Busca y agrega los productos que estás recibiendo. Puedes usar un escáner de códigos de barras.",
                 "step3": "Ajusta las cantidades y los costos reales de compra para mantener tu margen de ganancia actualizado.",
                 "step4": "Registra cuánto pagaste por esta compra para llevar un control de tus cuentas por pagar."

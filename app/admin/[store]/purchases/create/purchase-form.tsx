@@ -31,6 +31,7 @@ import Image from 'next/image'
 import { format } from 'date-fns'
 import { v4 as uuidv4 } from 'uuid'
 import { ProductModal } from '@/components/shared/product-modal'
+import { HelpTooltip } from '@/components/shared/help-tooltip'
 
 import { cn, formatCurrency } from '@/lib/utils'
 import { UploadButton, useUploadThing } from '@/lib/uploadthing'
@@ -135,7 +136,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
     const defaultValues = initialData ? {
         ...initialData,
         purchaseDate: new Date(initialData.purchaseDate),
-        supplierId: initialData.supplierId?._id || initialData.supplierId,
+        supplierId: initialData.supplierId?._id || initialData.supplierId || 'internal',
     } : storedFormData && storedFormData.storeId === storeId ? {
         // Restore from stored data if it's for the same store
         ...storedFormData,
@@ -488,7 +489,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                         name="supplierId"
                                         render={({ field, fieldState }) => (
                                             <FormItem className="flex flex-col">
-                                                <FormLabel>{t('supplier')}</FormLabel>
+                                                <FormLabel className="flex items-center gap-1.5">{t('supplier')} <HelpTooltip content={t('help.supplier')} /></FormLabel>
                                                 <Popover open={supplierSearchOpen} onOpenChange={setSupplierSearchOpen}>
                                                     <PopoverTrigger asChild>
                                                         <FormControl>
@@ -501,9 +502,11 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                                                     !field.value && "text-muted-foreground"
                                                                 )}
                                                             >
-                                                                {field.value
-                                                                    ? suppliers.find((s) => s._id === field.value)?.nameProvider
-                                                                    : t('selectSupplier')}
+                                                                {field.value === 'internal'
+                                                                    ? t('internalSupplier')
+                                                                    : field.value
+                                                                        ? suppliers.find((s) => s._id === field.value)?.nameProvider
+                                                                        : t('selectSupplier')}
                                                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                             </Button>
                                                         </FormControl>
@@ -513,6 +516,22 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                                             <CommandInput placeholder={t('searchPlaceholder')} />
                                                             <CommandEmpty>{tCommon('noResults')}</CommandEmpty>
                                                             <CommandGroup className="max-h-[300px] overflow-y-auto">
+                                                                <CommandItem
+                                                                    value="internal"
+                                                                    onSelect={() => {
+                                                                        form.setValue("supplierId", "internal")
+                                                                        setSupplierSearchOpen(false)
+                                                                    }}
+                                                                    className="font-bold text-orange"
+                                                                >
+                                                                    <Check
+                                                                        className={cn(
+                                                                            "mr-2 h-4 w-4",
+                                                                            field.value === 'internal' ? "opacity-100" : "opacity-0"
+                                                                        )}
+                                                                    />
+                                                                    {t('internalSupplier')}
+                                                                </CommandItem>
                                                                 {suppliers.map((supplier) => (
                                                                     <CommandItem
                                                                         value={supplier.nameProvider}

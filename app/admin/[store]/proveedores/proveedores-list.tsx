@@ -3,9 +3,7 @@
 import Link from 'next/link'
 import { IProveedor } from '@/lib/db/models/proveedor.model';
 
-
 import DeleteDialog from '@/components/shared/delete-dialog'
-// import CreateProviderModal from './create-provider-modal' // Reverted to page
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -19,11 +17,12 @@ import {
   deleteProveedor,
   getAllProveedoresForAdmin,
 } from '@/lib/actions/proveedor.actions'
+import { Card, CardContent } from '@/components/ui/card'
 
 import React, { useEffect, useState, useTransition } from 'react'
 import { Input } from '@/components/ui/input'
 import { formatDateTime, formatId } from '@/lib/utils'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, Plus, Store, Users, Edit } from 'lucide-react'
 
 type ProveedoresListDataProps = {
   proveedores: IProveedor[]
@@ -32,6 +31,7 @@ type ProveedoresListDataProps = {
   to: number
   from: number
 }
+
 const ProveedoresList = ({ store }: { store: string }) => {
   const [page, setPage] = useState<number>(1)
   const [inputValue, setInputValue] = useState<string>('')
@@ -51,11 +51,7 @@ const ProveedoresList = ({ store }: { store: string }) => {
 
   const handlePageChange = (changeType: 'next' | 'prev') => {
     const newPage = changeType === 'next' ? page + 1 : page - 1
-    if (changeType === 'next') {
-      setPage(newPage)
-    } else {
-      setPage(newPage)
-    }
+    setPage(newPage)
     startTransition(async () => {
       const data = await getAllProveedoresForAdmin({
         query: inputValue,
@@ -84,6 +80,7 @@ const ProveedoresList = ({ store }: { store: string }) => {
       })
     }
   }
+
   useEffect(() => {
     startTransition(async () => {
       const data = await getAllProveedoresForAdmin({ query: '', storeId: store })
@@ -92,107 +89,147 @@ const ProveedoresList = ({ store }: { store: string }) => {
   }, [store])
 
   return (
-    <div>
-      <div className='space-y-2'>
-        <div className='flex-between flex-wrap gap-2'>
-          <div className='flex flex-wrap items-center gap-2 '>
-            <h1 className='font-bold text-lg'>Lista de proveedores</h1>
-            <div className='flex flex-wrap items-center  gap-2 '>
+    <div className='space-y-6'>
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
+        <div>
+          <h1 className='text-2xl font-bold tracking-tight text-gray-900'>Proveedores</h1>
+          <p className='text-sm text-gray-500'>
+            Administra los proveedores de tu negocio para usar en tus compras.
+          </p>
+        </div>
+        <Button asChild className='bg-orange hover:bg-orange/90 text-white font-bold h-11 px-6 rounded-xl shadow-sm'>
+          <Link href={`/admin/${store}/proveedores/nuevo-proveedor`}>
+            <Plus className='w-4 h-4 mr-2' />
+            Crear Proveedor
+          </Link>
+        </Button>
+      </div>
+
+      <Card className='border-slate-200 shadow-sm'>
+        <CardContent className='p-0'>
+          <div className='p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50 rounded-t-xl'>
+            <div className='relative w-full sm:w-96'>
+              <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
               <Input
-                className='w-auto'
-                type='text '
+                className='pl-9 bg-white border-gray-200 focus:border-orange'
+                type='text'
                 value={inputValue}
                 onChange={handleInputChange}
-                placeholder='Filtrar por nombre...'
+                placeholder='Buscar proveedores por nombre...'
               />
+            </div>
 
+            <div className='text-sm text-gray-500 font-medium whitespace-nowrap'>
               {isPending ? (
-                <p>Cargando...</p>
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full border-2 border-orange/20 border-t-orange animate-spin" />
+                  Cargando...
+                </span>
               ) : (
-                <p>
+                <span>
                   {data?.totalProducts === 0
-                    ? 'No hay'
-                    : `${data?.from}-${data?.to} de ${data?.totalProducts}`}
-                  {' resultados'}
-                </p>
+                    ? 'Sin resultados'
+                    : `Mostrando ${data?.from || 0}-${data?.to || 0} de ${data?.totalProducts || 0}`}
+                </span>
               )}
             </div>
           </div>
 
-          <Button asChild variant='default'>
-            <Link href={`/admin/${store}/proveedores/nuevo-proveedor`}>Crear proveedor</Link>
-          </Button>
-        </div>
-        <div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Id</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Clave</TableHead>
-                <TableHead>Fecha de creación</TableHead>
-                <TableHead className='w-[100px]'>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.proveedores.map((proveedor: IProveedor) => (
-                <TableRow key={proveedor._id}>
-                  <TableCell>{formatId(proveedor._id)}</TableCell>
-                  <TableCell>
-                    <Link href={`/admin/proveedores/${proveedor._id}`}>
-                      {proveedor.nameProvider}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    {proveedor.clave}
-                  </TableCell>
-                  <TableCell>
-                    {formatDateTime(proveedor.updatedAt).dateTime}
-                  </TableCell>
-                  <TableCell className='flex gap-1'>
-                    <Button asChild variant='outline' size='sm'>
-                      <Link href={`/admin/products/${proveedor._id}`}>Editar</Link>
-                    </Button>
-                    <DeleteDialog
-                      id={proveedor._id}
-                      action={deleteProveedor}
-                      callbackAction={() => {
-                        startTransition(async () => {
-                          const data = await getAllProveedoresForAdmin({
-                            query: inputValue,
-                          })
-                          setData(data)
-                        })
-                      }}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className='overflow-x-auto'>
+            {data?.proveedores?.length === 0 && !isPending ? (
+              <div className='flex flex-col items-center justify-center p-12 text-center'>
+                <div className='w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4'>
+                  <Users className='w-8 h-8 text-slate-300' />
+                </div>
+                <h3 className='text-lg font-bold text-gray-900 mb-1'>No hay proveedores creados</h3>
+                <p className='text-slate-500 max-w-sm mx-auto'>
+                  Aún no tienes proveedores registrados o no coinciden con tu búsqueda.
+                </p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader className='bg-slate-50/50'>
+                  <TableRow className='hover:bg-transparent'>
+                    <TableHead className='font-semibold text-slate-600'>Id</TableHead>
+                    <TableHead className='font-semibold text-slate-600'>Nombre</TableHead>
+                    <TableHead className='font-semibold text-slate-600'>Clave</TableHead>
+                    <TableHead className='font-semibold text-slate-600'>Fecha de Creación</TableHead>
+                    <TableHead className='font-semibold text-slate-600 text-right pr-6'>Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data?.proveedores?.map((proveedor: IProveedor) => (
+                    <TableRow key={proveedor._id} className='hover:bg-slate-50/50 transition-colors'>
+                      <TableCell className='text-slate-500 font-mono text-xs'>
+                        {formatId(proveedor._id)}
+                      </TableCell>
+                      <TableCell className='font-medium text-gray-900'>
+                        <span className='flex items-center gap-2'>
+                          <div className='w-6 h-6 rounded-full bg-orange/10 flex items-center justify-center text-orange text-[10px] font-bold'>
+                            {proveedor.nameProvider.charAt(0).toUpperCase()}
+                          </div>
+                          {proveedor.nameProvider}
+                        </span>
+                      </TableCell>
+                      <TableCell className='text-slate-600'>
+                        {proveedor.clave || '-'}
+                      </TableCell>
+                      <TableCell className='text-slate-500'>
+                        {formatDateTime(proveedor.createdAt).dateTime}
+                      </TableCell>
+                      <TableCell className='text-right pr-6'>
+                        <div className='flex justify-end items-center gap-1.5'>
+                          {/* Removed broken link to product edit */}
+                          <DeleteDialog
+                            id={proveedor._id}
+                            action={deleteProveedor}
+                            callbackAction={() => {
+                              startTransition(async () => {
+                                const newData = await getAllProveedoresForAdmin({
+                                  query: inputValue,
+                                  page,
+                                  storeId: store,
+                                })
+                                setData(newData)
+                              })
+                            }}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+
           {(data?.totalPages ?? 0) > 1 && (
-            <div className='flex items-center gap-2'>
+            <div className='p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30 rounded-b-xl'>
               <Button
                 variant='outline'
+                size="sm"
                 onClick={() => handlePageChange('prev')}
                 disabled={Number(page) <= 1}
-                className='w-24'
+                className='font-medium'
               >
-                <ChevronLeft /> Anterior
+                <ChevronLeft className="w-4 h-4 mr-1" /> Anterior
               </Button>
-              Página {page} de {data?.totalPages}
+              <div className='text-sm font-medium text-slate-600'>
+                Página {page} de {data?.totalPages}
+              </div>
               <Button
                 variant='outline'
+                size="sm"
                 onClick={() => handlePageChange('next')}
                 disabled={Number(page) >= (data?.totalPages ?? 0)}
-                className='w-24'
+                className='font-medium'
               >
-                Siguiente <ChevronRight />
+                Siguiente <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

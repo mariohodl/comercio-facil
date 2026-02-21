@@ -24,7 +24,7 @@ const purchaseSchema = new Schema<IPurchase>(
         supplierId: {
             type: Schema.Types.ObjectId,
             ref: 'Proveedor',
-            required: true,
+            required: false,
         },
         reference: {
             type: String,

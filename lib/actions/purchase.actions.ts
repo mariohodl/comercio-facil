@@ -23,11 +23,17 @@ export async function createPurchase(data: z.infer<typeof PurchaseInputSchema>) 
         // Always force status to Received and update stock
         purchase.status = 'Received'
 
-        const newPurchase = await Purchase.create({
+        const newPurchaseData: any = {
             ...purchase,
             storeId: session.user.storeId,
             paymentStatus: purchase.paidAmount >= purchase.totalAmount ? 'Paid' : purchase.paidAmount > 0 ? 'Partial' : 'Unpaid'
-        })
+        };
+
+        if (newPurchaseData.supplierId === 'internal' || !newPurchaseData.supplierId) {
+            delete newPurchaseData.supplierId;
+        }
+
+        const newPurchase = await Purchase.create(newPurchaseData)
 
         // Update stock
         for (const item of purchase.items) {
@@ -79,7 +85,13 @@ export async function updatePurchase(data: z.infer<typeof PurchaseUpdateSchema>)
         // Recalculate payment status
         purchase.paymentStatus = purchase.paidAmount >= purchase.totalAmount ? 'Paid' : purchase.paidAmount > 0 ? 'Partial' : 'Unpaid'
 
-        const updatedPurchase = await Purchase.findByIdAndUpdate(purchase._id, purchase, { new: true })
+        const purchaseDataToUpdate: any = { ...purchase };
+        if (purchaseDataToUpdate.supplierId === 'internal' || !purchaseDataToUpdate.supplierId) {
+            purchaseDataToUpdate.$unset = { supplierId: 1 };
+            delete purchaseDataToUpdate.supplierId;
+        }
+
+        const updatedPurchase = await Purchase.findByIdAndUpdate(purchase._id, purchaseDataToUpdate, { new: true })
 
         revalidatePath(`/admin/${session.user.storeId}/purchases`)
         return {

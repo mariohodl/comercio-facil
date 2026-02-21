@@ -250,7 +250,7 @@ const PurchaseList = ({ store }: { store: string }) => {
                                     return (
                                         <TableRow key={purchase._id} className="hover:bg-gray-50/50 transition-colors">
                                             <TableCell className="font-medium">
-                                                {purchase.supplierId?.nameProvider || '-'}
+                                                {purchase.supplierId?.nameProvider || t('internalSupplier')}
                                             </TableCell>
                                             <TableCell className='text-gray-600 font-mono text-xs'>
                                                 {purchase.reference}

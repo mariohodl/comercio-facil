@@ -134,17 +134,23 @@ const PurchaseDetails = ({ purchase, storeId }: PurchaseDetailsProps) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                         <div className="space-y-4">
                             <div className="flex items-center gap-2 text-orange font-bold uppercase text-xs tracking-widest">
-                                <Truck className="w-4 h-4" /> {t('supplierInformation')}
+                                {purchase.supplierId ? (
+                                    <><Truck className="w-4 h-4" /> {t('supplierInformation')}</>
+                                ) : (
+                                    <><User className="w-4 h-4" /> {t('internalSupplier')}</>
+                                )}
                             </div>
                             <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                     <User className="w-16 h-16 text-navy" />
                                 </div>
-                                <h3 className="text-xl font-bold text-navy mb-2">{purchase.supplierId?.nameProvider || 'Unknown'}</h3>
-                                <div className="space-y-1 text-sm text-gray-500">
-                                    <p>RFC: {purchase.supplierId?.rfc || '-'}</p>
-                                    <p>Clave: {purchase.supplierId?.clave || '-'}</p>
-                                </div>
+                                <h3 className="text-xl font-bold text-navy mb-2">{purchase.supplierId?.nameProvider || t('internalSupplier')}</h3>
+                                {purchase.supplierId && (
+                                    <div className="space-y-1 text-sm text-gray-500">
+                                        <p>RFC: {purchase.supplierId?.rfc || '-'}</p>
+                                        <p>Clave: {purchase.supplierId?.clave || '-'}</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

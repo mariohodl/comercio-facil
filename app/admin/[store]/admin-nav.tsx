@@ -313,7 +313,12 @@ export function AdminNav({
                   (currentStep === 'purchases' && isCreatePurchaseLink) ||
                   (currentStep === 'sales' && isPosLink)
 
-                const shouldShowHighlight = mounted && isHighlightedLink && !isActive
+                // En la vista de "Proveedores", el usuario está cumpliendo un requisito previo,
+                // así que NO le deberíamos mostrar el brillo insistente para ir a "Agregar compra".
+                const isNavigatingToPurchasesWhileInSuppliers =
+                  currentStep === 'purchases' && pathname.includes('/proveedores')
+
+                const shouldShowHighlight = mounted && isHighlightedLink && !isActive && !isNavigatingToPurchasesWhileInSuppliers
 
                 const rowContent = (
                   <div className='flex items-center gap-3 w-full'>

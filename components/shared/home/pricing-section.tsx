@@ -21,12 +21,15 @@ export function PricingSection() {
         },
         {
             name: 'Plan Intermedio',
-            price: '200',
+            originalPrice: '200',
+            price: '100',
+            discount: '50',
             description: 'Potencia tu punto de venta con integración de hardware.',
             features: [
                 'Todo lo incluido en el Plan Básico',
+                'MODO OFFLINE (Vende sin internet)',
                 'Conexión con Escáner de códigos',
-                'Integración con Impresoras de tickets',
+                // 'Integración con Impresoras de tickets',
                 'Gestión de múltiples terminales',
                 'Analítica detallada de inventario',
                 'Soporte técnico prioritario'
@@ -42,7 +45,6 @@ export function PricingSection() {
             description: 'Máxima disponibilidad. Tu negocio nunca se detiene.',
             features: [
                 'Todo lo incluido en el Plan Intermedio',
-                'MODO OFFLINE (Vende sin internet)',
                 'Sincronización automática a la nube',
                 'Módulo de Facturación Electrónica',
                 'App móvil para dueños (Real-time)',
@@ -96,16 +98,24 @@ export function PricingSection() {
                             </div>
 
                             <div className="mb-8 flex flex-col gap-1">
-                                <div className="flex items-baseline gap-1">
-                                    <span className='text-4xl font-black text-slate-900'>${plan.price}</span>
-                                    <span className='text-slate-500 font-medium'>/ mes</span>
+                                <div className="flex items-center flex-wrap gap-2">
+                                    {plan.originalPrice && (
+                                        <span className='text-xl font-bold text-slate-400 line-through'>${plan.originalPrice}</span>
+                                    )}
+                                    <div className="flex items-baseline gap-1">
+                                        <span className='text-4xl font-black text-slate-900'>${plan.price}</span>
+                                        <span className='text-slate-500 font-medium'>/ mes</span>
+                                    </div>
+                                    {plan.discount && (
+                                        <span className="text-orange-600 text-[10px] font-bold uppercase bg-orange-50 px-2 py-1 rounded border border-orange-100">{plan.discount}% OFF</span>
+                                    )}
                                     {plan.name === 'Plan Básico' && (
-                                        <span className="ml-2 text-emerald-600 text-xs font-bold uppercase bg-emerald-50 px-2 py-1 rounded">1er Mes Gratis</span>
+                                        <span className="text-emerald-600 text-[10px] font-bold uppercase bg-emerald-50 px-2 py-1 rounded border border-emerald-100">1er Mes Gratis</span>
                                     )}
                                 </div>
                                 {plan.name === 'Plan Intermedio' && (
                                     <span className="text-[10px] text-slate-400 font-medium italic mt-1">
-                                        * Costo de hardware: $1,400 (pago único opcional)
+                                        * Costo de hardware: $630.00 (pago único opcional)
                                     </span>
                                 )}
                             </div>

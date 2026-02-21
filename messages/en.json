@@ -892,7 +892,11 @@
         "editPurchase": "Edit Purchase",
         "purchaseDetails": "Purchase Details",
         "supplier": "Supplier",
+        "help": {
+            "supplier": "Select a supplier from your list to track accounts payable, or choose 'Direct Purchase' if you made the purchase directly without a registered supplier."
+        },
         "selectSupplier": "Select Supplier",
+        "internalSupplier": "Direct Purchase (No Supplier)",
         "purchaseDate": "Purchase Date",
         "notes": "Notes",
         "items": "Items",
@@ -934,7 +938,7 @@
             "title": "How does this page work?",
             "description": "This page allows you to record the entry of merchandise into your inventory. When creating a purchase, the stock of the selected products will automatically increase.",
             "steps": {
-                "step1": "Select a Supplier and verify the purchase date.",
+                "step1": "Select a Supplier (create it first in its section if missing) and the purchase date.",
                 "step2": "Search and add the products you are receiving. You can use a barcode scanner.",
                 "step3": "Adjust the quantities and real purchase costs to keep your profit margin updated.",
                 "step4": "Record how much you paid for this purchase to keep track of your accounts payable."
