@@ -9,6 +9,7 @@ export class ProductPage {
     readonly brandSelect: Locator;
     readonly unitSelect: Locator;
     readonly warehouseSelect: Locator;
+    readonly storeSelect: Locator;
     readonly costInput: Locator;
     readonly priceInput: Locator;
     readonly stockInput: Locator;
@@ -23,6 +24,7 @@ export class ProductPage {
         this.brandSelect = page.getByTestId('product-brand-select');
         this.unitSelect = page.getByTestId('product-unit-select');
         this.warehouseSelect = page.getByTestId('product-warehouse-select');
+        this.storeSelect = page.getByTestId('product-store-select');
         this.costInput = page.getByTestId('product-cost-input');
         this.priceInput = page.getByTestId('product-price-input');
         this.stockInput = page.getByTestId('product-stock-input');
@@ -39,8 +41,17 @@ export class ProductPage {
         cost: string,
         price: string,
         stock: string,
+        store?: string,
+        warehouse?: string,
     }) {
         await this.nameInput.fill(data.name);
+
+        if (data.store) {
+            await this.selectFromSelect(this.storeSelect, data.store);
+        }
+        if (data.warehouse) {
+            await this.selectFromSelect(this.warehouseSelect, data.warehouse);
+        }
 
         // Wait for slug to auto-generate (driven by a useEffect watching name)
         // Increased for CI stability
@@ -82,14 +93,24 @@ export class ProductPage {
         cost: string,
         price: string,
         stock: string,
+        store?: string,
+        warehouse?: string,
     }) {
         await this.nameInput.fill(data.name);
-        await this.page.waitForTimeout(500);
+
+        if (data.store) {
+            await this.selectFromSelect(this.storeSelect, data.store);
+        }
+        if (data.warehouse) {
+            await this.selectFromSelect(this.warehouseSelect, data.warehouse);
+        }
+
+        await this.page.waitForTimeout(1000);
 
         // Skip barcode intentionally
 
         await this.selectFromAutocomplete(this.categorySelect, data.category);
-        await this.page.waitForTimeout(500);
+        await this.page.waitForTimeout(1000);
         await this.selectFromAutocomplete(this.subCategorySelect, data.subCategory);
         await this.selectFromAutocomplete(this.brandSelect, data.brand);
         await this.selectFromAutocomplete(this.unitSelect, data.unit);
@@ -142,6 +163,24 @@ export class ProductPage {
         await this.submitButton.scrollIntoViewIfNeeded();
         await expect(this.submitButton).toBeEnabled({ timeout: 5000 });
         await this.submitButton.click({ force: true });
+    }
+
+    /**
+     * Selects an option from a Shadcn UI (Radix-based) Select component.
+     */
+    private async selectFromSelect(trigger: Locator, value: string) {
+        await trigger.click();
+        // Radios/Select items are usually in a portal, so we search the whole page
+        const option = this.page.locator('role=option').filter({ hasText: new RegExp(`^${value}$`, 'i') }).first();
+
+        // If not found by exact text, try to find by value/selector as fallback
+        if (!(await option.isVisible().catch(() => false))) {
+            await this.page.locator(`[role=option][value="${value}"], [role=option]:has-text("${value}")`).first().click();
+        } else {
+            await option.click();
+        }
+
+        await this.page.waitForTimeout(300);
     }
 
     /**

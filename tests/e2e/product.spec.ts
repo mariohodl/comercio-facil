@@ -110,7 +110,9 @@ test.describe('Product Management', () => {
             unit: 'Pieza',
             cost: '10.50',
             price: '20.00',
-            stock: '100'
+            stock: '100',
+            store: 'Product Store',
+            warehouse: 'Product Warehouse'
         });
 
         // The form's onSubmit shows a loading toast immediately. If we don't see it,
@@ -213,7 +215,9 @@ test.describe('Product Management', () => {
             unit: 'Pieza',
             cost: '0',
             price: '0',
-            stock: '0'
+            stock: '0',
+            store: 'Product Store',
+            warehouse: 'Product Warehouse'
         });
 
         // Product with $0 price should still save (as draft/unpublished)
@@ -244,7 +248,9 @@ test.describe('Product Management', () => {
             unit: 'Pieza',
             cost: '10.00',
             price: '20.00',
-            stock: '50'
+            stock: '50',
+            store: 'Product Store',
+            warehouse: 'Product Warehouse'
         });
 
         // Should stay on the create page
