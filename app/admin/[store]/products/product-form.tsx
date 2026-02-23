@@ -802,7 +802,7 @@ const ProductForm = ({
                       </FormLabel>
                       <FormControl>
                         <div className='relative'>
-                          <Input placeholder={t('enterProductSlug')} {...field} disabled className="h-10" />
+                          <Input data-testid="product-slug-input" placeholder={t('enterProductSlug')} {...field} disabled className="h-10" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -1941,7 +1941,7 @@ const ProductForm = ({
                                 <FormControl>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 text-sm">⚠</span>
-                                    <Input type='number' min="0" placeholder="0" {...field} className="pl-9 h-10" />
+                                    <Input data-testid="product-quantity-alert-input" type='number' min="0" placeholder="0" {...field} className="pl-9 h-10" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />

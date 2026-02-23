@@ -111,6 +111,7 @@ test.describe('Product Management', () => {
             cost: '10.50',
             price: '20.00',
             stock: '100',
+            quantityAlert: '10',
             store: 'Product Store',
             warehouse: 'Product Warehouse'
         });
@@ -216,6 +217,7 @@ test.describe('Product Management', () => {
             cost: '0',
             price: '0',
             stock: '0',
+            quantityAlert: '0',
             store: 'Product Store',
             warehouse: 'Product Warehouse'
         });
@@ -249,6 +251,7 @@ test.describe('Product Management', () => {
             cost: '10.00',
             price: '20.00',
             stock: '50',
+            quantityAlert: '5',
             store: 'Product Store',
             warehouse: 'Product Warehouse'
         });
