@@ -43,7 +43,8 @@ export class ProductPage {
         await this.nameInput.fill(data.name);
 
         // Wait for slug to auto-generate (driven by a useEffect watching name)
-        await this.page.waitForTimeout(500);
+        // Increased for CI stability
+        await this.page.waitForTimeout(1000);
 
         await this.barcodeInput.fill(data.barcode);
 
@@ -51,7 +52,7 @@ export class ProductPage {
         await this.selectFromAutocomplete(this.categorySelect, data.category);
 
         // Wait briefly for subCategory options to load (depends on selected category)
-        await this.page.waitForTimeout(500);
+        await this.page.waitForTimeout(1000);
         await this.selectFromAutocomplete(this.subCategorySelect, data.subCategory);
 
         await this.selectFromAutocomplete(this.brandSelect, data.brand);
@@ -155,7 +156,8 @@ export class ProductPage {
         await input.fill(value);
 
         // Wait for debounce + server fetch to resolve
-        await this.page.waitForTimeout(1500);
+        // Increased for CI stability
+        await this.page.waitForTimeout(2500);
 
         // Look for exact match among the items
         const items = this.page.locator('[cmdk-item]');

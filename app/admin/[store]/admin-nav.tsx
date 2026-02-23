@@ -147,11 +147,11 @@ export function AdminNav({
           href: `/admin/${storeId}/inventory/attributes`,
           icon: Settings2,
         },
-        {
-          title: t('printBarcode'),
-          href: `/admin/${storeId}/products/print-barcodes`,
-          icon: Barcode,
-        },
+        // {
+        //   title: t('printBarcode'),
+        //   href: `/admin/${storeId}/products/print-barcodes`,
+        //   icon: Barcode,
+        // },
       ],
     },
     {
@@ -169,21 +169,21 @@ export function AdminNav({
           icon: ShoppingCart,
           hasSubmenu: true,
         },
-        {
-          title: t('invoices'),
-          href: `/admin/${storeId}/sales/invoices`,
-          icon: FileText,
-        },
-        {
-          title: t('salesReturn'),
-          href: `/admin/${storeId}/sales/returns`,
-          icon: RotateCcw,
-        },
-        {
-          title: t('quotation'),
-          href: `/admin/${storeId}/sales/quotations`,
-          icon: FileOutput,
-        },
+        // {
+        //   title: t('invoices'),
+        //   href: `/admin/${storeId}/sales/invoices`,
+        //   icon: FileText,
+        // },
+        // {
+        //   title: t('salesReturn'),
+        //   href: `/admin/${storeId}/sales/returns`,
+        //   icon: RotateCcw,
+        // },
+        // {
+        //   title: t('quotation'),
+        //   href: `/admin/${storeId}/sales/quotations`,
+        //   icon: FileOutput,
+        // },
       ],
     },
     {

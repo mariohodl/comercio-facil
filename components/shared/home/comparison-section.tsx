@@ -57,7 +57,7 @@ export function ComparisonSection() {
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 mb-4 font-bold text-sm tracking-wider uppercase">
                         El Salto Tecnológico
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
+                    <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
                         La evolución de tu punto de venta <span className="text-orange-500">está aquí</span>
                     </h2>
                     <p className="text-lg text-slate-400 font-medium">

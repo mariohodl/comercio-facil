@@ -105,8 +105,12 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
 
     return (
         <Dialog open={open} onOpenChange={() => { }}>
-            <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
-                <div className="bg-orange p-5 text-white">
+            <DialogContent
+                className="w-[98vw] max-w-[95vw] sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl max-h-[95vh] flex flex-col"
+                onPointerDownOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+            >
+                <div className="bg-orange p-5 text-white shrink-0">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
                             <Building2 className="w-5 h-5" />
@@ -118,7 +122,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                     </DialogHeader>
                 </div>
 
-                <div className="p-6 bg-white">
+                <div className="flex-1 overflow-y-auto p-6 bg-white">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
@@ -279,7 +283,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 />
                             </div>
 
-                            <DialogFooter className="pt-4 border-t border-gray-100 flex flex-row gap-3 justify-between items-center sm:justify-between">
+                            <DialogFooter className="mt-6 pt-4 border-t border-gray-100 flex flex-row gap-3 justify-between items-center pb-4">
                                 <Button
                                     type="button"
                                     variant="ghost"

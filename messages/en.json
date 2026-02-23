@@ -225,6 +225,7 @@
         "customerService": "Customer Service",
         "aboutUs": "About Us",
         "help": "Help",
+        "contact": "Contact Us",
         "language": "Language"
     },
     "products": {
@@ -768,41 +769,42 @@
         "subtitle": "Manage your settings on portal",
         "saveSuccess": "Settings saved successfully",
         "saveError": "Error saving settings",
-        "companySettingsTitle": "Company Settings",
-        "setupInstructions": "Please complete your company, main store, and warehouse details to continue.",
-        "saveContinue": "Save and Continue",
+        "companySettingsTitle": "Company Configuration",
+        "welcomeTitle": "Hello {name}! Let's set up your workspace.",
+        "setupInstructions": "We need some basic details to activate your account and Point of Sale.",
+        "saveContinue": "Ready! Start Now",
         "sections": {
-            "profile": "Profile",
-            "store": "Store Settings",
-            "warehouse": "Warehouse Settings",
-            "billing": "Billing & Plan"
+            "profile": "Corporate Profile",
+            "store": "Main Branch",
+            "warehouse": "Central Warehouse",
+            "billing": "Plan & Billing"
         },
-        "profileDescription": "Manage your company profile information",
-        "storeDescription": "Configure your store details and location",
-        "warehouseDescription": "Manage your warehouse information",
-        "billingDescription": "View and manage your subscription plan",
+        "profileDescription": "Configure your company's identity and legal data",
+        "storeDescription": "Details of the location where you will make your sales",
+        "warehouseDescription": "Physical location for inventory control",
+        "billingDescription": "Manage your subscription and payment methods",
         "fields": {
-            "companyName": "Company Name",
-            "taxId": "Tax ID (RFC)",
-            "storeName": "Store Name",
-            "storeLocation": "Store Location",
-            "storeId": "Store ID",
+            "companyName": "Your Company Name",
+            "taxId": "Tax Identification (ID)",
+            "storeName": "Branch Name",
+            "storeLocation": "Branch Location",
+            "storeId": "System ID",
             "warehouseName": "Warehouse Name",
             "warehouseLocation": "Warehouse Location",
-            "planStatus": "Status",
+            "planStatus": "Plan Status",
             "trialEndDate": "Trial End Date",
             "subscriptionEndDate": "Subscription End Date",
-            "industry": "Company Industry",
-            "storeIdGenerated": "Store ID (Generated)"
+            "industry": "Line of Business / Industry",
+            "storeIdGenerated": "Unique Identifier (Generated)"
         },
         "placeholders": {
-            "companyName": "Enter your company name",
+            "companyName": "e.g. My Store Corp S.A.",
             "taxId": "Enter your tax ID",
-            "storeName": "Enter store name",
-            "storeLocation": "Enter store location",
-            "storeId": "Store identifier",
-            "warehouseName": "Enter warehouse name",
-            "warehouseLocation": "Enter warehouse location"
+            "storeName": "e.g. Main Downtown Branch",
+            "storeLocation": "e.g. 123 Main St, City Center",
+            "storeId": "Identifier",
+            "warehouseName": "e.g. General Warehouse",
+            "warehouseLocation": "e.g. 45 Industrial St, Bay 4"
         },
         "storeIdHelp": "Store ID cannot be changed once set",
         "planStatuses": {
@@ -1046,5 +1048,60 @@
         "updateSuccess": "Brand updated successfully",
         "addProduct": "Add Brand",
         "updateProduct": "Update Brand"
+    },
+    "publicPages": {
+        "aboutUs": {
+            "title": "About Us",
+            "subtitle": "Our mission is to empower local commerce",
+            "description": "At Comercio Fácil, we believe every local business deserves the best technology to thrive in the digital world.",
+            "history": "Our History",
+            "historyContent": "We were born from the need to bridge the technological gap between big retail and local shops. Our platform is designed to simplify management and boost growth.",
+            "values": "Our Values",
+            "value1Title": "Friendly Innovation",
+            "value1Desc": "We create advanced technology that anyone can use.",
+            "value2Title": "Local Impact",
+            "value2Desc": "When local businesses grow, communities thrive.",
+            "value3Title": "Transparency",
+            "value3Desc": "No fine print, always clear with our customers."
+        },
+        "customerService": {
+            "title": "Customer Service",
+            "subtitle": "We are here to accompany you in every step",
+            "waysToContact": "Ways to contact",
+            "phoneSupport": "Phone Support",
+            "phoneDesc": "Call us Monday to Friday, from 9:00 AM to 6:00 PM.",
+            "emailSupport": "Email Support",
+            "emailDesc": "Write to us and we will respond in less than 24 hours.",
+            "faqCTA": "Looking for quick answers?",
+            "faqButton": "Visit Help Section"
+        },
+        "help": {
+            "title": "Help Center",
+            "subtitle": "Find answers to your questions",
+            "frequentlyAsked": "Frequently Asked Questions",
+            "q1": "How do I start using Comercio Fácil?",
+            "a1": "It's simple: register, set up your company, and start recording your products. We have step-by-step guides to help you.",
+            "q2": "Do I have to install anything?",
+            "a2": "No, Comercio Fácil is a cloud-based platform. You can access it from any browser.",
+            "q3": "Is my inventory and data secure?",
+            "a3": "Absolutely. We use bank-grade encryption to protect all your information.",
+            "q4": "Do you have technical support?",
+            "a4": "Yes, we have a dedicated team to resolve any questions you have."
+        },
+        "contact": {
+            "title": "Contact",
+            "subtitle": "Do you have any questions or special requirements?",
+            "formTitle": "Send us a message",
+            "formDescription": "Complete the form below and an advisor will contact you shortly.",
+            "name": "Full Name",
+            "email": "Email Address",
+            "subject": "Subject",
+            "message": "Message",
+            "submit": "Send Message",
+            "success": "Message sent successfully!",
+            "error": "Error sending message. Please try again.",
+            "location": "Location",
+            "followUs": "Follow Us"
+        }
     }
 }

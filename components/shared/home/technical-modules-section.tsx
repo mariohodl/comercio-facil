@@ -59,7 +59,7 @@ export function TechnicalModulesSection() {
                         <div className="w-2 h-2 bg-[#1976D2] rounded-full animate-pulse"></div>
                         <span className="text-sm font-semibold text-[#1976D2]">MÓDULOS TÉCNICOS</span>
                     </div>
-                    <h2 className='text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-4'>
+                    <h2 className='text-4xl md:text-5xl font-bold text-gray-900 tracking-tight mb-4'>
                         Tecnología que <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1976D2] to-[#0D47A1]">Impulsa su Negocio</span>
                     </h2>
                     <p className="text-lg md:text-xl text-gray-600">

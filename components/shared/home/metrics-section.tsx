@@ -62,7 +62,7 @@ export function MetricsSection() {
             <div className='container mx-auto px-4 relative z-10'>
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-20 space-y-6">
-                    <h2 className='text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight'>
+                    <h2 className='text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight'>
                         Resultados Reales en <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Cada Área de su Negocio</span>
                     </h2>

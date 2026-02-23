@@ -92,7 +92,7 @@ export function FeaturesSection() {
                         <div className="w-2 h-2 bg-[#1976D2] rounded-full animate-ping"></div>
                         <span className="text-sm font-semibold text-[#1976D2]">Todo bajo su control</span>
                     </div>
-                    <h2 className='text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight'>
+                    <h2 className='text-4xl md:text-6xl font-bold text-gray-900 tracking-tight leading-tight'>
                         Domine su Operación <br className="hidden md:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1976D2] via-blue-600 to-[#0D47A1]">desde la Primera Venta</span>
                     </h2>
