@@ -133,7 +133,33 @@ test.describe('Product Management', () => {
         const errorToast = toasts.filter({ hasText: /error|revisar|revisa|check|already exists|ya existe/i });
         if (await errorToast.isVisible({ timeout: 5000 }).catch(() => false)) {
             const errorMsg = await errorToast.innerText();
-            throw new Error(`Product creation failed with error toast: "${errorMsg}"`);
+
+            // Collect field values for diagnostics
+            const categoryText = await page.getByTestId('product-category-select').innerText().catch(() => '<not found>');
+            const subCategoryText = await page.getByTestId('product-subcategory-select').innerText().catch(() => '<not found>');
+            const brandText = await page.getByTestId('product-brand-select').innerText().catch(() => '<not found>');
+            const unitText = await page.getByTestId('product-unit-select').innerText().catch(() => '<not found>');
+            const storeText = await page.getByTestId('product-store-select').innerText().catch(() => '<not found>');
+            const warehouseText = await page.getByTestId('product-warehouse-select').innerText().catch(() => '<not found>');
+            const nameValue = await page.getByTestId('product-name-input').inputValue().catch(() => '<not found>');
+            const barcodeValue = await page.getByTestId('product-barcode-input').inputValue().catch(() => '<not found>');
+
+            // Collect all visible validation messages
+            const validationMessages = await page.locator('[data-slot="form-message"]').allInnerTexts().catch(() => []);
+
+            throw new Error(
+                `Product creation failed with error toast: "${errorMsg}"\n` +
+                `--- Form field diagnostics ---\n` +
+                `Name: "${nameValue}"\n` +
+                `Barcode: "${barcodeValue}"\n` +
+                `Store: "${storeText}"\n` +
+                `Warehouse: "${warehouseText}"\n` +
+                `Category: "${categoryText}"\n` +
+                `SubCategory: "${subCategoryText}"\n` +
+                `Brand: "${brandText}"\n` +
+                `Unit: "${unitText}"\n` +
+                `Validation messages: ${JSON.stringify(validationMessages)}`
+            );
         }
 
         // Verify redirect to product list after successful creation

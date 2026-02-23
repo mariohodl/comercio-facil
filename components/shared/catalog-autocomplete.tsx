@@ -32,7 +32,7 @@ interface Option {
 interface CatalogAutocompleteProps {
     value: string
     onSelect: (option: Option | null) => void
-    onCustomCreate?: (name: string) => void
+    onCustomCreate?: (name: string) => void | Promise<void>
     initialOptions?: Option[]
     placeholder?: string
     industry?: string
@@ -197,8 +197,8 @@ export function CatalogAutocomplete({
                                                     variant="secondary"
                                                     size="sm"
                                                     className="w-full justify-start mt-2"
-                                                    onClick={() => {
-                                                        onCustomCreate(query)
+                                                    onClick={async () => {
+                                                        await onCustomCreate(query)
                                                         showSuccess(tInventory('itemCreated', {
                                                             item: getModeLabel(mode),
                                                             name: query

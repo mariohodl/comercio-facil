@@ -52,7 +52,7 @@ export function AdminHeader({
           </div>
           <ChevronRight className="w-3 h-3 text-gray-700" />
         </div>
-
+        {/* 
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 scroll-smooth">
           {breadcrumbs.map((crumb, index) => (
             <React.Fragment key={crumb.href}>
@@ -72,7 +72,7 @@ export function AdminHeader({
               )}
             </React.Fragment>
           ))}
-        </div>
+        </div> */}
       </div>
 
 
@@ -123,7 +123,7 @@ export function AdminHeader({
         <div className="w-[1px] h-4 bg-white/10 mx-1 hidden sm:block" />
 
         {/* Notifications */}
-        <div className="relative shrink-0">
+        {/* <div className="relative shrink-0">
           <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-transform active:scale-90">
             <Bell className="w-5 h-5" />
             <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
@@ -131,7 +131,7 @@ export function AdminHeader({
               <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
             </span>
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   )

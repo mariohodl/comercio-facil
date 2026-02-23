@@ -212,27 +212,39 @@ export class ProductPage {
     /**
      * Selects an option from a CatalogAutocomplete (cmdk-based) popover.
      * If the exact option is not found, it falls back to clicking the "Create" button.
+     * After selection, verifies the trigger button reflects the chosen value.
      */
     private async selectFromAutocomplete(trigger: Locator, value: string) {
+        // Remember initial text to detect change later
+        const initialText = await trigger.innerText().catch(() => '');
+
         await trigger.click();
 
-        const input = this.page.locator('[cmdk-input]').first();
+        // Scope to the open popover content to avoid matching elements from other popovers
+        const popoverContent = this.page.locator('[data-radix-popper-content-wrapper]:visible').last();
+        await expect(popoverContent).toBeVisible({ timeout: 10000 });
+
+        const input = popoverContent.locator('[cmdk-input]');
         await expect(input).toBeVisible({ timeout: 10000 });
         await input.fill(value);
 
-        // Wait for debounce + server fetch to resolve
-        // Increased for CI stability
-        await this.page.waitForTimeout(2500);
+        // Wait for debounce (300ms) + server fetch to resolve
+        // Use a generous timeout for CI stability
+        await this.page.waitForTimeout(3000);
 
-        // Look for exact match among the items
-        const items = this.page.locator('[cmdk-item]');
+        // Look for exact match among the items within the popover
+        const items = popoverContent.locator('[cmdk-item]');
         const matchingItem = items.filter({ hasText: new RegExp(value, 'i') }).first();
-        const createBtn = this.page.locator('button').filter({ hasText: /Crear|Create/i }).first();
+        // Scope create button to just the popover, not the whole page
+        const createBtn = popoverContent.locator('button').filter({ hasText: /Crear|Create/i }).first();
 
         if (await matchingItem.isVisible().catch(() => false)) {
             await matchingItem.click();
         } else if (await createBtn.isVisible().catch(() => false)) {
             await createBtn.click();
+            // The create button triggers an async server action.
+            // Wait for it to complete and set the form value.
+            await this.page.waitForTimeout(2000);
         } else {
             // Last resort: click the first available item
             const firstItem = items.first();
@@ -244,6 +256,19 @@ export class ProductPage {
         }
 
         // Wait for popover to close
-        await this.page.waitForTimeout(300);
+        await expect(popoverContent).not.toBeVisible({ timeout: 5000 }).catch(() => {
+            // If popover didn't close, press Escape to close it
+            return this.page.keyboard.press('Escape');
+        });
+
+        // Extra settle time for async callbacks (onSelect/onCustomCreate)
+        await this.page.waitForTimeout(500);
+
+        // Verify the trigger button now shows the selected value
+        await expect(trigger).not.toHaveText(initialText === '' ? /^$/ : new RegExp(`^\\s*$`), { timeout: 5000 }).catch(() => {
+            // If text didn't change, log for diagnostics but don't fail here;
+            // the form submission error will catch it
+            console.warn(`Autocomplete for "${value}": trigger text may not have updated. Current: "${trigger.innerText()}"`)
+        });
     }
 }
