@@ -294,6 +294,7 @@ export const UserSignUpSchema = UserSignInSchema.extend({
 	phone: z.string().min(1, 'El teléfono es obligatorio'),
 	confirmPassword: Password,
 	promoCode: z.string().optional(),
+	middle_name_verification: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
 	message: "Passwords don't match",
 	path: ['confirmPassword'],

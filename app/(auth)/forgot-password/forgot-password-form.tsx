@@ -34,6 +34,7 @@ export default function ForgotPasswordForm() {
     })
 
     async function onSubmit(values: z.infer<typeof ForgotPasswordSchema>) {
+        if (isLoading) return
         setIsLoading(true)
         try {
             const res = await requestPasswordReset(values.email)

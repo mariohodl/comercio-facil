@@ -48,6 +48,7 @@ export default function ResetPasswordForm() {
             return
         }
 
+        if (isLoading) return
         setIsLoading(true)
         try {
             const res = await resetPassword({

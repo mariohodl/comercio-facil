@@ -46,6 +46,18 @@ export const getSession = async () => {
 // CREATE
 export async function registerUser(userSignUp: IUserSignUp) {
 	try {
+		// Honeypot check (Bot protection)
+		if (userSignUp.middle_name_verification && userSignUp.middle_name_verification.trim() !== '') {
+			console.warn(`Bot detected during registration attempt: ${userSignUp.email}`);
+			// Return success: true but do nothing, or return a fake success message
+			// to avoid letting the bot know it failed. 
+			// But the user asked to "Discard the request".
+			return {
+				success: true,
+				message: 'User created successfully. Please check your email for verification code.'
+			};
+		}
+
 		const user = await UserSignUpSchema.parseAsync({
 			name: userSignUp.name,
 			email: userSignUp.email,
@@ -53,6 +65,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
 			phone: userSignUp.phone,
 			confirmPassword: userSignUp.confirmPassword,
 			promoCode: userSignUp.promoCode,
+			middle_name_verification: userSignUp.middle_name_verification,
 		});
 
 		await connectToDatabase();
@@ -90,8 +103,10 @@ export async function registerUser(userSignUp: IUserSignUp) {
 			message: 'User created successfully. Please check your email for verification code.',
 			redirectUrl: `/verify-email?email=${encodeURIComponent(user.email)}`
 		};
-	} catch (error) {
-
+	} catch (error: any) {
+		if (error.code === 11000) {
+			return { success: false, error: 'Email already registered' };
+		}
 		return { success: false, error: formatError(error) };
 	}
 }
