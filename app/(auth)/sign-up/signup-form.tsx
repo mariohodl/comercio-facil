@@ -33,6 +33,7 @@ const signUpDefaultValues =
       confirmPassword: '123456',
       phone: '1234567890',
       promoCode: '',
+      middle_name_verification: '',
     }
     : {
       name: '',
@@ -41,6 +42,7 @@ const signUpDefaultValues =
       confirmPassword: '',
       phone: '',
       promoCode: '',
+      middle_name_verification: '',
     }
 
 export default function SignUpForm() {
@@ -64,11 +66,13 @@ export default function SignUpForm() {
 
 
   const onSubmit = async (data: IUserSignUp) => {
+    if (isLoading) return
     setIsLoading(true)
     try {
       const res = await registerUser(data)
       if (!res.success) {
         toast.error(res.error || 'Error al crear la cuenta')
+        setIsLoading(false)
         return
       }
 
@@ -108,6 +112,15 @@ export default function SignUpForm() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <input type='hidden' name='callbackUrl' value={callbackUrl} />
           <input type='hidden' {...form.register('promoCode')} />
+          {/* Honeypot field - Bot protection */}
+          <div style={{ display: 'none' }} aria-hidden="true">
+            <input
+              type="text"
+              {...form.register('middle_name_verification')}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
           <div className='space-y-4'>
             <FormField
               control={control}
