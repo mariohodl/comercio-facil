@@ -3,6 +3,8 @@ import { expect, type Locator, type Page } from '@playwright/test';
 export class ProductPage {
     readonly page: Page;
     readonly nameInput: Locator;
+    readonly skuInput: Locator;
+    readonly slugInput: Locator;
     readonly barcodeInput: Locator;
     readonly categorySelect: Locator;
     readonly subCategorySelect: Locator;
@@ -13,11 +15,14 @@ export class ProductPage {
     readonly costInput: Locator;
     readonly priceInput: Locator;
     readonly stockInput: Locator;
+    readonly quantityAlertInput: Locator;
     readonly submitButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.nameInput = page.getByTestId('product-name-input');
+        this.skuInput = page.getByTestId('product-sku-input');
+        this.slugInput = page.getByTestId('product-slug-input');
         this.barcodeInput = page.getByTestId('product-barcode-input');
         this.categorySelect = page.getByTestId('product-category-select');
         this.subCategorySelect = page.getByTestId('product-subcategory-select');
@@ -28,6 +33,7 @@ export class ProductPage {
         this.costInput = page.getByTestId('product-cost-input');
         this.priceInput = page.getByTestId('product-price-input');
         this.stockInput = page.getByTestId('product-stock-input');
+        this.quantityAlertInput = page.getByTestId('product-quantity-alert-input');
         this.submitButton = page.getByTestId('product-submit-button');
     }
 
@@ -41,6 +47,7 @@ export class ProductPage {
         cost: string,
         price: string,
         stock: string,
+        quantityAlert?: string,
         store?: string,
         warehouse?: string,
     }) {
@@ -53,9 +60,9 @@ export class ProductPage {
             await this.selectFromSelect(this.warehouseSelect, data.warehouse);
         }
 
-        // Wait for slug to auto-generate (driven by a useEffect watching name)
-        // Increased for CI stability
-        await this.page.waitForTimeout(1000);
+        // Wait for slug and sku to auto-generate
+        await expect(this.slugInput).not.toHaveValue('', { timeout: 10000 });
+        await expect(this.skuInput).not.toHaveValue('', { timeout: 10000 });
 
         await this.barcodeInput.fill(data.barcode);
 
@@ -73,8 +80,14 @@ export class ProductPage {
         await this.priceInput.fill(data.price);
         await this.stockInput.fill(data.stock);
 
-        // Wait for auto-publish useEffect to settle (it fires when all fields
-        // are filled and triggers a re-render that can make the button briefly stale)
+        if (data.quantityAlert) {
+            await this.quantityAlertInput.fill(data.quantityAlert);
+        } else {
+            // Fill a default if missing, as it's mandatory
+            await this.quantityAlertInput.fill('5');
+        }
+
+        // Wait for auto-publish useEffect to settle
         await this.page.waitForTimeout(1500);
 
         await this.clickSubmit();
@@ -93,6 +106,7 @@ export class ProductPage {
         cost: string,
         price: string,
         stock: string,
+        quantityAlert?: string,
         store?: string,
         warehouse?: string,
     }) {
@@ -105,7 +119,8 @@ export class ProductPage {
             await this.selectFromSelect(this.warehouseSelect, data.warehouse);
         }
 
-        await this.page.waitForTimeout(1000);
+        await expect(this.slugInput).not.toHaveValue('', { timeout: 10000 });
+        await expect(this.skuInput).not.toHaveValue('', { timeout: 10000 });
 
         // Skip barcode intentionally
 
@@ -118,6 +133,12 @@ export class ProductPage {
         await this.costInput.fill(data.cost);
         await this.priceInput.fill(data.price);
         await this.stockInput.fill(data.stock);
+
+        if (data.quantityAlert) {
+            await this.quantityAlertInput.fill(data.quantityAlert);
+        } else {
+            await this.quantityAlertInput.fill('5');
+        }
 
         await this.page.waitForTimeout(1500);
         await this.clickSubmit();
@@ -132,6 +153,7 @@ export class ProductPage {
         cost?: string,
         price?: string,
         stock?: string,
+        quantityAlert?: string,
     }) {
         if (data.name !== undefined) {
             await this.nameInput.clear();
@@ -149,6 +171,10 @@ export class ProductPage {
         if (data.stock !== undefined) {
             await this.stockInput.clear();
             await this.stockInput.fill(data.stock);
+        }
+        if (data.quantityAlert !== undefined) {
+            await this.quantityAlertInput.clear();
+            await this.quantityAlertInput.fill(data.quantityAlert);
         }
 
         await this.page.waitForTimeout(1000);
