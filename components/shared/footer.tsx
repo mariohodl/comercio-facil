@@ -41,6 +41,8 @@ export default function Footer() {
         <div className='pt-3 flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-gray-500 border-t border-dashed'>
           <p>Copyright © {currentYear}, {APP_NAME}, Inc.</p>
           <div className="flex gap-4">
+            <Link href="/page/help" className="hover:underline">Ayuda</Link>
+            <Link href="/page/contact" className="hover:underline">Contacto</Link>
             <Link href="/privacy" className="hover:underline">Privacidad</Link>
             <Link href="/data-deletion" className="hover:underline">Eliminación de Datos</Link>
           </div>

@@ -23,7 +23,8 @@ export default async function Header() {
     "Browsing History": 'browsingHistory',
     "Customer Service": 'customerService',
     "About Us": 'aboutUs',
-    "Help": 'help'
+    "Help": 'help',
+    "Contact Us": 'contact'
   }
 
   return (
@@ -38,7 +39,7 @@ export default async function Header() {
 
             {/* Search Section */}
             <div className='hidden md:block flex-1 max-w-2xl'>
-              <Search />
+              {/* <Search /> */}
             </div>
 
             {/* Menu Section */}
@@ -49,7 +50,7 @@ export default async function Header() {
 
           {/* Mobile Search */}
           <div className='md:hidden block pt-3 pb-2'>
-            <Search />
+            {/* <Search /> */}
           </div>
         </div>
 

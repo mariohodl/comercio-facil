@@ -23,7 +23,7 @@ export function HeroSection() {
                         <span className="text-sm font-medium text-gray-600">La plataforma #1 para comercio local</span>
                     </div>
 
-                    <h1 className='text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.1]'>
+                    <h1 className='text-5xl md:text-7xl font-bold text-gray-900 tracking-tight leading-[1.1]'>
                         Comercio Fácil: <br className="hidden md:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1976D2] to-[#0D47A1]">Eficiencia Operativa</span> al 100%
                     </h1>

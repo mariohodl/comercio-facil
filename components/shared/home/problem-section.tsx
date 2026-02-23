@@ -43,7 +43,7 @@ export function ProblemSection() {
 
                             <div className="relative z-10">
                                 <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                                    <h2 className='text-3xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.1]'>
+                                    <h2 className='text-3xl md:text-6xl font-bold text-slate-900 tracking-tight leading-[1.1]'>
                                         ¿Cansado de la <span className="text-red-600">Venta a Ciegas?</span>
                                     </h2>
                                     <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">

@@ -114,10 +114,10 @@ test.describe('Product Management', () => {
         });
 
         // The form's onSubmit shows a loading toast immediately. If we don't see it,
-        // the click silently failed (common when GuidedHighlighter re-renders during auto-publish).
-        // In that case, retry the click.
-        const loadingToast = page.locator('[data-sonner-toaster] [data-sonner-toast]').first();
-        const submitted = await loadingToast.isVisible({ timeout: 3000 }).catch(() => false);
+        // the click might have been lost due to a re-render.
+        const toasts = page.locator('[data-sonner-toaster] [data-sonner-toast]');
+        const submitted = await toasts.first().isVisible({ timeout: 5000 }).catch(() => false);
+
         if (!submitted) {
             // Retry: scroll to button and click again
             const submitBtn = page.getByTestId('product-submit-button');
@@ -125,9 +125,17 @@ test.describe('Product Management', () => {
             await submitBtn.click({ force: true });
         }
 
+        // Diagnostic: Check if an error toast appears (like validation or server error)
+        // If an error appears, we want to know it rather than just timing out on the URL check.
+        const errorToast = toasts.filter({ hasText: /error|revisar|revisa|check|already exists|ya existe/i });
+        if (await errorToast.isVisible({ timeout: 5000 }).catch(() => false)) {
+            const errorMsg = await errorToast.innerText();
+            throw new Error(`Product creation failed with error toast: "${errorMsg}"`);
+        }
+
         // Verify redirect to product list after successful creation
-        await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 90000 });
-        await expect(page.getByText(/lista de productos/i)).toBeVisible({ timeout: 20000 });
+        await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 60000 });
+        await expect(page.getByText(/lista de productos|product list/i)).toBeVisible({ timeout: 20000 });
 
         // Verify the product row shows correct data in the table
         // Wait for the table to load data first
@@ -139,7 +147,7 @@ test.describe('Product Management', () => {
         await expect(productRow).toContainText('100');
 
         // Product is auto-published when all fields (price, cost, stock, barcode) are filled
-        await expect(productRow.getByText(/activo/i)).toBeVisible();
+        await expect(productRow.getByText(/activo|active/i)).toBeVisible();
     });
 
     test('should show validation errors when required fields are empty', async ({ page, authPage }) => {
@@ -210,14 +218,14 @@ test.describe('Product Management', () => {
 
         // Product with $0 price should still save (as draft/unpublished)
         await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 45000 });
-        await expect(page.getByText(/lista de productos/i)).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/lista de productos|product list/i)).toBeVisible({ timeout: 15000 });
 
         // Verify the draft product appears in the table
         const productRow = page.locator('table tbody tr').filter({ hasText: 'Draft Zero Price Product' });
         await expect(productRow).toBeVisible({ timeout: 10000 });
 
         // Should be inactive since price is $0 (auto-publish requires price > 0)
-        await expect(productRow.getByText(/inactivo/i)).toBeVisible();
+        await expect(productRow.getByText(/inactivo|inactive/i)).toBeVisible();
     });
 
     test('should show barcode validation error when barcode is missing', async ({ page, authPage, productPage }) => {
@@ -255,7 +263,7 @@ test.describe('Product Management', () => {
 
         // Navigate to the product list
         await page.goto(`/admin/${storeId}/products`);
-        await expect(page.getByText(/lista de productos/i)).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/lista de productos|product list/i)).toBeVisible({ timeout: 15000 });
 
         // Wait for product data to load in the table
         await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 15000 });
@@ -278,7 +286,7 @@ test.describe('Product Management', () => {
 
         // Should redirect back to the product list
         await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 45000 });
-        await expect(page.getByText(/lista de productos/i)).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/lista de productos|product list/i)).toBeVisible({ timeout: 15000 });
 
         // Verify the updated product row
         const updatedRow = page.locator('table tbody tr').filter({ hasText: 'Test Product Updated' });

@@ -238,6 +238,7 @@
         "customerService": "Servicio al Cliente",
         "aboutUs": "Sobre Nosotros",
         "help": "Ayuda",
+        "contact": "Contacto",
         "language": "Idioma"
     },
     "products": {
@@ -788,41 +789,41 @@
         "saveSuccess": "Configuración guardada exitosamente",
         "saveError": "Error al guardar la configuración",
         "companySettingsTitle": "Configuración de la Empresa",
-        "welcomeTitle": "¡Hola {name}! Bienvenido a Comercio Fácil.",
-        "setupInstructions": "Por favor completa los datos de tu empresa, sucursal principal y almacén para continuar.",
-        "saveContinue": "Guardar y Continuar",
+        "welcomeTitle": "¡Hola {name}! Vamos a configurar tu espacio de trabajo.",
+        "setupInstructions": "Necesitamos unos detalles básicos para activar tu cuenta y tu Punto de Venta.",
+        "saveContinue": "¡Listo! Empezar ahora",
         "sections": {
-            "profile": "Perfil",
-            "store": "Configuración de Tienda",
-            "warehouse": "Configuración de Almacén",
-            "billing": "Facturación y Plan"
+            "profile": "Perfil Corporativo",
+            "store": "Sucursal Principal",
+            "warehouse": "Almacén Central",
+            "billing": "Plan y Facturación"
         },
-        "profileDescription": "Administra la información del perfil de tu empresa",
-        "storeDescription": "Configura los detalles y dirección de tu tienda",
-        "warehouseDescription": "Administra la información de tu almacén",
-        "billingDescription": "Ver y administrar tu plan de suscripción",
+        "profileDescription": "Configura la identidad y datos legales de tu empresa",
+        "storeDescription": "Detalles de la ubicación donde realizarás tus ventas",
+        "warehouseDescription": "Ubicación física para el control de inventario",
+        "billingDescription": "Gestiona tu suscripción y métodos de pago",
         "fields": {
-            "companyName": "Nombre de la Empresa",
-            "taxId": "RFC (ID Fiscal)",
-            "storeName": "Nombre de la Tienda",
-            "storeLocation": "Dirección de la Tienda",
-            "storeId": "ID de la Tienda",
+            "companyName": "Nombre de tu Empresa",
+            "taxId": "Identificación Fiscal (RFC)",
+            "storeName": "Nombre de la Sucursal",
+            "storeLocation": "Dirección de la Sucursal",
+            "storeId": "ID del Sistema",
             "warehouseName": "Nombre del Almacén",
             "warehouseLocation": "Dirección del Almacén",
-            "planStatus": "Estado",
-            "trialEndDate": "Fecha de Fin de Prueba",
-            "subscriptionEndDate": "Fecha de Fin de Suscripción",
-            "industry": "Giro de la Empresa",
-            "storeIdGenerated": "ID de la Sucursal (Generado)"
+            "planStatus": "Estado del Plan",
+            "trialEndDate": "Fin de la Prueba",
+            "subscriptionEndDate": "Fin de Suscripción",
+            "industry": "Giro / Industria",
+            "storeIdGenerated": "Identificador Único (Generado)"
         },
         "placeholders": {
-            "companyName": "Ingresa el nombre de tu empresa",
-            "taxId": "Ingresa tu RFC",
-            "storeName": "Ingresa el nombre de la tienda",
-            "storeLocation": "Ingresa la dirección de la tienda",
-            "storeId": "Identificador de tienda",
-            "warehouseName": "Ingresa el nombre del almacén",
-            "warehouseLocation": "Ingresa la dirección del almacén"
+            "companyName": "Ej. Mi Comercializadora S.A.",
+            "taxId": "Ingresa tu ID fiscal",
+            "storeName": "Ej. Sucursal Matriz Centro",
+            "storeLocation": "Ej. Av. Insurgentes Sur 123, CDMX",
+            "storeId": "Identificador",
+            "warehouseName": "Ej. Bodega General",
+            "warehouseLocation": "Ej. Calle Industrial 45, Bodega 4"
         },
         "storeIdHelp": "El ID de la tienda no se puede cambiar una vez establecido",
         "planStatuses": {
@@ -1073,5 +1074,60 @@
         "updateSuccess": "Marca actualizada exitosamente",
         "addProduct": "Agregar Marca",
         "updateProduct": "Actualizar Marca"
+    },
+    "publicPages": {
+        "aboutUs": {
+            "title": "Sobre Nosotros",
+            "subtitle": "Nuestra misión es empoderar al comercio local",
+            "description": "En Comercio Fácil, creemos que cada negocio local merece la mejor tecnología para prosperar en el mundo digital.",
+            "history": "Nuestra Historia",
+            "historyContent": "Nacimos de la necesidad de cerrar la brecha tecnológica entre el gran retail y los comercios locales. Nuestra plataforma está diseñada para simplificar la gestión y potenciar el crecimiento.",
+            "values": "Nuestros Valores",
+            "value1Title": "Innovación Cercana",
+            "value1Desc": "Creamos tecnología avanzada que cualquiera puede usar.",
+            "value2Title": "Impacto Local",
+            "value2Desc": "Cuando los comercios locales crecen, las comunidades prosperan.",
+            "value3Title": "Transparencia",
+            "value3Desc": "Sin letras pequeñas, siempre claros con nuestros clientes."
+        },
+        "customerService": {
+            "title": "Servicio al Cliente",
+            "subtitle": "Estamos aquí para acompañarte en cada paso",
+            "waysToContact": "Formas de contacto",
+            "phoneSupport": "Soporte Telefónico",
+            "phoneDesc": "Llámanos de lunes a viernes, de 9:00 AM a 6:00 PM.",
+            "emailSupport": "Soporte por Correo",
+            "emailDesc": "Escríbenos y te responderemos en menos de 24 horas.",
+            "faqCTA": "¿Buscas respuestas rápidas?",
+            "faqButton": "Visitar sección de Ayuda"
+        },
+        "help": {
+            "title": "Centro de Ayuda",
+            "subtitle": "Encuentra respuestas a tus preguntas",
+            "frequentlyAsked": "Preguntas Frecuentes",
+            "q1": "¿Cómo empiezo a usar Comercio Fácil?",
+            "a1": "Es simple: regístrate, configura tu empresa y comienza a registrar tus productos. Tenemos guías paso a paso para ayudarte.",
+            "q2": "¿Tengo que instalar algo?",
+            "a2": "No, Comercio Fácil es una plataforma en la nube. Puedes acceder desde cualquier navegador.",
+            "q3": "¿Es seguro mi inventario y datos?",
+            "a3": "Absolutamente. Utilizamos encriptación de grado bancario para proteger toda tu información.",
+            "q4": "¿Tienen soporte técnico?",
+            "a4": "Sí, contamos con un equipo dedicado para resolver cualquier duda que tengas."
+        },
+        "contact": {
+            "title": "Contacto",
+            "subtitle": "¿Tienes alguna duda o requerimiento especial?",
+            "formTitle": "Envíanos un mensaje",
+            "formDescription": "Completa el siguiente formulario y un asesor se pondrá en contacto contigo a la brevedad.",
+            "name": "Nombre completo",
+            "email": "Correo electrónico",
+            "subject": "Asunto",
+            "message": "Mensaje",
+            "submit": "Enviar Mensaje",
+            "success": "¡Mensaje enviado con éxito!",
+            "error": "Error al enviar el mensaje. Por favor intenta de nuevo.",
+            "location": "Ubicación",
+            "followUs": "Síguenos"
+        }
     }
 }

@@ -1929,6 +1929,10 @@ const data: Data = {
 			name: 'Help',
 			href: '/page/help',
 		},
+		{
+			name: 'Contact Us',
+			href: '/page/contact',
+		},
 	],
 
 	carousels: [

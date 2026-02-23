@@ -24,7 +24,7 @@ export function FooterSection() {
                                 </Link>
                             </Button>
                             <Button size='lg' variant="outline" className='rounded-full px-8 h-12 text-base font-medium border-gray-800 text-gray-300 hover:bg-gray-900 hover:text-white' asChild>
-                                <Link href='#'>
+                                <Link href='/page/contact'>
                                     Contactar Ventas
                                 </Link>
                             </Button>
@@ -79,10 +79,10 @@ export function FooterSection() {
                     <div className="space-y-4">
                         <h4 className="font-bold text-white">Compañía</h4>
                         <ul className="space-y-2 text-sm text-gray-500">
-                            <li><Link href="#" className="hover:text-blue-400 transition-colors">Sobre Nosotros</Link></li>
+                            <li><Link href="/page/about-us" className="hover:text-blue-400 transition-colors">Sobre Nosotros</Link></li>
                             <li><Link href="#" className="hover:text-blue-400 transition-colors">Carreras</Link></li>
                             <li><Link href="#" className="hover:text-blue-400 transition-colors">Blog</Link></li>
-                            <li><Link href="#" className="hover:text-blue-400 transition-colors">Contacto</Link></li>
+                            <li><Link href="/page/contact" className="hover:text-blue-400 transition-colors">Contacto</Link></li>
                         </ul>
                     </div>
 
