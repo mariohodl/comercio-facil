@@ -385,18 +385,12 @@ const ProductForm = ({
         return
       }
 
-      const subs = await getSubCategoriesByCategory(categoryId)
+      const subs = await getSubCategoriesByCategory(categoryId, storeId)
       setSubCategories(subs)
-
-      const currentSub = form.getValues('subCategory')
-      const isValid = subs.some(s => s.name === currentSub) || currentSub === 'None'
-      if (currentSub && !isValid) {
-        form.setValue('subCategory', '')
-      }
     }
 
     fetchSubCategories()
-  }, [selectedCategory, selectedCategoryId, categories, form])
+  }, [selectedCategory, selectedCategoryId, categories, form, storeId])
 
   // Watch pricing fields for automatic discount calculation
   const discountType = form.watch('discountType')

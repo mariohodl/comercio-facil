@@ -151,13 +151,10 @@ export async function getSubCategoriesByCategory(categoryId: string, storeId?: s
     const filter: any = {
         parentCategory: categoryId,
         status: true,
-        isApproved: true,
-        ...(storeId ? {
-            $or: [
-                { isGlobal: true },
-                { storeId: storeId }
-            ]
-        } : { isGlobal: true })
+        $or: [
+            { isApproved: true },
+            ...(storeId ? [{ storeId }] : [])
+        ]
     }
     const subCategories = await SubCategory.find(filter)
         .select('name slug code isGlobal industry isApproved')

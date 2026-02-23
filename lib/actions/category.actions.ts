@@ -159,13 +159,10 @@ export async function getActiveCategories(storeId?: string) {
     await connectToDatabase()
     const filter = {
         status: true,
-        isApproved: true,
-        ...(storeId ? {
-            $or: [
-                { isGlobal: true },
-                { storeId: storeId }
-            ]
-        } : { isGlobal: true })
+        $or: [
+            { isApproved: true },
+            ...(storeId ? [{ storeId }] : [])
+        ]
     }
 
     const categories = await Category.find(filter)
