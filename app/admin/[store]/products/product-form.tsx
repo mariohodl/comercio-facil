@@ -723,7 +723,7 @@ const ProductForm = ({
                       <FormLabel className="gap-1.5">{t('store')} <span className="text-red-500">*</span><HelpTooltip content={t('help.store')} /></FormLabel>
                       <Select key={field.value} onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
-                          <SelectTrigger className="h-10">
+                          <SelectTrigger className="h-10" data-testid="product-store-select">
                             <SelectValue placeholder={t('select')} />
                           </SelectTrigger>
                         </FormControl>
@@ -811,48 +811,46 @@ const ProductForm = ({
                 />
               </div>
 
-              {type === 'Update' && (
-                <div className='grid grid-cols-1 gap-3'>
-                  <FormField
-                    control={form.control}
-                    name='sku'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="gap-1.5">
-                          {t('sku')} <span className="text-red-500">*</span>
-                          <HelpTooltip content={t('help.sku')} />
-                        </FormLabel>
-                        <div className="flex flex-col sm:flex-row gap-2">
-                          <div className="w-full flex-1">
-                            <FormControl>
-                              <Input data-testid="product-sku-input" placeholder={t('enterBarcode')} {...field} className="h-10" />
-                            </FormControl>
-                          </div>
-                          <Button
-                            type="button"
-                            className="bg-orange hover:bg-orange-dark text-white h-10 shrink-0 w-full sm:w-auto"
-                            onClick={() => {
-                              const name = form.getValues('name')
-                              if (!name) {
-                                showError(t('enterProductNameFirst'))
-                                return
-                              }
-                              const namePart = name.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(3, 'X')
-                              const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : 'STOR'
-                              const randomPart = Math.floor(10000 + Math.random() * 90000)
-                              const sku = `${namePart}-${storePart}-${randomPart}`
-                              form.setValue('sku', sku)
-                            }}
-                          >
-                            {t('generate')}
-                          </Button>
+              <div className='grid grid-cols-1 gap-3'>
+                <FormField
+                  control={form.control}
+                  name='sku'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="gap-1.5">
+                        {t('sku')} <span className="text-red-500">*</span>
+                        <HelpTooltip content={t('help.sku')} />
+                      </FormLabel>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="w-full flex-1">
+                          <FormControl>
+                            <Input data-testid="product-sku-input" placeholder={t('enterBarcode')} {...field} className="h-10" />
+                          </FormControl>
                         </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              )}
+                        <Button
+                          type="button"
+                          className="bg-orange hover:bg-orange-dark text-white h-10 shrink-0 w-full sm:w-auto"
+                          onClick={() => {
+                            const name = form.getValues('name')
+                            if (!name) {
+                              showError(t('enterProductNameFirst'))
+                              return
+                            }
+                            const namePart = name.replace(/[^a-zA-Z0-9]/g, '').substring(0, 6).toUpperCase().padEnd(3, 'X')
+                            const storePart = storeId ? storeId.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : 'STOR'
+                            const randomPart = Math.floor(10000 + Math.random() * 90000)
+                            const sku = `${namePart}-${storePart}-${randomPart}`
+                            form.setValue('sku', sku, { shouldValidate: true })
+                          }}
+                        >
+                          {t('generate')}
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 items-start'>
                 <FormField
