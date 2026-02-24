@@ -72,6 +72,15 @@ export type Data = {
 	}[];
 	stores: any[];
 	warehouses: any[];
+	globalCatalog?: {
+		industry: string;
+		categories: {
+			name: string;
+			subcategories: string[];
+			units: (string | { name: string; abbreviation: string; status: boolean })[];
+			brands: string[];
+		}[];
+	}[];
 };
 
 export type ProductImage = {

@@ -151,15 +151,17 @@ export default function CategoriesPage({
                         </Button>
                     </div>
 
-                    <Button
-                        variant="outline"
-                        onClick={handleSeedCatalog}
-                        disabled={isSeeding}
-                        className="border-navy text-navy font-bold hover:bg-navy hover:text-white transition-all shadow-md"
-                    >
-                        {isSeeding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />}
-                        {t('setupCatalog') || 'Setup Catalog'}
-                    </Button>
+                    {process.env.NODE_ENV !== 'production' && (
+                        <Button
+                            variant="outline"
+                            onClick={handleSeedCatalog}
+                            disabled={isSeeding}
+                            className="border-navy text-navy font-bold hover:bg-navy hover:text-white transition-all shadow-md"
+                        >
+                            {isSeeding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Database className="h-4 w-4 mr-2" />}
+                            {t('setupCatalog') || 'Setup Catalog'}
+                        </Button>
+                    )}
                     <Button
                         onClick={handleAddCategory}
                         className="bg-orange hover:bg-orange-dark text-white font-bold flex-1 sm:flex-none shadow-lg shadow-orange-500/20 active:scale-95 transition-all"

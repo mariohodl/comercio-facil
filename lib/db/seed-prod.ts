@@ -17,9 +17,91 @@ const main = async () => {
         }
         await connectToDatabase(mongoUri);
 
-        const { categories, subCategories, brands, units, attributes } = data;
+        const { categories, subCategories, brands, units, attributes, globalCatalog } = data;
 
-        console.log('Seeding Categories...');
+        // --- Seed from globalCatalog (Industry-specific) ---
+        if (globalCatalog && globalCatalog.length > 0) {
+            console.log('Seeding from Global Catalog...');
+            for (const item of globalCatalog) {
+                const { industry, categories: industryCategories } = item;
+                console.log(`Processing industry: ${industry}...`);
+
+                for (const catData of industryCategories) {
+                    const categorySlug = toSlug(catData.name);
+                    const categoryResult = await Category.findOneAndUpdate(
+                        { categoryName: catData.name, industry: industry },
+                        {
+                            $set: {
+                                categorySlug,
+                                industry,
+                                isGlobal: true,
+                                isApproved: true,
+                                status: true
+                            }
+                        },
+                        { upsert: true, new: true }
+                    );
+
+                    for (const subName of catData.subcategories) {
+                        const subSlug = toSlug(subName);
+                        await SubCategory.updateOne(
+                            { name: subName, parentCategory: categoryResult._id },
+                            {
+                                $set: {
+                                    slug: subSlug,
+                                    parentCategory: categoryResult._id,
+                                    industry,
+                                    isGlobal: true,
+                                    isApproved: true,
+                                    status: true
+                                }
+                            },
+                            { upsert: true }
+                        );
+                    }
+
+                    for (const brandName of catData.brands) {
+                        const brandSlug = toSlug(brandName);
+                        await Brand.updateOne(
+                            { name: brandName, industry: industry },
+                            {
+                                $set: {
+                                    slug: brandSlug,
+                                    industry,
+                                    isGlobal: true,
+                                    isApproved: true,
+                                    status: true
+                                }
+                            },
+                            { upsert: true }
+                        );
+                    }
+
+                    for (const unitData of catData.units) {
+                        const uName = typeof unitData === 'string' ? unitData : unitData.name;
+                        const uAbbr = typeof unitData === 'string' ? toSlug(unitData).substring(0, 3) : unitData.abbreviation;
+
+                        await Unit.updateOne(
+                            { name: uName, industry: industry },
+                            {
+                                $set: {
+                                    abbreviation: uAbbr,
+                                    industry,
+                                    isGlobal: true,
+                                    isApproved: true,
+                                    status: true
+                                }
+                            },
+                            { upsert: true }
+                        );
+                    }
+                }
+            }
+            console.log('✅ Global Catalog seeded.');
+        }
+
+        // --- Original Seeding (General) ---
+        console.log('Seeding General Categories...');
         let categoriesSeeded = 0;
         for (const cat of categories) {
             await Category.updateOne(
@@ -41,24 +123,19 @@ const main = async () => {
             );
             categoriesSeeded++;
         }
-        console.log(`✅ Seeded ${categoriesSeeded} categories.`);
+        console.log(`✅ Seeded ${categoriesSeeded} general categories.`);
 
-        console.log('Seeding SubCategories...');
-        // We need parent IDs for subcategories
+        console.log('Seeding General SubCategories...');
         const allCategories = await Category.find({});
         const categoryMap = new Map();
         allCategories.forEach((c) => {
-            // Map by name to match the data structure which uses parentCategory name
             categoryMap.set(c.categoryName, c._id);
         });
 
         let subCategoriesSeeded = 0;
         for (const subCat of subCategories) {
             const parentId = categoryMap.get(subCat.parentCategory);
-            if (!parentId) {
-                console.warn(`Parent category "${subCat.parentCategory}" not found for subcategory "${subCat.name}". Skipping.`);
-                continue;
-            }
+            if (!parentId) continue;
 
             await SubCategory.updateOne(
                 { slug: subCat.slug },
@@ -81,9 +158,9 @@ const main = async () => {
             );
             subCategoriesSeeded++;
         }
-        console.log(`✅ Seeded ${subCategoriesSeeded} subcategories.`);
+        console.log(`✅ Seeded ${subCategoriesSeeded} general subcategories.`);
 
-        console.log('Seeding Brands...');
+        console.log('Seeding General Brands...');
         let brandsSeeded = 0;
         for (const brand of brands) {
             const slug = toSlug(brand.name);
@@ -106,9 +183,9 @@ const main = async () => {
             );
             brandsSeeded++;
         }
-        console.log(`✅ Seeded ${brandsSeeded} brands.`);
+        console.log(`✅ Seeded ${brandsSeeded} general brands.`);
 
-        console.log('Seeding Units...');
+        console.log('Seeding General Units...');
         let unitsSeeded = 0;
         for (const unit of units) {
             await Unit.updateOne(
@@ -130,10 +207,10 @@ const main = async () => {
             );
             unitsSeeded++;
         }
-        console.log(`✅ Seeded ${unitsSeeded} units.`);
+        console.log(`✅ Seeded ${unitsSeeded} general units.`);
 
         if (attributes && attributes.length > 0) {
-            console.log('Seeding Attributes...');
+            console.log('Seeding General Attributes...');
             let attributesSeeded = 0;
             for (const attr of attributes as any[]) {
                 await Attribute.updateOne(
@@ -153,7 +230,7 @@ const main = async () => {
                 );
                 attributesSeeded++;
             }
-            console.log(`✅ Seeded ${attributesSeeded} attributes.`);
+            console.log(`✅ Seeded ${attributesSeeded} general attributes.`);
         }
 
         console.log('🎉 PROD database seeding completed successfully!');
