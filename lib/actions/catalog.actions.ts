@@ -10,6 +10,9 @@ import { normalizeText } from '@/lib/catalog-utils';
 
 
 export async function seedGlobalCatalog() {
+    if (process.env.NODE_ENV === 'production') {
+        return { success: false, error: 'Catalog seeding is not allowed in production.' };
+    }
     try {
         await connectToDatabase();
 

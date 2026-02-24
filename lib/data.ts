@@ -1294,7 +1294,8 @@ export const globalCatalog = [
 					'Azúcar y Endulzantes',
 					'Sal y Especias',
 					'Conservas y Enlatados',
-					'Sopas y Caldos'
+					'Sopas y Caldos',
+					'Cereales',
 				],
 				units: [
 					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
@@ -1303,21 +1304,31 @@ export const globalCatalog = [
 					{ name: 'Mililitro', abbreviation: 'ml', status: true },
 					{ name: 'Pieza', abbreviation: 'pza', status: true },
 					{ name: 'Paquete', abbreviation: 'paq', status: true },
-					{ name: 'Lata', abbreviation: 'lata', status: true }
+					{ name: 'Lata', abbreviation: 'lata', status: true },
+					{ name: 'Bolsa', abbreviation: 'bolsa', status: true },
+					{ name: 'Frasco', abbreviation: 'fco', status: true }
 				],
-				brands: ['Herdez', 'La Costeña', 'Knorr', 'McCormick', 'Cristal', 'Zwan', 'Great Value', 'Safeway']
+				brands: ['Herdez', 'La Costeña', 'Knorr', 'McCormick', 'Verde Valle', 'Doña María', 'Del Fuerte', 'Zwan', 'Great Value', 'Nesquik', 'Nescafé', 'Morena', 'Zulia']
 			},
 			{
 				name: 'Bebidas',
 				subcategories: [
 					'Refrescos y Gaseosas',
+					'Aguas Minerales',
+					'Aguas Naturales',
+					'Aguas Purificadas (Garrafón)',
+					'Jugos y Néctares Infantiles',
+					'Bebidas Hidratantes y Sueros',
+					'Energizantes',
+					'Cerveza',
+					'Vinos y Mezclas Preparadas',
+					'Leche Entera y Especializada',
+					'Yogurt para Beber',
+					'Té Helado',
+					'Bebidas de Fruta',
+					'Café',
+					'Té y Sustitutos',
 					'Jugos y Néctares',
-					'Aguas y Bebidas Hidratantes',
-					'Cervezas',
-					'Vinos y Licores',
-					'Bebidas Energéticas',
-					'Leche y Bebidas Lácteas',
-					'Tés y Cafés Preparados'
 				],
 				units: [
 					{ name: 'Mililitro', abbreviation: 'ml', status: true },
@@ -1325,30 +1336,281 @@ export const globalCatalog = [
 					{ name: 'Botella', abbreviation: 'bot', status: true },
 					{ name: 'Lata', abbreviation: 'lata', status: true },
 					{ name: 'Six-pack', abbreviation: '6pk', status: true },
-					{ name: 'Caja', abbreviation: 'caja', status: true },
-					{ name: 'Garrafón', abbreviation: 'garrafon', status: true }
+					{ name: 'Twelve-pack', abbreviation: '12pk', status: true },
+					{ name: 'Garrafón', abbreviation: 'garrafon', status: true },
+					{ name: 'Caja', abbreviation: 'caja', status: true }
 				],
-				brands: ['Coca-Cola', 'Pepsi', 'Jumex', 'Boing', 'Bonafont', 'Corona', 'Modelo', 'Heineken', 'Nestlé', 'Lala', 'Alpura']
+				brands: ['Coca-Cola', 'Pepsi', 'Jarritos', 'Peñafiel', 'Jumex', 'Del Valle', 'Bonafont', 'Ciel', 'Corona', 'Modelo', 'Tecate', 'Heineken', 'Lala', 'Alpura', 'Gatorade', 'Monster', 'Red Bull', 'Nescafé', 'Nesquik']
+			},
+			{
+				name: 'Desechables y Productos de Fiesta',
+				subcategories: [
+					'Vasos Desechables',
+					'Platos Desechables',
+					'Cubiertos de Plástico',
+					'Servilletas de Fiesta',
+					'Bolsas para Regalo',
+					'Velitas de Cumpleaños',
+					'Globos y Decoración Básica',
+					'Contenedores para Alimentos'
+				],
+				units: [
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Ciento', abbreviation: 'cto', status: true }
+				],
+				brands: ['Reyma', 'Dart', 'Jaguar', 'Convergente', 'Regio', 'Pétalo', 'Genérico']
+			},
+			{
+				name: 'Tabaco y Otros',
+				subcategories: [
+					'Cigarrillos (Cajetilla)',
+					'Cigarrillos (Sueltos)',
+					'Encendedores',
+					'Cerillos',
+					'Pilas de Carbón',
+					'Pilas Alcalinas',
+					'Tarjetas de Regalo / Tiempo Aire'
+				],
+				units: [
+					{ name: 'Cajetilla', abbreviation: 'caj', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Par', abbreviation: 'par', status: true }
+				],
+				brands: ['Marlboro', 'Pall Mall', 'Lucky Strike', 'Bic', 'Tokai', 'La Central', 'Duracell', 'Energizer', 'Volt']
+			},
+			{
+				name: 'Lácteos y Huevos',
+				subcategories: [
+					'Leche Entera',
+					'Leche Deslactosada',
+					'Queso Fresco',
+					'Queso Oaxaca',
+					'Queso Panela',
+					'Huevos Blancos',
+					'Huevos Rojos',
+					'Yogurt Natural',
+					'Yogurt de Frutas',
+					'Mantequilla y Margarina',
+					'Crema Ácida'
+				],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+					{ name: 'Litro', abbreviation: 'L', status: true },
+					{ name: 'Caja', abbreviation: 'caja', status: true },
+					{ name: 'Docena', abbreviation: 'doc', status: true },
+					{ name: 'Medio Kilo', abbreviation: '1/2kg', status: true }
+				],
+				brands: ['Lala', 'Alpura', 'Santa Clara', 'Nutrileche', 'San Juan', 'El Calvario', 'NocheBuena', 'Philadelphia', 'Danone', 'Yoplait', 'Primavera']
 			},
 			{
 				name: 'Botana y Dulces',
 				subcategories: [
-					'Papas Fritas y Frituras',
-					'Galletas y Pastelitos',
-					'Chocolates y Dulces',
+					'Papas Fritas',
+					'Frituras de Maíz',
+					'Galletas Dulces',
+					'Galletas Saladas',
+					'Pastelitos',
+					'Chocolates',
+					'Dulces Típicos',
+					'Gomas de Mascar',
 					'Frutos Secos',
-					'Palomitas y Botanas',
-					'Gomas y Caramelos',
-					'Helados y Postres Congelados'
+					'Semillas',
+					'Chicles',
 				],
 				units: [
 					{ name: 'Gramo', abbreviation: 'g', status: true },
 					{ name: 'Paquete', abbreviation: 'paq', status: true },
 					{ name: 'Pieza', abbreviation: 'pza', status: true },
-					{ name: 'Caja', abbreviation: 'caja', status: true },
-					{ name: 'Bolsa', abbreviation: 'bolsa', status: true }
+					{ name: 'Bolsa', abbreviation: 'bolsa', status: true },
+					{ name: 'Tira', abbreviation: 'tira', status: true }
 				],
-				brands: ['Sabritas', 'Barcel', 'Gamesa', 'Marinela', 'Coca-Cola (snacks)', 'Nestlé', 'Hershey\'s', 'M&M\'s']
+				brands: ['Sabritas', 'Barcel', 'Gamesa', 'Marinela', 'Bimbo', 'Nestlé', 'Hershey\'s', 'Ferrero', 'Ricolino', 'Vero', 'Adams']
+			},
+			{
+				name: 'Carnes y Embutidos',
+				subcategories: [
+					'Jamón',
+					'Salchicha',
+					'Tocino',
+					'Chorizo y Longaniza',
+					'Queso de Puerco',
+					'Pollo Fresco',
+					'Carne de Res',
+					'Carne de Cerdo'
+
+				],
+				units: [
+					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+					{ name: 'Gramo', abbreviation: 'g', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Rebanada', abbreviation: 'reb', status: true }
+				],
+				brands: ['Fud', 'Zwan', 'San Rafael', 'Kir', 'Capistrano', 'Chimex', 'Pery', 'Bernina']
+			},
+			{
+				name: 'Frutas y Verduras',
+				subcategories: [
+					'Frutas de Temporada',
+					'Verduras Frescas',
+					'Hortalizas',
+					'Tubérculos',
+					'Chiles Secos',
+					'Frutas Secas',
+					'Frutos Secos',
+					'Semillas',
+				],
+				units: [
+					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+					{ name: 'Gramo', abbreviation: 'g', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Manojo', abbreviation: 'manojo', status: true },
+					{ name: 'Caja', abbreviation: 'caja', status: true }
+				],
+				brands: ['Genérico', 'Campo Fresco', 'Dole', 'Chiquita']
+			},
+			{
+				name: 'Panadería y Tortillería',
+				subcategories: [
+					'Pan de Caja',
+					'Pan Dulce Empaquetado',
+					'Tortillas de Maíz',
+					'Tortillas de Harina',
+					'Tostadas y Totopos',
+					'Pan Molido'
+				],
+				units: [
+					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Docena', abbreviation: 'doc', status: true }
+				],
+				brands: ['Bimbo', 'Wonder', 'Tía Rosa', 'Marinela', 'Milpa Real', 'Misión', 'Guerrero']
+			},
+			{
+				name: 'Limpieza del Hogar',
+				subcategories: [
+					'Detergentes en Polvo',
+					'Detergentes Líquidos',
+					'Suavizantes de Telas',
+					'Limpiadores de Pisos',
+					'Jabón de Trastes',
+					'Desinfectantes',
+					'Insecticidas',
+					'Papel Higiénico',
+					'Servilletas y Toallas de Papel',
+					'Fibras y Esponjas',
+					'Escobas y Trapeadores'
+				],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Litro', abbreviation: 'L', status: true },
+					{ name: 'Mililitro', abbreviation: 'ml', status: true },
+					{ name: 'Gramo', abbreviation: 'g', status: true },
+					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+					{ name: 'Rollo', abbreviation: 'rollo', status: true }
+				],
+				brands: ['Ariel', 'Persil', 'Roma', 'Zote', 'Foca', 'Downy', 'Suavitel', 'Fabuloso', 'Pinol', 'Cloralex', 'Axion', 'Salvo', 'Raid', 'Pétalo', 'Regio', 'Suavel', 'Elite']
+			},
+			{
+				name: 'Higiene y Cuidado Personal',
+				subcategories: [
+					'Jabones de Tocador',
+					'Shampoo y Acondicionador',
+					'Pasta Dental',
+					'Cepillos de Dientes',
+					'Desodorantes',
+					'Crema Corporal',
+					'Rasuradoras y Espuma',
+					'Toallas Femeninas',
+					'Tampones',
+					'Gel Antibacterial'
+				],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+					{ name: 'Gramo', abbreviation: 'g', status: true },
+					{ name: 'Mililitro', abbreviation: 'ml', status: true },
+					{ name: 'Tubo', abbreviation: 'tubo', status: true }
+				],
+				brands: ['Palmolive', 'Dove', 'Zest', 'Colgate', 'Oral-B', 'Pantene', 'Head & Shoulders', 'Rexona', 'Gillette', 'Saba', 'Kotex', 'Nivea']
+			},
+			{
+				name: 'Alimento para Mascotas',
+				subcategories: [
+					'Croquetas para Perro',
+					'Croquetas para Gato',
+					'Alimento Húmedo (Sobres)',
+					'Alimento Húmedo (Latas)',
+					'Premios y Snacks para Mascotas',
+					'Arena para Gato'
+				],
+				units: [
+					{ name: 'Kilogramo', abbreviation: 'kg', status: true },
+					{ name: 'Gramo', abbreviation: 'g', status: true },
+					{ name: 'Sobre', abbreviation: 'sobre', status: true },
+					{ name: 'Lata', abbreviation: 'lata', status: true },
+					{ name: 'Bolsa', abbreviation: 'bolsa', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true }
+				],
+				brands: ['Pedigree', 'Whiskas', 'Purina Dog Chow', 'Purina Cat Chow', 'Campeón', 'Ganador', 'Pal Perro', 'Mainstay']
+			},
+			{
+				name: 'Bebés',
+				subcategories: [
+					'Pañales Etapa 1 a 6',
+					'Toallitas Húmedas',
+					'Fórmulas Lácteas',
+					'Papillas y Alimento Infantil',
+					'Accesorios para Bebé (Biberones, Chupones)',
+					'Jabón y Shampoo para Bebé'
+				],
+				units: [
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Lata', abbreviation: 'lata', status: true },
+					{ name: 'Frasco', abbreviation: 'fco', status: true }
+				],
+				brands: ['Huggies', 'Pampers', 'Suavelastic', 'Baby Fresh', 'Gerber', 'Nan', 'Enfamil', 'Nido', 'Johnson\'s Baby', 'Mennen']
+			},
+			{
+				name: 'Farmacia y Botiquín',
+				subcategories: [
+					'Analgésicos y Antigripales',
+					'Alka-Seltzer y Antiácidos',
+					'Curitas y Material de Curación',
+					'Preservativos',
+					'Sueros Orales',
+					'Cuidado de los Pies'
+				],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Caja', abbreviation: 'caja', status: true },
+					{ name: 'Sobre', abbreviation: 'sobre', status: true },
+					{ name: 'Frasco', abbreviation: 'fco', status: true }
+				],
+				brands: ['Aspirina', 'Tabcin', 'Desenfriol', 'Alka-Seltzer', 'Pepto-Bismol', 'Sico', 'Trojan', 'Electrolit', 'Suerox', 'Band-Aid']
+			},
+			{
+				name: 'Artículos del Hogar y Varios',
+				subcategories: [
+					'Pilas y Baterías',
+					'Focos y Bombillas',
+					'Velas y Veladoras',
+					'Cerrillas y Encendedores',
+					'Artículos de Papelería Básica',
+					'Artículos de Plástico (Vasos, Platos, Cubiertos)',
+					'Bolsas para Basura'
+				],
+				units: [
+					{ name: 'Pieza', abbreviation: 'pza', status: true },
+					{ name: 'Paquete', abbreviation: 'paq', status: true },
+					{ name: 'Juego', abbreviation: 'jgo', status: true }
+				],
+				brands: ['Duracell', 'Energizer', 'Sylvania', 'Philips', 'La Morena (velas)', 'Bic', 'Scribe', 'Reyma', 'Dart']
 			}
 		]
 	},
@@ -1975,6 +2237,7 @@ const data: Data = {
 	stores,
 	warehouses,
 	customers,
+	globalCatalog,
 	orders: [
 		{
 			userEmail: 'mario@example.com',
