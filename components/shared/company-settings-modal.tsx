@@ -106,7 +106,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
     return (
         <Dialog open={open} onOpenChange={() => { }}>
             <DialogContent
-                className="w-[98vw] max-w-[95vw] sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl h-auto max-h-[90vh] flex flex-col gap-0"
+                className="w-[98vw] max-w-[95vw] sm:max-w-[550px] p-0 overflow-hidden border-none shadow-2xl h-auto max-h-[85dvh] flex flex-col gap-0"
                 onPointerDownOutside={(e) => e.preventDefault()}
                 onEscapeKeyDown={(e) => e.preventDefault()}
             >

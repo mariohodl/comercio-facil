@@ -81,7 +81,7 @@ export function ProductModal({ open, onClose, onSuccess, storeId }: ProductModal
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent
-                className="w-[95vw] sm:max-w-[80vw] lg:max-w-[70%] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-xl"
+                className="w-[95vw] sm:max-w-[80vw] lg:max-w-[70%] max-h-[90dvh] overflow-y-auto p-0 border-none shadow-2xl rounded-xl"
                 onOpenAutoFocus={(e) => e.preventDefault()}
             >
                 <DialogHeader className="p-4 sm:p-6 pb-0 sticky top-0 bg-white z-20 border-b border-gray-100 rounded-t-xl">

@@ -3,8 +3,7 @@ import React from 'react'
 import useCartSidebar from '@/hooks/use-cart-sidebar'
 import CartSidebar from './cart-sidebar'
 import { SessionProvider } from 'next-auth/react'
-// import { ThemeProvider } from './theme-provider'
-// import { Toaster } from '../ui/toast'
+import GlobalLoader from './GlobalLoader'
 
 export default function ClientProviders({
   children,
@@ -36,6 +35,7 @@ export default function ClientProviders({
         <div>{children}</div>
       )}
       {/* <Toaster /> */}
+      <GlobalLoader />
     </SessionProvider>)
 
 }

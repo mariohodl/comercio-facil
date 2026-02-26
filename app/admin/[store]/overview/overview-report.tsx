@@ -1,7 +1,7 @@
 'use client'
 import {
-  FileText,
-  RefreshCw,
+  TrendingUp,
+  RotateCcw,
   Gift,
   ShieldCheck,
   Layers,
@@ -144,7 +144,7 @@ export default function OverviewReport() {
             <SummaryCard
               title={t('totalSales')}
               value={formatCurrency(data.totalSales)}
-              icon={FileText}
+              icon={TrendingUp}
               percentage={22}
               className='bg-orange-50 border-orange-100'
               iconClassName='bg-orange-100 text-orange-600'
@@ -152,7 +152,7 @@ export default function OverviewReport() {
             <SummaryCard
               title={t('totalSalesReturn')}
               value={formatCurrency(0)}
-              icon={RefreshCw}
+              icon={RotateCcw}
               percentage={-22}
               className='bg-navy text-white border-navy-dark'
               iconClassName='bg-navy-dark text-white'

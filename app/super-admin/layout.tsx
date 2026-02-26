@@ -67,7 +67,7 @@ export default async function SuperAdminLayout({
             <main className="flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950 flex flex-col">
                 <header className="h-20 border-b border-slate-800 flex items-center justify-between px-8 shrink-0 backdrop-blur-xl bg-slate-950/50 sticky top-0 z-10">
                     <div className="flex flex-col">
-                        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest">Panel de Control Global</h2>
+                        <h2 className="text-sm md: font-bold text-slate-500 uppercase tracking-widest">Panel de Control Global</h2>
                         <p className="text-white font-bold">{session.user.name}</p>
                     </div>
                     <div className="flex items-center gap-4">

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ScanLine, Camera } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 interface POSBarcodeScannerProps {
     open: boolean
@@ -23,6 +24,7 @@ export default function POSBarcodeScanner({ open, onOpenChange, storeId }: POSBa
     const [cameraOpen, setCameraOpen] = useState(false)
     const { addToCart } = usePOSStore()
     const t = useTranslations('pos')
+    const { showSuccess, showError } = useToast()
 
     const searchAndAddProduct = async (barcode: string) => {
         if (!barcode.trim()) return
@@ -47,17 +49,13 @@ export default function POSBarcodeScanner({ open, onOpenChange, storeId }: POSBa
                 setManualSKU('')
                 onOpenChange(false)
                 // Show success feedback
-                const successMsg = document.createElement('div')
-                successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50'
-                successMsg.textContent = t('addedToCart', { product: product.name })
-                document.body.appendChild(successMsg)
-                setTimeout(() => successMsg.remove(), 2000)
+                showSuccess(t('addedToCart', { product: product.name }))
             } else {
-                alert(t('productNotFound', { sku: barcode }))
+                showError(t('productNotFound', { sku: barcode }))
             }
         } catch (error) {
             console.error('Error searching product:', error)
-            alert(t('errorSearching'))
+            showError(t('errorSearching'))
         } finally {
             setScanning(false)
         }

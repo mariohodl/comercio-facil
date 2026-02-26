@@ -13,7 +13,7 @@ export function PromoPopup() {
     useEffect(() => {
         // Show popup after 5 seconds
         const timer = setTimeout(() => {
-            const hasSeenPromo = sessionStorage.getItem('seen_promo_exito2026')
+            const hasSeenPromo = sessionStorage.getItem('seen_promo_2m')
             if (!hasSeenPromo) {
                 setIsOpen(true)
             }
@@ -24,11 +24,11 @@ export function PromoPopup() {
 
     const handleClose = () => {
         setIsOpen(false)
-        sessionStorage.setItem('seen_promo_exito2026', 'true')
+        sessionStorage.setItem('seen_promo_2m', 'true')
     }
 
     const copyCode = () => {
-        navigator.clipboard.writeText('EXITO2026')
+        navigator.clipboard.writeText('PROMO2M')
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
     }
@@ -58,7 +58,7 @@ export function PromoPopup() {
                                 ¡Regalo Exclusivo!
                             </h3>
                             <p className="text-sm text-gray-500 leading-snug">
-                                Obtén <span className="text-blue-600 font-semibold">3 meses gratis</span> extra en planes anuales.
+                                Obtén <span className="text-blue-600 font-semibold">2 meses gratis</span> extra en tu plan.
                             </p>
                         </div>
                     </div>
@@ -69,14 +69,14 @@ export function PromoPopup() {
                             className="flex-1 bg-gray-50 border border-dashed border-gray-300 rounded-lg px-3 py-2 flex items-center justify-between group hover:border-blue-400 hover:bg-blue-50/50 transition-colors cursor-pointer"
                             onClick={copyCode}
                         >
-                            <code className="text-sm font-bold text-gray-700 font-mono tracking-wide">EXITO2026</code>
+                            <code className="text-sm font-bold text-gray-700 font-mono tracking-wide">PROMO2M</code>
                             <div className={cn("text-gray-400 transition-colors", copied && "text-green-600")}>
                                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                             </div>
                         </div>
 
                         <Button asChild size="sm" className="bg-gray-900 hover:bg-gray-800 text-white shadow-md transition-all active:scale-95">
-                            <Link href="/sign-up?promo=EXITO2026">
+                            <Link href="/sign-up?promo=PROMO2M">
                                 Canjear
                             </Link>
                         </Button>

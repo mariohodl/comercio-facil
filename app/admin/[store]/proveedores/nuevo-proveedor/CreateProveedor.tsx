@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Upload, AlertTriangle, CheckCircle2, Trash2, ArrowLeft, Save, RefreshCw } from 'lucide-react'
+import { Upload, AlertTriangle, CheckCircle2, Trash2, ArrowLeft, Save, RotateCcw } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { ProveedorInputSchema } from '@/lib/validator'
@@ -250,7 +250,7 @@ const CreateProveedor = () => {
                               <Input placeholder="Generar clave..." {...field} className="bg-gray-100 text-gray-500 font-mono" readOnly />
                             </FormControl>
                             <Button type="button" variant="outline" onClick={generateClave} className="shrink-0 text-navy hover:text-navy-600">
-                              <RefreshCw className="mr-2 h-4 w-4" />
+                              <RotateCcw className="mr-2 h-4 w-4" />
                               Generar
                             </Button>
                           </div>

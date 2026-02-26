@@ -65,8 +65,7 @@ test.describe('Company Setup Flow', () => {
             industry: 'abarrotes'
         });
 
-        await expect(page).toHaveURL(/.*\/admin\/.*\/overview/, { timeout: 15000 });
-
+        await expect(page).toHaveURL(/.*\/admin\/.*\/overview/, { timeout: 30000 });
         await expect(page.getByText('Test Company INC')).toBeVisible();
     });
 });

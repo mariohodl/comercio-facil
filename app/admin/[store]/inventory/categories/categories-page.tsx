@@ -26,7 +26,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Search, Plus, Edit, Trash2, RefreshCw, Database, Loader2 } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Database, Loader2 } from 'lucide-react'
 import { DeleteDialog } from '@/components/shared/delete-dialog'
 
 export default function CategoriesPage({
@@ -140,16 +140,11 @@ export default function CategoriesPage({
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-navy tracking-tight">{t('categories')}</h1>
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{t('manageCategories')}</p>
+                    <h1 className="text-xl md:text-2xl font-bold text-navy tracking-tight">{t('categories')}</h1>
+                    <p className="text-sm md:text-md text-slate-500 font-medium">{t('manageCategories')}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                    <div className="flex gap-2 w-full sm:w-auto">
 
-                        <Button variant="outline" size="icon" onClick={fetchCategories} className="shrink-0">
-                            <RefreshCw className="h-4 w-4" />
-                        </Button>
-                    </div>
 
                     {process.env.NODE_ENV !== 'production' && (
                         <Button

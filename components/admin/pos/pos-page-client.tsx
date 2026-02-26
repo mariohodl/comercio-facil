@@ -255,7 +255,7 @@ export default function POSPageClient({
 
             {/* Main Content */}
             <div className='flex-1 overflow-hidden relative'>
-                <div className='grid grid-cols-1 lg:grid-cols-12 h-full gap-0 lg:gap-6 lg:p-6'>
+                <div className='grid grid-cols-1 lg:grid-cols-12 h-full gap-0 lg:gap-3 lg:p-2'>
                     {/* Category Sidebar - Hidden on mobile in the grid, but potentially included inside ProductSearch or as a top bar */}
                     <div className='hidden lg:block lg:col-span-1 overflow-hidden h-full'>
                         <CategorySidebar

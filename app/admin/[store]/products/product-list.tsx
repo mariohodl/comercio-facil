@@ -7,11 +7,8 @@ import {
     ChevronRight,
     Edit,
     Eye,
-    FileSpreadsheet,
-    FileText,
     Import,
     Plus,
-    RefreshCw,
     Search,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -115,21 +112,11 @@ const ProductList = ({ store }: { store: string }) => {
         <div className='space-y-4'>
             <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4'>
                 <div>
-                    <h1 className='font-bold text-2xl'>{t('productList')}</h1>
-                    <p className='text-muted-foreground text-sm'>{t('manageProducts')}</p>
+                    <h1 className='font-bold text-xl md:text-2xl'>{t('productList')}</h1>
+                    <p className='text-sm md:text-md text-slate-500 font-medium'>{t('manageProducts')}</p>
                 </div>
                 <div className='flex flex-wrap gap-2 w-full xl:w-auto'>
-                    <div className='flex gap-2 w-full sm:w-auto'>
-                        <Button variant='outline' size='icon' className="shrink-0">
-                            <FileText className='w-4 h-4 text-red-500' />
-                        </Button>
-                        <Button variant='outline' size='icon' className="shrink-0">
-                            <FileSpreadsheet className='w-4 h-4 text-green-500' />
-                        </Button>
-                        <Button variant='outline' size='icon' onClick={() => fetchData(page)} className="shrink-0">
-                            <RefreshCw className='w-4 h-4' />
-                        </Button>
-                    </div>
+
                     <GuidedHighlighter
                         show={data?.totalProducts === 0}
                         message={tOnboarding('highlights.addProduct')}

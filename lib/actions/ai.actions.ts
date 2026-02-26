@@ -1,5 +1,9 @@
 'use server'
 
+import { connectToDatabase } from '@/lib/db'
+import AICache from '@/lib/db/models/ai-cache.model'
+
+
 export async function getSuggestedSubCategories(categoryName: string, industry: string = 'general') {
     try {
         // Try Google Gemini (free)
@@ -124,5 +128,140 @@ export async function getSuggestedSubCategories(categoryName: string, industry: 
     } catch (error) {
         console.error('Error fetching suggested subcategories:', error)
         return []
+    }
+}
+
+export async function extractProductClassificationWithAI(categoriesText: string, productName: string, description?: string, keywords?: string[]) {
+    if (!categoriesText && !productName && (!keywords || keywords.length === 0)) return null
+
+    // Normalize input to create a consistent cache key
+    const normalizedKey = `${productName}|${categoriesText}|${(keywords || []).sort().join(',')}`.toLowerCase()
+
+    try {
+        await connectToDatabase()
+
+        // 1. Check Cache First
+        const cached = await AICache.findOne({ key: normalizedKey, type: 'classification_refinement' })
+        if (cached) {
+            console.log(`[AI Cache] HIT for key: ${normalizedKey.substring(0, 50)}...`)
+            AICache.updateOne({ _id: cached._id }, { $inc: { hits: 1 } }).catch(e => console.error('Error updating cache hits:', e))
+            try {
+                return JSON.parse(cached.value) as { name: string, category: string, subCategory: string }
+            } catch (e) {
+                console.error('Error parsing cached classification JSON:', e)
+            }
+        }
+
+        console.log(`[AI Cache] MISS for key: ${normalizedKey.substring(0, 50)}...`)
+
+        const googleKey = process.env.GOOGLE_API_KEY
+        let extractedJSON: string | null = null
+        let usedModel: string | null = null
+
+        if (googleKey) {
+            const listResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${googleKey}`)
+            if (listResponse.ok) {
+                const listData = await listResponse.json()
+                const models = (listData.models || []).filter((m: any) =>
+                    m.supportedGenerationMethods?.includes('generateContent') &&
+                    m.name.toLowerCase().includes('gemini')
+                )
+
+                const model = models.find((m: any) => m.name.includes('gemini-1.5-flash')) || models[0]
+
+                if (model) {
+                    usedModel = model.name
+                    const prompt = `
+                        As an expert in Mexican retail and "tienditas de abarrotes", classify this product into a concise Category and a specific Subcategory.
+                        Also, improve the product name if it's too short, generic, or incomplete (e.g., "Integral" -> "Pan Integral Bimbo").
+                        
+                        Original Name: "${productName}"
+                        Description: "${description || 'No description available'}"
+                        Keywords: "${keywords?.join(', ') || 'No keywords available'}"
+                        Raw Categories from API: "${categoriesText}"
+                        
+                        Requirements:
+                        - Use Mexican Spanish terminology (e.g., "Abarrotes", "Carnes y Embutidos", "Lácteos", "Limpieza", "Cuidado Personal", "Botanas", "Refrescos").
+                        - The Category should be broad but concise.
+                        - Create a descriptive and professional name for the product.
+                        - IMPORTANT: Return ONLY a JSON object: {"name": "...", "category": "...", "subCategory": "..."}
+                    `.trim()
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model.name}:generateContent?key=${googleKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: prompt }]
+                            }]
+                        })
+                    })
+
+                    if (response.ok) {
+                        const data = await response.json()
+                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+                        if (text) {
+                            // Robust JSON extraction
+                            const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim()
+                            const startIdx = cleanJson.indexOf('{')
+                            const endIdx = cleanJson.lastIndexOf('}')
+
+                            if (startIdx !== -1 && endIdx !== -1) {
+                                extractedJSON = cleanJson.substring(startIdx, endIdx + 1)
+                            } else {
+                                extractedJSON = cleanJson
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        let result = { name: productName, category: '', subCategory: '' }
+        if (extractedJSON) {
+            try {
+                const parsed = JSON.parse(extractedJSON)
+                result = {
+                    name: parsed.name || productName,
+                    category: parsed.category || '',
+                    subCategory: parsed.subCategory || ''
+                }
+            } catch (e) { }
+        }
+
+        if (!result.category) {
+            result.category = categoriesText.split(',')[0]?.trim() || 'General'
+        }
+        if (!result.subCategory) {
+            result.subCategory = categoriesText.split(',').pop()?.trim() || 'General'
+        }
+
+        // 2. Save to Cache
+        try {
+            await AICache.findOneAndUpdate(
+                { key: normalizedKey, type: 'classification_refinement' },
+                {
+                    value: JSON.stringify(result),
+                    type: 'classification_refinement',
+                    modelName: usedModel || 'fallback',
+                    inputContext: `${productName} | ${description} | ${keywords?.join(',')}`.substring(0, 500),
+                    $inc: { hits: 0 }
+                },
+                { upsert: true, new: true, setDefaultsOnInsert: true }
+            )
+            console.log(`[AI Cache] SAVE SUCCESS for key: ${normalizedKey.substring(0, 50)}...`)
+        } catch (saveError) {
+            console.error('[AI Cache] SAVE FAILED:', saveError)
+        }
+
+        return result
+    } catch (e) {
+        console.error('[AI Action] Error extracting classification:', e)
+        const parts = categoriesText.split(',')
+        return {
+            name: productName,
+            category: parts[0]?.trim() || 'General',
+            subCategory: parts.pop()?.trim() || 'General'
+        }
     }
 }

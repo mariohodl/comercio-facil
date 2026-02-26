@@ -22,17 +22,14 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import {
+    Plus,
+    Settings,
     Pencil,
     Trash2,
     Search,
-    FileText,
-    FileSpreadsheet,
-    RotateCcw,
     ChevronUp,
     ChevronLeft,
     ChevronRight,
-    Plus,
-    Settings
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { IUnit } from '@/lib/db/models/unit.model'
@@ -132,22 +129,11 @@ export default function UnitList({ store }: { store: string }) {
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">{t('units')}</h2>
-                    <p className="text-muted-foreground">{t('manageUnits')}</p>
+                    <h2 className="text-xl md:text-2xl font-bold tracking-tight">{t('units')}</h2>
+                    <p className="text-sm md:text-md text-slate-500 font-medium">{t('manageUnits')}</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" className="h-9 w-9">
-                        <FileText className="h-4 w-4 text-red-500" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-9 w-9">
-                        <FileSpreadsheet className="h-4 w-4 text-green-500" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => fetchUnits()}>
-                        <RotateCcw className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-9 w-9">
-                        <ChevronUp className="h-4 w-4" />
-                    </Button>
+
                     <Button className="bg-orange hover:bg-orange-dark text-white" onClick={() => setIsModalOpen(true)}>
                         <Plus className="mr-2 h-4 w-4" /> {t('addUnit')}
                     </Button>

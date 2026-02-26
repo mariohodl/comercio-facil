@@ -87,6 +87,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.ufs.sh',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.openfoodfacts.org',
+      },
     ],
     dangerouslyAllowSVG: true,
   },

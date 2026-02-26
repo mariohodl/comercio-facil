@@ -22,7 +22,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table'
-import { Plus, Search, FileText, FileSpreadsheet, RefreshCw, ChevronUp } from 'lucide-react'
+import { Plus, Search, ChevronUp } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { getColumns } from './attribute-column'
@@ -62,24 +62,11 @@ export function AttributeClient({ data, storeId }: AttributeClientProps) {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-navy">{t('title')}</h1>
-                    <p className="text-sm text-muted-foreground">{t('description')}</p>
+                    <h1 className="text-xl md:text-2xl font-bold text-navy">{t('title')}</h1>
+                    <p className="text-xs md:text-sm text-slate-500 font-medium">{t('description')}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <div className="flex items-center gap-2 mr-auto sm:mr-0">
-                        <Button variant="outline" size="icon" className="text-red-500 bg-red-50 border-red-100 hover:bg-red-100 h-9 w-9">
-                            <FileText className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="icon" className="text-green-600 bg-green-50 border-green-100 hover:bg-green-100 h-9 w-9">
-                            <FileSpreadsheet className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="icon" className="h-9 w-9">
-                            <RefreshCw className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="icon" className="h-9 w-9">
-                            <ChevronUp className="h-4 w-4" />
-                        </Button>
-                    </div>
+
                     <AttributeDialog
                         storeId={storeId}
                         trigger={

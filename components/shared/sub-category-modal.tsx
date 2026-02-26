@@ -125,7 +125,7 @@ export function SubCategoryModal({ open, onClose, subCategory, onSuccess, storeI
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[500px] max-h-[90dvh] overflow-y-auto">
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-xl font-semibold">

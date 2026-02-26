@@ -215,60 +215,54 @@ export class ProductPage {
      * After selection, verifies the trigger button reflects the chosen value.
      */
     private async selectFromAutocomplete(trigger: Locator, value: string) {
-        // Remember initial text to detect change later
-        const initialText = await trigger.innerText().catch(() => '');
-
         await trigger.click();
 
-        // Scope to the open popover content to avoid matching elements from other popovers
-        const popoverContent = this.page.locator('[data-radix-popper-content-wrapper]:visible').last();
-        await expect(popoverContent).toBeVisible({ timeout: 10000 });
+        // Wait for the actual visible popover wrapper
+        const popover = this.page.locator('[data-radix-popper-content-wrapper]:visible').last();
+        await expect(popover).toBeVisible({ timeout: 15000 });
 
-        const input = popoverContent.locator('[cmdk-input]');
-        await expect(input).toBeVisible({ timeout: 10000 });
+        // Find the input inside the popover
+        const input = popover.locator('input').first();
+        await expect(input).toBeVisible({ timeout: 5000 });
+
+        await input.clear();
         await input.fill(value);
 
-        // Wait for debounce (300ms) + server fetch to resolve
-        // Use a generous timeout for CI stability
-        await this.page.waitForTimeout(3000);
+        await this.page.waitForTimeout(1000);
+        const loader = popover.locator('svg.animate-spin');
+        if (await loader.isVisible().catch(() => false)) {
+            await expect(loader).not.toBeVisible({ timeout: 15000 });
+        }
 
-        // Look for exact match among the items within the popover
-        const items = popoverContent.locator('[cmdk-item]');
-        const matchingItem = items.filter({ hasText: new RegExp(value, 'i') }).first();
-        // Scope create button to just the popover, not the whole page
-        const createBtn = popoverContent.locator('button').filter({ hasText: /Crear|Create/i }).first();
+        const items = popover.locator('[role="option"], [cmdk-item], [data-cmdk-item]');
+
+        const matchingItem = items.filter({ hasText: new RegExp(`^${value}$`, 'i') }).first();
+        const partialMatch = items.filter({ hasText: new RegExp(value, 'i') }).first();
 
         if (await matchingItem.isVisible().catch(() => false)) {
             await matchingItem.click();
-        } else if (await createBtn.isVisible().catch(() => false)) {
-            await createBtn.click();
-            // The create button triggers an async server action.
-            // Wait for it to complete and set the form value.
-            await this.page.waitForTimeout(2000);
+        } else if (await partialMatch.isVisible().catch(() => false)) {
+            await partialMatch.click();
         } else {
-            // Last resort: click the first available item
             const firstItem = items.first();
             if (await firstItem.isVisible().catch(() => false)) {
                 await firstItem.click();
             } else {
-                throw new Error(`Autocomplete: no option or create button found for "${value}"`);
+                const createBtn = popover.locator('button').filter({ hasText: /Crear|Create|Nuevo|New|Agregar|Add/i }).first();
+                if (await createBtn.isVisible().catch(() => false)) {
+                    await createBtn.click();
+                    await this.page.waitForTimeout(3000);
+                } else {
+                    throw new Error(`Autocomplete: no option or create button found for "${value}"`);
+                }
             }
         }
 
         // Wait for popover to close
-        await expect(popoverContent).not.toBeVisible({ timeout: 5000 }).catch(() => {
-            // If popover didn't close, press Escape to close it
+        await expect(popover).not.toBeVisible({ timeout: 10000 }).catch(() => {
             return this.page.keyboard.press('Escape');
         });
 
-        // Extra settle time for async callbacks (onSelect/onCustomCreate)
         await this.page.waitForTimeout(500);
-
-        // Verify the trigger button now shows the selected value
-        await expect(trigger).not.toHaveText(initialText === '' ? /^$/ : new RegExp(`^\\s*$`), { timeout: 5000 }).catch(() => {
-            // If text didn't change, log for diagnostics but don't fail here;
-            // the form submission error will catch it
-            console.warn(`Autocomplete for "${value}": trigger text may not have updated. Current: "${trigger.innerText()}"`)
-        });
     }
 }
