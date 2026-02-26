@@ -4,9 +4,6 @@ import Link from 'next/link'
 import {
     ChevronLeft,
     ChevronRight,
-    FileSpreadsheet,
-    FileText,
-    RefreshCw,
     Search,
     Edit,
 } from 'lucide-react'
@@ -126,15 +123,7 @@ const LowStockList = ({ store }: { store: string }) => {
                     <p className='text-muted-foreground text-sm'>{t('manageLowStock')}</p>
                 </div>
                 <div className='flex flex-wrap gap-2'>
-                    <Button variant='outline' size='icon'>
-                        <FileText className='w-4 h-4 text-red-500' />
-                    </Button>
-                    <Button variant='outline' size='icon'>
-                        <FileSpreadsheet className='w-4 h-4 text-green-500' />
-                    </Button>
-                    <Button variant='outline' size='icon' onClick={() => fetchData(page)}>
-                        <RefreshCw className='w-4 h-4' />
-                    </Button>
+
                     <Button className='bg-navy hover:bg-navy-dark text-white'>
                         {t('sendEmail')}
                     </Button>

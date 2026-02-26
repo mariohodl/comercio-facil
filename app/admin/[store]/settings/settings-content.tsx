@@ -166,11 +166,11 @@ export default function SettingsContent() {
 
     return (
         <div className="container mx-auto  max-w-7xl">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="mb-2">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                     {t('title')}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-sm md:text-md text-gray-600 dark:text-gray-400">
                     {t('subtitle')}
                 </p>
             </div>

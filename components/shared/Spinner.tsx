@@ -1,21 +1,20 @@
 'use client'
 import React from 'react'
-// @ts-expect-error -- Library has some  missing types
-import { Ring } from 'react-css-spinners'
+import { Loader2 } from 'lucide-react'
 
-const Spinner = () => {
+interface SpinnerProps {
+  size?: number
+  className?: string
+}
+
+const Spinner = ({ size = 48, className = "" }: SpinnerProps) => {
   return (
-    <div>
-      <section className="flex justify-center items-center w-full h-screen bg-black bg-opacity-80 absolute" style={{ zIndex: 9999 }}>
-        <Ring
-          size={150}
-          color="#fff"
-          className="animate-spin"
-          style={{ width: '150px', height: '150px' }}
-        />
-      </section>
+    <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
+      <Loader2
+        size={size}
+        className="animate-spin text-orange transition-all duration-700"
+      />
     </div>
-
   )
 }
 

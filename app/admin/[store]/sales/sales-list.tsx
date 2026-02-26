@@ -7,10 +7,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Eye,
-    FileSpreadsheet,
-    FileText,
     Plus,
-    RefreshCw,
     Search,
     MoreVertical,
     ShoppingBag,
@@ -18,6 +15,7 @@ import {
     Clock,
     Trash2,
     Settings,
+    Loader2,
 } from 'lucide-react'
 import SalesDetailsModal from '@/components/admin/sales/sales-details-modal'
 import FulfillmentStatusModal from '@/components/admin/sales/fulfillment-status-modal'
@@ -171,19 +169,10 @@ const SalesList = ({ store }: { store: string }) => {
             <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-2 md:px-0'>
                 <div>
                     <h1 className='font-bold text-2xl text-navy'>{t('title')}</h1>
-                    <p className='text-muted-foreground text-sm'>{t('manageSales')}</p>
+                    <p className='text-xs text-slate-500 font-medium'>{t('manageSales')}</p>
                 </div>
                 <div className='flex flex-wrap items-center gap-2 w-full sm:w-auto'>
                     <div className='flex items-center gap-2 mr-auto sm:mr-0'>
-                        <Button variant='outline' size='icon' className="h-9 w-9">
-                            <FileText className='w-4 h-4 text-red-500' />
-                        </Button>
-                        <Button variant='outline' size='icon' className="h-9 w-9">
-                            <FileSpreadsheet className='w-4 h-4 text-green-500' />
-                        </Button>
-                        <Button variant='outline' size='icon' onClick={() => fetchData(page)} className="h-9 w-9">
-                            <RefreshCw className='w-4 h-4' />
-                        </Button>
                         <Button variant='outline' size='icon' className="h-9 w-9">
                             <ChevronLeft className='w-4 h-4 rotate-90' />
                         </Button>
@@ -276,7 +265,7 @@ const SalesList = ({ store }: { store: string }) => {
                                     <TableRow>
                                         <TableCell colSpan={11} className='text-center h-32'>
                                             <div className="flex flex-col items-center gap-2">
-                                                <RefreshCw className="h-6 w-6 animate-spin text-gray-400" />
+                                                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                                                 <span className="text-sm text-gray-500">{tCommon('loading')}</span>
                                             </div>
                                         </TableCell>

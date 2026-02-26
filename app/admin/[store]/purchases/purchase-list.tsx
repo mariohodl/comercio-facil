@@ -7,10 +7,7 @@ import {
     ChevronRight,
     Edit,
     Eye,
-    FileSpreadsheet,
-    FileText,
     Plus,
-    RefreshCw,
     Search,
     Copy,
     Trash2
@@ -134,17 +131,7 @@ const PurchaseList = ({ store }: { store: string }) => {
                     <p className='text-muted-foreground text-sm'>{t('managePurchases')}</p>
                 </div>
                 <div className='flex flex-wrap gap-2 w-full xl:w-auto'>
-                    <div className='flex gap-2 w-full sm:w-auto'>
-                        <Button variant='outline' size='icon' className="shrink-0">
-                            <FileText className='w-4 h-4 text-red-500' />
-                        </Button>
-                        <Button variant='outline' size='icon' className="shrink-0">
-                            <FileSpreadsheet className='w-4 h-4 text-green-500' />
-                        </Button>
-                        <Button variant='outline' size='icon' onClick={() => fetchData(page)} className="shrink-0">
-                            <RefreshCw className='w-4 h-4' />
-                        </Button>
-                    </div>
+
                     <GuidedHighlighter
                         show={data?.totalPurchases === 0}
                         message={tOnboarding('highlights.addPurchase')}

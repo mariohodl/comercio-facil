@@ -3,7 +3,7 @@ import { redirect, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
-import { Mail, Lock, ArrowRight, Loader2, KeyRound } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Loader2, KeyRound, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import {
   Form,
@@ -38,6 +38,7 @@ const signInDefaultValues =
 export default function CredentialsSignInForm() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const promo = searchParams.get('promo')
 
   const [isLoading, setIsLoading] = useState(false)
   const form = useForm<IUserSignIn>({
@@ -91,6 +92,18 @@ export default function CredentialsSignInForm() {
           Inicia sesión para gestionar tu negocio en <span className='font-semibold text-orange'>{APP_NAME}</span>.
         </p>
       </div>
+
+      {promo === 'PROMO2M' && (
+        <div className='mb-8 p-4 bg-gradient-to-br from-orange-50 to-white border border-orange-200 rounded-2xl flex items-center gap-4 text-orange-800 text-sm font-bold animate-in fade-in zoom-in slide-in-from-top-4 duration-700 shadow-sm'>
+          <div className='bg-orange-500 p-2 rounded-xl shadow-lg shadow-orange-500/20 rotate-3'>
+            <ShieldCheck className='w-5 h-5 text-white' />
+          </div>
+          <div className='flex flex-col'>
+            <span className='text-[10px] uppercase tracking-tighter text-orange-600'>Beneficio Activado</span>
+            <span>¡Código <strong>{promo}</strong> aplicado! 2 meses extra gratis.</span>
+          </div>
+        </div>
+      )}
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <input type='hidden' name='callbackUrl' value={callbackUrl} />

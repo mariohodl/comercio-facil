@@ -18,11 +18,12 @@ export const metadata: Metadata = {
 export default async function SignIn(props: {
   searchParams: Promise<{
     callbackUrl: string
+    promo?: string
   }>
 }) {
   const searchParams = await props.searchParams
 
-  const { callbackUrl = '/' } = searchParams
+  const { callbackUrl = '/', promo } = searchParams
 
   const session = await auth()
   if (session) {
@@ -57,7 +58,7 @@ export default async function SignIn(props: {
             <p className='text-sm text-gray-500'>
               ¿No tienes una cuenta?{' '}
               <Link
-                href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                href={`/sign-up?${new URLSearchParams(searchParams as any).toString()}`}
                 className='text-orange font-bold hover:underline'
               >
                 Regístrate ahora

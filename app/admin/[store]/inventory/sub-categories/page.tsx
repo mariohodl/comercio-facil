@@ -34,7 +34,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Search, Plus, Edit, Trash2, RefreshCw, Sparkles, Loader2 } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Sparkles, Loader2 } from 'lucide-react'
 import { DeleteDialog } from '@/components/shared/delete-dialog'
 import { SubCategoryModal } from '@/components/shared/sub-category-modal'
 
@@ -147,16 +147,11 @@ export default function SubCategoriesPage() {
         <div className="space-y-6 md:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-navy tracking-tight">{t('subCategories')}</h1>
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{t('manageSubCategories')}</p>
+                    <h1 className="text-xl md:text-2xl font-bold text-navy tracking-tight">{t('subCategories')}</h1>
+                    <p className="text-sm md:text-md text-slate-500 font-medium">{t('manageSubCategories')}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                    <div className="flex items-center gap-2 mr-auto sm:mr-0">
 
-                        <Button variant="outline" size="icon" onClick={fetchSubCategories} className="h-9 w-9 shrink-0">
-                            <RefreshCw className="h-4 w-4" />
-                        </Button>
-                    </div>
                     <Button
                         variant="outline"
                         onClick={handleOpenAiSelection}
@@ -215,7 +210,7 @@ export default function SubCategoriesPage() {
                                 <TableRow>
                                     <TableCell colSpan={9} className="text-center py-10">
                                         <div className="flex flex-col items-center gap-2">
-                                            <RefreshCw className="h-6 w-6 animate-spin text-slate-300" />
+                                            <Loader2 className="h-6 w-6 animate-spin text-slate-300" />
                                             <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t('loading')}</span>
                                         </div>
                                     </TableCell>

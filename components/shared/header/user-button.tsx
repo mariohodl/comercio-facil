@@ -24,7 +24,7 @@ export default async function UserButton({
   const session = await auth()
   const t = await getTranslations()
   return (
-    <div className='flex gap-2 items-center'>
+    <div className='flex mdgap-2 items-center'>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

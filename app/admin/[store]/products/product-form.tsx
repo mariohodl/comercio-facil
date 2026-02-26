@@ -4,7 +4,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { PlusCircle, ScanBarcode, Trash, RefreshCw, ChevronLeft, ChevronDown, X, Edit, Info } from 'lucide-react'
+import { PlusCircle, ScanBarcode, Trash, RotateCcw, ChevronLeft, ChevronDown, X, Edit, Info } from 'lucide-react'
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
@@ -26,6 +26,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import { useBarcodeScanner } from '@/hooks/use-barcode-scanner'
 import { createProduct, updateProduct, deleteProductImg } from '@/lib/actions/product.actions'
+import { getProductInfoByBarcode } from '@/lib/actions/external-api.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { UploadButton, useUploadThing } from '@/lib/uploadthing'
 import { compressImage } from '@/lib/image-compression'
@@ -47,7 +48,17 @@ import { IWarehouse } from '@/lib/db/models/warehouse.model'
 import { CatalogAutocomplete } from '@/components/shared/catalog-autocomplete'
 import PricingInfoModal from '@/components/shared/pricing-info-modal'
 import GuidedHighlighter from '@/components/shared/guided-highlighter'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { quickCreateCategory, quickCreateBrand, quickCreateUnit, quickCreateSubCategory } from '@/lib/actions/quick-creation.actions'
+import { NormalizedProduct } from '@/lib/actions/external-api.actions'
+import useLoadingStore from '@/hooks/use-loading-store'
 
 const useDefaultValues = false;
 
@@ -171,6 +182,8 @@ const ProductForm = ({
   const [subCategories, setSubCategories] = useState<any[]>([])
   const [isScannerOpen, setIsScannerOpen] = useState(false)
   const [barcodeScanned, setBarcodeScanned] = useState(false)
+  const [fetchedProduct, setFetchedProduct] = useState<NormalizedProduct | null>(null)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(null)
   const variantBuilderRef = useRef<HTMLDivElement>(null)
 
@@ -248,8 +261,8 @@ const ProductForm = ({
 
     if (target === 'main') {
       const currentImages = form.getValues('images') || [];
-      if (currentImages.length + newImages.length > 4) {
-        showError(t('maxImagesReached') || 'Maximum of 4 images allowed');
+      if (currentImages.length + newImages.length > 3) {
+        showError(t('maxImagesReached') || 'Maximum of 3 images allowed');
         return;
       }
       form.setValue('images', [...currentImages, ...newImages]);
@@ -381,7 +394,11 @@ const ProductForm = ({
 
       if (!categoryId) {
         setSubCategories([])
-        form.setValue('subCategory', '')
+        // Only reset subCategory if there's also no category text set (truly empty)
+        // If a custom category is set (no DB id), preserve any existing subCategory value
+        if (!selectedCategory) {
+          form.setValue('subCategory', '')
+        }
         return
       }
 
@@ -422,12 +439,164 @@ const ProductForm = ({
 
   const barcodeInputRef = useRef<HTMLInputElement>(null)
 
+
+  // External Product Info Fetching Logic
+  const { setIsLoading } = useLoadingStore()
+
+  const fetchExternalProductInfo = useCallback(async (barcode: string) => {
+    // Only fetch for specific industries as requested by user
+    const industriesToFetch = ['abarrotes', 'farmacia', 'tienda-de-conveniencia']
+    const normalizedIndustry = industry.toLowerCase()
+
+    console.log(`[Client] fetchExternalProductInfo triggered for: ${barcode}`)
+    console.log(`[Client] Industry: ${industry} (Normalized: ${normalizedIndustry})`)
+
+    if (!industriesToFetch.includes(normalizedIndustry)) {
+      console.log(`[Client] Industry "${normalizedIndustry}" not in fetch list. Skipping API call.`)
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      console.log('[Client] Calling server action getProductInfoByBarcode...')
+      const response = await getProductInfoByBarcode(barcode)
+
+      console.log('[Client] Data:', response)
+
+      if (response) {
+        setFetchedProduct(response as NormalizedProduct)
+        setShowConfirmModal(true)
+      }
+    } catch (error) {
+      console.error('[Client] Error in fetchExternalProductInfo:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [industry, t, setIsLoading])
+
+  const handleConfirmFill = useCallback(async () => {
+    if (!fetchedProduct) return
+
+    showSuccess(t('barcodeScannedSuccessfully'))
+
+    const response = fetchedProduct
+
+    // --- Pre-fill Form Fields ---
+
+    // Name
+    if (response.name) {
+      form.setValue('name', response.name)
+    }
+
+    // Description
+    const rawDesc = response.description || response.quantity
+    if (rawDesc) {
+      // Capitalize first letter and truncate to 500 characters
+      const formattedDesc = rawDesc.charAt(0).toUpperCase() + rawDesc.slice(1)
+      form.setValue('description', formattedDesc.slice(0, 500))
+    }
+
+    // Try to match Brand
+    if (response.brand && brands) {
+      const matchedBrand = brands.find(b =>
+        b.name.toLowerCase() === response.brand?.toLowerCase()
+      )
+      if (matchedBrand) {
+        form.setValue('brand', matchedBrand.name)
+        form.setValue('brandId', matchedBrand._id)
+        form.setValue('isCustomBrand' as any, false)
+      } else {
+        // Fallback: Set the brand name even if not in DB
+        form.setValue('brand', response.brand)
+        form.setValue('brandId' as any, undefined)
+        form.setValue('isCustomBrand' as any, true)
+      }
+    }
+
+    // Try to match Category
+    let matchedCatId = ''
+    if (response.category && categories) {
+      const matchedCat = categories.find(c =>
+        c.categoryName.toLowerCase() === response.category?.toLowerCase() ||
+        c.categorySlug.toLowerCase() === response.category?.toLowerCase()
+      )
+      if (matchedCat) {
+        form.setValue('category', matchedCat.categoryName)
+        form.setValue('categoriaId', matchedCat._id)
+        form.setValue('isCustomCategory' as any, false)
+        matchedCatId = matchedCat._id
+      } else {
+        // Fallback: Set the category name (refined by AI) even if not in DB
+        form.setValue('category', response.category)
+        form.setValue('categoriaId' as any, undefined)
+        form.setValue('isCustomCategory' as any, true)
+      }
+    }
+
+    // Try to match Subcategory (AI extracted)
+    if (response.subCategory) {
+      // Always set the subCategory name as fallback first
+      form.setValue('subCategory', response.subCategory)
+
+      // If we matched a category in DB, fetch its subcategories and try to match
+      if (matchedCatId) {
+        try {
+          const subs = await getSubCategoriesByCategory(matchedCatId, storeId)
+          if (subs && subs.length > 0) {
+            setSubCategories(subs)
+            const matchedSub = subs.find(s =>
+              s.name.toLowerCase() === response.subCategory?.toLowerCase()
+            )
+            if (matchedSub) {
+              form.setValue('subCategory', matchedSub.name)
+              form.setValue('subCategoriaId', matchedSub._id)
+            }
+          }
+        } catch (error) {
+          console.error('Error matching subcategory:', error)
+        }
+      }
+    }
+
+    // Try to match Unit
+    if (response.unit && units) {
+      const matchedUnit = units.find(u =>
+        u.abbreviation.toLowerCase() === response.unit?.toLowerCase() ||
+        u.name.toLowerCase() === response.unit?.toLowerCase()
+      )
+      if (matchedUnit) {
+        form.setValue('unit', matchedUnit.name)
+        form.setValue('unitId', matchedUnit._id)
+      }
+    }
+
+    // Images - Replace with external image if found
+    if (response.image) {
+      const newImg: ProductImage = {
+        imgUrl: response.image,
+        imgKey: 'ext-' + Date.now(),
+        name: response.name || 'product'
+      }
+      form.setValue('images', [newImg])
+      // Also set the main image field if it exists separately
+      form.setValue('image' as any, response.image)
+    }
+
+    setShowConfirmModal(false)
+    setFetchedProduct(null)
+
+    // Auto-scroll to pricing section after filling
+    setTimeout(() => {
+      const element = document.getElementById('pricing-section')
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 300)
+  }, [fetchedProduct, t, form, brands, categories, units, storeId, showSuccess, setSubCategories])
+
   // Hardware Scanner Integration
   useBarcodeScanner((barcode) => {
-    // Debug alert for mobile testing
-    if (typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-      alert(`Barcode: ${barcode} (${barcode.length} chars)`)
-    }
+
 
     // Clean up the first character that leaked into a focused input
     const activeEl = document.activeElement
@@ -458,6 +627,7 @@ const ProductForm = ({
       form.setValue('itemBarcode', barcode)
       setBarcodeScanned(true)
       showSuccess(t('barcodeScannedSuccessfully') + ': ' + barcode)
+      fetchExternalProductInfo(barcode)
     }
   }, type === 'Create' || type === 'Update', 120)
 
@@ -669,13 +839,11 @@ const ProductForm = ({
       {!isModal && (
         <div className="flex flex-row items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <h1 className="text-lg sm:text-2xl font-bold text-navy truncate">{type === 'Create' ? t('createProduct') : t('updateProduct')}</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground truncate">{t('createNewProduct')}</p>
+            <h1 className="text-xl md:text-2xl font-bold text-navy truncate">{type === 'Create' ? t('createProduct') : t('updateProduct')}</h1>
+            <p className="text-sm md:text-md text-muted-foreground truncate">{t('createNewProduct')}</p>
           </div>
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
+
             <Link href={`/admin/${storeId}/products`}>
               <Button className="bg-navy hover:bg-navy/90 text-white h-8 px-3 sm:h-10 sm:px-4">
                 <ChevronLeft className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
@@ -708,7 +876,7 @@ const ProductForm = ({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 p-3">
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='store'
@@ -805,7 +973,97 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-1 gap-3'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='itemBarcode'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="gap-1.5">
+                        {t('itemBarcode')} {productType === 'Single Product' && <span className="text-red-500">*</span>}
+                        <HelpTooltip content={t('help.itemBarcode')} />
+                      </FormLabel>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="w-full flex-1">
+                          <FormControl>
+                            <Input
+                              data-testid="product-barcode-input"
+                              placeholder={t('enterBarcode')}
+                              {...field}
+                              ref={(el) => {
+                                field.ref(el)
+                                barcodeInputRef.current = el
+                              }}
+                              readOnly={barcodeScanned}
+                              data-barcode-capture
+                              className={`h-10 ${barcodeScanned ? 'bg-muted cursor-not-allowed' : ''}`}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
+                                field.onChange(value)
+                                setBarcodeScanned(false) // Allow editing if user types
+                              }}
+                            />
+                          </FormControl>
+                        </div>
+                        <div className="flex gap-2 w-full sm:w-auto">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setIsScannerOpen(true)}
+                            title={t('scanBarcode')}
+                            className="h-10 w-10 shrink-0"
+                          >
+                            <ScanBarcode className="h-4 w-4" />
+                          </Button>
+                          {barcodeScanned ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => {
+                                form.setValue('itemBarcode', '')
+                                setBarcodeScanned(false)
+                              }}
+                              title={t('clearScannedBarcode')}
+                              className="h-10 w-10 shrink-0"
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button
+                              type="button"
+                              className="bg-orange hover:bg-orange-dark text-white h-10 shrink-0 px-3 text-xs"
+                              onClick={() => {
+                                const symbology = form.getValues('barcodeSymbology')
+                                let barcode = ''
+                                if (symbology === 'EAN-13') {
+                                  // Generate 12 digits, calculate checksum
+                                  let sum = 0;
+                                  for (let i = 0; i < 12; i++) {
+                                    const digit = Math.floor(Math.random() * 10);
+                                    barcode += digit;
+                                    sum += digit * (i % 2 === 0 ? 1 : 3);
+                                  }
+                                  const checksum = (10 - (sum % 10)) % 10;
+                                  barcode += checksum;
+                                } else {
+                                  // Simple random string for Code 128 and Code 39
+                                  barcode = Math.random().toString(36).substring(2, 12).toUpperCase();
+                                }
+                                form.setValue('itemBarcode', barcode)
+                                setBarcodeScanned(false)
+                              }}
+                            >
+                              {t('generate')}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name='sku'
@@ -844,6 +1102,7 @@ const ProductForm = ({
                     </FormItem>
                   )}
                 />
+
               </div>
 
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 items-start'>
@@ -940,7 +1199,7 @@ const ProductForm = ({
                 />
               </div>
 
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='brand'
@@ -1046,94 +1305,7 @@ const ProductForm = ({
               </div> */}
 
               <div className='grid grid-cols-1 gap-2'>
-                <FormField
-                  control={form.control}
-                  name='itemBarcode'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="gap-1.5">
-                        {t('itemBarcode')} {productType === 'Single Product' && <span className="text-red-500">*</span>}
-                        <HelpTooltip content={t('help.itemBarcode')} />
-                      </FormLabel>
-                      <div className="flex flex-row gap-1">
-                        <div className="flex-1 min-w-0">
-                          <FormControl>
-                            <Input
-                              data-testid="product-barcode-input"
-                              placeholder={t('enterBarcode')}
-                              {...field}
-                              ref={(el) => {
-                                field.ref(el)
-                                barcodeInputRef.current = el
-                              }}
-                              readOnly={barcodeScanned}
-                              data-barcode-capture
-                              className={`h-10 ${barcodeScanned ? 'bg-muted cursor-not-allowed' : ''}`}
-                              onChange={(e) => {
-                                const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
-                                field.onChange(value)
-                                setBarcodeScanned(false) // Allow editing if user types
-                              }}
-                            />
-                          </FormControl>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => setIsScannerOpen(true)}
-                          title={t('scanBarcode')}
-                          className="h-10 w-10 shrink-0"
-                        >
-                          <ScanBarcode className="h-4 w-4" />
-                        </Button>
-                        {barcodeScanned ? (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                              form.setValue('itemBarcode', '')
-                              setBarcodeScanned(false)
-                            }}
-                            title={t('clearScannedBarcode')}
-                            className="h-10 w-10 shrink-0"
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        ) : (
-                          <Button
-                            type="button"
-                            className="bg-orange hover:bg-orange-dark text-white h-10 shrink-0 px-3 text-xs"
-                            onClick={() => {
-                              const symbology = form.getValues('barcodeSymbology')
-                              let barcode = ''
-                              if (symbology === 'EAN-13') {
-                                // Generate 12 digits, calculate checksum
-                                let sum = 0;
-                                for (let i = 0; i < 12; i++) {
-                                  const digit = Math.floor(Math.random() * 10);
-                                  barcode += digit;
-                                  sum += digit * (i % 2 === 0 ? 1 : 3);
-                                }
-                                const checksum = (10 - (sum % 10)) % 10;
-                                barcode += checksum;
-                              } else {
-                                // Simple random string for Code 128 and Code 39
-                                barcode = Math.random().toString(36).substring(2, 12).toUpperCase();
-                              }
-                              form.setValue('itemBarcode', barcode)
-                              setBarcodeScanned(false)
-                            }}
-                          >
-                            {t('generate')}
-                          </Button>
-                        )}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
               </div>
 
               <FormField
@@ -1146,10 +1318,13 @@ const ProductForm = ({
                       <Textarea
                         placeholder={t('enterProductDescription')}
                         className='resize-none min-h-[100px]'
+                        maxLength={500}
                         {...field}
-
                       />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground text-right">
+                      {(field.value || '').length}/500
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -1158,7 +1333,7 @@ const ProductForm = ({
           </Card>
 
           {/* Pricing & Stocks Section */}
-          <Card className="border-neutral-200 shadow-sm">
+          <Card id="pricing-section" className="border-neutral-200 shadow-sm scroll-mt-20">
             <CardHeader>
               <CardTitle className="text-navy flex items-center gap-2">
                 <span className="text-orange">ⓘ</span> {t('pricingAndStocks')}
@@ -1415,7 +1590,7 @@ const ProductForm = ({
                                     }}
                                     title={t('regenerateSku')}
                                   >
-                                    <RefreshCw className="h-4 w-4" />
+                                    <RotateCcw className="h-4 w-4" />
                                   </Button>
                                 </div>
                               </div>
@@ -1503,7 +1678,7 @@ const ProductForm = ({
                                             src={image.imgUrl}
                                             alt={`Variant image ${idx + 1}`}
                                             fill
-                                            className="object-cover"
+                                            className="object-contain bg-neutral-50"
                                           />
                                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <Button
@@ -1695,7 +1870,7 @@ const ProductForm = ({
                                             src={variant.images[0].imgUrl}
                                             alt="Variant thumbnail"
                                             fill
-                                            className="object-cover"
+                                            className="object-contain bg-neutral-50"
                                           />
                                         </div>
                                       ) : (
@@ -2134,18 +2309,24 @@ const ProductForm = ({
                     <div className='space-y-2 mt-2 min-h-48 border-2 border-dashed border-neutral-200 rounded-lg p-4 flex flex-col items-center justify-center'>
                       <div className='flex justify-start items-center space-x-2 w-full flex-wrap gap-4'>
                         {images.map((image: ProductImage) => (
-                          <Card key={image.imgKey} className='relative overflow-hidden'>
+                          <Card key={image.imgKey} className={`relative overflow-hidden group bg-neutral-50 ${image.imgKey.startsWith('ext-') ? 'border-orange-200' : ''}`}>
                             <Image
                               src={image.imgUrl}
                               alt='product image'
-                              className='w-36 h-36 object-cover object-center rounded-sm'
+                              className='w-36 h-36 object-contain object-center rounded-sm transition-transform duration-300 group-hover:scale-105'
                               width={100}
                               height={100}
                               unoptimized={true}
                             />
+                            {image.imgKey.startsWith('ext-') && (
+                              <div className="absolute bottom-0 left-0 right-0 bg-orange/90 backdrop-blur-[2px] text-[8px] text-white py-1 px-1.5 flex items-center justify-center gap-1 font-bold tracking-tight uppercase">
+                                <span>✨</span>
+                                <span>{t('suggestedImageWarning')}</span>
+                              </div>
+                            )}
                             <Button
                               variant={'destructive'}
-                              className='absolute top-1 right-1 h-6 w-6 p-0 rounded-full'
+                              className='absolute top-1 right-1 h-6 w-6 p-0 rounded-full shadow-md transition-all group-hover:scale-110'
                               type='button'
                               onClick={() => handleRemoveImage(image)}
                             >
@@ -2155,7 +2336,7 @@ const ProductForm = ({
                         ))}
                         <div className="flex flex-col items-center justify-center p-4">
                           <FormControl>
-                            {images.length < 4 ? (
+                            {images.length < 3 ? (
                               <div className="flex flex-col items-center gap-2">
                                 <Input
                                   type="file"
@@ -2179,12 +2360,12 @@ const ProductForm = ({
                               </div>
                             ) : (
                               <div className="flex flex-col items-center gap-2 p-6 bg-orange-50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-900/30 rounded-xl">
-                                <span className="text-orange-600 dark:text-orange-400 font-bold text-lg">4/4</span>
+                                <span className="text-orange-600 dark:text-orange-400 font-bold text-lg">3/3</span>
                                 <p className="text-orange-600 dark:text-orange-400 text-sm font-medium">{t('maxImagesReached')}</p>
                               </div>
                             )}
                           </FormControl>
-                          {images.length < 4 && (
+                          {images.length < 3 && (
                             <div className="text-center mt-2 space-y-1">
                               <p className="text-sm text-neutral-500 font-medium">{t('addImages')}</p>
                               <p className="text-xs text-neutral-400">{t('maxImagesDescription')}</p>
@@ -2205,40 +2386,40 @@ const ProductForm = ({
               <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)} className="w-full sm:w-auto h-10">
                 {tCommon('cancel')}
               </Button>
-              <GuidedHighlighter
+              {/* <GuidedHighlighter
                 show={type === 'Create'}
                 message={tOnboarding('highlights.saveProduct')}
                 position="top"
+              > */}
+              <Button
+                type='submit'
+                size='lg'
+                disabled={form.formState.isSubmitting}
+                data-testid='product-submit-button'
+                className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
               >
-                <Button
-                  type='submit'
-                  size='lg'
-                  disabled={form.formState.isSubmitting}
-                  data-testid='product-submit-button'
-                  className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
-                >
-                  {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
-                </Button>
-              </GuidedHighlighter>
+                {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
+              </Button>
+              {/* </GuidedHighlighter> */}
             </div>
           )}
           {isModal && (
             <div className="flex justify-end gap-2">
-              <GuidedHighlighter
+              {/* <GuidedHighlighter
                 show={type === 'Create'}
                 message={tOnboarding('highlights.saveProduct')}
                 position="top"
+              > */}
+              <Button
+                type='submit'
+                size='lg'
+                disabled={form.formState.isSubmitting}
+                data-testid='product-submit-button-modal'
+                className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
               >
-                <Button
-                  type='submit'
-                  size='lg'
-                  disabled={form.formState.isSubmitting}
-                  data-testid='product-submit-button-modal'
-                  className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
-                >
-                  {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
-                </Button>
-              </GuidedHighlighter>
+                {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
+              </Button>
+              {/* </GuidedHighlighter> */}
             </div>
           )}
         </form>
@@ -2249,11 +2430,112 @@ const ProductForm = ({
             form.setValue('itemBarcode', result)
             setBarcodeScanned(true)
             showSuccess(t('barcodeScannedSuccessfully'))
+            fetchExternalProductInfo(result)
           }}
         />
       </Form>
 
       <PricingInfoModal open={showPricingInfo} onOpenChange={setShowPricingInfo} />
+
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="sm:max-w-md mb-0">
+          <DialogHeader>
+            <DialogTitle>{t('confirmFillTitle') || 'Product Found!'}</DialogTitle>
+            <DialogDescription className="mb-0">
+              {t('confirmFillDescription') || 'Would you like to auto-fill the form with this information?'}
+            </DialogDescription>
+          </DialogHeader>
+
+          {fetchedProduct && (
+            <div className="flex flex-col gap-4 py-4">
+              {fetchedProduct.image && (
+                <div className="relative w-full h-48 rounded-lg overflow-hidden border bg-neutral-50 flex items-center justify-center">
+                  <Image
+                    src={fetchedProduct.image}
+                    alt={fetchedProduct.name || 'Product'}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              )}
+
+              <div className="">
+                {fetchedProduct.name && (
+                  <div className="flex justify-between items-start">
+                    <span className="text-sm font-medium text-neutral-500">{t('productName') || tCommon('name')}:</span>
+                    <span className="text-sm text-right font-semibold max-w-[70%]">{fetchedProduct.name}</span>
+                  </div>
+                )}
+                {fetchedProduct.brand && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-neutral-500">{t('brand')}:</span>
+                    <span className="text-sm font-semibold">{fetchedProduct.brand}</span>
+                  </div>
+                )}
+                {fetchedProduct.category && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-neutral-500">{t('category')}:</span>
+                    <span className="text-sm font-semibold">{fetchedProduct.category}</span>
+                  </div>
+                )}
+                {fetchedProduct.subCategory && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-neutral-500">{t('subCategory')}:</span>
+                    <span className="text-sm font-semibold italic">{fetchedProduct.subCategory}</span>
+                  </div>
+                )}
+                {(fetchedProduct.unit || fetchedProduct.quantity) && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-neutral-500">{t('unit')}:</span>
+                    <span className="text-sm font-semibold">{fetchedProduct.unit || fetchedProduct.quantity}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Enhanced Info for User */}
+              <div className=" bg-orange/5 border border-orange/10 rounded-lg space-y-1.5">
+                <p className="text-[13px] font-medium text-orange-dark flex items-center ">
+                  <span className="text-base">💡</span> {t('details.reviewDataEncouragement')}
+                </p>
+
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-neutral-600 uppercase tracking-wider">
+                    {t('details.missingFieldsNotice')}
+                  </p>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5">
+                    {[t('listPrice'), t('costPerUnit'), t('inStock'), t('quantityAlert')].map((field, idx) => (
+                      <li key={idx} className="text-[11px] text-neutral-500 flex items-center gap-1.5">
+                        <span className="h-1 w-1 bg-neutral-300 rounded-full" />
+                        {field}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="sm:justify-end gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setShowConfirmModal(false)
+                setFetchedProduct(null)
+              }}
+            >
+              {tCommon('cancel')}
+            </Button>
+            <Button
+              type="button"
+              className="bg-orange hover:bg-orange-dark text-white"
+              onClick={handleConfirmFill}
+            >
+              {t('fillForm') || 'Fill Form'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

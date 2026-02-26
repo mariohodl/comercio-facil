@@ -99,12 +99,15 @@ export default function SignUpForm() {
           Crea tu cuenta en <span className='font-semibold text-orange'>{APP_NAME}</span> y empieza a escalar tu negocio.
         </p>
 
-        {promoCode === 'EXITO2026' && (
-          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700 text-sm font-medium animate-bounce-subtle shadow-sm">
-            <div className='bg-green-100 p-1.5 rounded-full'>
-              <ShieldCheck className="w-5 h-5 text-green-600" />
+        {(promoCode === 'EXITO2026' || promoCode === 'PROMO2M') && (
+          <div className="mt-4 p-4 bg-gradient-to-br from-orange-50 to-white border border-orange-200 rounded-2xl flex items-center gap-4 text-orange-800 text-sm font-bold animate-in fade-in zoom-in slide-in-from-top-4 duration-700 shadow-sm">
+            <div className='bg-orange-500 p-2 rounded-xl shadow-lg shadow-orange-500/20 rotate-3'>
+              <ShieldCheck className="w-5 h-5 text-white" />
             </div>
-            <span>¡Código <strong>EXITO2026</strong> aplicado! 3 meses extra gratis.</span>
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-tighter text-orange-600">Beneficio Activado</span>
+              <span>¡Código <strong>{promoCode}</strong> aplicado! 2 meses extra gratis.</span>
+            </div>
           </div>
         )}
       </div>
@@ -269,7 +272,7 @@ export default function SignUpForm() {
 
               <div className='mt-6 text-center text-sm text-gray-600'>
                 ¿Ya tienes una cuenta?{' '}
-                <Link className='font-bold text-orange hover:underline transition-all' href={`/sign-in?callbackUrl=${callbackUrl}`}>
+                <Link className='font-bold text-orange hover:underline transition-all' href={`/sign-in?${searchParams.toString()}`}>
                   Inicia sesión aquí
                 </Link>
               </div>

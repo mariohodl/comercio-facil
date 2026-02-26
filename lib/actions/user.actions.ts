@@ -139,8 +139,8 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 
 			// Check for specialized promo code
 			let freeMonths = 1;
-			if (user.promoCode === 'EXITO2026') {
-				freeMonths = 4; // 3 extra months
+			if (user.promoCode === 'EXITO2026' || user.promoCode === 'PROMO2M') {
+				freeMonths = 3; // 2 extra months + 1 base month = 3 months total
 			}
 
 			trialEndDate.setMonth(trialEndDate.getMonth() + freeMonths);

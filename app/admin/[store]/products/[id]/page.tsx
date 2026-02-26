@@ -41,12 +41,6 @@ const UpdateProduct = async (props: UpdateProductProps) => {
 
   return (
     <main className='max-w-7xl mx-auto'>
-      <div className='flex mb-4'>
-        <Link href={`/admin/${store}/products`}>Products</Link>
-        <span className='mx-1'>›</span>
-        <Link href={`/admin/${store}/products/${product._id}`}>{product._id}</Link>
-      </div>
-
       <div className='my-8'>
         <ProductForm
           type='Update'

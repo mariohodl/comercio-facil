@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures';
 import { connectToDatabase } from '../../lib/db';
 import User from '../../lib/db/models/user.model';
+import Company from '../../lib/db/models/company.model';
 import PasswordResetToken from '../../lib/db/models/password-reset-token.model';
 
 
@@ -139,5 +140,69 @@ test.describe('Authentication E2E Flows', () => {
 
         // Should be redirected to sign-in with callbackUrl
         await expect(page).toHaveURL(/.*sign-in.*callbackUrl=.*%2Fadmin/);
+    });
+
+    test('Sign Up with PROMO2M gives 3 months trial', async ({ page, authPage, companySetupPage }) => {
+        const promoUser = {
+            name: 'Promo User',
+            email: `promo${Date.now()}@example.com`,
+            password: 'Password123!',
+            phone: '1234567890'
+        };
+
+        // Navigate directly to sign-up with promo code
+        await page.goto('/sign-up?promo=PROMO2M', { waitUntil: 'networkidle' });
+
+        await authPage.signUpNameInput.fill(promoUser.name);
+        await authPage.signUpEmailInput.fill(promoUser.email);
+        await authPage.signUpPhoneInput.fill(promoUser.phone);
+        await authPage.signUpPasswordInput.fill(promoUser.password);
+        await authPage.signUpConfirmPasswordInput.fill(promoUser.password);
+
+        // Verify promo badge is visible
+        await expect(page.getByText(/¡Código PROMO2M aplicado!/i)).toBeVisible();
+        await authPage.signUpSubmitButton.click();
+
+        // Wait for user creation and verify email
+        let user: any = null;
+        for (let i = 0; i < 10; i++) {
+            user = await User.findOne({ email: promoUser.email });
+            if (user) break;
+            await page.waitForTimeout(500);
+        }
+        await User.updateOne({ email: promoUser.email }, { emailVerified: true });
+
+        // Sign in
+        await authPage.gotoSignIn();
+        await authPage.signIn({ email: promoUser.email, password: promoUser.password });
+
+        // Should go to setup
+        await expect(page).toHaveURL(/.*\/admin\/setup/);
+
+        // Complete setup
+        await companySetupPage.setupCompany({
+            companyName: 'Promo Corp',
+            storeName: 'Promo Store',
+            storeLocation: 'Promo City',
+            warehouseName: 'Promo Wh',
+            warehouseLocation: 'Promo Area',
+            industry: 'abarrotes'
+        });
+
+        await expect(page).toHaveURL(/.*\/admin\/.*\/overview/, { timeout: 30000 });
+
+        // Verify trial duration in DB
+        const updatedUser = (await User.findOne({ email: promoUser.email })) as any;
+        expect(updatedUser?.business?.companyId).toBeDefined();
+
+        const company = (await Company.findById(updatedUser.business.companyId)) as any;
+        if (company?.trialEndDate) {
+            const startDate = new Date();
+            const trialEnd = new Date(company.trialEndDate);
+
+            // Should be roughly 3 months from now (2 extra + 1 base)
+            const diffMonths = (trialEnd.getFullYear() - startDate.getFullYear()) * 12 + (trialEnd.getMonth() - startDate.getMonth());
+            expect(diffMonths).toBeGreaterThanOrEqual(2);
+        }
     });
 });

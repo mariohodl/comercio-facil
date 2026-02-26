@@ -218,12 +218,11 @@ test.describe('Product Management', () => {
         });
 
         // Should stay on the create page and show a duplicate barcode error (via toast)
-        await expect(page).toHaveURL(/.*\/products\/create/, { timeout: 15000 });
-        // The error is shown via sonner toast: "Este código de barras ya está registrado en esta tienda por otro producto."
-        // Sonner renders toasts in <li> elements inside an <ol> with [data-sonner-toaster]
-        await expect(
-            page.locator('[data-sonner-toaster] [data-sonner-toast]').filter({ hasText: /ya está registrado|already registered/i }).first()
-        ).toBeVisible({ timeout: 30000 });
+        await expect(page).toHaveURL(/.*\/products\/create/, { timeout: 30000 });
+        // The error is shown via sonner toast
+        const toast = page.locator('[data-sonner-toast]');
+        await expect(toast.filter({ hasText: /ya está registrado|already registered/i }).first())
+            .toBeVisible({ timeout: 15000 });
     });
 
     test('should create a draft product with $0 price', async ({ page, authPage, productPage }) => {
