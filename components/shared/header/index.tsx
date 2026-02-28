@@ -20,7 +20,7 @@ export default async function Header() {
     "New Arrivals": 'newArrivals',
     "Featured Products": 'featuredProducts',
     "Best Sellers": 'bestSellers',
-    "Browsing History": 'browsingHistory',
+    "Pricing": 'pricing',
     "Customer Service": 'customerService',
     "About Us": 'aboutUs',
     "Help": 'help',

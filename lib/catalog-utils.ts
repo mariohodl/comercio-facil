@@ -44,7 +44,7 @@ export async function suggestCategories(query: string, industry: string, storeId
     const normalized = normalizeText(query);
 
     return await Category.find({
-        industry,
+        industry: { $in: [industry, 'general'] },
         $and: [
             {
                 $or: [
@@ -95,7 +95,7 @@ export async function suggestSubCategories(query: string, categoryId?: string, i
         ]
     };
     if (categoryId) finalFilter.parentCategory = categoryId;
-    if (industry) finalFilter.industry = industry;
+    if (industry) finalFilter.industry = { $in: [industry, 'general'] };
 
     return await SubCategory.find(finalFilter).limit(100).lean();
 }
@@ -106,7 +106,7 @@ export async function suggestBrands(query: string, industry: string, storeId?: s
     const normalized = normalizeText(query);
 
     return await Brand.find({
-        industry,
+        industry: { $in: [industry, 'general'] },
         $and: [
             {
                 $or: [
@@ -131,6 +131,7 @@ export async function suggestUnits(query: string, industry: string = 'general', 
     const normalized = normalizeText(query);
 
     return await Unit.find({
+        industry: { $in: [industry, 'general'] },
         $and: [
             {
                 $or: [

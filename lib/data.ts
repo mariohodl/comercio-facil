@@ -2176,8 +2176,8 @@ const data: Data = {
 			href: '/search?tag=best-seller',
 		},
 		{
-			name: 'Browsing History',
-			href: '/#browsing-history',
+			name: 'Pricing',
+			href: '/#pricing',
 		},
 		{
 			name: 'Customer Service',

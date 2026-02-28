@@ -116,6 +116,11 @@ export async function getProductFromOpenFoodFacts(barcode: string) {
                     normalized.name = refinement.name
                     normalized.category = refinement.category
                     normalized.subCategory = refinement.subCategory
+                    // If AI suggests a better sales unit (e.g. "Pieza" instead of "g"), use it
+                    if (refinement.salesUnit) {
+                        console.log(`${logPrefix} AI Refined Unit: ${refinement.salesUnit}`)
+                        normalized.unit = refinement.salesUnit
+                    }
                 }
             }
         }

@@ -14,11 +14,11 @@ export function PricingSection() {
             name: 'Plan Básico',
             subTitle: 'Para la tienda que atiende su dueño',
             monthlyPrice: '149',
-            yearlyPrice: '104',
-            annualTotal: '1,250',
+            yearlyPrice: '100',
+            annualTotal: '1,200',
             dailyPrice: '3.4',
             dailyMessage: 'Menos que un refresco',
-            discount: '30',
+            discount: '32',
             description: 'Gestión esencial para el pequeño comercio.',
             features: [
                 'POS rápido',
@@ -34,12 +34,12 @@ export function PricingSection() {
         {
             name: 'Plan Intermedio',
             subTitle: 'Para negocios con empleados y ventas offline',
-            monthlyPrice: '299',
-            yearlyPrice: '209',
-            annualTotal: '2,500',
-            dailyPrice: '6.8',
+            monthlyPrice: '300',
+            yearlyPrice: '195',
+            annualTotal: '2,300',
+            dailyPrice: '6.4',
             dailyMessage: 'Como un café a la semana',
-            discount: '30',
+            discount: '35',
             description: 'Potencia tu punto de venta con modo offline.',
             features: [
                 'TODO lo del Básico',
@@ -56,12 +56,12 @@ export function PricingSection() {
         {
             name: 'Plan Avanzado',
             subTitle: 'Para dueños con múltiples tiendas',
-            monthlyPrice: '499',
+            monthlyPrice: '550',
             yearlyPrice: '349',
-            annualTotal: '4,500',
-            dailyPrice: '12.3',
+            annualTotal: '4,200',
+            dailyPrice: '11.6',
             dailyMessage: 'Lo que pierdes en un producto caducado',
-            discount: '30',
+            discount: '36',
             description: 'Máxima disponibilidad y gestión multi-sucursal.',
             features: [
                 'TODO del Intermedio',
@@ -178,7 +178,7 @@ export function PricingSection() {
                                     <div className="h-28 flex flex-col items-center justify-center gap-1">
                                         <div className="flex items-baseline gap-2">
                                             {originalPrice && (
-                                                <span className='text-sm font-bold text-slate-300 line-through'>
+                                                <span className='text-sm font-bold text-slate-400 line-through'>
                                                     ${originalPrice}
                                                 </span>
                                             )}
@@ -193,7 +193,7 @@ export function PricingSection() {
                                         {/* Daily Cost Badge - Fixed height for alignment */}
                                         <div className="min-h-[52px] w-full mt-4 px-4 py-2 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center gap-0.5 group-hover:bg-white transition-all duration-500 shadow-sm group-hover:shadow-md">
                                             <span className="text-orange-600 font-black text-xs uppercase tracking-widest">${plan.dailyPrice} pesos / día</span>
-                                            <span className="text-[9px] text-slate-400 font-bold italic">"{plan.dailyMessage}"</span>
+                                            <span className="text-[13px] text-slate-500 font-bold italic">"{plan.dailyMessage}"</span>
                                         </div>
                                     </div>
 
@@ -204,7 +204,7 @@ export function PricingSection() {
                                                     Facturado anual: ${plan.annualTotal}/año
                                                 </span>
                                                 <span className="text-orange-600 text-[8px] font-black uppercase bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100">
-                                                    30% de ahorro incluido
+                                                    {plan.discount}% de ahorro incluido
                                                 </span>
                                             </>
                                         ) : (
