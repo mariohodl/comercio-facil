@@ -48,11 +48,34 @@ declare module 'next-auth' {
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	...authConfig,
 	trustHost: true,
+	cookies: {
+		// Explicit cookie config to fix Brave/Firefox PKCE issue
+		// Brave's Shields can drop cookies during OAuth redirect chains
+		pkceCodeVerifier: {
+			name: 'authjs.pkce.code_verifier',
+			options: {
+				httpOnly: true,
+				sameSite: 'lax' as const,
+				path: '/',
+				secure: process.env.NODE_ENV === 'production',
+			},
+		},
+		state: {
+			name: 'authjs.state',
+			options: {
+				httpOnly: true,
+				sameSite: 'lax' as const,
+				path: '/',
+				secure: process.env.NODE_ENV === 'production',
+			},
+		},
+	},
 	session: {
 		strategy: 'jwt',
 		maxAge: 30 * 24 * 60 * 60,
 	},
 	adapter: MongoDBAdapter(client),
+
 	providers: [
 		Google({
 			allowDangerousEmailAccountLinking: true,
@@ -201,18 +224,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 	],
 	events: {
 		async createUser({ user }) {
-			// For all social providers (anything that's not credentials), we mark as verified
-			// and give them the admin role by default since they are signing up to create a store
-			await connectToDatabase();
-			const cookieStore = await cookies();
-			const promoCode = cookieStore.get('promo_code')?.value;
+			try {
+				// For all social providers (anything that's not credentials), we mark as verified
+				// and give them the admin role by default since they are signing up to create a store
+				await connectToDatabase();
+				let promoCode;
+				try {
+					const cookieStore = await cookies();
+					promoCode = cookieStore.get('promo_code')?.value;
+				} catch (e) {
+					// safe to ignore, likely out of req context
+				}
 
-			await User.findOneAndUpdate({ email: user.email }, {
-				emailVerified: true,
-				role: ROL_ADMIN,
-				isStore: true,
-				promoCode: promoCode || undefined,
-			});
+				await User.findOneAndUpdate({ email: user.email }, {
+					emailVerified: true,
+					role: ROL_ADMIN,
+					isStore: true,
+					promoCode: promoCode || undefined,
+				});
+			} catch (error) {
+				console.error("Error in createUser event:", error);
+			}
 		},
 	},
 	callbacks: {

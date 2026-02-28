@@ -10,8 +10,50 @@ const withPWA = withPWAInit({
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === 'development',
+  fallbacks: {
+    document: '/offline',
+  },
   workboxOptions: {
     disableDevLogs: true,
+    exclude: [/middleware-manifest\.json$/], // Essential for Next.js 15
+    skipWaiting: true,
+    clientsClaim: true,
+    runtimeCaching: [
+      {
+        // Auth routes: NEVER cache, always go to network
+        urlPattern: /\/api\/auth\/.*/i,
+        handler: 'NetworkOnly',
+      },
+      {
+        // Static assets: serve from cache if available
+        urlPattern: /\.(?:js|css|woff2?|png|jpg|jpeg|svg|gif|webp)$/i,
+        handler: 'StaleWhileRevalidate',
+        options: {
+          cacheName: 'static-assets',
+        },
+      },
+      {
+        // External images (UploadThing CDN, product images, logos)
+        urlPattern: /^https:\/\/(?:utfs\.io|.*\.ufs\.sh|placehold\.co|api\.dicebear\.com)\/.*/i,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'external-images',
+          expiration: {
+            maxEntries: 100,
+            maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+          },
+        },
+      },
+      {
+        // Catch-all: NetworkFirst for all other requests (pages, etc.)
+        // No expiration plugin to avoid the _ref bug in sw.js
+        urlPattern: /.*/i,
+        handler: 'NetworkFirst',
+        options: {
+          cacheName: 'pages-cache',
+        },
+      },
+    ],
   },
 });
 

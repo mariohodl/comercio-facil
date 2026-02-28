@@ -100,6 +100,9 @@ const main = async () => {
       ...brand,
       slug: toSlug(brand.name),
       storeId: createdStores[0].slug, // Default to first store
+      isGlobal: true,
+      isApproved: true,
+      industry: (brand as any).industry || 'general'
     }));
     const createdBrands = await Brand.insertMany(brandsToInsert);
 
@@ -108,6 +111,9 @@ const main = async () => {
     const unitsToInsert = units.map(unit => ({
       ...unit,
       storeId: createdStores[0].slug,
+      isGlobal: true,
+      isApproved: true,
+      industry: (unit as any).industry || 'general'
     }));
     const createdUnits = await Unit.insertMany(unitsToInsert);
 
@@ -127,6 +133,9 @@ const main = async () => {
     const categoriesToInsert = categories.map(cat => ({
       ...cat,
       storeId: createdStores[0].slug,
+      isGlobal: true,
+      isApproved: true,
+      industry: (cat as any).industry || 'general'
     }));
     const createdCategories = await Category.insertMany(categoriesToInsert);
 
@@ -144,6 +153,9 @@ const main = async () => {
         ...sc,
         parentCategory: parentId,
         storeId: createdStores[0].slug,
+        isGlobal: true,
+        isApproved: true,
+        industry: (sc as any).industry || 'general'
       };
     }).filter(Boolean);
 

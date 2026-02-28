@@ -143,10 +143,14 @@ export async function extractProductClassificationWithAI(categoriesText: string,
         // 1. Check Cache First
         const cached = await AICache.findOne({ key: normalizedKey, type: 'classification_refinement' })
         if (cached) {
-            console.log(`[AI Cache] HIT for key: ${normalizedKey.substring(0, 50)}...`)
-            AICache.updateOne({ _id: cached._id }, { $inc: { hits: 1 } }).catch(e => console.error('Error updating cache hits:', e))
             try {
-                return JSON.parse(cached.value) as { name: string, category: string, subCategory: string }
+                const parsed = JSON.parse(cached.value)
+                if (parsed.salesUnit || parsed.unit) { // Support both names just in case
+                    console.log(`[AI Cache] HIT for key: ${normalizedKey.substring(0, 50)}...`)
+                    AICache.updateOne({ _id: cached._id }, { $inc: { hits: 1 } }).catch(e => console.error('Error updating cache hits:', e))
+                    return parsed as { name: string, category: string, subCategory: string, salesUnit: string }
+                }
+                console.log(`[AI Cache] INCOMPLETE (Missing salesUnit) for key: ${normalizedKey.substring(0, 50)}... RE-CLASSIFYING`)
             } catch (e) {
                 console.error('Error parsing cached classification JSON:', e)
             }
@@ -184,7 +188,10 @@ export async function extractProductClassificationWithAI(categoriesText: string,
                         - Use Mexican Spanish terminology (e.g., "Abarrotes", "Carnes y Embutidos", "Lácteos", "Limpieza", "Cuidado Personal", "Botanas", "Refrescos").
                         - The Category should be broad but concise.
                         - Create a descriptive and professional name for the product.
-                        - IMPORTANT: Return ONLY a JSON object: {"name": "...", "category": "...", "subCategory": "..."}
+                        - SALES UNIT: Differentiate between "Net Content" (e.g., 220g) and "How it is sold". 
+                          Most sealed/packaged products are sold as "Pieza" (Piece). 
+                          Only suggest "Kilogramo", "Litro", or "Gramo" if the product is typically sold in bulk (granel) or by weight/volume measurement in a Mexican "tiendita".
+                        - IMPORTANT: Return ONLY a JSON object: {"name": "...", "category": "...", "subCategory": "...", "salesUnit": "..."}
                     `.trim()
 
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model.name}:generateContent?key=${googleKey}`, {
@@ -217,14 +224,15 @@ export async function extractProductClassificationWithAI(categoriesText: string,
             }
         }
 
-        let result = { name: productName, category: '', subCategory: '' }
+        let result = { name: productName, category: '', subCategory: '', salesUnit: '' }
         if (extractedJSON) {
             try {
                 const parsed = JSON.parse(extractedJSON)
                 result = {
                     name: parsed.name || productName,
                     category: parsed.category || '',
-                    subCategory: parsed.subCategory || ''
+                    subCategory: parsed.subCategory || '',
+                    salesUnit: parsed.salesUnit || ''
                 }
             } catch (e) { }
         }
@@ -261,7 +269,8 @@ export async function extractProductClassificationWithAI(categoriesText: string,
         return {
             name: productName,
             category: parts[0]?.trim() || 'General',
-            subCategory: parts.pop()?.trim() || 'General'
+            subCategory: parts.pop()?.trim() || 'General',
+            salesUnit: ''
         }
     }
 }

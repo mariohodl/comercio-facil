@@ -31,9 +31,9 @@ export class CompanySetupPage {
     }) {
         await this.companyNameInput.fill(data.companyName);
         await this.storeNameInput.fill(data.storeName);
-        await this.storeLocationInput.fill(data.storeLocation);
+        // await this.storeLocationInput.fill(data.storeLocation);
         await this.warehouseNameInput.fill(data.warehouseName);
-        await this.warehouseLocationInput.fill(data.warehouseLocation);
+        // await this.warehouseLocationInput.fill(data.warehouseLocation);
         await this.industrySelect.selectOption(data.industry);
         await this.submitButton.click();
     }

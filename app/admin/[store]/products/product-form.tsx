@@ -558,11 +558,11 @@ const ProductForm = ({
       }
     }
 
-    // Try to match Unit
+    // Auto-fill Unit (optimized for non-fractionable products like "Pieza")
     if (response.unit && units) {
       const matchedUnit = units.find(u =>
-        u.abbreviation.toLowerCase() === response.unit?.toLowerCase() ||
-        u.name.toLowerCase() === response.unit?.toLowerCase()
+        u.name.toLowerCase() === response.unit?.toLowerCase() ||
+        u.abbreviation.toLowerCase() === response.unit?.toLowerCase()
       )
       if (matchedUnit) {
         form.setValue('unit', matchedUnit.name)

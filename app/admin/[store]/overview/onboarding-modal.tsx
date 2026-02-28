@@ -60,10 +60,10 @@ export default function OnboardingModal({ storeId }: OnboardingModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="sm:max-w-[500px] border-none bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 shadow-2xl p-0 overflow-hidden">
-                <div className="h-2 bg-gradient-to-r from-orange-500 via-emerald-500 to-blue-500" />
+            <DialogContent className="sm:max-w-[500px] border-none bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 shadow-2xl p-0 overflow-y-auto max-h-[96vh] sm:max-h-[90vh]">
+                <div className="h-2 bg-gradient-to-r from-orange-500 via-emerald-500 to-blue-500 shrink-0" />
 
-                <div className="p-8">
+                <div className="p-5 sm:p-8">
                     <div className="mb-6 flex justify-center">
                         <div className="relative">
                             <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-orange-400 to-emerald-400 opacity-75 blur animate-pulse" />

@@ -235,7 +235,7 @@
         "newArrivals": "Nuevos Productos",
         "featuredProducts": "Productos Destacados",
         "bestSellers": "Más Vendidos",
-        "browsingHistory": "Historial de Navegación",
+        "pricing": "Precios",
         "customerService": "Servicio al Cliente",
         "aboutUs": "Sobre Nosotros",
         "help": "Ayuda",
@@ -858,7 +858,7 @@
         "saveError": "Error al guardar la configuración",
         "companySettingsTitle": "Configuración de la Empresa",
         "welcomeTitle": "¡Hola {name}! Vamos a configurar tu espacio de trabajo.",
-        "setupInstructions": "Necesitamos unos detalles básicos para activar tu cuenta y tu Punto de Venta.",
+        "setupInstructions": "Necesitamos algunos detalles básicos de tu tienda ó empresa para activar tu cuenta y tu Punto de Venta.",
         "saveContinue": "¡Listo! Empezar ahora",
         "sections": {
             "profile": "Perfil Corporativo",

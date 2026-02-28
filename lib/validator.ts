@@ -303,9 +303,9 @@ export const UserSignUpSchema = UserSignInSchema.extend({
 export const StoreSettingsSchema = z.object({
 	companyName: z.string().min(3, 'Company name must be at least 3 characters'),
 	storeName: z.string().min(3, 'Store name must be at least 3 characters'),
-	storeLocation: z.string().min(3, 'Store location must be at least 3 characters'),
+	storeLocation: z.string().optional().default(''),
 	warehouseName: z.string().min(3, 'Warehouse name must be at least 3 characters'),
-	warehouseLocation: z.string().min(3, 'Warehouse location must be at least 3 characters'),
+	warehouseLocation: z.string().optional().default(''),
 	taxId: z.string().optional(),
 	storeId: StoreId,
 	industry: z.string().min(1, 'La industria es obligatoria'),

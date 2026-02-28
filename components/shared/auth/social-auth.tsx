@@ -1,15 +1,9 @@
 'use client'
-import { useEffect } from 'react'
+
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import {
-  SignInWithGoogle,
-  SignInWithFacebook,
-  SignInWithInstagram
-} from '@/lib/actions/user.actions'
-import { useFormStatus } from 'react-dom'
-import { Facebook, Instagram } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { signIn } from 'next-auth/react'
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
@@ -21,7 +15,7 @@ const GoogleIcon = () => (
 )
 
 const SocialButton = ({
-  action,
+  id,
   icon: Icon,
   provider,
   bgColor,
@@ -29,7 +23,7 @@ const SocialButton = ({
   textColor = "text-white",
   borderColor = "border-gray-100"
 }: {
-  action: () => Promise<void>,
+  id: string,
   icon: any,
   provider: string,
   bgColor: string,
@@ -37,25 +31,34 @@ const SocialButton = ({
   textColor?: string,
   borderColor?: string
 }) => {
-  const { pending } = useFormStatus()
-  const t = useTranslations('auth')
+  const [loading, setLoading] = useState(false)
+
+  const handleSignIn = async () => {
+    setLoading(true)
+    try {
+      // Use client-side signIn for better PWA compatibility
+      await signIn(id)
+    } catch (error) {
+      console.error('Social sign in error:', error)
+      setLoading(false)
+    }
+  }
 
   return (
-    <form action={action} className="flex-1">
-      <Button
-        type="submit"
-        disabled={pending}
-        className={`w-full h-11 shadow-sm flex items-center justify-center gap-3 ${bgColor} ${hoverColor} ${textColor} border ${borderColor} transition-all duration-300 hover:shadow-md hover:scale-[1.02] active:scale-95 font-bold text-base group relative overflow-hidden rounded-xl`}
-      >
-        <span className="relative z-10 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center">
-          {typeof Icon === 'function' ? <Icon /> : Icon}
-        </span>
-        <span className="relative z-10 font-bold">
-          {pending ? '...' : provider}
-        </span>
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-      </Button>
-    </form>
+    <Button
+      type="button"
+      disabled={loading}
+      onClick={handleSignIn}
+      className={`flex-1 h-11 shadow-sm flex items-center justify-center gap-3 ${bgColor} ${hoverColor} ${textColor} border ${borderColor} transition-all duration-300 hover:shadow-md hover:scale-[1.02] active:scale-95 font-bold text-base group relative overflow-hidden rounded-xl`}
+    >
+      <span className="relative z-10 transition-transform duration-300 group-hover:scale-110 flex items-center justify-center">
+        {typeof Icon === 'function' ? <Icon /> : Icon}
+      </span>
+      <span className="relative z-10 font-bold">
+        {loading ? '...' : provider}
+      </span>
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+    </Button>
   )
 }
 
@@ -65,20 +68,39 @@ const SocialAuth = () => {
 
   useEffect(() => {
     if (promoCode) {
-      document.cookie = `promo_code=${promoCode}; path=/; max-age=3600`;
+      document.cookie = `promo_code=${promoCode}; path=/; max-age=3600`
     }
 
     if (window.location.hash === '#_=_') {
       history.replaceState
         ? history.replaceState(null, '', window.location.href.split('#')[0])
-        : (window.location.hash = '');
+        : (window.location.hash = '')
     }
-  }, [promoCode]);
+
+    // Auto-recovery for Brave browser PKCE issue:
+    // When OAuth callback fails (pkceCodeVerifier not parsed),
+    // Auth.js redirects back to sign-in with ?error=OAuthCallbackError.
+    // We detect this and auto-reload once, which clears the error state
+    // and lets the user try again with a fresh PKCE cookie.
+    const hasOAuthError = searchParams.get('error')
+    const alreadyRetried = sessionStorage.getItem('oauth_retry')
+
+    if (hasOAuthError && !alreadyRetried) {
+      sessionStorage.setItem('oauth_retry', '1')
+      // Small delay so the page renders before navigating cleanly
+      setTimeout(() => {
+        window.location.replace(window.location.pathname)
+      }, 150)
+    } else if (!hasOAuthError) {
+      // Clean retry flag when no error present
+      sessionStorage.removeItem('oauth_retry')
+    }
+  }, [promoCode, searchParams])
 
   return (
     <div className='flex flex-col sm:flex-row gap-3 w-full'>
       <SocialButton
-        action={SignInWithGoogle}
+        id="google"
         icon={GoogleIcon}
         provider="Google"
         bgColor="bg-white"
@@ -86,24 +108,6 @@ const SocialAuth = () => {
         textColor="text-slate-700"
         borderColor="border-slate-300 shadow-sm hover:shadow-md hover:border-slate-400"
       />
-      {/* 
-      <SocialButton
-        action={SignInWithFacebook}
-        icon={<Facebook size={24} fill="white" />}
-        provider="Facebook"
-        bgColor="bg-[#1877F2]"
-        hoverColor="hover:bg-[#0C63D4]"
-        textColor="text-white"
-      />
-      <SocialButton
-        action={SignInWithInstagram}
-        icon={<Instagram size={24} strokeWidth={2.5} />}
-        provider="Instagram"
-        bgColor="bg-gradient-to-br from-[#833AB4] via-[#E1306C] to-[#F77737]"
-        hoverColor="hover:opacity-90"
-        textColor="text-white"
-      /> 
-      */}
     </div>
   )
 }
