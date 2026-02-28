@@ -24,7 +24,22 @@ export const metadata: Metadata = {
     default: `${APP_NAME}. ${APP_SLOGAN}`,
   },
   description: APP_DESCRIPTION,
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: APP_NAME,
+  },
+  formatDetection: {
+    telephone: false,
+  },
 }
+
+export const viewport = {
+  themeColor: '#F97316',
+}
+
+
 export default async function RootLayout({
   children,
 }: Readonly<{

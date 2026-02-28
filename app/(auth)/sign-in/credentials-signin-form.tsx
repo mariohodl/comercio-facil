@@ -64,7 +64,16 @@ export default function CredentialsSignInForm() {
       const session = await getSession()
 
       if (session?.user) {
-        const { role, storeId } = session.user
+        const { role, storeId, companyId, storeName } = session.user
+
+        // Save store info for PIN login selection in this device
+        if (storeId && companyId && storeName) {
+          localStorage.setItem('last_pos_store', JSON.stringify({
+            companyId,
+            storeId,
+            storeName
+          }))
+        }
 
         if (role === 'Seller' && storeId) {
           redirect(`/admin/pos/${storeId}`)

@@ -11,6 +11,7 @@ import Store from './lib/db/models/store.model';
 import Company from './lib/db/models/company.model';
 import { ROL_ADMIN } from './lib/constants';
 import { cookies } from 'next/headers';
+import { MOCK_SELLERS, MOCK_ADMIN } from './lib/mocks/data';
 
 import NextAuth, { type DefaultSession } from 'next-auth';
 import authConfig from './auth.config';
@@ -106,7 +107,95 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 						return user
 					}
 				}
+
+				// Fallback to MOCK_ADMIN
+				if (credentials.email === MOCK_ADMIN.email && credentials.password === MOCK_ADMIN.password) {
+					return {
+						id: '65abc0000000000000000000',
+						name: MOCK_ADMIN.name,
+						email: MOCK_ADMIN.email,
+						role: MOCK_ADMIN.role,
+						storeId: 'demo-store',
+						isStore: true,
+						storeName: 'Tienda Demo',
+						companyId: 'demo-company',
+						companyName: 'Empresa Demo',
+						plan: 'pro',
+						planStatus: 'active',
+					};
+				}
+
 				return null;
+			},
+		}),
+		// PIN-based authentication for Seller role
+		CredentialsProvider({
+			id: 'pin',
+			name: 'PIN',
+			credentials: {
+				pin: { type: 'text' },
+				userId: { type: 'text' },
+			},
+			async authorize(credentials) {
+				if (!credentials?.pin || !credentials?.userId) return null;
+
+				// Fallback to MOCK_SELLERS for testing/offline mode
+				const mockSeller = MOCK_SELLERS.find(s => s._id === credentials.userId);
+				if (mockSeller) {
+					if (mockSeller.pin === credentials.pin) {
+						return {
+							id: mockSeller._id,
+							name: mockSeller.name,
+							email: mockSeller.email,
+							role: mockSeller.role,
+							storeId: 'demo-store',
+							isStore: true,
+							storeName: 'Tienda Demo',
+							companyId: 'demo-company',
+							companyName: 'Empresa Demo',
+							plan: 'pro',
+							planStatus: 'active',
+						};
+					}
+					return null; // Incorrect PIN for mock seller, stop here.
+				}
+
+				await connectToDatabase();
+
+				const DBuser = await User.findOne({
+					_id: credentials.userId,
+					isDeleted: { $ne: true },
+					status: true,
+				})
+					.populate('business.defaultStoreId')
+					.populate('business.companyId') as any;
+
+				if (!DBuser || !DBuser.pin) {
+					return null;
+				}
+
+				const isMatch = await bcrypt.compare(
+					credentials.pin as string,
+					DBuser.pin
+				);
+				if (!isMatch) return null;
+
+				const defaultStore = DBuser.business?.defaultStoreId as any;
+				const company = DBuser.business?.companyId as any;
+				return {
+					id: DBuser._id.toString(),
+					name: DBuser.name,
+					email: DBuser.email,
+					role: DBuser.role,
+					storeId: defaultStore?.slug || '',
+					isStore: DBuser.isStore,
+					storeName: defaultStore?.name || '',
+					companyId: company?._id?.toString() || '',
+					companyName: company?.name || '',
+					plan: company?.plan || '',
+					planStatus: company?.planStatus || '',
+					trialEndDate: company?.trialEndDate?.toISOString() || '',
+				};
 			},
 		}),
 	],

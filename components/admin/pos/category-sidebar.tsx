@@ -20,15 +20,27 @@ export default function CategorySidebar({ storeId, selectedCategory, onCategoryC
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await getAllProductsForAdmin({
-                    query: '',
-                    page: 1,
-                    limit: 100,
-                    store: storeId,
-                })
+                let productsToExtract: any[] = [];
+                if (navigator.onLine) {
+                    const res = await getAllProductsForAdmin({
+                        query: '',
+                        page: 1,
+                        limit: 100,
+                        store: storeId,
+                    })
+                    productsToExtract = res.products;
+                } else {
+                    const { get } = await import('idb-keyval');
+                    productsToExtract = await get(`offline_catalog_${storeId}`) || [];
+                }
 
-                // Extract unique categories
-                const uniqueCategories = Array.from(new Set(res.products.map(p => p.category).filter(Boolean)))
+                // Extract unique categories, handling nested objects if any
+                const uniqueCategories = Array.from(new Set(productsToExtract.map((p) => {
+                    if (typeof p.category === 'object' && p.category) {
+                        return (p.category as any)._id || 'general';
+                    }
+                    return p.category;
+                }).filter(Boolean)))
 
                 // Map categories to objects with icons
                 const categoryData = uniqueCategories.map(cat => ({

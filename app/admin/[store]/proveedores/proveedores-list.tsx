@@ -37,15 +37,30 @@ const ProveedoresList = ({ store }: { store: string }) => {
   const [inputValue, setInputValue] = useState<string>('')
   const [data, setData] = useState<ProveedoresListDataProps>()
   const [isPending, startTransition] = useTransition()
+  const [isOfflineMode, setIsOfflineMode] = useState(false)
 
   const refreshData = () => {
     startTransition(async () => {
-      const data = await getAllProveedoresForAdmin({
-        query: inputValue,
-        page,
-        storeId: store,
-      })
-      setData(data)
+      try {
+        const result = await getAllProveedoresForAdmin({
+          query: inputValue,
+          page,
+          storeId: store,
+        })
+        setData(result)
+        setIsOfflineMode(false)
+        if (page === 1 && !inputValue) {
+          const { set } = await import('idb-keyval')
+          await set(`offline_proveedores_${store}`, result)
+        }
+      } catch (error) {
+        const { get } = await import('idb-keyval')
+        const cached = await get(`offline_proveedores_${store}`)
+        if (cached) {
+          setData(cached)
+          setIsOfflineMode(true)
+        }
+      }
     })
   }
 
@@ -53,12 +68,17 @@ const ProveedoresList = ({ store }: { store: string }) => {
     const newPage = changeType === 'next' ? page + 1 : page - 1
     setPage(newPage)
     startTransition(async () => {
-      const data = await getAllProveedoresForAdmin({
-        query: inputValue,
-        page: newPage,
-        storeId: store,
-      })
-      setData(data)
+      try {
+        const result = await getAllProveedoresForAdmin({
+          query: inputValue,
+          page: newPage,
+          storeId: store,
+        })
+        setData(result)
+        setIsOfflineMode(false)
+      } catch {
+        // En modo offline no podemos paginar, ya que solo cacheamos la página 1
+      }
     })
   }
 
@@ -69,23 +89,36 @@ const ProveedoresList = ({ store }: { store: string }) => {
       clearTimeout((window as any).debounce)
         ; (window as any).debounce = setTimeout(() => {
           startTransition(async () => {
-            const data = await getAllProveedoresForAdmin({ query: value, page: 1, storeId: store })
-            setData(data)
+            try {
+              const result = await getAllProveedoresForAdmin({ query: value, page: 1, storeId: store })
+              setData(result)
+              setIsOfflineMode(false)
+            } catch {
+              // Manejo offline
+            }
           })
         }, 500)
     } else {
       startTransition(async () => {
-        const data = await getAllProveedoresForAdmin({ query: '', page, storeId: store })
-        setData(data)
+        try {
+          const result = await getAllProveedoresForAdmin({ query: '', page, storeId: store })
+          setData(result)
+          setIsOfflineMode(false)
+        } catch {
+          const { get } = await import('idb-keyval')
+          const cached = await get(`offline_proveedores_${store}`)
+          if (cached) {
+            setData(cached)
+            setIsOfflineMode(true)
+          }
+        }
       })
     }
   }
 
   useEffect(() => {
-    startTransition(async () => {
-      const data = await getAllProveedoresForAdmin({ query: '', storeId: store })
-      setData(data)
-    })
+    refreshData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store])
 
   return (
@@ -119,7 +152,13 @@ const ProveedoresList = ({ store }: { store: string }) => {
               />
             </div>
 
-            <div className='text-sm text-gray-500 font-medium whitespace-nowrap'>
+            <div className='text-sm text-gray-500 font-medium whitespace-nowrap flex items-center gap-2'>
+              {isOfflineMode && (
+                <span className="flex items-center gap-1.5 text-amber-600 bg-amber-50 px-2 py-1 rounded-md text-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  Modo Offline (Caché)
+                </span>
+              )}
               {isPending ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 rounded-full border-2 border-orange/20 border-t-orange animate-spin" />
@@ -150,32 +189,47 @@ const ProveedoresList = ({ store }: { store: string }) => {
               <Table>
                 <TableHeader className='bg-slate-50/50'>
                   <TableRow className='hover:bg-transparent'>
-                    <TableHead className='font-semibold text-slate-600'>Id</TableHead>
-                    <TableHead className='font-semibold text-slate-600'>Nombre</TableHead>
-                    <TableHead className='font-semibold text-slate-600'>Clave</TableHead>
-                    <TableHead className='font-semibold text-slate-600'>Fecha de Creación</TableHead>
+                    <TableHead className='font-semibold text-slate-600 max-w-[250px]'>Proveedor</TableHead>
+                    <TableHead className='font-semibold text-slate-600'>Contacto</TableHead>
+                    <TableHead className='font-semibold text-slate-600'>Teléfono</TableHead>
+                    <TableHead className='font-semibold text-slate-600'>Correo</TableHead>
                     <TableHead className='font-semibold text-slate-600 text-right pr-6'>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {data?.proveedores?.map((proveedor: IProveedor) => (
                     <TableRow key={proveedor._id} className='hover:bg-slate-50/50 transition-colors'>
-                      <TableCell className='text-slate-500 font-mono text-xs'>
-                        {formatId(proveedor._id)}
-                      </TableCell>
-                      <TableCell className='font-medium text-gray-900'>
+                      <TableCell className='font-medium text-gray-900 max-w-[250px] truncate'>
                         <span className='flex items-center gap-2'>
-                          <div className='w-6 h-6 rounded-full bg-orange/10 flex items-center justify-center text-orange text-[10px] font-bold'>
+                          <div className='w-8 h-8 rounded-full bg-orange/10 flex items-center justify-center text-orange text-xs font-bold shrink-0'>
                             {proveedor.nameProvider.charAt(0).toUpperCase()}
                           </div>
-                          {proveedor.nameProvider}
+                          <div>
+                            <div className="font-bold">{proveedor.nameProvider}</div>
+                            {proveedor.tradeName && <div className="text-xs text-gray-500 font-normal">{proveedor.tradeName}</div>}
+                          </div>
                         </span>
                       </TableCell>
                       <TableCell className='text-slate-600'>
-                        {proveedor.clave || '-'}
+                        {proveedor.mainContact ? (
+                          <span className="font-medium text-sm">{proveedor.mainContact}</span>
+                        ) : (
+                          <span className="text-gray-400 text-xs italic">Sin contacto</span>
+                        )}
                       </TableCell>
-                      <TableCell className='text-slate-500'>
-                        {formatDateTime(proveedor.createdAt).dateTime}
+                      <TableCell className='text-slate-600 font-medium'>
+                        {proveedor.phone ? (
+                          <span className="font-medium">{proveedor.phone}</span>
+                        ) : (
+                          <span className="text-gray-400 text-xs italic">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className='text-slate-500 text-sm'>
+                        {proveedor.email ? (
+                          <span>{proveedor.email}</span>
+                        ) : (
+                          <span className="text-gray-400 text-xs italic">-</span>
+                        )}
                       </TableCell>
                       <TableCell className='text-right pr-6'>
                         <div className='flex justify-end items-center gap-1.5'>

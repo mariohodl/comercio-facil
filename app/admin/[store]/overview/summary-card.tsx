@@ -43,7 +43,7 @@ export default function SummaryCard({
                                 )}>
                                     {value}
                                 </h3>
-                                {percentage !== undefined && (
+                                {/* {percentage !== undefined && (
                                     <span
                                         className={cn(
                                             'text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-tighter',
@@ -55,7 +55,7 @@ export default function SummaryCard({
                                         {percentage >= 0 ? '↑' : '↓'}
                                         {Math.abs(percentage)}%
                                     </span>
-                                )}
+                                )} */}
                             </div>
                         </div>
                     </div>

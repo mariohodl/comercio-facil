@@ -17,6 +17,7 @@ import User from '../db/models/user.model'
 import OrderReception from '../db/models/orderReception.model'
 import Proveedor from '../db/models/proveedor.model'
 import Store from '../db/models/store.model'
+import Expense from '../db/models/expense.model'
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
 	try {
@@ -275,22 +276,7 @@ export async function getOrderSummary(date: DateRange, storeId: string) {
 	])
 	const totalPurchases = totalPurchasesResult[0] ? totalPurchasesResult[0].totalPurchases : 0
 
-	const invoiceDueResult = await OrderReception.aggregate([
-		{
-			$match: {
-				storeId,
-				isPaid: false,
-			},
-		},
-		{
-			$group: {
-				_id: null,
-				due: { $sum: '$total' },
-			},
-		},
-		{ $project: { invoiceDue: { $ifNull: ['$due', 0] } } },
-	])
-	const invoiceDue = invoiceDueResult[0] ? invoiceDueResult[0].invoiceDue : 0
+	const customersCount = await Customer.countDocuments({ storeId })
 
 	const totalSalesResult = await Order.aggregate([
 		{
@@ -346,11 +332,84 @@ export async function getOrderSummary(date: DateRange, storeId: string) {
 	const topSalesCategories = await getTopSalesCategories(date, storeId)
 	const topSalesProducts = await getTopSalesProducts(date, storeId)
 
+	// Calculate Advanced Metrics for Business Intelligence
+	// 1. Gross Profit Estimation (Utilidad Bruta)
+	// We calculate this based on the items sold in the selected period
+	const profitResult = await Order.aggregate([
+		{
+			$match: {
+				storeId,
+				createdAt: { $gte: date.from, $lte: date.to }
+			}
+		},
+		{ $unwind: '$items' },
+		{
+			$lookup: {
+				from: 'products',
+				localField: 'items.product',
+				foreignField: '_id',
+				as: 'productInfo'
+			}
+		},
+		{ $unwind: { path: '$productInfo', preserveNullAndEmptyArrays: true } },
+		{
+			$group: {
+				_id: null,
+				totalRevenue: { $sum: '$totalPrice' },
+				totalCost: { $sum: { $multiply: [{ $ifNull: ['$productInfo.costPerUnit', 0] }, '$items.quantity'] } },
+				grossSales: { $sum: { $multiply: ['$items.price', '$items.quantity'] } },
+				totalUnitsSold: { $sum: '$items.quantity' }
+			}
+		}
+	])
+
+	const grossSales = profitResult[0]?.grossSales || 0
+	const totalCost = profitResult[0]?.totalCost || 0
+	const grossProfit = grossSales - totalCost
+	const totalUnitsSold = profitResult[0]?.totalUnitsSold || 0
+
+	// 2. Average Order Value (Ticket Promedio)
+	const avgOrderValue = ordersCount > 0 ? totalSales / ordersCount : 0
+
+	// 3. Inventory Value (Valor Total del Inventario Actual)
+	const inventoryValueResult = await Product.aggregate([
+		{ $match: { store: storeId } },
+		{
+			$group: {
+				_id: null,
+				totalValue: { $sum: { $multiply: [{ $toDouble: '$countInStock' }, { $toDouble: { $ifNull: ['$costPerUnit', 0] } }] } }
+			}
+		}
+	])
+	const inventoryValue = inventoryValueResult[0]?.totalValue || 0
+
+	// 4. Operational Expenses (Gastos Operativos)
+	const operationalExpensesResult = await Expense.aggregate([
+		{
+			$match: {
+				storeId,
+				date: {
+					$gte: date.from,
+					$lte: date.to,
+				},
+			},
+		},
+		{
+			$group: {
+				_id: null,
+				total: { $sum: '$amount' },
+			},
+		},
+	])
+	const operationalExpenses = operationalExpensesResult[0]?.total || 0
+	const totalExpenses = totalPurchases + operationalExpenses
+
 	const latestOrders = await Order.find({ storeId })
 		.populate('user', 'name')
 		.populate('customer', 'name')
 		.sort({ createdAt: 'desc' })
 		.limit(PAGE_SIZE)
+
 	return {
 		ordersCount,
 		productsCount,
@@ -362,7 +421,7 @@ export async function getOrderSummary(date: DateRange, storeId: string) {
 		topSalesProducts: JSON.parse(JSON.stringify(topSalesProducts)),
 		latestOrders: JSON.parse(JSON.stringify(latestOrders)) as IOrderList[],
 		totalPurchases,
-		invoiceDue,
+		customersCount,
 		suppliersCount,
 		purchasesCount,
 		purchaseChartData: JSON.parse(JSON.stringify(await getPurchaseChartData(date, storeId))),
@@ -370,6 +429,14 @@ export async function getOrderSummary(date: DateRange, storeId: string) {
 		recentTransactions: JSON.parse(JSON.stringify(await getRecentTransactions(date, storeId))),
 		topCustomers: JSON.parse(JSON.stringify(await getTopCustomers(date, storeId))),
 		orderStats: JSON.parse(JSON.stringify(await getOrderStatistics(date, storeId))),
+		// Refined metrics
+		grossProfit,
+		netProfit: grossProfit - operationalExpenses,
+		avgOrderValue,
+		inventoryValue,
+		totalUnitsSold,
+		totalExpenses,
+		operationalExpenses,
 	}
 }
 
@@ -602,20 +669,15 @@ async function getTopSalesProducts(date: DateRange, storeId: string) {
 				},
 			},
 		},
-		// Step 1: Unwind orderItems array
 		{ $unwind: '$items' },
-
-		// Step 2: Group by productId to calculate total sales per product
 		{
 			$group: {
-				_id: {
-					name: '$items.name',
-					image: '$items.image',
-					_id: '$items.product',
-				},
+				_id: '$items.name', // Grouping by name to avoid duplicates if ID differs but name is same
+				productId: { $first: '$items.product' },
+				image: { $first: '$items.image' },
 				totalSales: {
 					$sum: { $multiply: ['$items.quantity', '$items.price'] },
-				}, // Assume quantity field in orderItems represents units sold
+				},
 			},
 		},
 		{
@@ -624,20 +686,15 @@ async function getTopSalesProducts(date: DateRange, storeId: string) {
 			},
 		},
 		{ $limit: 6 },
-
-		// Step 3: Replace productInfo array with product name and format the output
 		{
 			$project: {
 				_id: 0,
-				id: '$_id._id',
-				label: '$_id.name',
-				image: '$_id.image',
+				id: '$productId',
+				label: '$_id',
+				image: '$image',
 				value: '$totalSales',
 			},
 		},
-
-		// Step 4: Sort by totalSales in descending order
-		{ $sort: { _id: 1 } },
 	])
 
 	return result

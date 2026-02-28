@@ -68,17 +68,38 @@ export default function CreateCustomerModal({ onSuccess, storeId }: CreateCustom
                 Object.entries(data).map(([key, value]) => [key, value === '' ? undefined : value])
             ) as any
 
-            const result = await createCustomer({ ...cleanData, storeId })
+            if (navigator.onLine) {
+                const result = await createCustomer({ ...cleanData, storeId })
 
-            if (result.success) {
-                showSuccess(result.message)
-                setOpen(false)
-                form.reset()
-                if (result.data) {
-                    onSuccess(result.data)
+                if (result.success) {
+                    showSuccess(result.message)
+                    setOpen(false)
+                    form.reset()
+                    if (result.data) {
+                        onSuccess(result.data)
+                    }
+                } else {
+                    showError(result.message)
                 }
             } else {
-                showError(result.message)
+                // Offline fallback
+                const offlineCustomer: ICustomer = {
+                    ...cleanData,
+                    _id: `offline_customer_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+                    storeId,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                };
+
+                const { get, set } = await import('idb-keyval');
+                const cachedCustomers = await get(`offline_customers_${storeId}`) || [];
+                cachedCustomers.push(offlineCustomer);
+                await set(`offline_customers_${storeId}`, cachedCustomers);
+
+                showSuccess('Cliente guardado localmente (Offline)');
+                setOpen(false);
+                form.reset();
+                onSuccess(offlineCustomer);
             }
         } catch (error) {
             showError(tCommon('somethingWentWrong'))

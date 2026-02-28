@@ -99,7 +99,7 @@ export const usePOSStore = create<POSState>()(
                         ? (variant.discountPrice && variant.discountPrice > 0 ? variant.discountPrice : variant.listPrice)
                         : (product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.listPrice);
 
-                    const imageUrl = variant?.images?.[0]?.imgUrl || (product.images && product.images[0] ? product.images[0].imgUrl : '/images/logo-prueba.png');
+                    const imageUrl = variant?.images?.[0]?.imgUrl || (product.images && product.images[0] ? product.images[0].imgUrl : '');
 
                     const variantDetails = variant
                         ? variant.attributes.map(attr => `${attr.value}`).join(' / ')

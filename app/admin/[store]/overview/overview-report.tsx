@@ -10,6 +10,7 @@ import {
   Hash,
   Users,
   ShoppingCart,
+  Calculator,
 } from 'lucide-react'
 
 import {
@@ -23,6 +24,7 @@ import { useTranslations } from 'next-intl'
 
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState, useTransition } from 'react'
+import { toast } from 'sonner'
 import { DateRange } from 'react-day-picker'
 import { getOrderSummary } from '@/lib/actions/order.actions'
 import { CalendarDateRangePicker } from './date-range-picker'
@@ -50,21 +52,52 @@ export default function OverviewReport() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<{ [key: string]: any }>()
+  const [isOfflineData, setIsOfflineData] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, startTransition] = useTransition()
   const [showChecklist, setShowChecklist] = useState(false)
 
   useEffect(() => {
-    if (date && store) {
-      startTransition(async () => {
-        const summary = await getOrderSummary(date, store as string)
-        setData(summary)
+    const fetchData = async () => {
+      if (!store) return;
+      const { get, set } = await import('idb-keyval');
+      const cacheKey = `dashboard_summary_${store}`;
+
+      try {
+        const summary = await getOrderSummary(date as DateRange, store as string);
+        setData(summary);
+        setIsOfflineData(false);
+
+        // Cache for offline use
+        await set(cacheKey, summary);
+
         // Automatically show checklist if store is empty
-        const empty = summary.productsCount === 0 && summary.ordersCount === 0 && summary.purchasesCount === 0
-        if (empty) setShowChecklist(true)
-      })
+        const empty = summary.productsCount === 0 && summary.ordersCount === 0 && summary.purchasesCount === 0;
+        if (empty) setShowChecklist(true);
+      } catch (error) {
+        console.error('Error fetching dashboard summary:', error);
+
+        // Try to load from cache
+        const cachedData = await get(cacheKey);
+        if (cachedData) {
+          setData(cachedData);
+          setIsOfflineData(true);
+          // Only show toast if we are actually offline
+          if (typeof navigator !== 'undefined' && !navigator.onLine) {
+            const offlineMsg = t('viewingOfflineData');
+            // If next-intl returns the key itself, use a fallback
+            toast.warning(offlineMsg.includes('viewingOfflineData') ? 'Viendo datos sin conexión (Caché)' : offlineMsg);
+          }
+        }
+      }
+    };
+
+    if (date && store) {
+      startTransition(() => {
+        fetchData();
+      });
     }
-  }, [date, store])
+  }, [date, store]);
 
   if (!data)
     return (
@@ -116,18 +149,26 @@ export default function OverviewReport() {
             {!isEmptyState && !showChecklist && (
               <p className='text-xs font-semibold text-slate-400 uppercase tracking-widest'>{t('ordersToday', { count: data.ordersCount })}</p>
             )}
-            <button
-              onClick={() => setShowChecklist(!showChecklist)}
-              className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-orange hover:text-orange-dark transition-colors"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-orange animate-pulse" />
-              {showChecklist ? t('showDashboard') : t('showGuide')}
-            </button>
+            {(isEmptyState || showChecklist) && (
+              <button
+                onClick={() => setShowChecklist(!showChecklist)}
+                className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-orange hover:text-orange-dark transition-colors"
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-orange animate-pulse" />
+                {showChecklist ? t('showDashboard') : t('showGuide')}
+              </button>
+            )}
+            {isOfflineData && (
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-bold text-slate-500 uppercase tracking-tighter">
+                <Clock className="w-2.5 h-2.5" />
+                {t('viewingOfflineData').includes('viewingOfflineData') ? 'Sin conexión - Datos en caché' : t('viewingOfflineData')}
+              </div>
+            )}
           </div>
         </div>
-        {!isEmptyState && !showChecklist && (
+        {/* {!isEmptyState && !showChecklist && (
           <CalendarDateRangePicker defaultDate={date} setDate={setDate} className="w-full md:w-auto" />
-        )}
+        )} */}
       </div>
 
       {showChecklist ? (
@@ -150,10 +191,10 @@ export default function OverviewReport() {
               iconClassName='bg-orange-100 text-orange-600'
             />
             <SummaryCard
-              title={t('totalSalesReturn')}
-              value={formatCurrency(0)}
-              icon={RotateCcw}
-              percentage={-22}
+              title={t('totalUnitsSold')}
+              value={t('units', { count: data.totalUnitsSold || 0 })}
+              icon={ShoppingCart}
+              percentage={12}
               className='bg-navy text-white border-navy-dark'
               iconClassName='bg-navy-dark text-white'
             />
@@ -161,53 +202,53 @@ export default function OverviewReport() {
               title={t('totalPurchase')}
               value={formatCurrency(data.totalPurchases)}
               icon={Gift}
-              percentage={22}
+              percentage={15}
               className='bg-emerald-50 border-emerald-100'
               iconClassName='bg-emerald-100 text-emerald-600'
             />
             <SummaryCard
-              title={t('totalPurchaseReturn')}
-              value={formatCurrency(0)}
-              icon={ShieldCheck}
-              percentage={22}
-              className='bg-blue-50 border-blue-100'
-              iconClassName='bg-blue-100 text-blue-600'
+              title={t('expense')}
+              value={formatCurrency(data.operationalExpenses || 0)}
+              icon={Wallet}
+              percentage={-5}
+              className='bg-rose-50 border-rose-100'
+              iconClassName='bg-rose-100 text-rose-600'
             />
           </div>
 
           {/* Row 2: Secondary Metrics */}
           <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
             <SummaryCard
-              title={t('profit')}
-              value={formatCurrency(data.totalSales - data.totalPurchases)}
+              title={t('grossProfit')}
+              value={formatCurrency(data.grossProfit)}
               icon={Layers}
               percentage={35}
               className="bg-white border-slate-50"
               iconClassName="bg-cyan-50 text-cyan-600"
             />
             <SummaryCard
-              title={t('invoiceDue')}
-              value={formatCurrency(data.invoiceDue)}
-              icon={Clock}
-              percentage={35}
-              className="bg-white border-slate-50"
+              title={t('totalCustomers')}
+              value={data.customersCount || 0}
+              icon={Users}
+              percentage={-10}
+              className="bg-white border-slate-50 text-navy"
               iconClassName="bg-teal-50 text-teal-600"
             />
             <SummaryCard
               title={t('totalExpenses')}
-              value={formatCurrency(data.totalPurchases)}
+              value={formatCurrency(data.totalExpenses)}
               icon={Wallet}
               percentage={41}
               className="bg-white border-slate-50"
               iconClassName="bg-amber-50 text-amber-600"
             />
             <SummaryCard
-              title={t('totalPaymentReturns')}
-              value={formatCurrency(0)}
-              icon={Hash}
-              percentage={-20}
-              className="bg-white border-slate-50"
-              iconClassName="bg-indigo-50 text-indigo-600"
+              title={t('netProfit')}
+              value={formatCurrency(data.netProfit)}
+              icon={Calculator}
+              percentage={8}
+              className="bg-navy border-navy text-white shadow-xl shadow-navy/20"
+              iconClassName="bg-white/10 text-white"
             />
           </div>
 

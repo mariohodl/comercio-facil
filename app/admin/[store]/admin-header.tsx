@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 export function AdminHeader({
   className,
@@ -36,6 +37,9 @@ export function AdminHeader({
     }
   }).filter(b => b.href !== `/admin/${store}`) // Skip the store root if redundant
 
+  const { data: session } = useSession()
+  const isSeller = session?.user?.role === 'Seller'
+
   return (
     <div
       className={cn(
@@ -52,27 +56,6 @@ export function AdminHeader({
           </div>
           <ChevronRight className="w-3 h-3 text-gray-700" />
         </div>
-        {/* 
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 scroll-smooth">
-          {breadcrumbs.map((crumb, index) => (
-            <React.Fragment key={crumb.href}>
-              <Link
-                href={crumb.href}
-                className={cn(
-                  "px-3 py-1.5 rounded-xl whitespace-nowrap transition-all text-xs font-bold ring-1",
-                  crumb.active
-                    ? "bg-orange text-white ring-orange shadow-lg shadow-orange-500/20"
-                    : "text-gray-400 ring-white/10 hover:bg-white/5 hover:text-white"
-                )}
-              >
-                {crumb.label}
-              </Link>
-              {index < breadcrumbs.length - 1 && (
-                <ChevronRight className="w-3 h-3 text-gray-800 shrink-0" />
-              )}
-            </React.Fragment>
-          ))}
-        </div> */}
       </div>
 
 
@@ -92,33 +75,35 @@ export function AdminHeader({
         </Button>
 
         {/* Quick Actions Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="bg-orange hover:bg-orange-dark text-white h-9 px-3 sm:px-4 gap-2 rounded-lg transition-all active:scale-95 shadow-lg shadow-orange-500/20 shrink-0">
-              <span className="text-xs sm:text-sm font-bold uppercase tracking-tight">
-                <span className="inline sm:hidden">{t('quickAction')}</span>
-                <span className="hidden sm:inline">{t('quickAction') || 'Acción Rápida'}</span>
-              </span>
-              <Plus className="hidden sm:block w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
-            <DropdownMenuLabel className="text-navy font-bold">{t('shortcuts') || 'Shortcuts'}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href={`/admin/${store}/products/create`} className="cursor-pointer">
-                <Plus className="mr-2 h-4 w-4" />
-                <span>{t('newProduct') || 'New Product'}</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href={`/admin/${store}/pos`} className="cursor-pointer">
-                <Plus className="mr-2 h-4 w-4" />
-                <span>{t('newSale') || 'New Sale'}</span>
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {!isSeller && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-orange hover:bg-orange-dark text-white h-9 px-3 sm:px-4 gap-2 rounded-lg transition-all active:scale-95 shadow-lg shadow-orange-500/20 shrink-0">
+                <span className="text-xs sm:text-sm font-bold uppercase tracking-tight">
+                  <span className="inline sm:hidden">{t('quickAction')}</span>
+                  <span className="hidden sm:inline">{t('quickAction') || 'Acción Rápida'}</span>
+                </span>
+                <Plus className="hidden sm:block w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
+              <DropdownMenuLabel className="text-navy font-bold">{t('shortcuts') || 'Shortcuts'}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href={`/admin/${store}/products/create`} className="cursor-pointer">
+                  <Plus className="mr-2 h-4 w-4" />
+                  <span>{t('newProduct') || 'New Product'}</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/admin/${store}/pos`} className="cursor-pointer">
+                  <Plus className="mr-2 h-4 w-4" />
+                  <span>{t('newSale') || 'New Sale'}</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         <div className="w-[1px] h-4 bg-white/10 mx-1 hidden sm:block" />
 

@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Trash2, Edit, Eye, Plus, Search } from 'lucide-react'
+import { Trash2, Edit, Eye, Plus, Search, KeyRound, Lock, Unlock } from 'lucide-react'
 import { IUser } from '@/lib/db/models/user.model'
 import { Button } from '@/components/ui/button'
 import Pagination from '@/components/shared/pagination'
@@ -41,6 +41,37 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalMode, setModalMode] = useState<'add' | 'edit' | 'view'>('add')
     const [selectedUser, setSelectedUser] = useState<IUser | null>(null)
+
+    // PIN modal state
+    const [pinModalUser, setPinModalUser] = useState<IUser | null>(null)
+    const [pinValue, setPinValue] = useState('')
+    const [pinSaving, setPinSaving] = useState(false)
+    const [pinMessage, setPinMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+
+    const handleSetPin = async () => {
+        if (!/^\d{4}$/.test(pinValue) || !pinModalUser) return
+        setPinSaving(true)
+        setPinMessage(null)
+        try {
+            const res = await fetch('/api/sellers/set-pin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: pinModalUser._id, pin: pinValue }),
+            })
+            const data = await res.json()
+            if (res.ok) {
+                setPinMessage({ type: 'success', text: '✓ PIN actualizado' })
+                setPinValue('')
+                setTimeout(() => { setPinModalUser(null); setPinMessage(null) }, 1500)
+            } else {
+                setPinMessage({ type: 'error', text: data.error || 'Error al guardar el PIN' })
+            }
+        } catch {
+            setPinMessage({ type: 'error', text: 'Error de conexión' })
+        } finally {
+            setPinSaving(false)
+        }
+    }
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault()
@@ -92,7 +123,6 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
                         <TableHeader className="bg-gray-50/50">
                             <TableRow className="hover:bg-transparent">
                                 <TableHead className="font-bold text-navy py-4 min-w-[200px]">{t('userName')}</TableHead>
-                                <TableHead className="font-bold text-navy py-4 min-w-[150px]">{t('phone')}</TableHead>
                                 <TableHead className="font-bold text-navy py-4 min-w-[200px]">{t('email')}</TableHead>
                                 <TableHead className="font-bold text-navy py-4 min-w-[100px]">{t('role')}</TableHead>
                                 <TableHead className="font-bold text-navy py-4 min-w-[100px]">{t('status')}</TableHead>
@@ -102,7 +132,7 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
                         <TableBody>
                             {users.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-16 text-gray-500">
+                                    <TableCell colSpan={5} className="text-center py-16 text-gray-500">
                                         <div className="flex flex-col items-center gap-2">
                                             <Search className="h-8 w-8 text-gray-300" />
                                             <p>{t('noUsersFound')}</p>
@@ -125,9 +155,6 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
                                                 </div>
                                                 <span className="font-semibold text-navy truncate max-w-[150px]">{user.name}</span>
                                             </div>
-                                        </TableCell>
-                                        <TableCell className="text-gray-600 py-4 font-medium italic">
-                                            {user.phone || (user as any).address?.phone || tCommon('notAvailable')}
                                         </TableCell>
                                         <TableCell className="text-gray-600 py-4">{user.email}</TableCell>
                                         <TableCell className="py-4">
@@ -166,6 +193,17 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
                                                 >
                                                     <Edit className="h-4 w-4" />
                                                 </Button>
+                                                {user.role === 'Seller' && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => { setPinModalUser(user); setPinValue(''); setPinMessage(null) }}
+                                                        title="Establecer PIN"
+                                                        className="h-8 w-8 text-orange-500 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                                                    >
+                                                        <KeyRound className="h-4 w-4" />
+                                                    </Button>
+                                                )}
                                                 {!(user.role === 'Admin' && user.isStore) && (
                                                     <DeleteDialog id={user._id} action={deleteUser} />
                                                 )}
@@ -181,6 +219,55 @@ export default function UserList({ users, storeId, page, totalPages, searchTerm 
             {totalPages > 1 && (
                 <div className="mt-6 flex justify-center sm:justify-end px-2 md:px-0">
                     <Pagination page={page} totalPages={totalPages} />
+                </div>
+            )}
+
+            {/* PIN Setup Modal */}
+            {pinModalUser && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-xs mx-4">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                <KeyRound className="w-5 h-5 text-orange-500" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-gray-900">Establecer PIN</h3>
+                                <p className="text-xs text-gray-500">{pinModalUser.name}</p>
+                            </div>
+                        </div>
+
+                        <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">PIN de 4 dígitos</label>
+                        <input
+                            type="number"
+                            maxLength={4}
+                            value={pinValue}
+                            onChange={e => setPinValue(e.target.value.slice(0, 4))}
+                            placeholder="••••"
+                            className="w-full h-12 text-center text-2xl tracking-widest border-2 border-gray-200 rounded-xl focus:border-orange-400 focus:outline-none mb-3"
+                        />
+
+                        {pinMessage && (
+                            <p className={`text-sm text-center mb-3 ${pinMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+                                {pinMessage.text}
+                            </p>
+                        )}
+
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setPinModalUser(null)}
+                                className="flex-1 h-10 rounded-xl border-2 border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSetPin}
+                                disabled={pinSaving || !/^\d{4}$/.test(pinValue)}
+                                className="flex-1 h-10 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold transition-colors disabled:opacity-50"
+                            >
+                                {pinSaving ? 'Guardando...' : 'Guardar PIN'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

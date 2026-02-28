@@ -15,9 +15,17 @@ export default async function AdminUserPage(props: {
   const searchParams = await props.searchParams
   const session = await auth()
 
-  // Basic admin or higher check
+  // Role verification
   if (!session?.user) throw new Error('Unauthorized')
 
+  if (session.user.role === 'Seller') {
+    const { redirect } = await import('next/navigation')
+    redirect(`/admin/pos/${session.user.storeId}`)
+  }
+
+  if (session.user.role !== 'Admin' && session.user.role !== 'SuperAdmin') {
+    throw new Error('Admin permission required')
+  }
   const page = Number(searchParams.page) || 1
   const query = searchParams.query || ''
   const storeId = params.store

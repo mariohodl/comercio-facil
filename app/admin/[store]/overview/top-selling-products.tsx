@@ -61,9 +61,9 @@ export default function TopSellingProducts({ data }: TopSellingProductsProps) {
                                 </div>
                             </div>
                             <div className='flex items-center'>
-                                <span className='text-[10px] font-bold text-emerald-500'>
+                                {/* <span className='text-[10px] font-bold text-emerald-500'>
                                     +25%
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                     ))}

@@ -55,20 +55,63 @@ const PurchaseList = ({ store }: { store: string }) => {
     const [dateRange, setDateRange] = useState<string>('this_month')
     const [data, setData] = useState<PurchaseListDataProps>()
     const [isPending, startTransition] = useTransition()
+    const [isOfflineMode, setIsOfflineMode] = useState(false)
 
     const fetchData = useCallback((pageToFetch: number) => {
-        startTransition(() => {
-            getAllPurchases({
-                query: inputValue,
-                page: pageToFetch,
-                storeId: store,
-                status,
-                paymentStatus,
-                type,
-                dateRange,
-            }).then((result) => {
+        startTransition(async () => {
+            try {
+                const result = await getAllPurchases({
+                    query: inputValue,
+                    page: pageToFetch,
+                    storeId: store,
+                    status,
+                    paymentStatus,
+                    type,
+                    dateRange,
+                })
                 setData(result)
-            })
+                setIsOfflineMode(false)
+
+                // Solo cachear datos limpios de la primera página
+                if (pageToFetch === 1 && !inputValue && status === 'all' && paymentStatus === 'all' && type === 'all' && dateRange === 'this_month') {
+                    const { set } = await import('idb-keyval')
+                    await set(`offline_purchases_${store}`, result)
+                }
+            } catch (error) {
+                const { get } = await import('idb-keyval')
+                const cached = await get(`offline_purchases_${store}`)
+                const offlineQueue = await get(`offline_purchases_queue_${store}`) || []
+
+                let processedQueue = offlineQueue;
+
+                if (offlineQueue.length > 0) {
+                    const cachedProviders = await get(`offline_proveedores_${store}`) as any;
+                    const providersQueue = await get(`offline_proveedores_queue_${store}`) as any[] || [];
+                    const allOfflineProviders = [...(cachedProviders?.proveedores || []), ...providersQueue];
+
+                    processedQueue = offlineQueue.map((purchase: any) => {
+                        if (typeof purchase.supplierId === 'string') {
+                            const foundProvider = allOfflineProviders.find(p => p._id === purchase.supplierId || p.localId === purchase.supplierId);
+                            if (foundProvider) {
+                                return { ...purchase, offlineSupplierName: foundProvider.nameProvider };
+                            }
+                        }
+                        return purchase;
+                    });
+                }
+
+                if (cached || processedQueue.length > 0) {
+                    setData({
+                        ...cached,
+                        purchases: [
+                            ...processedQueue,
+                            ...(cached?.purchases || [])
+                        ],
+                        totalPurchases: (cached?.totalPurchases || 0) + processedQueue.length
+                    })
+                    setIsOfflineMode(true)
+                }
+            }
         })
     }, [inputValue, status, paymentStatus, type, dateRange, store])
 
@@ -127,7 +170,15 @@ const PurchaseList = ({ store }: { store: string }) => {
         <div className='space-y-4'>
             <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4'>
                 <div>
-                    <h1 className='font-bold text-2xl'>{t('title')}</h1>
+                    <h1 className='font-bold text-2xl flex items-center gap-3'>
+                        {t('title')}
+                        {isOfflineMode && (
+                            <span className="flex items-center gap-1.5 text-amber-600 bg-amber-50 px-2 py-1 rounded-md text-xs font-medium border border-amber-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                Offline
+                            </span>
+                        )}
+                    </h1>
                     <p className='text-muted-foreground text-sm'>{t('managePurchases')}</p>
                 </div>
                 <div className='flex flex-wrap gap-2 w-full xl:w-auto'>
@@ -235,9 +286,12 @@ const PurchaseList = ({ store }: { store: string }) => {
                                 data?.purchases.map((purchase) => {
                                     const due = purchase.totalAmount - purchase.paidAmount;
                                     return (
-                                        <TableRow key={purchase._id} className="hover:bg-gray-50/50 transition-colors">
+                                        <TableRow key={purchase._id || purchase.localId} className={`transition-colors ${purchase.isOffline ? 'bg-amber-50/30' : 'hover:bg-gray-50/50'}`}>
                                             <TableCell className="font-medium">
-                                                {purchase.supplierId?.nameProvider || t('internalSupplier')}
+                                                <div className="flex items-center gap-2">
+                                                    {purchase.isOffline && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" title="Sincronización pendiente" />}
+                                                    {purchase.supplierId?.nameProvider || purchase.offlineSupplierName || purchase.supplierId || t('internalSupplier')}
+                                                </div>
                                             </TableCell>
                                             <TableCell className='text-gray-600 font-mono text-xs'>
                                                 {purchase.reference}

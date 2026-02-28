@@ -16,6 +16,7 @@ export interface IUser extends Document, IUserInput {
 	deletedAt?: Date | null;
 	phone: string;
 	promoCode?: string;
+	pin?: string;
 	business?: {
 		companyId: string;
 		stores: string[];
@@ -46,6 +47,7 @@ const userSchema = new Schema<IUser>(
 			defaultStoreId: { type: Schema.Types.ObjectId as any, ref: 'Store' }
 		},
 		promoCode: { type: String },
+		pin: { type: String }, // bcrypt-hashed 4-digit PIN for Seller role
 	},
 	{
 		timestamps: true,

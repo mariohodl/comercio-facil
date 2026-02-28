@@ -61,14 +61,43 @@ export default function ProductSearch({
     const fetchProducts = useCallback(async (searchQuery: string, category: string = 'all') => {
         setLoading(true)
         try {
-            const res = await getAllProductsForAdmin({
-                query: searchQuery,
-                page: 1,
-                limit: 50,
-                store: storeId,
-                category: category !== 'all' ? category : undefined,
-            })
-            setProducts(res.products)
+            if (navigator.onLine) {
+                const res = await getAllProductsForAdmin({
+                    query: searchQuery,
+                    page: 1,
+                    limit: 50,
+                    store: storeId,
+                    category: category !== 'all' ? category : undefined,
+                })
+                setProducts(res.products)
+            } else {
+                const { get } = await import('idb-keyval')
+                let cachedProducts: IProduct[] = await get(`offline_catalog_${storeId}`) || []
+
+                // Offline fallback filtering
+                let results = cachedProducts
+                if (category !== 'all') {
+                    results = results.filter(p => {
+                        if (typeof p.category === 'object' && p.category) {
+                            return (p.category as any)._id === category
+                        }
+                        return p.category === category
+                    })
+                }
+
+                if (searchQuery) {
+                    const q = searchQuery.toLowerCase()
+                    results = results.filter(p =>
+                        p.name.toLowerCase().includes(q) ||
+                        p.sku?.toLowerCase().includes(q) ||
+                        p.itemBarcode?.toLowerCase().includes(q) ||
+                        p.variants?.some(v => v.sku?.toLowerCase().includes(q) || v.barcode?.toLowerCase().includes(q))
+                    )
+                }
+
+                // Mimic limit of 50
+                setProducts(results.slice(0, 50))
+            }
         } catch (error) {
             console.error('Failed to fetch products', error)
         } finally {
@@ -219,6 +248,34 @@ export default function ProductSearch({
                         <Package className="h-16 w-16 mb-4 text-gray-300" />
                         <p className="text-gray-500 font-medium">{t('noProductsFound')}</p>
                         <p className="text-sm text-gray-400 mt-1">{t('tryAdjusting')}</p>
+
+                        {/* Demo Seed Button if catalog is completely empty */}
+                        {navigator.onLine && selectedCategory === 'all' && query === '' && (
+                            <Button
+                                variant="outline"
+                                className="mt-6 border-orange-200 text-orange hover:bg-orange hover:text-white"
+                                onClick={async () => {
+                                    setLoading(true);
+                                    try {
+                                        const { toast } = await import('sonner');
+                                        const { seedMockProductsForStore } = await import('@/lib/actions/product.actions');
+                                        const res = await seedMockProductsForStore(storeId);
+                                        if (res?.success) {
+                                            toast.success('Productos de prueba instalados.');
+                                            window.location.reload();
+                                        } else {
+                                            toast.error('Ocurrió un error', { description: res?.message });
+                                            setLoading(false);
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                        setLoading(false);
+                                    }
+                                }}
+                            >
+                                Cargar Productos Demo
+                            </Button>
+                        )}
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 pb-40 lg:pb-4">

@@ -13,6 +13,7 @@ import { AppLogo } from '@/components/shared/AppLogo'
 import { hasProducts } from '@/lib/actions/product.actions'
 import { hasPurchases } from '@/lib/actions/purchase.actions'
 import { hasSales } from '@/lib/actions/order.actions'
+import { OfflineSyncManager } from '@/components/shared/offline-sync-manager'
 
 export default async function AdminLayout({
     children,
@@ -33,6 +34,7 @@ export default async function AdminLayout({
 
     return (
         <>
+            <OfflineSyncManager storeId={storeId} />
             <div className='flex flex-col min-h-screen bg-gray-50/50'>
                 <div className='bg-black text-white fixed top-0 left-0 w-full z-20 border-b border-white/5 backdrop-blur-xl'>
                     <div className='flex h-16 items-center md:px-6 transition-all duration-300'>

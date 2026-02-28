@@ -134,6 +134,27 @@ const CreateProveedor = () => {
 
     setIsPending(true)
     try {
+      if (!navigator.onLine) {
+        const { get, set } = await import('idb-keyval')
+        const offlineProviders = await get(`offline_proveedores_queue_${store}`) || []
+
+        const newProvider = {
+          ...data,
+          localId: Date.now().toString(),
+          isOffline: true,
+          storeId: store
+        }
+
+        await set(`offline_proveedores_queue_${store}`, [...offlineProviders, newProvider])
+
+        toast.warning('Estás sin conexión. El proveedor se guardó localmente y se sincronizará cuando vuelvas a estar en línea.', { duration: 5000 })
+
+        form.reset()
+        setShowRFCWarning(false)
+        router.push(`/admin/${store}/proveedores`)
+        return
+      }
+
       const res = await createProveedor(data)
       if (res.success) {
         toast.success('Proveedor creado exitosamente')

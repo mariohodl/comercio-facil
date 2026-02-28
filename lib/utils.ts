@@ -238,11 +238,19 @@ export const getFilterUrl = ({
 }
 
 
-export const formatDateWithHours = (date: Date) => {
-
-	const datestring = ("0" + date.getDate()).slice(-2) + "/" + ("0" + (date.getMonth() + 1)).slice(-2) + "/" +
-		date.getFullYear();
+export const formatDateWithHours = (date: Date | string) => {
+	const d = new Date(date)
+	const datestring = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" +
+		d.getFullYear();
 
 	return datestring;
-	//will return something like 16-05-2020 09:50
+}
+
+export const formatDate = (date: Date | string) => {
+	const d = new Date(date)
+	return d.toLocaleDateString('es-MX', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric'
+	})
 }

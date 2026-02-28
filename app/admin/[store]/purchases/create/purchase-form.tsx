@@ -99,9 +99,22 @@ interface PurchaseFormProps {
 const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFormProps) => {
     const t = useTranslations('purchases')
     const tCommon = useTranslations('common')
-    const { showSuccess, showError } = useToast()
+    const { showSuccess, showError, showWarning } = useToast()
     const router = useRouter()
     const [isPending, startTransition] = useTransition()
+    const [localSuppliers, setLocalSuppliers] = useState<IProveedor[]>(suppliers)
+
+    useEffect(() => {
+        if (!navigator.onLine) {
+            import('idb-keyval').then(({ get }) => {
+                get(`offline_proveedores_${storeId}`).then((res) => {
+                    if (res && res.proveedores) {
+                        setLocalSuppliers(res.proveedores)
+                    }
+                })
+            })
+        }
+    }, [storeId])
 
     // Zustand store actions and state selectors
     const storedProducts = usePurchaseFormStore(state => state.products)
@@ -246,6 +259,27 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
     const onSubmit = async (values: any) => {
         startTransition(async () => {
             try {
+                if (!navigator.onLine && !initialData) {
+                    const { get, set } = await import('idb-keyval')
+                    const offlinePurchases = await get(`offline_purchases_queue_${storeId}`) || []
+
+                    const newPurchase = {
+                        ...values,
+                        localId: Date.now().toString(),
+                        isOffline: true,
+                    }
+
+                    await set(`offline_purchases_queue_${storeId}`, [...offlinePurchases, newPurchase])
+
+                    showWarning('Estás sin conexión. La compra se guardó localmente y se sincronizará cuando vuelvas a estar en línea.', { duration: 5000 })
+
+                    if (!initialData) {
+                        clearFormData()
+                    }
+                    router.push(`/admin/${storeId}/purchases`)
+                    return
+                }
+
                 let res;
                 if (initialData) {
                     res = await updatePurchase({ ...values, _id: initialData._id })
@@ -505,7 +539,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                                                 {field.value === 'internal'
                                                                     ? t('internalSupplier')
                                                                     : field.value
-                                                                        ? suppliers.find((s) => s._id === field.value)?.nameProvider
+                                                                        ? localSuppliers.find((s) => s._id === field.value)?.nameProvider
                                                                         : t('selectSupplier')}
                                                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                             </Button>
@@ -532,7 +566,7 @@ const PurchaseForm = ({ storeId, suppliers, products, initialData }: PurchaseFor
                                                                     />
                                                                     {t('internalSupplier')}
                                                                 </CommandItem>
-                                                                {suppliers.map((supplier) => (
+                                                                {localSuppliers.map((supplier) => (
                                                                     <CommandItem
                                                                         value={supplier.nameProvider}
                                                                         key={supplier._id}
