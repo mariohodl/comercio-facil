@@ -29,6 +29,7 @@ import { StoreUserCreateSchema } from '@/lib/validator'
 
 const CreateUserForm = ({ storeId }: { storeId: string }) => {
     const router = useRouter()
+    const { showError, showSuccess } = useToast()
 
     const form = useForm<z.infer<typeof StoreUserCreateSchema>>({
         resolver: zodResolver(StoreUserCreateSchema),
@@ -36,24 +37,28 @@ const CreateUserForm = ({ storeId }: { storeId: string }) => {
             name: '',
             email: '',
             password: '',
+            confirmPassword: '',
+            pin: '',
             role: 'Seller',
             storeId: storeId,
+            status: true,
         },
     })
 
-    const { showError, showSuccess } = useToast()
+    const selectedRole = form.watch('role')
+    const isSeller = selectedRole === 'Seller'
 
     async function onSubmit(values: z.infer<typeof StoreUserCreateSchema>) {
         try {
             const res = await createStoreUser(values)
             if (!res.success) {
-                return showError(res.message || 'Failed to create user', { duration: 3000, position: 'top-center', important: true })
+                return showError(res.message || 'Error al crear el usuario', { duration: 3000, position: 'top-center', important: true })
             }
 
-            showSuccess(res.message || 'User created successfully', { duration: 3000, position: 'top-center', important: true })
+            showSuccess(res.message || 'Usuario creado correctamente', { duration: 3000, position: 'top-center', important: true })
             router.push(`/admin/${storeId}/users`)
         } catch (error: any) {
-            showError(error?.message || 'Something went wrong', { duration: 3000, position: 'top-center', important: true })
+            showError(error?.message || 'Algo salió mal', { duration: 3000, position: 'top-center', important: true })
         }
     }
 
@@ -65,64 +70,26 @@ const CreateUserForm = ({ storeId }: { storeId: string }) => {
                 className='space-y-6 bg-white p-6 rounded-lg shadow-sm border border-gray-100'
             >
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                    <FormField
-                        control={form.control}
-                        name='name'
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Full Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter full name' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name='email'
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Email Address</FormLabel>
-                                <FormControl>
-                                    <Input type="email" placeholder='Enter email address' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name='password'
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <Input type="password" placeholder='Enter password' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {/* Role Selection - First because it changes other fields */}
                     <FormField
                         control={form.control}
                         name='role'
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Role</FormLabel>
+                                <FormLabel>Rol / Perfil</FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
                                     defaultValue={field.value}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder='Select a role' />
+                                            <SelectValue placeholder='Selecciona un rol' />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
                                         {USER_ROLES.map((role) => (
                                             <SelectItem key={role} value={role}>
-                                                {role}
+                                                {role === 'Seller' ? 'Vendedor (PIN Login)' : role}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -131,6 +98,90 @@ const CreateUserForm = ({ storeId }: { storeId: string }) => {
                             </FormItem>
                         )}
                     />
+
+                    <FormField
+                        control={form.control}
+                        name='name'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Nombre Completo</FormLabel>
+                                <FormControl>
+                                    <Input placeholder='Nombre del vendedor' {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {isSeller ? (
+                        <FormField
+                            control={form.control}
+                            name='pin'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>PIN de Acceso (4 dígitos)</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder='Ej. 1234'
+                                            maxLength={4}
+                                            {...field}
+                                            onChange={(e) => {
+                                                const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                                                field.onChange(val);
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <p className="text-[0.8rem] text-muted-foreground">
+                                        Este PIN se usará para iniciar sesión rápidamente en el POS.
+                                    </p>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    ) : (
+                        <>
+                            <FormField
+                                control={form.control}
+                                name='email'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Correo Electrónico</FormLabel>
+                                        <FormControl>
+                                            <Input type="email" placeholder='correo@ejemplo.com' {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name='password'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Contraseña</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder='Mínimo 3 caracteres' {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name='confirmPassword'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Confirmar Contraseña</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder='Repite la contraseña' {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </>
+                    )}
+
                 </div>
 
                 <div className='flex justify-end gap-3 pt-4 border-t'>
@@ -139,10 +190,10 @@ const CreateUserForm = ({ storeId }: { storeId: string }) => {
                         type='button'
                         onClick={() => router.push(`/admin/${storeId}/users`)}
                     >
-                        Cancel
+                        Cancelar
                     </Button>
                     <Button type='submit' disabled={form.formState.isSubmitting} className="bg-orange hover:bg-orange-600 text-white">
-                        {form.formState.isSubmitting ? 'Creating...' : 'Create User'}
+                        {form.formState.isSubmitting ? 'Creando...' : 'Crear Usuario / Vendedor'}
                     </Button>
                 </div>
             </form>

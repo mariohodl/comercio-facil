@@ -778,6 +778,42 @@ const ProductForm = ({
       }
 
       if (type === 'Create') {
+        if (typeof window !== 'undefined' && !navigator.onLine) {
+          // OFFLINE MODE: Save to sync queue and local catalog
+          const { get, set } = await import('idb-keyval')
+          const queueKey = `offline_products_queue_${storeId}`
+          const catalogKey = `offline_catalog_${storeId}`
+
+          // 1. Add to sync queue
+          const queue = await get(queueKey) || []
+          const offlineProduct = {
+            ...finalValues,
+            _id: `offline_prod_${Date.now()}`,
+            localId: `offline_prod_${Date.now()}`,
+            createdAt: new Date(),
+            isOffline: true
+          }
+          queue.push(offlineProduct)
+          await set(queueKey, queue)
+
+          // 2. Add to local catalog for immediate POS use
+          const catalog = await get(catalogKey) || []
+          catalog.unshift(offlineProduct)
+          await set(catalogKey, catalog)
+
+          const offlineMsg = t('productSavedOffline');
+          showToast(offlineMsg.includes('productSavedOffline') ? 'Producto guardado localmente (Fuera de línea)' : offlineMsg, {
+            variant: 'default',
+          })
+
+          if (onSuccess) {
+            onSuccess(offlineProduct)
+          } else {
+            router.push(`/admin/${storeId}/products`)
+          }
+          return;
+        }
+
         const res = await createProduct(finalValues)
         if (!res.success) {
           showError(res.message)

@@ -404,7 +404,8 @@
             "noBarcode": "Sin código de barras generado",
             "missingFieldsNotice": "Campos pendientes de agregar:",
             "reviewDataEncouragement": "Siempre verifica la información auto-completada."
-        }
+        },
+        "productSavedOffline": "Producto guardado localmente (Fuera de línea)"
     },
     "orders": {
         "title": "Órdenes",
@@ -469,7 +470,50 @@
             "purchaseReturn": "Devolución de Compra",
             "suppliers": "Proveedores",
             "userManagement": "Gestión de Usuarios",
-            "users": "Usuarios"
+            "users": "Usuarios",
+            "finances": "Finanzas",
+            "expenses": "Gastos"
+        },
+        "expenses": {
+            "title": "Gastos",
+            "manageExpenses": "Administra y registra todos los gastos de tu negocio para un control financiero detallado.",
+            "addExpense": "Agregar Gasto",
+            "editExpense": "Editar Gasto",
+            "viewExpense": "Ver Gasto",
+            "date": "Fecha",
+            "category": "Categoría",
+            "categoryPlaceholder": "Seleccionar o escribir categoría",
+            "addCustomCategory": "Agregar \"{category}\"",
+            "amount": "Monto",
+            "description": "Descripción",
+            "status": "Estado",
+            "paid": "Pagado",
+            "pending": "Pendiente",
+            "search": "Buscar...",
+            "noExpensesFound": "No se encontraron gastos",
+            "cancel": "Cancelar",
+            "saveChanges": "Guardar Cambios",
+            "close": "Cerrar",
+            "expenseCategories": {
+                "title": "Categorías de Gastos",
+                "manageCategories": "Organiza tus gastos en categorías para un mejor seguimiento y análisis.",
+                "addCategory": "Agregar Categoría",
+                "editCategory": "Editar Categoría",
+                "name": "Nombre de Categoría",
+                "enterName": "Ingresar nombre de categoría",
+                "noCategoriesFound": "No se encontraron categorías de gastos",
+                "categoryCreated": "Categoría de gasto creada exitosamente",
+                "categoryUpdated": "Categoría de gasto actualizada exitosamente",
+                "categoryDeleted": "Categoría de gasto eliminada exitosamente",
+                "deleteConfirmTitle": "¿Eliminar Categoría de Gasto?",
+                "deleteConfirmDescription": "¿Estás seguro de que deseas eliminar esta categoría de gasto? Esta acción no se puede deshacer."
+            },
+            "expenseCreated": "Gasto creado exitosamente",
+            "expenseUpdated": "Gasto actualizado exitosamente",
+            "expenseDeleted": "Gasto eliminado exitosamente",
+            "deleteConfirmTitle": "¿Eliminar Gasto?",
+            "deleteConfirmDescription": "¿Estás seguro de que deseas eliminar este gasto? Esta acción no se puede deshacer.",
+            "error": "Algo salió mal al procesar el gasto"
         },
         "attributes": {
             "title": "Atributos de Variante",
@@ -499,6 +543,7 @@
         "dashboard": {
             "welcome": "Bienvenido, Admin",
             "ordersToday": "Tienes {count} Órdenes, Hoy",
+            "units": "{count} Unidades",
             "showGuide": "Ver Guía",
             "showDashboard": "Ver Reportes",
             "totalSales": "Ventas Totales",
@@ -506,6 +551,12 @@
             "totalPurchase": "Compra Total",
             "totalPurchaseReturn": "Devolución de Compra Total",
             "profit": "Ganancia",
+            "grossProfit": "Utilidad Bruta",
+            "netProfit": "Utilidad Neta",
+            "avgOrderValue": "Ticket Promedio",
+            "inventoryValue": "Valor del Inventario",
+            "totalUnitsSold": "Unidades Vendidas",
+            "totalCustomers": "Clientes Totales Registrados",
             "invoiceDue": "Factura Pendiente",
             "totalExpenses": "Gastos Totales",
             "totalPaymentReturns": "Devoluciones de Pago Totales",
@@ -546,7 +597,8 @@
             "date": "Fecha",
             "customerSupplier": "Cliente/Proveedor",
             "status": "Estado",
-            "total": "Total"
+            "total": "Total",
+            "viewingOfflineData": "Viendo datos sin conexión (Caché)"
         },
         "onboarding": {
             "welcomeTitle": "¡Bienvenido a Comercio Fácil!",
@@ -888,7 +940,7 @@
             "updateError": "Error al actualizar el logo de empresa",
             "updatesRemaining": "actualizaciones restantes",
             "compressing": "Comprimiendo imagen...",
-            "uploadSuccess": "¡Logo de empresa cargado exitosamente!",
+            "imageUploaded": "Imagen cargada exitosamente",
             "fileAlreadyUploaded": "Este logo ya ha sido cargado"
         },
         "actions": {
@@ -1144,6 +1196,19 @@
             "error": "Error al enviar el mensaje. Por favor intenta de nuevo.",
             "location": "Ubicación",
             "followUs": "Síguenos"
+        },
+        "expense": {
+            "title": "Gastos",
+            "add": "Agregar Gasto",
+            "list": "Lista de Gastos",
+            "amount": "Monto",
+            "category": "Categoría",
+            "description": "Descripción",
+            "date": "Fecha",
+            "categoryPlaceholder": "Seleccionar o escribir categoría",
+            "empty": "No hay gastos registrados",
+            "success": "Gasto registrado correctamente",
+            "error": "Error al registrar el gasto"
         }
     }
 }

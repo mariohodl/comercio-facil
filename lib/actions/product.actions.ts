@@ -624,3 +624,122 @@ export async function hasProducts(storeId: string) {
 		return false
 	}
 }
+
+export async function seedMockProductsForStore(storeId: string) {
+	try {
+		await connectToDatabase()
+
+		const mockProducts = [
+			{
+				name: 'Coca Cola 600ml',
+				price: 18.50,
+				cost: 12.00,
+				stock: 50,
+				category: 'Bebidas',
+				brand: 'Coca Cola',
+				barcode: '7501055300075',
+				image: 'https://placehold.co/400x400?text=Coca+Cola',
+				alert: 10
+			},
+			{
+				name: 'Sabritas Sal 42g',
+				price: 15.00,
+				cost: 10.00,
+				stock: 30,
+				category: 'Botanas',
+				brand: 'Sabritas',
+				barcode: '7501011115147',
+				image: 'https://placehold.co/400x400?text=Sabritas',
+				alert: 5
+			},
+			{
+				name: 'Leche Alpura 1L',
+				price: 26.00,
+				cost: 20.00,
+				stock: 20,
+				category: 'Lácteos',
+				brand: 'Alpura',
+				barcode: '7501020512345',
+				image: 'https://placehold.co/400x400?text=Leche',
+				alert: 5
+			},
+			{
+				name: 'Pan Bimbo Blanco',
+				price: 45.00,
+				cost: 35.00,
+				stock: 15,
+				category: 'Panadería',
+				brand: 'Bimbo',
+				barcode: '7501000100014',
+				image: 'https://placehold.co/400x400?text=Bimbo',
+				alert: 3
+			},
+			{
+				name: 'Atún Dolores en Agua',
+				price: 21.00,
+				cost: 16.00,
+				stock: 40,
+				category: 'Abarrotes',
+				brand: 'Dolores',
+				barcode: '7501040001235',
+				image: 'https://placehold.co/400x400?text=Atun',
+				alert: 10
+			}
+		];
+
+		const lastProduct = await Product.findOne().sort({ productId: -1 });
+		let latestProductId = lastProduct ? lastProduct.productId : 0;
+
+		let insertedCount = 0;
+
+		for (const p of mockProducts) {
+			const existing = await Product.findOne({ sku: p.barcode, store: storeId });
+			if (!existing) {
+				latestProductId++;
+				const newProduct = new Product({
+					productId: latestProductId,
+					name: p.name,
+					slug: p.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]/g, '') + '-' + Date.now(),
+					sku: p.barcode,
+					itemBarcode: p.barcode,
+					images: [
+						{
+							imgUrl: p.image,
+							imgKey: 'mock_key',
+							name: p.name,
+							size: 100
+						}
+					],
+					description: `Producto mock: ${p.name}`,
+					listPrice: p.price,
+					costPerUnit: p.cost,
+					countInStock: p.stock,
+					quantityAlert: p.alert,
+					category: p.category,
+					subCategory: 'General',
+					brand: p.brand,
+					unit: 'pz',
+					store: storeId,
+					warehouse: 'Principal',
+					productType: 'Physical',
+					isPublished: true,
+					isCustomCategory: true,
+					isCustomBrand: true,
+					numSales: 0
+				})
+				await newProduct.save();
+				insertedCount++;
+			}
+		}
+
+		revalidatePath('/admin/pos');
+
+		return {
+			success: true,
+			message: `Se insertaron ${insertedCount} productos de prueba.`,
+		}
+	} catch (error) {
+		console.error('Error seeding products:', error);
+		return { success: false, message: formatError(error) }
+	}
+}

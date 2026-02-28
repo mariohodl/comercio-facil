@@ -67,9 +67,13 @@ export function UserModal({ isOpen, onClose, storeId, user, mode }: UserModalPro
             storeId: storeId,
             password: '',
             confirmPassword: '',
+            pin: '',
             ...(isAddMode ? {} : { _id: user?._id }),
         } as any,
     })
+
+    const role = form.watch('role')
+    const isSeller = role === 'Seller'
 
     useEffect(() => {
         if (isOpen && user) {
@@ -82,6 +86,7 @@ export function UserModal({ isOpen, onClose, storeId, user, mode }: UserModalPro
                 storeId: storeId,
                 password: '',
                 confirmPassword: '',
+                pin: '',
                 ...(isAddMode ? {} : { _id: user._id }),
             } as any)
         } else if (isOpen && isAddMode) {
@@ -94,6 +99,7 @@ export function UserModal({ isOpen, onClose, storeId, user, mode }: UserModalPro
                 storeId: storeId,
                 password: '',
                 confirmPassword: '',
+                pin: '',
             } as any)
         }
     }, [isOpen, user, isAddMode, form, storeId])
@@ -136,112 +142,93 @@ export function UserModal({ isOpen, onClose, storeId, user, mode }: UserModalPro
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
                         <div className="grid grid-cols-1 gap-6">
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-navy font-semibold">{t('name')} <span className="text-red-500">*</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                disabled={isViewMode || isRestrictedAdmin}
-                                                className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="role"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-navy font-semibold">{t('role')} <span className="text-red-500">*</span></FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value}
-                                            disabled={isViewMode || isRestrictedAdmin}
-                                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-navy font-semibold">{t('name')} <span className="text-red-500">*</span></FormLabel>
                                             <FormControl>
-                                                <SelectTrigger className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg">
-                                                    <SelectValue placeholder={t('selectRole')} />
-                                                </SelectTrigger>
+                                                <Input
+                                                    {...field}
+                                                    disabled={isViewMode || isRestrictedAdmin}
+                                                    className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg"
+                                                />
                                             </FormControl>
-                                            <SelectContent>
-                                                {USER_ROLES.map((role) => (
-                                                    <SelectItem key={role} value={role}>{t(`roles.${role}`)}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-navy font-semibold">{t('email')} <span className="text-red-500">*</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                type="email"
+                                <FormField
+                                    control={form.control}
+                                    name="role"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-navy font-semibold">{t('role')} <span className="text-red-500">*</span></FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value}
                                                 disabled={isViewMode || isRestrictedAdmin}
-                                                className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg">
+                                                        <SelectValue placeholder={t('selectRole')} />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {USER_ROLES.map((role) => (
+                                                        <SelectItem key={role} value={role}>{t(`roles.${role}`)}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
-                            <FormField
-                                control={form.control}
-                                name="phone"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-navy font-semibold">{t('phone')} <span className="text-red-500">*</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                disabled={isViewMode || isRestrictedAdmin}
-                                                className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            {/* PIN field for Sellers */}
+                            {isSeller && !isViewMode && (
+                                <FormField
+                                    control={form.control}
+                                    name="pin"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-navy font-semibold">PIN de Seguridad (4 dígitos) <span className="text-red-500">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    type="text"
+                                                    maxLength={4}
+                                                    placeholder="XXXX"
+                                                    onChange={(e) => field.onChange(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                                                    className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg text-lg tracking-widest text-center"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                            <p className="text-xs text-muted-foreground mt-1">Este PIN se usará para iniciar sesión rápidamente en el POS.</p>
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
 
-                            {!isViewMode && (
-                                <div className="grid grid-cols-2 gap-4">
+                            {!isSeller && (
+                                <>
                                     <FormField
                                         control={form.control}
-                                        name="password"
+                                        name="email"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-navy font-semibold">{t('password')} {!isAddMode ? '' : <span className="text-red-500">*</span>}</FormLabel>
+                                                <FormLabel className="text-navy font-semibold">{t('email')} <span className="text-red-500">*</span></FormLabel>
                                                 <FormControl>
-                                                    <div className="relative">
-                                                        <Input
-                                                            {...field}
-                                                            type={showPassword ? 'text' : 'password'}
-                                                            placeholder={!isAddMode ? '••••••••' : ''}
-                                                            className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg pr-10"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setShowPassword(!showPassword)}
-                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                                                        >
-                                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                                        </button>
-                                                    </div>
+                                                    <Input
+                                                        {...field}
+                                                        type="email"
+                                                        disabled={isViewMode || isRestrictedAdmin}
+                                                        className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg"
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -250,32 +237,82 @@ export function UserModal({ isOpen, onClose, storeId, user, mode }: UserModalPro
 
                                     <FormField
                                         control={form.control}
-                                        name="confirmPassword"
+                                        name="phone"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-navy font-semibold">{t('confirmPassword')} {!isAddMode ? '' : <span className="text-red-500">*</span>}</FormLabel>
+                                                <FormLabel className="text-navy font-semibold">{t('phone')}</FormLabel>
                                                 <FormControl>
-                                                    <div className="relative">
-                                                        <Input
-                                                            {...field}
-                                                            type={showConfirmPassword ? 'text' : 'password'}
-                                                            placeholder={!isAddMode ? '••••••••' : ''}
-                                                            className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg pr-10"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                                                        >
-                                                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                                        </button>
-                                                    </div>
+                                                    <Input
+                                                        {...field}
+                                                        disabled={isViewMode || isRestrictedAdmin}
+                                                        className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg"
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
-                                </div>
+
+                                    {!isViewMode && (
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <FormField
+                                                control={form.control}
+                                                name="password"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-navy font-semibold">{t('password')} {!isAddMode ? '' : <span className="text-red-500">*</span>}</FormLabel>
+                                                        <FormControl>
+                                                            <div className="relative">
+                                                                <Input
+                                                                    {...field}
+                                                                    type={showPassword ? 'text' : 'password'}
+                                                                    placeholder={!isAddMode ? '••••••••' : ''}
+                                                                    className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg pr-10"
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setShowPassword(!showPassword)}
+                                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                                                >
+                                                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                                </button>
+                                                            </div>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="confirmPassword"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-navy font-semibold">{t('confirmPassword')} {!isAddMode ? '' : <span className="text-red-500">*</span>}</FormLabel>
+                                                        <FormControl>
+                                                            <div className="relative">
+                                                                <Input
+                                                                    {...field}
+                                                                    type={showConfirmPassword ? 'text' : 'password'}
+                                                                    placeholder={!isAddMode ? '••••••••' : ''}
+                                                                    className="h-12 border-gray-200 focus:border-orange focus:ring-orange rounded-lg pr-10"
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                                                >
+                                                                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                                </button>
+                                                            </div>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    )}
+                                </>
                             )}
 
                             <FormField

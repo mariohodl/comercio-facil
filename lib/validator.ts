@@ -362,25 +362,56 @@ export const UserUpdateSchema = z.object({
 
 export const StoreUserCreateSchema = z.object({
 	name: UserName,
-	email: Email,
-	phone: z.string().min(1, 'El teléfono es obligatorio'),
-	password: Password,
-	confirmPassword: Password,
+	email: z.string().email('Email is invalid').optional().or(z.literal('')),
+	phone: z.string().optional(),
+	password: z.string().optional(),
+	confirmPassword: z.string().optional(),
+	pin: z.string().regex(/^\d{4}$/, 'El PIN debe ser de 4 dígitos').optional(),
 	role: z.string().min(1, 'El rol es obligatorio'),
 	status: z.boolean().default(true),
 	storeId: z.string().min(1, 'El ID de la tienda es obligatorio'),
-}).refine((data) => data.password === data.confirmPassword, {
-	message: "Passwords don't match",
+}).refine((data) => {
+	if (data.role === 'Seller' && (!data.pin || data.pin.length !== 4)) {
+		return false;
+	}
+	return true;
+}, {
+	message: "El PIN de 4 dígitos es obligatorio para vendedores",
+	path: ['pin'],
+}).refine((data) => {
+	if (data.role !== 'Seller' && (!data.email || data.email === '')) {
+		return false;
+	}
+	return true;
+}, {
+	message: "El correo electrónico es obligatorio para este rol",
+	path: ['email'],
+}).refine((data) => {
+	if (data.role !== 'Seller' && (!data.password || data.password.length < 3)) {
+		return false;
+	}
+	return true;
+}, {
+	message: "La contraseña es obligatoria para este rol",
+	path: ['password'],
+}).refine((data) => {
+	if (data.password || data.confirmPassword) {
+		return data.password === data.confirmPassword;
+	}
+	return true;
+}, {
+	message: "Las contraseñas no coinciden",
 	path: ['confirmPassword'],
 })
 
 export const StoreUserUpdateSchema = z.object({
 	_id: MongoId,
 	name: UserName,
-	email: Email,
+	email: z.string().email('Email is invalid').optional().or(z.literal('')),
 	phone: z.string().optional(),
 	password: z.string().optional(),
 	confirmPassword: z.string().optional(),
+	pin: z.string().regex(/^\d{4}$/, 'El PIN debe ser de 4 dígitos').optional(),
 	role: z.string().min(1, 'El rol es obligatorio'),
 	status: z.boolean().default(true),
 	storeId: z.string().optional(),
@@ -604,6 +635,7 @@ export const POSOrderSchema = z.object({
 	customerId: z.string().optional(),
 	fulfillmentType: z.enum(['IN_STORE', 'PICKUP_LATER', 'DELIVERY']).default('IN_STORE'),
 	fulfillmentStatus: z.enum(['PENDING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED']).optional(),
+	createdAt: z.string().optional(),
 })
 
 export const CategoryInputSchema = z.object({
@@ -685,4 +717,20 @@ export const ContactInputSchema = z.object({
 	email: z.string().email('Invalid email address'),
 	subject: z.string().min(5, 'Subject must be at least 5 characters'),
 	message: z.string().min(10, 'Message must be at least 10 characters'),
+})
+
+export const ExpenseInputSchema = z.object({
+	amount: z.coerce.number().positive('El monto debe ser un número positivo'),
+	category: z.string().min(1, 'La categoría es obligatoria'),
+	description: z.string().optional(),
+	date: z.date()
+		.default(() => new Date())
+		.refine((d) => d <= new Date(), {
+			message: 'La fecha no puede ser posterior al día de hoy',
+		}),
+	storeId: z.string().optional(),
+})
+
+export const ExpenseUpdateSchema = ExpenseInputSchema.extend({
+	_id: MongoId,
 })

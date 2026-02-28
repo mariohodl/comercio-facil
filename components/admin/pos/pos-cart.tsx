@@ -163,9 +163,23 @@ export default function POSCart({ storeId }: POSCartProps) {
     const roundingDifference = roundOff ? roundedTotal - finalTotal : 0
 
     const fetchCustomers = useCallback(async () => {
-        const result = await getCustomersByStore(storeId)
-        if (result.success && result.data) {
-            setCustomers(result.data)
+        try {
+            if (navigator.onLine) {
+                const result = await getCustomersByStore(storeId)
+                if (result.success && result.data) {
+                    setCustomers(result.data)
+                    const { set } = await import('idb-keyval')
+                    await set(`offline_customers_${storeId}`, result.data)
+                }
+            } else {
+                const { get } = await import('idb-keyval')
+                const cachedCustomers = await get(`offline_customers_${storeId}`)
+                if (cachedCustomers) {
+                    setCustomers(cachedCustomers)
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching customers:', error)
         }
     }, [storeId])
 

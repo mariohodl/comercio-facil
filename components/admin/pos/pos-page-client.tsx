@@ -54,22 +54,65 @@ export default function POSPageClient({
                 clearCart()
             }
             setUserId(session.user.id)
+
+            // Persist this store as the "pinned" store for this device
+            // This allows the PIN login screen to know which sellers to show
+            if (session.user.companyId && storeId) {
+                localStorage.setItem('last_pos_store', JSON.stringify({
+                    companyId: session.user.companyId,
+                    storeId: storeId,
+                    storeName: session.user.storeName || 'Mi Tienda'
+                }))
+            }
         }
-    }, [session?.user?.id, userId, setUserId, clearCart])
+    }, [session?.user, userId, setUserId, clearCart, storeId])
+
 
     const { addToCart } = usePOSStore()
+
+    const syncCatalog = useCallback(async () => {
+        if (!navigator.onLine) return;
+        try {
+            const { set } = await import('idb-keyval');
+            // Fetch a large page of products to cache for offline use
+            const result = await getAllProductsForAdmin({
+                query: '',
+                page: 1,
+                limit: 2000,
+                store: storeId,
+            });
+            await set(`offline_catalog_${storeId}`, result.products);
+        } catch (error) {
+            console.error('Failed to sync catalog for offline use:', error);
+        }
+    }, [storeId]);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && navigator.onLine) {
+            syncCatalog();
+        }
+    }, [syncCatalog]);
 
     const handleBarcodeScan = useCallback(async (barcode: string) => {
         if (!barcode.trim()) return
 
         try {
-            // 1. Search for products matching the barcode/sku via API
-            const result = await getAllProductsForAdmin({
-                query: barcode,
-                page: 1,
-                limit: 100, // Search more products to ensure we find the match
-                store: storeId,
-            })
+            let productsToSearch: any[] = []
+
+            if (navigator.onLine) {
+                // 1. Search for products matching the barcode/sku via API
+                const result = await getAllProductsForAdmin({
+                    query: barcode,
+                    page: 1,
+                    limit: 100, // Search more products to ensure we find the match
+                    store: storeId,
+                })
+                productsToSearch = result.products
+            } else {
+                // Offline search using IndexedDB
+                const { get } = await import('idb-keyval');
+                productsToSearch = await get(`offline_catalog_${storeId}`) || [];
+            }
 
             let foundProduct: any = null
             let foundVariant: any = undefined
@@ -77,7 +120,7 @@ export default function POSPageClient({
             // 2. Look for an EXACT match in the results (Case Insensitive)
             const searchCode = barcode.toLowerCase()
 
-            for (const product of result.products) {
+            for (const product of productsToSearch) {
                 // Check main product matches
                 if (
                     product.itemBarcode === barcode ||

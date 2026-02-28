@@ -458,18 +458,33 @@ export async function createStoreUser(data: z.infer<typeof StoreUserCreateSchema
 			return { success: false, message: 'Store not found' }
 		}
 
+		// Handle missing email/password for Sellers
+		let finalEmail = validatedData.email;
+		if (validatedData.role === 'Seller' && (!finalEmail || finalEmail === '')) {
+			// Generate a unique internal email: name_shortid@store.cf
+			const shortId = Math.random().toString(36).substring(2, 6);
+			finalEmail = `${validatedData.name.toLowerCase().replace(/\s+/g, '_')}_${shortId}@${store.slug}.cf`;
+		}
+
+		let finalPassword = validatedData.password;
+		if (validatedData.role === 'Seller' && (!finalPassword || finalPassword === '')) {
+			finalPassword = uuidv4(); // Random secure password
+		}
+
 		// Check if user already exists
-		const existingUser = await User.findOne({ email: validatedData.email })
+		const existingUser = await User.findOne({ email: finalEmail })
 		if (existingUser) {
 			return { success: false, message: 'User with this email already exists' }
 		}
 
-		const hashedPassword = await bcrypt.hash(validatedData.password, 5)
+		const hashedPassword = await bcrypt.hash(finalPassword!, 5)
+		const hashedPin = validatedData.pin ? await bcrypt.hash(validatedData.pin, 5) : undefined;
 
 		const newUser = await User.create({
 			name: validatedData.name,
-			email: validatedData.email,
+			email: finalEmail,
 			password: hashedPassword,
+			pin: hashedPin,
 			role: validatedData.role,
 			phone: validatedData.phone,
 			status: validatedData.status,
@@ -500,19 +515,23 @@ export async function updateStoreUser(data: z.infer<typeof StoreUserUpdateSchema
 		if (!user) throw new Error('User not found')
 
 		// Defensive check: Store Admin users can only change their password
-		if (user.role === ROL_ADMIN && user.isStore) {
+		if (user.role === 'Admin' && user.isStore) {
 			if (validatedData.password) {
 				user.password = await bcrypt.hash(validatedData.password, 5)
 			}
 		} else {
 			user.name = validatedData.name
-			user.email = validatedData.email
+			if (validatedData.email) user.email = validatedData.email
 			user.role = validatedData.role
 			if (validatedData.phone) user.phone = validatedData.phone
-			user.status = validatedData.status
+			if (validatedData.status !== undefined) user.status = validatedData.status
 
 			if (validatedData.password) {
 				user.password = await bcrypt.hash(validatedData.password, 5)
+			}
+
+			if (validatedData.pin) {
+				user.pin = await bcrypt.hash(validatedData.pin, 5)
 			}
 		}
 

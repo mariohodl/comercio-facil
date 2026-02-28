@@ -36,19 +36,26 @@ export default function GettingStartedChecklist({
     const t = useTranslations('admin.onboarding')
     const tCommon = useTranslations('common')
 
-    // Track clicks for steps 2 and 3 if products already exist
+    // Track clicks for steps
+    const [productsVisited, setProductsVisited] = React.useState(false)
     const [purchasesVisited, setPurchasesVisited] = React.useState(false)
     const [salesVisited, setSalesVisited] = React.useState(false)
 
     React.useEffect(() => {
+        const prod = localStorage.getItem(`onboarding_products_visited_${storeId}`)
         const p = localStorage.getItem(`onboarding_purchases_visited_${storeId}`)
         const s = localStorage.getItem(`onboarding_sales_visited_${storeId}`)
+        if (prod) setProductsVisited(true)
         if (p) setPurchasesVisited(true)
         if (s) setSalesVisited(true)
     }, [storeId])
 
     const handleStepClick = (stepId: string) => {
-        if (!hasProducts) return
+        if (stepId === 'products') {
+            setProductsVisited(true)
+            localStorage.setItem(`onboarding_products_visited_${storeId}`, 'true')
+        }
+        if (!hasProducts && stepId !== 'products') return
         if (stepId === 'purchases') {
             setPurchasesVisited(true)
             localStorage.setItem(`onboarding_purchases_visited_${storeId}`, 'true')
@@ -67,7 +74,7 @@ export default function GettingStartedChecklist({
             buttonText: t('step1Button'),
             href: `/admin/${storeId}/products/create`,
             icon: ShoppingBag,
-            completed: hasProducts,
+            completed: hasProducts || productsVisited,
             color: 'text-orange-600',
             bgColor: 'bg-orange-50',
         },

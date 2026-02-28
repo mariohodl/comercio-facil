@@ -385,7 +385,8 @@
             "noBarcode": "No barcode generated",
             "missingFieldsNotice": "Pending fields to add:",
             "reviewDataEncouragement": "Always verify auto-filled information."
-        }
+        },
+        "productSavedOffline": "Product saved locally (Offline)"
     },
     "orders": {
         "title": "Orders",
@@ -450,7 +451,50 @@
             "purchaseReturn": "Purchase Return",
             "suppliers": "Suppliers",
             "userManagement": "User Management",
-            "users": "Users"
+            "users": "Users",
+            "finances": "Finances",
+            "expenses": "Expenses"
+        },
+        "expenses": {
+            "title": "Expenses",
+            "manageExpenses": "Manage and record all your business expenses for detailed financial control.",
+            "addExpense": "Add Expense",
+            "editExpense": "Edit Expense",
+            "viewExpense": "View Expense",
+            "date": "Date",
+            "category": "Category",
+            "categoryPlaceholder": "Select or type category",
+            "addCustomCategory": "Add \"{category}\"",
+            "amount": "Amount",
+            "description": "Description",
+            "status": "Status",
+            "paid": "Paid",
+            "pending": "Pending",
+            "search": "Search...",
+            "noExpensesFound": "No expenses found",
+            "cancel": "Cancel",
+            "saveChanges": "Save Changes",
+            "close": "Close",
+            "expenseCategories": {
+                "title": "Expense Categories",
+                "manageCategories": "Organize your expenses into categories for better tracking and analysis.",
+                "addCategory": "Add Category",
+                "editCategory": "Edit Category",
+                "name": "Category Name",
+                "enterName": "Enter category name",
+                "noCategoriesFound": "No expense categories found",
+                "categoryCreated": "Expense category created successfully",
+                "categoryUpdated": "Expense category updated successfully",
+                "categoryDeleted": "Expense category deleted successfully",
+                "deleteConfirmTitle": "Delete Expense Category?",
+                "deleteConfirmDescription": "Are you sure you want to delete this expense category? This action cannot be undone."
+            },
+            "expenseCreated": "Expense created successfully",
+            "expenseUpdated": "Expense updated successfully",
+            "expenseDeleted": "Expense deleted successfully",
+            "deleteConfirmTitle": "Delete Expense?",
+            "deleteConfirmDescription": "Are you sure you want to delete this expense? This action cannot be undone.",
+            "error": "Something went wrong processing the expense"
         },
         "attributes": {
             "title": "Variant Attributes",
@@ -480,6 +524,7 @@
         "dashboard": {
             "welcome": "Welcome, Admin",
             "ordersToday": "You have {count} Orders, Today",
+            "units": "{count} Units",
             "showGuide": "View Guide",
             "showDashboard": "View Reports",
             "totalSales": "Total Sales",
@@ -487,6 +532,12 @@
             "totalPurchase": "Total Purchase",
             "totalPurchaseReturn": "Total Purchase Return",
             "profit": "Profit",
+            "grossProfit": "Gross Profit",
+            "netProfit": "Net Profit",
+            "avgOrderValue": "Average Order Value",
+            "inventoryValue": "Inventory Value",
+            "totalUnitsSold": "Units Sold",
+            "totalCustomers": "Total Customers Registered",
             "invoiceDue": "Invoice Due",
             "totalExpenses": "Total Expenses",
             "totalPaymentReturns": "Total Payment Returns",
@@ -527,7 +578,8 @@
             "date": "Date",
             "customerSupplier": "Customer/Supplier",
             "status": "Status",
-            "total": "Total"
+            "total": "Total",
+            "viewingOfflineData": "Viewing offline data (Cached)"
         },
         "onboarding": {
             "welcomeTitle": "Welcome to Comercio Fácil!",

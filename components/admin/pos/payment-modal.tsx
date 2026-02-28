@@ -100,23 +100,55 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
         }
 
         try {
+            const payload = {
+                items: cart,
+                paymentMethod: isUnpaid ? 'Cash' : data.paymentMethod,
+                paymentSplits: isUnpaid ? [] : [{ method: data.paymentMethod === 'Split' ? 'Cash' : data.paymentMethod, amount: total }],
+                totalPrice: total,
+                receivedAmount: isUnpaid ? 0 : (data.receivedAmount || 0),
+                change: isUnpaid ? 0 : ((data.receivedAmount || 0) - total),
+                isRounded: groupRounding?.isRounded,
+                amountRounded: groupRounding?.amountRounded,
+                isPaid: !isUnpaid,
+                storeId,
+                customerId,
+                fulfillmentType: data.fulfillmentType
+            }
+
+            if (!navigator.onLine) {
+                // Offline fallback
+                const offlineKey = `offline_orders_${storeId}`;
+                const offlineOrders = JSON.parse(localStorage.getItem(offlineKey) || '[]');
+                const offlineOrder = {
+                    ...payload,
+                    _id: `offline_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+                    createdAt: new Date().toISOString()
+                };
+                offlineOrders.push(offlineOrder);
+                localStorage.setItem(offlineKey, JSON.stringify(offlineOrders));
+
+                toast.success('Offline order saved. It will sync when connection returns.', {
+                    description: 'Guardado localmente sin conexión'
+                });
+                setOpen(false);
+
+                if (onSuccess) {
+                    onSuccess({
+                        orderId: offlineOrder._id,
+                        totalAmount: total,
+                        changeGiven: isUnpaid ? 0 : change,
+                        isPaid: !isUnpaid
+                    });
+                } else {
+                    clearCart();
+                }
+                return;
+            }
+
             const res = await fetch('/api/admin/pos/transaction', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    items: cart,
-                    paymentMethod: isUnpaid ? 'Cash' : data.paymentMethod,
-                    paymentSplits: isUnpaid ? [] : [{ method: data.paymentMethod === 'Split' ? 'Cash' : data.paymentMethod, amount: total }],
-                    totalPrice: total,
-                    receivedAmount: isUnpaid ? 0 : (data.receivedAmount || 0),
-                    change: isUnpaid ? 0 : ((data.receivedAmount || 0) - total),
-                    isRounded: groupRounding?.isRounded,
-                    amountRounded: groupRounding?.amountRounded,
-                    isPaid: !isUnpaid,
-                    storeId,
-                    customerId,
-                    fulfillmentType: data.fulfillmentType
-                }),
+                body: JSON.stringify(payload),
             })
 
             const result = await res.json()

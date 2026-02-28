@@ -95,6 +95,7 @@ export function AdminNav({
     },
     {
       title: t('userManagement'),
+      roles: ['Admin', 'SuperAdmin'],
       items: [
         {
           title: t('users'),
@@ -105,6 +106,7 @@ export function AdminNav({
     },
     {
       title: t('inventory'),
+      roles: ['Admin', 'SuperAdmin'],
       items: [
         {
           title: t('createProduct'),
@@ -147,11 +149,6 @@ export function AdminNav({
           href: `/admin/${storeId}/inventory/attributes`,
           icon: Settings2,
         },
-        // {
-        //   title: t('printBarcode'),
-        //   href: `/admin/${storeId}/products/print-barcodes`,
-        //   icon: Barcode,
-        // },
       ],
     },
     {
@@ -169,21 +166,6 @@ export function AdminNav({
           icon: ShoppingCart,
           hasSubmenu: true,
         },
-        // {
-        //   title: t('invoices'),
-        //   href: `/admin/${storeId}/sales/invoices`,
-        //   icon: FileText,
-        // },
-        // {
-        //   title: t('salesReturn'),
-        //   href: `/admin/${storeId}/sales/returns`,
-        //   icon: RotateCcw,
-        // },
-        // {
-        //   title: t('quotation'),
-        //   href: `/admin/${storeId}/sales/quotations`,
-        //   icon: FileOutput,
-        // },
       ],
     },
     {
@@ -199,52 +181,37 @@ export function AdminNav({
           title: t('addPurchase'),
           href: `/admin/${storeId}/purchases/create`,
           icon: PlusSquare,
+          roles: ['Admin', 'SuperAdmin'], // Only admins should create purchases
         },
-        // {
-        //   title: t('purchaseOrder'),
-        //   href: `/admin/${storeId}/purchases/order`,
-        //   icon: FileText,
-        // },
-        // {
-        //   title: t('purchaseReturn'),
-        //   href: `/admin/${storeId}/purchases/return`,
-        //   icon: RotateCcw,
-        // },
         {
           title: t('suppliers'),
           href: `/admin/${storeId}/proveedores`,
           icon: Package,
+          roles: ['Admin', 'SuperAdmin'], // Hide suppliers from sellers
         },
       ],
     },
-
-    // {
-    //   title: t('stock'),
-    //   items: [
-    //     {
-    //       title: t('manageStock'),
-    //       href: `/admin/${storeId}/stock/manage`,
-    //       icon: Package,
-    //     },
-    //     {
-    //       title: t('stockAdjustment'),
-    //       href: `/admin/${storeId}/stock/adjustment`,
-    //       icon: ArrowUpRight,
-    //     },
-    //     {
-    //       title: t('stockTransfer'),
-    //       href: `/admin/${storeId}/stock/transfer`,
-    //       icon: ArrowLeftRight,
-    //     },
-    //   ],
-    // },
+    {
+      title: t('finances'),
+      roles: ['Admin', 'SuperAdmin'],
+      items: [
+        {
+          title: t('expenses'),
+          href: `/admin/${storeId}/expenses`,
+          icon: FileOutput,
+        },
+      ],
+    },
   ]
 
   // Filter sections based on role
-  const navSections = baseNavSections.map(section => ({
-    ...section,
-    items: section.items.filter((item: any) => !item.role || item.role === userRole)
-  })).filter(section => section.items.length > 0)
+  const navSections = baseNavSections
+    .filter(section => !section.roles || (userRole && section.roles.includes(userRole)))
+    .map(section => ({
+      ...section,
+      items: section.items.filter((item: any) => !item.roles || (userRole && item.roles.includes(userRole)))
+    }))
+    .filter(section => section.items.length > 0)
 
   // Helper component to wrap links with SheetClose only if on mobile
   const NavLinkWrapper = ({ children, asChild }: { children: React.ReactNode, asChild?: boolean }) => {
