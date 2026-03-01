@@ -40,7 +40,17 @@ function SignInContent({ searchParams }: { searchParams: any }) {
 
   if (view === 'select') {
     return (
-      <section className='flex w-full min-h-screen bg-gradient-to-br from-orange-50 to-white flex-col items-center justify-center p-6 text-center animate-in fade-in duration-500'>
+      <section className='flex w-full min-h-screen bg-gradient-to-br from-orange-50 to-white flex-col items-center justify-center p-6 text-center animate-in fade-in duration-500 relative'>
+        <div className="absolute top-6 left-6">
+          <Link
+            href="/"
+            className='flex items-center gap-2 text-gray-400 hover:text-orange transition-colors'
+          >
+            <ArrowLeft className='w-4 h-4' />
+            <span className='text-sm font-medium'>Regresar</span>
+          </Link>
+        </div>
+
         <div className='w-full max-w-md mx-auto'>
           <div className='flex justify-center mb-8'>
             <Image

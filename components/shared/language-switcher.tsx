@@ -1,6 +1,5 @@
 'use client'
 
-import { useTransition } from 'react'
 import { useLocale } from 'next-intl'
 import { cn } from '@/lib/utils'
 import {
@@ -19,16 +18,13 @@ const languages = {
 }
 
 export function LanguageSwitcher({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
-    const [isPending, startTransition] = useTransition()
     const locale = useLocale() as Locale
 
     const switchLanguage = (newLocale: Locale) => {
-        startTransition(() => {
-            // Set cookie with new locale
-            document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000` // 1 year
-            // Reload page to apply new locale
-            window.location.reload()
-        })
+        // Set cookie with new locale
+        document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000` // 1 year
+        // Reload page to apply new locale
+        window.location.reload()
     }
 
     return (
@@ -43,7 +39,6 @@ export function LanguageSwitcher({ variant = 'light' }: { variant?: 'light' | 'd
                             ? "text-white hover:bg-gray-800"
                             : "hover:bg-gray-100"
                     )}
-                    disabled={isPending}
                 >
                     <span className="text-xl leading-none">{languages[locale].flag}</span>
                     <span className="sr-only">{languages[locale].name}</span>

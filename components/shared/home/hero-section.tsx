@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react'
 
 export function HeroSection() {
     return (
-        <section className='relative overflow-hidden bg-gradient-to-b from-white via-blue-50/50 to-white pt-16 pb-32  md:pb-30'>
+        <section className='relative overflow-hidden bg-gradient-to-b from-white via-blue-50/50 to-white pt-10 pb-16 md:pt-16  md:pb-30'>
             {/* Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-gradient-to-br from-blue-100/40 to-purple-100/40 blur-3xl"></div>
