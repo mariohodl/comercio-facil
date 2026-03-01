@@ -102,39 +102,42 @@ export function PricingSection() {
                         <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl"></div>
                     </div>
 
-                    {/* Billing Toggle - Fixed Alignment */}
+                    {/* Unified Billing Toggle - Segmented Control Style */}
                     <div className="flex justify-center">
-                        <div className="inline-grid grid-cols-[1fr_auto_1fr] items-center gap-4 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-inner">
-                            <div className="text-right">
-                                <span className={cn(
-                                    "text-[10px] font-black transition-colors uppercase tracking-widest px-2",
-                                    !isAnnual ? "text-slate-900" : "text-slate-400"
-                                )}>
-                                    Mes a Mes
-                                </span>
-                            </div>
+                        <div className="relative grid grid-cols-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/40 shadow-inner w-full max-w-[340px]">
+                            {/* Sliding Background Pill */}
+                            <div
+                                className={cn(
+                                    "absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) bg-white rounded-[14px] shadow-sm shadow-slate-200/50 border border-slate-200/30",
+                                    isAnnual ? "translate-x-[calc(100%+6px)]" : "translate-x-0"
+                                )}
+                            />
 
                             <button
-                                onClick={() => setIsAnnual(!isAnnual)}
-                                className="relative w-14 h-7 rounded-full bg-slate-200 border border-slate-300 transition-colors duration-300 focus:outline-none"
+                                onClick={() => setIsAnnual(false)}
+                                className={cn(
+                                    "relative z-10 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all duration-300",
+                                    !isAnnual ? "text-slate-900" : "text-slate-400 hover:text-slate-500"
+                                )}
                             >
-                                <div className={cn(
-                                    "absolute top-0.5 left-0.5 w-5.5 h-5.5 rounded-full shadow-md transform transition-transform duration-300",
-                                    isAnnual ? "translate-x-7 bg-orange-500" : "translate-x-0 bg-white"
-                                )}></div>
+                                Mes a Mes
                             </button>
 
-                            <div className="flex items-center gap-2 px-2">
+                            <button
+                                onClick={() => setIsAnnual(true)}
+                                className={cn(
+                                    "relative z-10 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all duration-500 flex items-center justify-center gap-1.5",
+                                    isAnnual ? "text-slate-900" : "text-slate-400 hover:text-slate-500"
+                                )}
+                            >
+                                Anual
                                 <span className={cn(
-                                    "text-[10px] font-black transition-colors uppercase tracking-widest",
-                                    isAnnual ? "text-slate-900" : "text-slate-400"
+                                    "px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase shadow-sm transition-all duration-500",
+                                    isAnnual ? "bg-emerald-500 text-white scale-110" : "bg-emerald-100 text-emerald-600"
                                 )}>
-                                    Plan Anual
-                                </span>
-                                <span className="px-1.5 py-0.5 rounded-md bg-emerald-500 text-white text-[8px] font-black uppercase shadow-sm">
                                     -30%
                                 </span>
-                            </div>
+                            </button>
                         </div>
                     </div>
                 </div>
