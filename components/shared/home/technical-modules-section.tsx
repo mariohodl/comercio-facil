@@ -57,7 +57,7 @@ export function TechnicalModulesSection() {
                 <div className="text-center max-w-3xl mx-auto mb-20">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1976D2]/10 backdrop-blur-sm border border-[#1976D2]/20 mb-6">
                         <div className="w-2 h-2 bg-[#1976D2] rounded-full animate-pulse"></div>
-                        <span className="text-sm font-semibold text-[#1976D2]">MÓDULOS TÉCNICOS</span>
+                        <span className="text-sm font-semibold text-[#1976D2]">¿POR QUÉ ELEGIR COMERCIO FÁCIL?</span>
                     </div>
                     <h2 className='text-4xl md:text-5xl font-bold text-gray-900 tracking-tight mb-4'>
                         Tecnología que <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1976D2] to-[#0D47A1]">Impulsa su Negocio</span>

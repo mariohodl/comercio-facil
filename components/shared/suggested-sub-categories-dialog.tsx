@@ -155,25 +155,17 @@ export function SuggestedSubCategoriesDialog({
                     )}
                 </div>
 
-                <DialogFooter className="flex items-center sm:justify-between w-full gap-2">
-                    <Button
-                        variant="ghost"
-                        onClick={() => onOpenChange(false)}
-                        disabled={saving}
-                        className="text-slate-400 hover:text-slate-600"
-                    >
-                        Skip
-                    </Button>
-                    <div className="flex gap-2">
+                <DialogFooter className="flex flex-col sm:flex-row-reverse items-center justify-between w-full gap-3 pt-4 border-t border-slate-100">
+                    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         {!loading && suggestions.length === 0 && (
-                            <Button variant="outline" onClick={fetchSuggestions} disabled={saving}>
+                            <Button variant="outline" onClick={fetchSuggestions} disabled={saving} className="w-full sm:w-auto">
                                 Try Again
                             </Button>
                         )}
                         <Button
                             onClick={handleSave}
                             disabled={loading || saving || selected.length === 0}
-                            className="bg-orange hover:bg-orange-dark text-white min-w-[140px]"
+                            className="bg-orange hover:bg-orange-dark text-white min-w-[140px] w-full sm:w-auto font-bold"
                         >
                             {saving ? (
                                 <>
@@ -188,6 +180,14 @@ export function SuggestedSubCategoriesDialog({
                             )}
                         </Button>
                     </div>
+                    <Button
+                        variant="ghost"
+                        onClick={() => onOpenChange(false)}
+                        disabled={saving}
+                        className="text-slate-400 hover:text-slate-600 w-full sm:w-auto order-last sm:order-none"
+                    >
+                        Skip
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

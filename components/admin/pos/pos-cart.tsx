@@ -194,7 +194,7 @@ export default function POSCart({ storeId }: POSCartProps) {
 
     return (
         <Card className="flex h-full flex-col shadow-lg lg:border-gray-100 p-0 gap-0 border-none lg:border rounded-none lg:rounded-xl">
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-none lg:rounded-t-lg p-3 pt-10 lg:pt-3">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-none lg:rounded-t-lg p-3 pt-5 lg:pt-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <ShoppingBag className="h-4 w-4" />

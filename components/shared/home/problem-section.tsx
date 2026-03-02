@@ -23,7 +23,7 @@ export function ProblemSection() {
     ]
 
     return (
-        <section className='relative py-24 md:py-32 bg-slate-50/80 overflow-hidden'>
+        <section className='relative py-16 md:py-32 bg-slate-50/80 overflow-hidden'>
             {/* Background Decorations */}
             <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
                 <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-red-100/20 blur-[120px] rounded-full"></div>
@@ -43,7 +43,7 @@ export function ProblemSection() {
 
                             <div className="relative z-10">
                                 <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                                    <h2 className='text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-[1.1]'>
+                                    <h2 className='text-3xl md:text-5xl font-bold text-slate-900 tracking-tight leading-[1.1]'>
                                         ¿Cansado de la <span className="text-red-600">Venta a Ciegas?</span>
                                     </h2>
                                     <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
@@ -66,7 +66,7 @@ export function ProblemSection() {
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    <h3 className='text-2xl md:text-3xl font-bold text-slate-900 leading-tight'>
+                                                    <h3 className='text-xl md:text-3xl font-bold text-slate-900 leading-tight'>
                                                         {problem.title}
                                                     </h3>
                                                     <p className='text-slate-600 font-medium text-lg leading-relaxed opacity-90'>
@@ -77,7 +77,7 @@ export function ProblemSection() {
 
                                             {/* Decorative background element */}
                                             <div className="absolute top-4 right-4 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-all duration-500 group-hover:scale-110">
-                                                <AlertTriangle className="w-32 h-32" />
+                                                <AlertTriangle className="w-20 h-20 md:w-32 h-32" />
                                             </div>
                                         </div>
                                     ))}

@@ -209,14 +209,14 @@ export default function POSPageClient({
         <div className='h-screen max-h-screen overflow-hidden bg-[#f8fafc] flex flex-col'>
             {/* Header */}
             <div className='bg-[#0f172a] border-b border-slate-900 shadow-sm sticky top-0 z-30 shrink-0'>
-                <div className='px-4 lg:px-6 py-2.5'>
+                <div className='pl-4 pr-2 lg:px-6 py-2'>
                     <div className='flex items-center justify-between'>
-                        <div className='flex items-center gap-3'>
+                        <div className='flex items-center gap-2 sm:gap-3'>
                             <div className="flex items-center justify-center w-8 h-8 rounded-md bg-white/10 text-white border border-white/5">
                                 <Store className="w-4 h-4" />
                             </div>
                             <div className="flex flex-col justify-center">
-                                <h1 className='text-sm lg:text-base font-bold text-white tracking-tight leading-none mb-0.5'>
+                                <h1 className='text-xs lg:text-base font-bold text-white tracking-tight leading-none mb-0.5 truncate max-w-[120px] sm:max-w-none'>
                                     {mounted ? (session?.user?.storeName || t('title')) : t('title')}
                                 </h1>
                                 <div className="hidden sm:flex items-center gap-2">
@@ -233,7 +233,7 @@ export default function POSPageClient({
                             </div>
                         </div>
 
-                        <div className='flex items-center gap-3 lg:gap-4'>
+                        <div className='flex items-center gap-1.5 sm:gap-3 lg:gap-4'>
                             <div className="hidden lg:flex items-center">
                                 <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 px-3 py-1 rounded-md">
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" title="Sistema Online" />
@@ -243,13 +243,13 @@ export default function POSPageClient({
                                 </div>
                             </div>
 
-                            <div className='flex items-center gap-2 lg:border-l lg:border-slate-800 lg:pl-4'>
+                            <div className='flex items-center gap-1.5 lg:border-l lg:border-slate-800 lg:pl-4'>
                                 {session?.user?.role === 'Admin' && (
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         asChild
-                                        className="h-8 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-medium px-3 rounded-md transition-colors border border-transparent hover:border-white/10"
+                                        className="h-8 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-medium px-2 sm:px-3 rounded-md transition-colors border border-transparent hover:border-white/10"
                                     >
                                         <Link href={`/admin/${storeId}/overview`}>
                                             <LayoutDashboard className="h-3.5 w-3.5 text-orange" />
@@ -261,7 +261,7 @@ export default function POSPageClient({
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-medium px-3 rounded-md transition-colors border border-transparent hover:border-white/10 group"
+                                    className="h-8 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-medium px-2 sm:px-3 rounded-md transition-colors border border-transparent hover:border-white/10 group"
                                     onClick={() => setCalculatorOpen(true)}
                                     title={t('calculator')}
                                 >
@@ -273,7 +273,7 @@ export default function POSPageClient({
                                     variant="default"
                                     size="sm"
                                     onClick={() => setOrdersOpen(true)}
-                                    className="h-8 bg-orange hover:bg-orange/90 text-white font-bold px-3 rounded-md transition-all shadow-sm"
+                                    className="h-8 bg-orange hover:bg-orange/90 text-white font-bold px-2 sm:px-3 rounded-md transition-all shadow-sm"
                                 >
                                     <ShoppingCart className="h-3.5 w-3.5" />
                                     <span className="hidden xl:inline text-[11px] uppercase tracking-wider ml-1.5">{t('orders')}</span>
@@ -282,7 +282,7 @@ export default function POSPageClient({
 
                             <div className="h-6 w-[1px] bg-slate-800 hidden sm:block mx-1" />
 
-                            <div className="pl-1">
+                            <div className="pl-0">
                                 {userButton}
                             </div>
                         </div>

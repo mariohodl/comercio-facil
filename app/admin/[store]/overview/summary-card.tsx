@@ -23,46 +23,33 @@ export default function SummaryCard({
 
     return (
         <Card className={cn('group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-black/5 active:scale-[0.98] border-none shadow-sm bg-white', className)}>
-            <CardContent className='p-5 sm:p-6'>
+            <CardContent className='p-3 sm:p-6'>
                 <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-4'>
-                        <div className={cn('w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500', iconClassName)}>
-                            <Icon className='h-6 w-6' />
+                    <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4'>
+                        <div className={cn('w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500 shrink-0', iconClassName)}>
+                            <Icon className='h-4 w-4 sm:h-6 sm:h-6' />
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col min-w-0">
                             <span className={cn(
-                                'text-[10px] font-semibold uppercase tracking-widest leading-none mb-1',
+                                'text-[8px] sm:text-[10px] font-semibold uppercase tracking-widest leading-none mb-0.5 sm:mb-1 truncate',
                                 isDark ? 'text-slate-300' : 'text-slate-400'
                             )}>
                                 {title}
                             </span>
-                            <div className="flex items-baseline gap-2">
+                            <div className="flex items-baseline gap-1 min-w-0">
                                 <h3 className={cn(
-                                    'text-xl sm:text-2xl font-bold tracking-tight',
+                                    'text-base sm:text-2xl font-bold tracking-tight truncate',
                                     isDark ? 'text-white' : 'text-slate-900'
                                 )}>
                                     {value}
                                 </h3>
-                                {/* {percentage !== undefined && (
-                                    <span
-                                        className={cn(
-                                            'text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-tighter',
-                                            percentage >= 0
-                                                ? (isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-50 text-emerald-600')
-                                                : (isDark ? 'bg-rose-500/20 text-rose-400' : 'bg-rose-50 text-rose-600')
-                                        )}
-                                    >
-                                        {percentage >= 0 ? '↑' : '↓'}
-                                        {Math.abs(percentage)}%
-                                    </span>
-                                )} */}
                             </div>
                         </div>
                     </div>
                 </div>
-                {/* Subtle background decoration */}
-                <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
-                    <Icon size={100} />
+                {/* Subtle background decoration - hidden on mobile to save visual space */}
+                <div className="hidden sm:block absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                    <Icon className="size-[100px]" />
                 </div>
             </CardContent>
         </Card>

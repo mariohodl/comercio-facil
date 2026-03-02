@@ -77,39 +77,39 @@ export default function OnboardingModal({ storeId }: OnboardingModalProps) {
                         <DialogTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 tracking-tight text-center">
                             {t('welcomeTitle')}
                         </DialogTitle>
-                        <DialogDescription className="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
+                        <DialogDescription className="text-base text-slate-600 dark:text-slate-400  max-w-sm mx-auto">
                             {t('welcomeDescription')}
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="mt-8 grid gap-4">
-                        <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-orange-100 transition-colors">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600 font-bold">
+                    <div className="mt-4 grid gap-4">
+                        <div className="relative p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-orange-100 transition-all hover:shadow-md group">
+                            <div className="absolute top-0 right-0 flex h-8 w-10 items-center justify-center rounded-tr-2xl rounded-bl-2xl bg-orange-50 text-orange-600 text-xs font-black group-hover:bg-orange-100 transition-colors">
                                 1
                             </div>
-                            <div className="text-left space-y-1">
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">{t('step1Title')}</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">{t('step1Description')}</p>
+                            <div className="text-left space-y-1 pr-6">
+                                <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{t('step1Title')}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal">{t('step1Description')}</p>
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-emerald-100 transition-colors">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 font-bold">
+                        <div className="relative p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-emerald-100 transition-all hover:shadow-md group">
+                            <div className="absolute top-0 right-0 flex h-8 w-10 items-center justify-center rounded-tr-2xl rounded-bl-2xl bg-emerald-50 text-emerald-600 text-xs font-black group-hover:bg-emerald-100 transition-colors">
                                 2
                             </div>
-                            <div className="text-left space-y-1">
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">{t('step2Title')}</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">{t('step2Description')}</p>
+                            <div className="text-left space-y-1 pr-6">
+                                <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{t('step2Title')}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal">{t('step2Description')}</p>
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-blue-100 transition-colors">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold">
+                        <div className="relative p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-blue-100 transition-all hover:shadow-md group">
+                            <div className="absolute top-0 right-0 flex h-8 w-10 items-center justify-center rounded-tr-2xl rounded-bl-2xl bg-blue-50 text-blue-600 text-xs font-black group-hover:bg-blue-100 transition-colors">
                                 3
                             </div>
-                            <div className="text-left space-y-1">
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">{t('step3Title')}</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">{t('step3Description')}</p>
+                            <div className="text-left space-y-1 pr-6">
+                                <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{t('step3Title')}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal">{t('step3Description')}</p>
                             </div>
                         </div>
                     </div>

@@ -169,13 +169,13 @@ export const OrderItemSchema = z.object({
 	quantity: z
 		.number()
 		.int()
-		.nonnegative('Quantity must be a non-negative number'),
+		.nonnegative('La cantidad debe ser un número no negativo'),
 	countInStock: z
 		.number()
 		.int()
-		.nonnegative('Quantity must be a non-negative number'),
+		.nonnegative('La cantidad en stock debe ser un número no negativo'),
 	image: z.string().min(1, 'La imagen es obligatoria'),
-	price: z.number().nonnegative('Price must be a non-negative number'),
+	price: z.number().nonnegative('El precio debe ser un número no negativo'),
 	color: z.string().optional(),
 	size: z.string().optional(),
 })
@@ -255,10 +255,10 @@ export const CartSchema = z.object({
 // USER
 const UserName = z
 	.string()
-	.min(2, { message: 'Username must be at least 2 characters' })
-	.max(50, { message: 'Username must be at most 50 characters' })
-const Email = z.string().min(1, 'El correo electrónico es obligatorio').email('Email is invalid')
-const Password = z.string().min(3, 'Password must be at least 3 characters')
+	.min(2, { message: 'El nombre de usuario debe tener al menos 2 caracteres' })
+	.max(50, { message: 'El nombre de usuario debe tener como máximo 50 caracteres' })
+const Email = z.string().min(1, 'El correo electrónico es obligatorio').email('El correo electrónico no es válido')
+const Password = z.string().min(3, 'La contraseña debe tener al menos 3 caracteres')
 const UserRole = z.string().optional()
 const StoreId = z.string().optional()
 
@@ -296,15 +296,15 @@ export const UserSignUpSchema = UserSignInSchema.extend({
 	promoCode: z.string().optional(),
 	middle_name_verification: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
-	message: "Passwords don't match",
+	message: "Las contraseñas no coinciden",
 	path: ['confirmPassword'],
 })
 
 export const StoreSettingsSchema = z.object({
-	companyName: z.string().min(3, 'Company name must be at least 3 characters'),
-	storeName: z.string().min(3, 'Store name must be at least 3 characters'),
+	companyName: z.string().min(3, 'El nombre de la empresa debe tener al menos 3 caracteres'),
+	storeName: z.string().min(3, 'El nombre de la sucursal debe tener al menos 3 caracteres'),
 	storeLocation: z.string().optional().default(''),
-	warehouseName: z.string().min(3, 'Warehouse name must be at least 3 characters'),
+	warehouseName: z.string().min(3, 'El nombre del almacén debe tener al menos 3 caracteres'),
 	warehouseLocation: z.string().optional().default(''),
 	taxId: z.string().optional(),
 	storeId: StoreId,
@@ -421,7 +421,7 @@ export const StoreUserUpdateSchema = z.object({
 	}
 	return true;
 }, {
-	message: "Passwords don't match",
+	message: "Las contraseñas no coinciden",
 	path: ['confirmPassword'],
 })
 
@@ -466,10 +466,10 @@ export const EntryTypeSchema = z.enum(['Replacement', 'Exchange', 'Return'])
 export const PurchaseItemSchema = z.object({
 	productId: MongoId,
 	name: z.string(),
-	quantity: z.coerce.number().positive('Quantity must be positive'),
-	costPrice: z.coerce.number().nonnegative('Cost price must be non-negative'),
-	tax: z.coerce.number().nonnegative('Tax must be non-negative').optional(),
-	subtotal: z.coerce.number().nonnegative('Subtotal must be non-negative'),
+	quantity: z.coerce.number().positive('La cantidad debe ser positiva'),
+	costPrice: z.coerce.number().nonnegative('El precio de costo debe ser un número no negativo'),
+	tax: z.coerce.number().nonnegative('El impuesto debe ser un número no negativo').optional(),
+	subtotal: z.coerce.number().nonnegative('El subtotal debe ser un número no negativo'),
 	entryType: EntryTypeSchema.default('Replacement'),
 	reason: z.string().optional(),
 })
@@ -699,24 +699,24 @@ export const AttributeUpdateSchema = AttributeInputSchema.extend({
 
 // Cash Register
 export const OpenRegisterSchema = z.object({
-	openingAmount: z.coerce.number().nonnegative('Opening amount must be non-negative'),
+	openingAmount: z.coerce.number().nonnegative('El monto de apertura debe ser un número no negativo'),
 })
 
 export const RegisterMovementSchema = z.object({
 	type: z.enum(['withdrawal', 'deposit']),
-	amount: z.coerce.number().positive('Amount must be positive'),
-	notes: z.string().min(1, 'Notes are required'),
+	amount: z.coerce.number().positive('El monto debe ser un número positivo'),
+	notes: z.string().min(1, 'Las notas son obligatorias'),
 })
 
 export const CloseRegisterSchema = z.object({
-	closingAmount: z.coerce.number().nonnegative('Closing amount must be non-negative'),
+	closingAmount: z.coerce.number().nonnegative('El monto de cierre debe ser un número no negativo'),
 })
 
 export const ContactInputSchema = z.object({
-	name: z.string().min(2, 'Name must be at least 2 characters'),
-	email: z.string().email('Invalid email address'),
-	subject: z.string().min(5, 'Subject must be at least 5 characters'),
-	message: z.string().min(10, 'Message must be at least 10 characters'),
+	name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
+	email: z.string().email('Correo electrónico inválido'),
+	subject: z.string().min(5, 'El asunto debe tener al menos 5 caracteres'),
+	message: z.string().min(10, 'El mensaje debe tener al menos 10 caracteres'),
 })
 
 export const ExpenseInputSchema = z.object({
