@@ -2418,25 +2418,19 @@ const ProductForm = ({
           </Card>
 
           {!isModal && (
-            <div className="flex flex-col sm:flex-row justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)} className="w-full sm:w-auto h-10">
-                {tCommon('cancel')}
-              </Button>
-              {/* <GuidedHighlighter
-                show={type === 'Create'}
-                message={tOnboarding('highlights.saveProduct')}
-                position="top"
-              > */}
+            <div className="flex flex-col sm:flex-row-reverse justify-end gap-2 pt-4">
               <Button
                 type='submit'
                 size='lg'
                 disabled={form.formState.isSubmitting}
                 data-testid='product-submit-button'
-                className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-10'
+                className='bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-11 text-sm font-bold shadow-lg shadow-orange/20 order-1 sm:order-none'
               >
                 {form.formState.isSubmitting ? t('submitting') : type === 'Create' ? t('addProduct') : t('updateProduct')}
               </Button>
-              {/* </GuidedHighlighter> */}
+              <Button type="button" variant="outline" onClick={() => router.push(`/admin/${storeId}/products`)} className="w-full sm:w-auto h-11 text-sm font-bold border-slate-200 text-slate-600 hover:bg-slate-50 order-2 sm:order-none">
+                {tCommon('cancel')}
+              </Button>
             </div>
           )}
           {isModal && (
@@ -2551,23 +2545,24 @@ const ProductForm = ({
             </div>
           )}
 
-          <DialogFooter className="sm:justify-end gap-2">
+          <DialogFooter className="flex flex-col sm:flex-row-reverse gap-2 sm:justify-end mt-4">
+            <Button
+              type="button"
+              className="bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-11 font-bold"
+              onClick={handleConfirmFill}
+            >
+              {t('fillForm') || 'Fill Form'}
+            </Button>
             <Button
               type="button"
               variant="secondary"
+              className="w-full sm:w-auto h-11 font-bold"
               onClick={() => {
                 setShowConfirmModal(false)
                 setFetchedProduct(null)
               }}
             >
               {tCommon('cancel')}
-            </Button>
-            <Button
-              type="button"
-              className="bg-orange hover:bg-orange-dark text-white"
-              onClick={handleConfirmFill}
-            >
-              {t('fillForm') || 'Fill Form'}
             </Button>
           </DialogFooter>
         </DialogContent>

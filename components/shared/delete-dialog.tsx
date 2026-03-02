@@ -42,12 +42,11 @@ export default function DeleteDialogWithAction({
             {t('confirmDeleteDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-
+        <AlertDialogFooter className="flex flex-col sm:flex-row-reverse gap-2">
           <Button
             variant='destructive'
             size='sm'
+            className="w-full sm:w-auto"
             disabled={isPending}
             onClick={() =>
               startTransition(async () => {
@@ -69,6 +68,7 @@ export default function DeleteDialogWithAction({
           >
             {isPending ? t('deleting') : t('delete')}
           </Button>
+          <AlertDialogCancel className="w-full sm:w-auto mt-0">{t('cancel')}</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -97,11 +97,11 @@ export function DeleteDialog({
           <AlertDialogTitle>{title || t('confirmDeleteTitle')}</AlertDialogTitle>
           <AlertDialogDescription>{description || t('confirmDeleteDescription')}</AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-          <Button variant="destructive" onClick={onConfirm}>
+        <AlertDialogFooter className="flex flex-col sm:flex-row-reverse gap-2">
+          <Button variant="destructive" onClick={onConfirm} className="w-full sm:w-auto">
             {t('delete')}
           </Button>
+          <AlertDialogCancel className="w-full sm:w-auto mt-0">{t('cancel')}</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

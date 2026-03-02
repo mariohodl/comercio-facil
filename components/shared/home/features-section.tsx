@@ -2,7 +2,7 @@ import { BarChart2, Zap, Smartphone } from 'lucide-react'
 
 // SVG Illustrations
 const DataIllustration = () => (
-    <svg className="w-full h-48 mb-6" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg className="w-full h-28 md:h-48 mb-4 md:mb-6" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="20" y="40" width="30" height="100" rx="4" fill="#10B981" opacity="0.2" />
         <rect x="60" y="60" width="30" height="80" rx="4" fill="#10B981" opacity="0.3" />
         <rect x="100" y="20" width="30" height="120" rx="4" fill="#10B981" opacity="0.4" />
@@ -16,7 +16,7 @@ const DataIllustration = () => (
 )
 
 const SpeedIllustration = () => (
-    <svg className="w-full h-48 mb-6" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg className="w-full h-28 md:h-48 mb-4 md:mb-6" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="40" y="40" width="120" height="80" rx="12" fill="#FF9800" opacity="0.1" stroke="#FF9800" strokeWidth="2" />
         <rect x="50" y="50" width="100" height="60" rx="8" fill="white" stroke="#FF9800" strokeWidth="2" />
         <path d="M110 80L120 90L130 70" stroke="#FF9800" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -26,7 +26,7 @@ const SpeedIllustration = () => (
 )
 
 const ControlIllustration = () => (
-    <svg className="w-full h-48 mb-6" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg className="w-full h-28 md:h-48 mb-4 md:mb-6" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="50" y="30" width="100" height="100" rx="8" fill="#1976D2" opacity="0.1" stroke="#1976D2" strokeWidth="2" />
         <rect x="60" y="50" width="35" height="35" rx="4" fill="white" stroke="#1976D2" strokeWidth="2" />
         <rect x="105" y="50" width="35" height="35" rx="4" fill="white" stroke="#1976D2" strokeWidth="2" />
@@ -92,7 +92,7 @@ export function FeaturesSection() {
                         <div className="w-2 h-2 bg-[#1976D2] rounded-full animate-ping"></div>
                         <span className="text-sm font-semibold text-[#1976D2]">Todo bajo su control</span>
                     </div>
-                    <h2 className='text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight'>
+                    <h2 className='text-3xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight'>
                         Domine su Operación <br className="hidden md:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1976D2] via-blue-600 to-[#0D47A1]">desde la Primera Venta</span>
                     </h2>
@@ -130,7 +130,7 @@ export function FeaturesSection() {
                                         <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center ${feature.iconBg} shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 border border-white/60`}>
                                             <feature.icon className={`w-7 h-7 ${feature.iconColor}`} strokeWidth={2.5} />
                                         </div>
-                                        <h3 className='text-2xl font-bold text-gray-900 group-hover:text-[#1976D2] transition-colors duration-300 mt-2'>
+                                        <h3 className='text-xl md:text-2xl font-bold text-gray-900 group-hover:text-[#1976D2] transition-colors duration-300 mt-2'>
                                             {feature.title}
                                         </h3>
                                     </div>

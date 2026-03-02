@@ -107,7 +107,7 @@ export default function GettingStartedChecklist({
     const isAllFinished = completedCount === steps.length
 
     return (
-        <div className="space-y-4 max-w-4xl mx-auto py-2 lg:py-6">
+        <div className="max-w-4xl mx-auto py-2">
             {isAllFinished && (
                 <Card
                     data-testid="onboarding-completion-card"
@@ -125,7 +125,7 @@ export default function GettingStartedChecklist({
                 </Card>
             )}
 
-            <div className="pt-2 pb-6 text-center space-y-2">
+            <div className="pb-4 text-center space-y-2">
                 <h1 className="text-2xl font-bold tracking-tight text-navy">
                     {t('checklistTitle')}
                 </h1>
@@ -167,104 +167,125 @@ export default function GettingStartedChecklist({
                                 </div>
                             )}
 
-                            <CardContent className="p-3 lg:p-4">
-                                <div className="flex items-center gap-3 lg:gap-5">
-                                    <div className={cn(
-                                        "flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-xl transition-all duration-500",
-                                        step.bgColor,
-                                        step.color,
-                                        isActive && "ring-2 ring-orange/20"
-                                    )}>
-                                        <step.icon className={cn("h-5 w-5 lg:h-6 lg:w-6")} />
-                                    </div>
-
-                                    <div className="flex-1 min-w-0 space-y-0.5">
-                                        <div className="flex items-center gap-2">
-                                            <span className={cn(
-                                                "text-[10px] font-bold uppercase tracking-wider",
-                                                isActive ? "text-orange" : "text-slate-400"
-                                            )}>
-                                                {isActive ? t('nextStep') : `${t('step')} ${index + 1}`}
-                                            </span>
-                                        </div>
-                                        <CardTitle className="text-sm lg:text-base font-bold text-navy leading-tight">{step.title}</CardTitle>
-                                        <p className="text-xs text-slate-500 font-medium">
-                                            {step.description}
-                                        </p>
-                                    </div>
-
-                                    <div className="shrink-0">
-                                        <Button
-                                            asChild
-                                            disabled={step.completed}
-                                            data-testid={`onboarding-step-button-${step.id}`}
-                                            variant={step.completed ? "ghost" : isActive ? "default" : "secondary"}
-                                            className={cn(
-                                                "h-9 lg:h-10 px-4 lg:px-5 text-xs lg:text-sm font-bold transition-all active:scale-95 group rounded-lg",
-                                                isActive
-                                                    ? "bg-orange hover:bg-orange-dark text-white shadow-sm shadow-orange/10 border-none"
-                                                    : "bg-slate-50 hover:bg-slate-100 text-slate-600 border-none"
-                                            )}
-                                        >
-                                            <Link href={step.href} onClick={() => handleStepClick(step.id)}>
-                                                <span>{step.buttonText}</span>
-                                                <ArrowRight className="ml-2 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                                            </Link>
-                                        </Button>
-                                    </div>
+                            <div className="p-4 lg:p-5 flex flex-col sm:flex-row items-center gap-4 lg:gap-6 relative">
+                                {/* Step indicator badge - Absolute positioned to save vertical space */}
+                                <div className={cn(
+                                    "absolute top-0 right-0 h-7 px-3 flex items-center justify-center rounded-bl-xl text-[9px] font-black uppercase tracking-widest transition-colors",
+                                    isActive ? "bg-orange/10 text-orange" : "bg-slate-100 text-slate-400"
+                                )}>
+                                    {isActive ? t('nextStep') : `${t('step')} ${index + 1}`}
                                 </div>
-                            </CardContent>
+
+                                <div className={cn(
+                                    "flex h-12 w-12 lg:h-14 lg:w-14 items-center justify-center rounded-2xl transition-all duration-500 shrink-0 shadow-sm border border-white/20 backdrop-blur-sm",
+                                    step.bgColor,
+                                    step.color,
+                                    isActive && "ring-4 ring-orange/10 scale-105"
+                                )}>
+                                    <step.icon className={cn("h-6 w-6 lg:h-7 lg:w-7")} />
+                                </div>
+
+                                <div className="flex-1 min-w-0 text-center sm:text-left space-y-1">
+                                    <CardTitle className="text-sm lg:text-lg font-black text-navy leading-none tracking-tight">
+                                        {step.title}
+                                    </CardTitle>
+                                    <p className="text-xs text-slate-500 font-medium leading-normal lg:max-w-md">
+                                        {step.description}
+                                    </p>
+                                </div>
+
+                                <div className="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+                                    <Button
+                                        asChild
+                                        disabled={step.completed}
+                                        data-testid={`onboarding-step-button-${step.id}`}
+                                        variant={step.completed ? "ghost" : isActive ? "default" : "secondary"}
+                                        className={cn(
+                                            "h-10 lg:h-11 w-full sm:w-auto px-6 lg:px-8 text-xs lg:text-sm font-bold transition-all active:scale-95 group rounded-xl border-none",
+                                            isActive
+                                                ? "bg-orange hover:bg-orange-dark text-white shadow-lg shadow-orange/20"
+                                                : "bg-slate-50 hover:bg-slate-100 text-slate-600"
+                                        )}
+                                    >
+                                        <Link href={step.href} onClick={() => handleStepClick(step.id)}>
+                                            <span>{step.buttonText}</span>
+                                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                        </Link>
+                                    </Button>
+                                </div>
+                            </div>
                         </Card>
                     )
                 })}
             </div>
 
-            <div className="mt-8 space-y-3 bg-slate-50/50 p-4 lg:p-6 rounded-2xl border border-slate-100">
-                <div className="flex items-center justify-between px-1">
-                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Roadmap</h3>
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400">Progreso:</span>
-                        <span className="text-xs font-bold text-orange">{Math.round(progress)}%</span>
+            <div className="mt-8 bg-slate-50/80 p-6 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
+                {/* Decorative background element */}
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-orange/5 rounded-full blur-2xl group-hover:bg-orange/10 transition-colors" />
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
+                    <div className="space-y-1 text-center sm:text-left">
+                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-orange">Tu Ruta al Éxito</h3>
+                        <p className="text-[10px] sm:text-xs font-bold text-slate-500">Completa los pasos para desbloquear todo el potencial de tu negocio</p>
+                    </div>
+                    <div className="bg-white px-4 py-2 rounded-2xl border border-orange/10 shadow-sm flex items-center justify-center gap-3 min-w-[120px]">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Progreso Total</span>
+                        <span className="text-xl font-black text-orange tabular-nums">{Math.round(progress)}%</span>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 relative">
+                    {/* Connecting lines for desktop */}
+                    <div className="hidden sm:block absolute top-6 left-8 right-8 h-[2px] bg-slate-200 -z-0" />
+
                     {[
-                        { label: 'Catálogo', active: hasProducts, icon: Barcode },
-                        { label: 'Stock', active: steps[1].completed, icon: TrendingDown },
-                        { label: 'Terminal', active: steps[2].completed, icon: Zap },
-                        { label: 'Métricas', active: steps[2].completed, icon: LineChart },
+                        { label: 'Catálogo', active: hasProducts, icon: Barcode, detail: 'Base de datos' },
+                        { label: 'Inventario', active: steps[1].completed, icon: TrendingDown, detail: 'Control total' },
+                        { label: 'Punto de Venta', active: steps[2].completed, icon: Zap, detail: 'Listo para vender' },
+                        { label: 'Métricas AI', active: steps[2].completed, icon: LineChart, detail: 'Análisis de datos' },
                     ].map((item, i) => (
                         <div
                             key={i}
-                            className={cn(
-                                "flex items-center gap-2 p-2 rounded-lg border transition-all duration-300",
-                                item.active
-                                    ? "bg-white border-slate-200 shadow-sm"
-                                    : "bg-slate-100/30 border-transparent opacity-40 grayscale"
-                            )}
+                            className="relative flex sm:flex-col items-center gap-4 sm:gap-3 z-10 group/item"
                         >
                             <div className={cn(
-                                "h-6 w-6 rounded flex items-center justify-center shrink-0",
-                                item.active ? "bg-slate-100 text-navy" : "bg-slate-200 text-slate-400"
+                                "h-11 w-11 lg:h-12 lg:w-12 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 border-4 border-slate-50",
+                                item.active
+                                    ? "bg-orange text-white shadow-lg shadow-orange/20 scale-110"
+                                    : "bg-white text-slate-300 border-slate-100"
                             )}>
-                                <item.icon className="h-3 w-3" />
+                                <item.icon className={cn(
+                                    "h-5 w-5 lg:h-6 lg:w-6 transition-transform",
+                                    item.active && "group-hover/item:scale-110"
+                                )} />
                             </div>
-                            <span className={cn(
-                                "text-[10px] lg:text-xs font-bold",
-                                item.active ? "text-navy" : "text-slate-500"
-                            )}>
-                                {item.label}
-                            </span>
+                            <div className="text-left sm:text-center">
+                                <span className={cn(
+                                    "block text-xs font-black tracking-tight transition-colors",
+                                    item.active ? "text-navy" : "text-slate-400"
+                                )}>
+                                    {item.label}
+                                </span>
+                                <span className={cn(
+                                    "text-[9px] font-bold uppercase tracking-wider transition-opacity",
+                                    item.active ? "text-orange opacity-100" : "text-slate-300"
+                                )}>
+                                    {item.detail}
+                                </span>
+                            </div>
                         </div>
                     ))}
                 </div>
 
-                <div className="h-1.5 w-full bg-slate-200/50 rounded-full overflow-hidden mt-4">
-                    <div
-                        className="h-full bg-orange transition-all duration-1000 ease-out"
-                        style={{ width: `${progress}%` }}
-                    />
+                <div className="mt-8 relative pt-1 px-1">
+                    <div className="h-2 w-full bg-slate-200/50 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-orange to-orange-dark transition-all duration-1000 ease-out relative"
+                            style={{ width: `${progress}%` }}
+                        >
+                            <div className="absolute top-0 right-0 h-full w-8 bg-white/20 skew-x-[-20deg] animate-[shimmer_2s_infinite]" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

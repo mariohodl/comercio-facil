@@ -551,19 +551,11 @@ export default function SettingsContent() {
                         )}
 
                         {activeSection !== 'billing' && (
-                            <div className="flex items-center justify-end gap-3 pt-4">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={loadSettings}
-                                    disabled={saving}
-                                >
-                                    {t('actions.cancel')}
-                                </Button>
+                            <div className="flex flex-col sm:flex-row-reverse items-center sm:justify-start gap-3 pt-6 border-t border-gray-200 dark:border-gray-700 mt-6">
                                 <Button
                                     type="submit"
                                     disabled={saving}
-                                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                                    className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-bold h-11 px-8 shadow-md"
                                 >
                                     {saving ? (
                                         <>
@@ -573,6 +565,15 @@ export default function SettingsContent() {
                                     ) : (
                                         t('actions.save')
                                     )}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={loadSettings}
+                                    disabled={saving}
+                                    className="w-full sm:w-auto h-11 px-8 text-gray-500"
+                                >
+                                    {t('actions.cancel')}
                                 </Button>
                             </div>
                         )}

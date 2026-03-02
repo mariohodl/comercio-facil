@@ -106,12 +106,12 @@ export default function VerifyEmailPage() {
         <section className='flex w-full min-h-screen'>
             <article className='w-full lg:w-1/2 px-6 md:px-16 lg:px-28 py-10 lg:py-20 flex flex-col justify-center'>
                 <div className='w-full max-w-md mx-auto'>
-                    <div className='flex justify-center mb-10'>
+                    <div className='flex justify-center mb-8'>
                         <Link href="/">
                             <Image
                                 src="/images/app-logo.png"
                                 alt={APP_NAME}
-                                width={300}
+                                width={270}
                                 height={100}
                                 priority
                                 className="hover:opacity-80 transition-opacity"

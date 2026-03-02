@@ -28,7 +28,7 @@ import { useRouter } from 'next/navigation'
 import { z } from 'zod'
 
 import { useSession, signOut } from 'next-auth/react'
-import { LogOut, Store, Save, Loader2 } from 'lucide-react'
+import { LogOut, Store, Save, Loader2, Sparkles } from 'lucide-react'
 
 import { useTranslations } from 'next-intl'
 import { IndustryAutocomplete } from '@/components/shared/industry-autocomplete'
@@ -116,21 +116,37 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                 onEscapeKeyDown={(e) => e.preventDefault()}
                 onInteractOutside={(e) => e.preventDefault()}
             >
-                <div className="bg-orange p-4 sm:p-5 text-white shrink-0 rounded-t-xl overflow-hidden">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                            <div className="bg-white/20 rounded-lg p-1 shrink-0">
-                                <Store className="w-5 h-5 text-white" strokeWidth={2.5} />
+                {/* Thin accent line at the very top */}
+                <div className="h-1.5 bg-gradient-to-r from-orange-500 via-orange-400 to-amber-500 shrink-0" />
+
+                <div className="relative pt-8 pb-4 px-6 text-center sm:text-left shrink-0">
+                    {/* Subtle background glow */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-orange-100/40 blur-3xl rounded-full pointer-events-none"></div>
+
+                    <DialogHeader className="relative z-10 flex flex-col items-center sm:items-start gap-4">
+                        <div className="relative mb-2">
+                            <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-tr from-orange-400 to-orange-200 opacity-40 blur animate-pulse" />
+                            <div className="relative w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-md border border-orange-100 transition-transform hover:scale-110 duration-300">
+                                <Sparkles className="w-7 h-7 text-orange-500" />
                             </div>
-                            {userName ? t('welcomeTitle', { name: userName }) : t('companySettingsTitle')}
-                        </DialogTitle>
-                        <DialogDescription className="text-orange-100 text-xs font-medium mt-1">
-                            {t('setupInstructions')}
-                        </DialogDescription>
+                        </div>
+
+                        <div className="space-y-2">
+                            <DialogTitle className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 leading-tight">
+                                {userName ? (
+                                    <>
+                                        ¡Hola <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-500">{userName.split(' ')[0]}</span>!
+                                    </>
+                                ) : t('companySettingsTitle')}
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-500 text-sm sm:text-base font-medium leading-relaxed max-w-[400px]">
+                                {t('setupInstructions')}
+                            </DialogDescription>
+                        </div>
                     </DialogHeader>
                 </div>
 
-                <div className="p-4 sm:p-6 bg-white rounded-b-xl flex-1 overflow-y-auto">
+                <div className="px-6 bg-white flex-1 overflow-y-auto">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
@@ -138,7 +154,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 name="companyName"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.companyName')}</FormLabel>
+                                        <FormLabel className="text-[11px] font-bold uppercase tracking-wider text-slate-600">{t('fields.companyName')}</FormLabel>
                                         <FormControl>
                                             <Input
                                                 data-testid="setup-company-name-input"
@@ -158,7 +174,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                     name="storeName"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.storeName')}</FormLabel>
+                                            <FormLabel className="text-[11px] font-bold uppercase tracking-wider text-slate-600">{t('fields.storeName')}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     data-testid="setup-store-name-input"
@@ -176,7 +192,7 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                     name="warehouseName"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.warehouseName')}</FormLabel>
+                                            <FormLabel className="text-[11px] font-bold uppercase tracking-wider text-slate-600">{t('fields.warehouseName')}</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     data-testid="setup-warehouse-name-input"
@@ -191,13 +207,13 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pb-2 items-end">
+                            <div className="pb-2">
                                 <FormField
                                     control={form.control}
                                     name="industry"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.industry')}</FormLabel>
+                                            <FormLabel className="text-[11px] font-bold uppercase tracking-wider text-slate-600">{t('fields.industry')}</FormLabel>
                                             <FormControl>
                                                 <IndustryAutocomplete
                                                     data-testid="setup-industry-select"
@@ -209,39 +225,14 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="storeId"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{t('fields.storeIdGenerated')}</FormLabel>
-                                            <FormControl>
-                                                <div className="flex h-10 w-full items-center justify-start rounded-md border border-gray-200 bg-gray-100/50 px-3 py-2 text-sm font-mono tracking-widest text-gray-500 transition-all shadow-sm select-none">
-                                                    {field.value}
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage className="text-[10px]" />
-                                        </FormItem>
-                                    )}
-                                />
                             </div>
 
-                            <DialogFooter className="mt-6 pt-4 border-t border-gray-100 flex flex-row gap-3 justify-between items-center pb-4">
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => signOut({ callbackUrl: '/' })}
-                                    className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors font-medium flex items-center gap-2"
-                                >
-                                    <LogOut className="w-4 h-4" />
-                                    <span className="">{tCommon('signOut')}</span>
-                                </Button>
+                            <DialogFooter className="mt-6 pt-4 border-t border-gray-100 flex flex-col sm:flex-row-reverse gap-3 sm:justify-start items-center pb-4">
                                 <Button
                                     data-testid="setup-submit-button"
                                     type="submit"
                                     disabled={isLoading}
-                                    className="h-10 px-6 bg-orange hover:bg-orange-600 text-white font-bold text-sm transition-all transform active:scale-[0.98] shadow-md hover:shadow-lg flex items-center gap-2"
+                                    className="h-10 w-full sm:w-auto px-6 bg-orange hover:bg-orange-600 text-white font-bold text-sm transition-all transform active:scale-[0.98] shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                                 >
                                     {isLoading ? (
                                         <>
@@ -251,9 +242,19 @@ export default function CompanySettingsModal({ isOpen }: CompanySettingsModalPro
                                     ) : (
                                         <>
                                             <Save className="w-4 h-4" />
-                                            {t('saveContinue')}
+                                            ¡Listo! Empezar ahora
                                         </>
                                     )}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                    className="w-full sm:w-auto text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors font-medium flex items-center justify-center gap-2"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    <span className="">{tCommon('signOut')}</span>
                                 </Button>
                             </DialogFooter>
                         </form>

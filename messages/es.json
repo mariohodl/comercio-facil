@@ -885,7 +885,7 @@
             "storeIdGenerated": "Identificador Único (Generado)"
         },
         "placeholders": {
-            "companyName": "Ej. Mi Comercializadora S.A.",
+            "companyName": "Ej. Mi Tienda de Abarrotes",
             "taxId": "Ingresa tu ID fiscal",
             "storeName": "Ej. Sucursal Matriz Centro",
             "storeLocation": "Ej. Av. Insurgentes Sur 123, CDMX",

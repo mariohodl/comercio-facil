@@ -127,12 +127,12 @@ function SignInContent({ searchParams }: { searchParams: any }) {
             <ArrowLeft className='w-4 h-4' />
             <span className='text-sm font-medium'>Regresar</span>
           </button>
-          <div className='flex justify-center mb-10'>
+          <div className='flex justify-center mb-8'>
             <Link href="/">
               <Image
                 src="/images/app-logo.png"
                 alt={APP_NAME}
-                width={300}
+                width={270}
                 height={100}
                 priority
                 className="hover:opacity-80 transition-opacity"

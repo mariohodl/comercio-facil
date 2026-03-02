@@ -146,25 +146,25 @@ export function BrandModal({ open, onClose, brand, onSuccess, storeId }: BrandMo
                             />
                         </div>
 
-                        <div className="flex justify-end gap-3 pt-4 border-t">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={handleClose}
-                                className="bg-navy text-white hover:bg-navy/90"
-                            >
-                                {tCommon('cancel')}
-                            </Button>
+                        <div className="flex flex-col sm:flex-row-reverse gap-3 pt-6 mt-4 border-t">
                             <Button
                                 type="submit"
                                 disabled={form.formState.isSubmitting}
-                                className="bg-orange hover:bg-orange-dark text-white"
+                                className="bg-orange hover:bg-orange-dark text-white w-full sm:w-auto h-11 font-bold shadow-lg shadow-orange/20"
                             >
                                 {form.formState.isSubmitting
                                     ? tCommon('saving')
                                     : isEditMode
                                         ? t('updateProduct')
                                         : t('addProduct')}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleClose}
+                                className="w-full sm:w-auto h-11 font-bold border-slate-200 text-slate-600 hover:bg-slate-50"
+                            >
+                                {tCommon('cancel')}
                             </Button>
                         </div>
                     </form>

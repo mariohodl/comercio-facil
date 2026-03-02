@@ -55,7 +55,7 @@ export function ComparisonSection() {
             <div className="container mx-auto px-4">
                 <div className="text-center max-w-3xl mx-auto mb-20 space-y-6">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 mb-4 font-bold text-sm tracking-wider uppercase">
-                        El Salto Tecnológico
+                        ¿Por qué es mejor Comercio Fácil?
                     </div>
                     <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">
                         La evolución de tu punto de venta <span className="text-orange-500">está aquí</span>

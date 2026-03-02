@@ -30,7 +30,7 @@ export default async function Header() {
   return (
     <header className='bg-white text-black shadow-sm sticky top-0 z-50 transition-all duration-300'>
       <Container>
-        <div className='py-3 px-2'>
+        <div className='py-2 md:py-3 px-2'>
           <div className='flex items-center justify-between gap-8'>
             {/* Logo Section */}
             <div className='flex-shrink-0'>
@@ -46,11 +46,6 @@ export default async function Header() {
             <div className='flex-shrink-0'>
               <Menu />
             </div>
-          </div>
-
-          {/* Mobile Search */}
-          <div className='md:hidden block pt-3 pb-2'>
-            {/* <Search /> */}
           </div>
         </div>
 
