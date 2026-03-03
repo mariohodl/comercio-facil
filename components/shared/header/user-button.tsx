@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { SignOut } from '@/lib/actions/user.actions'
+import { SignOutButton } from '../auth/sign-out-button'
 import { cn } from '@/lib/utils'
 import { ChevronDown, User as UserIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -99,14 +99,11 @@ export default async function UserButton({
               </DropdownMenuGroup>
             )}
             <DropdownMenuItem className='p-0 mb-1'>
-              <form action={SignOut} className='w-full'>
-                <Button
-                  className='w-full py-4 px-2 h-4 justify-start'
-                  variant='ghost'
-                >
-                  {t('common.signOut')}
-                </Button>
-              </form>
+              <SignOutButton
+                variant="ghost"
+                className="w-full py-4 px-2 h-4 justify-start font-normal"
+                callbackUrl="/"
+              />
             </DropdownMenuItem>
           </DropdownMenuContent>
         ) : (

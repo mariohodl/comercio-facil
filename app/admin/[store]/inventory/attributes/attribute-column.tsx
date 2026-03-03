@@ -48,31 +48,35 @@ export const getColumns = (t: any, tCommon: any): ColumnDef<IAttribute>[] => [
     },
     {
         accessorKey: 'isApproved',
-        header: tCommon('approved'),
+        header: () => <div className="hidden sm:block">{tCommon('approved')}</div>,
         cell: ({ row }) => {
             const isApproved = row.original.isApproved
             return (
-                <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${isApproved ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'
-                        }`}
-                >
-                    {isApproved ? tCommon('yes') : tCommon('no')}
-                </span>
+                <div className="hidden sm:block">
+                    <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${isApproved ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'
+                            }`}
+                    >
+                        {isApproved ? tCommon('yes') : tCommon('no')}
+                    </span>
+                </div>
             )
         },
     },
     {
         accessorKey: 'status',
-        header: tCommon('status'),
+        header: () => <div className="hidden sm:block">{tCommon('status')}</div>,
         cell: ({ row }) => {
             const status = row.original.status
             return (
-                <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${status ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                        }`}
-                >
-                    {status ? tCommon('active') : tCommon('inactive')}
-                </span>
+                <div className="hidden sm:block">
+                    <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${status ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                            }`}
+                    >
+                        {status ? tCommon('active') : tCommon('inactive')}
+                    </span>
+                </div>
             )
         },
     },

@@ -589,7 +589,9 @@ const ProductForm = ({
     setTimeout(() => {
       const element = document.getElementById('pricing-section')
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        const yOffset = -150
+        const y = element.getBoundingClientRect().top + window.scrollY + yOffset
+        window.scrollTo({ top: y, behavior: 'smooth' })
       }
     }, 300)
   }, [fetchedProduct, t, form, brands, categories, units, storeId, showSuccess, setSubCategories])

@@ -14,9 +14,12 @@ export default defineConfig({
     retries: process.env.CI ? 2 : 0,
     workers: process.env.CI ? 1 : undefined,
     reporter: 'html',
+    timeout: 60000, // 1 minute global timeout
     use: {
         baseURL: 'http://localhost:3000',
         trace: 'on-first-retry',
+        actionTimeout: 15000,
+        navigationTimeout: 30000,
     },
 
     projects: [

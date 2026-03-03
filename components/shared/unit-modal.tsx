@@ -2,11 +2,13 @@
 
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslations } from 'next-intl'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UnitInputSchema } from '@/lib/validator'
 import { IUnitInput } from '@/types'
 import { IUnit } from '@/lib/db/models/unit.model'
 import { createUnit, updateUnit } from '@/lib/actions/unit.actions'
+import { getSuggestedAbbreviation } from '@/lib/actions/ai.actions'
 import { useToast } from '@/hooks/use-toast'
 import {
     Dialog,
@@ -35,6 +37,8 @@ interface UnitModalProps {
 }
 
 export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModalProps) {
+    const t = useTranslations('inventory')
+    const tCommon = useTranslations('common')
     const { showSuccess, showError } = useToast()
     const isEditMode = !!unit
 
@@ -64,6 +68,20 @@ export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModal
             })
         }
     }, [unit, form])
+    const unitName = form.watch('name')
+
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (unitName && unitName.length > 2) {
+                const suggestion = await getSuggestedAbbreviation(unitName)
+                if (suggestion) {
+                    form.setValue('abbreviation', suggestion)
+                }
+            }
+        }, 800)
+
+        return () => clearTimeout(timer)
+    }, [unitName, form])
 
     const onSubmit = async (data: IUnitInput) => {
         try {
@@ -83,7 +101,7 @@ export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModal
                 showError(result.message)
             }
         } catch (_error) {
-            showError('An error occurred. Please try again.')
+            showError(tCommon('unexpectedError'))
         }
     }
 
@@ -98,7 +116,7 @@ export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModal
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-xl font-semibold">
-                            {isEditMode ? 'Edit Unit' : 'Add Unit'}
+                            {isEditMode ? t('editUnit') : t('addUnit')}
                         </DialogTitle>
                     </div>
                 </DialogHeader>
@@ -112,11 +130,11 @@ export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModal
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            Name <span className="text-red-500">*</span>
+                                            {t('unitName')} <span className="text-red-500">*</span>
                                         </FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="Enter unit name"
+                                                placeholder={t('enterUnitName')}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -125,24 +143,7 @@ export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModal
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="abbreviation"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Abbreviation <span className="text-red-500">*</span>
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="Enter abbreviation (e.g. kg, m, pc)"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+
 
                             <FormField
                                 control={form.control}
@@ -150,7 +151,7 @@ export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModal
                                 render={({ field }) => (
                                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                                         <div className="space-y-0.5">
-                                            <FormLabel>Status</FormLabel>
+                                            <FormLabel>{t('status')}</FormLabel>
                                         </div>
                                         <FormControl>
                                             <Switch
@@ -170,7 +171,7 @@ export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModal
                                 onClick={handleClose}
                                 className="bg-navy text-white hover:bg-navy/90"
                             >
-                                Cancel
+                                {tCommon('cancel')}
                             </Button>
                             <Button
                                 type="submit"
@@ -178,10 +179,10 @@ export function UnitModal({ open, onClose, unit, onSuccess, storeId }: UnitModal
                                 className="bg-orange hover:bg-orange-dark text-white"
                             >
                                 {form.formState.isSubmitting
-                                    ? 'Saving...'
+                                    ? tCommon('saving')
                                     : isEditMode
-                                        ? 'Update Unit'
-                                        : 'Add Unit'}
+                                        ? t('updateUnit')
+                                        : t('addUnit')}
                             </Button>
                         </div>
                     </form>

@@ -88,6 +88,7 @@ export function AttributeClient({ data, storeId }: AttributeClientProps) {
                         value={globalFilter ?? ''}
                         onChange={(event) => setGlobalFilter(event.target.value)}
                         className="pl-10 w-full"
+                        disabled={data.length === 0}
                     />
                 </div>
                 <div className="ml-auto">
@@ -95,85 +96,118 @@ export function AttributeClient({ data, storeId }: AttributeClientProps) {
                 </div>
             </div>
 
-            <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id} className="bg-gray-50/50">
-                                    {headerGroup.headers.map((header) => {
-                                        return (
-                                            <TableHead key={header.id} className="font-semibold text-navy py-4">
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext()
-                                                    )}
-                                            </TableHead>
-                                        )
-                                    })}
-                                </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && 'selected'}
-                                        className="hover:bg-gray-50/50 transition-colors"
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id} className="py-4">
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
+            {/* Handle Truly Empty State (no data at all) */}
+            {data.length === 0 && !globalFilter ? (
+                <div className="bg-white rounded-2xl border shadow-sm p-8 md:p-12 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-6 max-w-xl mx-auto">
+                        <div className="bg-orange/10 p-5 rounded-full shadow-inner animate-pulse">
+                            <Plus className="h-12 w-12 text-orange" />
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-xl md:text-2xl font-bold text-navy">{t('emptyTitle')}</h3>
+                            <p className="text-sm md:text-base text-slate-600 leading-relaxed px-4">
+                                {t('emptyDescription')}
+                            </p>
+                        </div>
+                        <AttributeDialog
+                            storeId={storeId}
+                            trigger={
+                                <Button className="bg-orange hover:bg-orange-dark text-white px-8 py-6 text-lg shadow-lg hover:shadow-orange/20 transition-all rounded-xl w-full sm:w-auto">
+                                    <Plus className="mr-2 h-5 w-5" />
+                                    {t('emptyCTA')}
+                                </Button>
+                            }
+                        />
+                    </div>
+                </div>
+            ) : (
+                <>
+                    <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
+                        <div className="overflow-x-auto w-full">
+                            <Table className="min-w-full">
+                                <TableHeader>
+                                    {table.getHeaderGroups().map((headerGroup) => (
+                                        <TableRow key={headerGroup.id} className="bg-gray-50/50">
+                                            {headerGroup.headers.map((header) => {
+                                                return (
+                                                    <TableHead key={header.id} className="font-semibold text-navy py-4">
+                                                        {header.isPlaceholder
+                                                            ? null
+                                                            : flexRender(
+                                                                header.column.columnDef.header,
+                                                                header.getContext()
+                                                            )}
+                                                    </TableHead>
+                                                )
+                                            })}
+                                        </TableRow>
+                                    ))}
+                                </TableHeader>
+                                <TableBody>
+                                    {table.getRowModel().rows?.length ? (
+                                        table.getRowModel().rows.map((row) => (
+                                            <TableRow
+                                                key={row.id}
+                                                data-state={row.getIsSelected() && 'selected'}
+                                                className="hover:bg-gray-50/50 transition-colors"
+                                            >
+                                                {row.getVisibleCells().map((cell) => (
+                                                    <TableCell key={cell.id} className="py-4">
+                                                        {flexRender(
+                                                            cell.column.columnDef.cell,
+                                                            cell.getContext()
+                                                        )}
+                                                    </TableCell>
+                                                ))}
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={columns.length}
+                                                className="h-40 text-center"
+                                            >
+                                                <div className="flex flex-col items-center justify-center space-y-3">
+                                                    <div className="bg-slate-100 p-3 rounded-full">
+                                                        <Search className="h-6 w-6 text-slate-400" />
+                                                    </div>
+                                                    <p className="text-gray-500 font-medium px-4">{t('noResults')}</p>
+                                                </div>
                                             </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-32 text-center text-gray-500"
-                                    >
-                                        {t('noResults')}
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-            </div>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
-                <div className="flex-1 text-sm text-muted-foreground order-2 sm:order-1">
-                    {/* Row per page selector could go here */}
-                </div>
-                <div className="flex items-center gap-2 order-1 sm:order-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-9 px-4"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        {t('previous')}
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-9 px-4"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        {t('next')}
-                    </Button>
-                </div>
-            </div>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+                        <div className="flex-1 text-sm text-muted-foreground order-2 sm:order-1">
+                            {/* Row per page selector could go here */}
+                        </div>
+                        <div className="flex items-center gap-2 order-1 sm:order-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-9 px-4"
+                                onClick={() => table.previousPage()}
+                                disabled={!table.getCanPreviousPage()}
+                            >
+                                {t('previous')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-9 px-4"
+                                onClick={() => table.nextPage()}
+                                disabled={!table.getCanNextPage()}
+                            >
+                                {t('next')}
+                            </Button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     )
 }

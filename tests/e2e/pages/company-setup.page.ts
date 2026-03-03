@@ -34,7 +34,19 @@ export class CompanySetupPage {
         // await this.storeLocationInput.fill(data.storeLocation);
         await this.warehouseNameInput.fill(data.warehouseName);
         // await this.warehouseLocationInput.fill(data.warehouseLocation);
-        await this.industrySelect.selectOption(data.industry);
+
+        // IndustryAutocomplete is a custom portal-based combobox, not a native <select>.
+        // Click the trigger button to open the dropdown, then select the matching option.
+        const industryTrigger = this.industrySelect.getByRole('button');
+        await industryTrigger.click();
+        // Wait for the portal dropdown to appear and click the matching option
+        const dropdown = this.page.locator('#industry-ac-portal');
+        await dropdown.waitFor({ state: 'visible', timeout: 5000 });
+        // Click the option that matches the industry value (by text)
+        // The options contain industry names like "Abarrotes", "General", etc.
+        // data.industry is the slug (e.g. 'abarrotes'), so match case-insensitively
+        await dropdown.locator('button').filter({ hasText: new RegExp(data.industry, 'i') }).first().click();
+
         await this.submitButton.click();
     }
 }

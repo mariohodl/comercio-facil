@@ -70,7 +70,24 @@ export class AuthPage {
         await this.page.goto('/sign-in', { waitUntil: 'networkidle' });
     }
 
+    /**
+     * Select "Dueño / Administrador" on the role selection screen.
+     * This is required before the email/password form becomes visible.
+     */
+    async selectAdminRole() {
+        const adminButton = this.page.getByRole('button', { name: /Dueño.*Administrador/i });
+        await adminButton.click();
+        // Wait for the credentials form to appear
+        await this.signInEmailInput.waitFor({ state: 'visible', timeout: 10000 });
+    }
+
     async signIn(credentials: { email: string, password: string }) {
+        // Handle role selection screen if visible
+        const adminButton = this.page.getByRole('button', { name: /Dueño.*Administrador/i });
+        if (await adminButton.isVisible({ timeout: 1500 }).catch(() => false)) {
+            await adminButton.click();
+            await this.signInEmailInput.waitFor({ state: 'visible', timeout: 10000 });
+        }
         await this.signInEmailInput.fill(credentials.email);
         await this.signInPasswordInput.fill(credentials.password);
         await this.signInSubmitButton.click();

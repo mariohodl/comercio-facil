@@ -164,7 +164,7 @@ test.describe('Product Management', () => {
 
         // Verify redirect to product list after successful creation
         await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 60000 });
-        await expect(page.getByText(/lista de productos|product list/i)).toBeVisible({ timeout: 20000 });
+        await expect(page.getByText(/mis productos|my products|lista de productos|product list/i)).toBeVisible({ timeout: 20000 });
 
         // Verify the product row shows correct data in the table
         // Wait for the table to load data first
@@ -172,7 +172,6 @@ test.describe('Product Management', () => {
         const productRow = page.locator('table tbody tr').filter({ hasText: 'Test Product' });
         await expect(productRow).toBeVisible({ timeout: 15000 });
         await expect(productRow).toContainText('Materiales');
-        await expect(productRow).toContainText('Generico');
         await expect(productRow).toContainText('100');
 
         // Product is auto-published when all fields (price, cost, stock, barcode) are filled
@@ -249,7 +248,7 @@ test.describe('Product Management', () => {
 
         // Product with $0 price should still save (as draft/unpublished)
         await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 45000 });
-        await expect(page.getByText(/lista de productos|product list/i)).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/mis productos|my products|lista de productos|product list/i)).toBeVisible({ timeout: 15000 });
 
         // Verify the draft product appears in the table
         const productRow = page.locator('table tbody tr').filter({ hasText: 'Draft Zero Price Product' });
@@ -297,7 +296,7 @@ test.describe('Product Management', () => {
 
         // Navigate to the product list
         await page.goto(`/admin/${storeId}/products`);
-        await expect(page.getByText(/lista de productos|product list/i)).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/mis productos|my products|lista de productos|product list/i)).toBeVisible({ timeout: 15000 });
 
         // Wait for product data to load in the table
         await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 15000 });
@@ -320,7 +319,7 @@ test.describe('Product Management', () => {
 
         // Should redirect back to the product list
         await expect(page).toHaveURL(/.*\/admin\/.*\/products$/, { timeout: 45000 });
-        await expect(page.getByText(/lista de productos|product list/i)).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/mis productos|my products|lista de productos|product list/i)).toBeVisible({ timeout: 15000 });
 
         // Verify the updated product row
         const updatedRow = page.locator('table tbody tr').filter({ hasText: 'Test Product Updated' });

@@ -19,7 +19,7 @@ test.describe('Auth Validation Schemas', () => {
             });
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.issues[0].message).toBe('Email is invalid');
+                expect(result.error.issues[0].message).toBe('El correo electrónico no es válido');
             }
         });
 
@@ -30,7 +30,7 @@ test.describe('Auth Validation Schemas', () => {
             });
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.issues[0].message).toBe('Password must be at least 3 characters');
+                expect(result.error.issues[0].message).toBe('La contraseña debe tener al menos 3 caracteres');
             }
         });
     });
@@ -60,7 +60,7 @@ test.describe('Auth Validation Schemas', () => {
                 // The refinement error is usually attached to the path specified
                 const error = result.error.issues.find(issue => issue.path.includes('confirmPassword'));
                 expect(error).toBeDefined();
-                expect(error?.message).toBe("Passwords don't match");
+                expect(error?.message).toBe("Las contraseñas no coinciden");
             }
         });
 
@@ -74,7 +74,7 @@ test.describe('Auth Validation Schemas', () => {
             });
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.issues[0].message).toBe('Username must be at least 2 characters');
+                expect(result.error.issues[0].message).toBe('El nombre de usuario debe tener al menos 2 caracteres');
             }
         });
 
@@ -88,7 +88,7 @@ test.describe('Auth Validation Schemas', () => {
             });
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.issues[0].message).toBe('Username must be at most 50 characters');
+                expect(result.error.issues[0].message).toBe('El nombre de usuario debe tener como máximo 50 caracteres');
             }
         });
 

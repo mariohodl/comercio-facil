@@ -147,21 +147,29 @@ export default function OverviewReport() {
           <h1 className='text-2xl font-bold text-slate-900 tracking-tight whitespace-nowrap'>{t('welcome')}</h1>
           <div className="flex items-center gap-3">
             {!isEmptyState && !showChecklist && (
-              <p className='text-xs font-semibold text-slate-400 uppercase tracking-widest'>{t('ordersToday', { count: data.ordersCount })}</p>
+              <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm transition-all hover:shadow-md animate-in fade-in slide-in-from-left-4 duration-700">
+                <div className={cn(
+                  "w-2 h-2 rounded-full",
+                  data.ordersCount > 0 ? "bg-emerald-500 animate-pulse" : "bg-slate-300"
+                )} />
+                <p className='text-[11px] font-bold text-slate-600 uppercase tracking-tight'>
+                  {t('ordersToday', { count: data.ordersCount })}
+                </p>
+              </div>
             )}
             {(isEmptyState || showChecklist) && (
               <button
                 onClick={() => setShowChecklist(!showChecklist)}
-                className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-orange hover:text-orange-dark transition-colors py-1.5"
+                className="group flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-orange hover:text-orange-dark transition-all py-1.5 px-3 rounded-full bg-orange/5 hover:bg-orange/10 border border-orange/10"
               >
                 <div className="w-1.5 h-1.5 rounded-full bg-orange animate-pulse" />
                 {showChecklist ? t('showDashboard') : t('showGuide')}
               </button>
             )}
             {isOfflineData && (
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[9px] font-bold text-slate-500 uppercase tracking-tighter">
-                <Clock className="w-2.5 h-2.5" />
-                {t('viewingOfflineData').includes('viewingOfflineData') ? 'Sin conexión - Datos en caché' : t('viewingOfflineData')}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-100/50 text-[10px] font-bold text-amber-600 uppercase tracking-tight">
+                <Clock className="w-3 h-3" />
+                {t('viewingOfflineData').includes('viewingOfflineData') ? 'Modo Offline' : t('viewingOfflineData')}
               </div>
             )}
           </div>
