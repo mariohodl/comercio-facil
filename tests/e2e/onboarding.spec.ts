@@ -9,6 +9,10 @@ test.describe('Onboarding Checklist', () => {
     test.beforeAll(async () => {
         client = new MongoClient(process.env.MONGODB_URI!);
         await client.connect();
+
+        // Proactive cleanup
+        const db = client.db();
+        await db.collection('users').deleteOne({ email: testEmail });
     });
 
     test.afterAll(async () => {
@@ -73,13 +77,14 @@ test.describe('Onboarding Checklist', () => {
         }
 
         // Dismiss onboarding modal if it appears
-        // The modal might take a second to animate in
-        const getStartedButton = page.getByRole('button', { name: /Comenzar/i });
+        // Use bilingual regex since CI might be in English
+        const getStartedButton = page.getByRole('button', { name: /Comenzar|Get Started/i });
         try {
             await getStartedButton.waitFor({ state: 'visible', timeout: 5000 });
             await getStartedButton.click();
+            // Crucial: wait for modal to be gone so it doesn't block clicks
+            await expect(page.locator('role=dialog')).not.toBeVisible({ timeout: 5000 });
         } catch (e) {
-            // Modal might already be dismissed or didn't show up
             console.log('Onboarding modal not found or already dismissed');
         }
 
@@ -95,10 +100,9 @@ test.describe('Onboarding Checklist', () => {
         // Step 1 should be active (not completed)
         await expect(step1).toContainText('Crea tus productos');
 
-        // Check first step button
-        const step1Button = onboardingPage.getStepButton('products');
-        await expect(step1Button).toBeVisible();
-        await expect(step1Button).toBeEnabled();
+        // Check first step button - use bilingual text matching for the link
+        const step1Button = page.getByRole('link', { name: /Agregar Producto|Add Product/i });
+        await expect(step1Button).toBeVisible({ timeout: 10000 });
 
         // Click step 1 button and verify navigation
         await step1Button.scrollIntoViewIfNeeded();

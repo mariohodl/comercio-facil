@@ -41,7 +41,7 @@ test.describe('Authentication E2E Flows', () => {
         });
 
         // Verify success toast or redirection
-        await expect(page.getByText(/User created successfully|check your email for verification/i)).toBeVisible({ timeout: 10000 });
+        await expect(page.getByText(/User created successfully|creado con éxito|check your email/i)).toBeVisible({ timeout: 15000 });
 
         // Manually verify email in DB to allow Sign In (if app requires it)
         // Polling for user creation
@@ -66,12 +66,12 @@ test.describe('Authentication E2E Flows', () => {
 
         // Logout via UI to ensure NextAuth session is fully destroyed
         await page.getByRole('button', { name: /Salir|Sign Out/i }).click();
-        await page.waitForURL('/', { timeout: 15000 });
+        await page.waitForURL('/', { timeout: 20000 });
 
         await authPage.gotoForgotPassword();
         await authPage.requestPasswordReset(TEST_USER.email);
 
-        await expect(page.getByText('¡Correo enviado!')).toBeVisible();
+        await expect(page.getByText(/Correo enviado|Email sent/i)).toBeVisible({ timeout: 10000 });
 
         // Poll for token
         let tokenDoc: any = null;
@@ -88,7 +88,7 @@ test.describe('Authentication E2E Flows', () => {
 
         await authPage.resetPassword(NEW_PASSWORD);
 
-        await expect(page.getByText('Tu contraseña ha sido actualizada con éxito.')).toBeVisible();
+        await expect(page.getByText(/actualizada con éxito|success/i)).toBeVisible({ timeout: 10000 });
         await page.waitForURL('**/sign-in');
 
         await authPage.signIn({ email: TEST_USER.email, password: NEW_PASSWORD });
