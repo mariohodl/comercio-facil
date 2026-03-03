@@ -5,8 +5,8 @@ import data from '@/lib/data'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
-import { AlignRight, ShoppingCart, Globe, LogOut, LayoutDashboard, Settings, User, ChevronRight, Tag, Sparkles, Star, TrendingUp, BadgeDollarSign, Headphones, Info, HelpCircle, Mail } from 'lucide-react'
-import { SignOut } from '@/lib/actions/user.actions'
+import { AlignRight, ShoppingCart, Globe, LogOut, LayoutDashboard, Settings, User, ChevronRight, Tag, Sparkles, Star, TrendingUp, BadgeDollarSign, Headphones, Info, HelpCircle, Mail, X } from 'lucide-react'
+import { SignOutButton } from '../auth/sign-out-button'
 import { Button } from '@/components/ui/button'
 import { auth } from '@/auth'
 import Image from 'next/image'
@@ -21,7 +21,6 @@ import {
   SheetTrigger,
   SheetClose,
 } from '@/components/ui/sheet'
-import { X } from 'lucide-react'
 
 // Map menu names to icons for the mobile sidebar
 const menuIconMap: { [key: string]: any } = {
@@ -194,12 +193,12 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
             {/* Footer */}
             <div className="p-6 pb-10 shrink-0">
               {session ? (
-                <form action={SignOut}>
-                  <Button className="w-full bg-white hover:bg-red-50 text-red-500 h-12 rounded-2xl gap-2 border border-gray-200 shadow-sm font-semibold" variant="ghost">
-                    <LogOut className="w-4 h-4" />
-                    {tCommon('signOut')}
-                  </Button>
-                </form>
+                <SignOutButton
+                  variant="ghost"
+                  className="w-full bg-white hover:bg-red-50 text-red-500 h-12 rounded-2xl gap-2 border border-gray-200 shadow-sm font-semibold justify-center"
+                  callbackUrl="/"
+                  showIcon
+                />
               ) : (
                 <Link href="/sign-in">
                   <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white h-12 rounded-2xl font-semibold shadow-sm" variant="default">

@@ -674,7 +674,7 @@ export const BrandUpdateSchema = BrandInputSchema.extend({
 
 export const UnitInputSchema = z.object({
 	name: z.string().min(1, 'El nombre es obligatorio'),
-	abbreviation: z.string().min(1, 'La abreviatura es obligatoria'),
+	abbreviation: z.string().optional().nullable(),
 	storeId: z.string().optional(),
 	status: z.boolean().default(true),
 })

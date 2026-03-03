@@ -45,7 +45,7 @@ export default async function AdminLayout({
             <OfflineSyncManager storeId={storeId} />
             {sessionUser && <StorePersistenceManager sessionUser={sessionUser} />}
             <div className='flex flex-col min-h-screen bg-gray-50/50'>
-                <div className='bg-black text-white fixed top-0 left-0 w-full z-20 border-b border-white/5 backdrop-blur-xl'>
+                <div className='bg-black text-white fixed top-0 left-0 w-full z-50 border-b border-white/5 backdrop-blur-xl'>
                     <div className='flex h-16 items-center md:px-6 transition-all duration-300'>
                         {/* Mobile Sidebar Trigger */}
                         <div className='nav:hidden mr-2'>
@@ -94,7 +94,7 @@ export default async function AdminLayout({
 
                 <div className='flex pt-16'>
                     {/* Desktop Sidebar */}
-                    <aside className='hidden nav:block w-64 fixed left-0 top-16 bottom-0 z-10'>
+                    <aside className='hidden nav:block w-64 fixed left-0 top-16 bottom-0 z-40'>
                         <AdminNav
                             storeId={storeId}
                             storeName={session?.user?.storeName || ''}

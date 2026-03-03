@@ -22,7 +22,7 @@ import { useToast } from '@/hooks/use-toast'
 import { createAttribute, updateAttribute } from '@/lib/actions/attribute.actions'
 import { IAttribute } from '@/lib/db/models/attribute.model'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus } from 'lucide-react'
+import { Plus, Info } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -119,6 +119,14 @@ export function AttributeDialog({
                     <DialogTitle>
                         {attribute ? t('editAttribute') : t('addAttribute')}
                     </DialogTitle>
+                    {!attribute && (
+                        <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-100 flex gap-3 items-start">
+                            <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                            <p className="text-xs text-blue-700 leading-relaxed">
+                                {t('tip')}
+                            </p>
+                        </div>
+                    )}
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

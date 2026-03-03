@@ -10,7 +10,6 @@ const categories = [
 	{ categoryName: 'General', categorySlug: 'general', status: true },
 	{ categoryName: 'Materiales', categorySlug: 'materiales', status: true },
 	{ categoryName: 'Herramientas', categorySlug: 'herramientas', status: true },
-	{ categoryName: 'Equipo', categorySlug: 'equipo', status: true },
 	{ categoryName: 'Electricidad', categorySlug: 'electricidad', status: true },
 	{ categoryName: 'Plomería', categorySlug: 'plomeria', status: true },
 	{ categoryName: 'Pintura', categorySlug: 'pintura', status: true },
@@ -19,12 +18,7 @@ const categories = [
 	// Veterinary Categories
 	{ categoryName: 'Veterinaria', categorySlug: 'veterinaria', status: true },
 	{ categoryName: 'Alimento para Mascotas', categorySlug: 'alimento-mascotas', status: true },
-	{ categoryName: 'Accesorios para Mascotas', categorySlug: 'accesorios-mascotas', status: true },
 	{ categoryName: 'Higiene y Cuidado', categorySlug: 'higiene-cuidado', status: true },
-	{ categoryName: 'Acuariofilia', categorySlug: 'acuariofilia', status: true },
-	{ categoryName: 'Pequeños Mamíferos', categorySlug: 'pequenos-mamiferos', status: true },
-	{ categoryName: 'Aves', categorySlug: 'aves', status: true },
-	{ categoryName: 'Reptiles', categorySlug: 'reptiles', status: true },
 	{ categoryName: 'Ropa', categorySlug: 'ropa', status: true },
 ];
 
@@ -36,9 +30,6 @@ const subCategories = [
 	// Herramientas
 	{ name: 'Manuales', slug: 'manuales', parentCategory: 'Herramientas', code: 'HER-MAN', description: 'Herramientas de mano', status: true },
 	{ name: 'Eléctricas', slug: 'electricas', parentCategory: 'Herramientas', code: 'HER-ELE', description: 'Herramientas eléctricas', status: true },
-	// Equipo
-	{ name: 'Seguridad', slug: 'seguridad', parentCategory: 'Equipo', code: 'EQP-SEG', description: 'Equipo de protección personal', status: true },
-	{ name: 'Pesado', slug: 'pesado', parentCategory: 'Equipo', code: 'EQP-PES', description: 'Maquinaria pesada', status: true },
 	// Electricidad
 	{ name: 'Cables', slug: 'cables', parentCategory: 'Electricidad', code: 'ELE-CAB', description: 'Cables y alambres eléctricos', status: true },
 	{ name: 'Iluminación', slug: 'iluminacion', parentCategory: 'Electricidad', code: 'ELE-ILU', description: 'Focos y lámparas', status: true },
@@ -59,35 +50,12 @@ const subCategories = [
 	{ name: 'Vacunas', slug: 'vacunas', parentCategory: 'Veterinaria', code: 'VET-VAC', description: 'Vacunas para mascotas', status: true },
 	{ name: 'Antiparasitarios', slug: 'antiparasitarios', parentCategory: 'Veterinaria', code: 'VET-ANT', description: 'Control de parásitos', status: true },
 	{ name: 'Suplementos', slug: 'suplementos', parentCategory: 'Veterinaria', code: 'VET-SUP', description: 'Vitaminas y suplementos', status: true },
-	// Alimento para Mascotas
-	{ name: 'Alimento Seco', slug: 'alimento-seco', parentCategory: 'Alimento para Mascotas', code: 'ALI-SEC', description: 'Croquetas y alimento seco', status: true },
-	{ name: 'Alimento Húmedo', slug: 'alimento-humedo', parentCategory: 'Alimento para Mascotas', code: 'ALI-HUM', description: 'Sobres y latas', status: true },
-	{ name: 'Premios', slug: 'premios', parentCategory: 'Alimento para Mascotas', code: 'ALI-PRE', description: 'Premios y carnazas', status: true },
-	{ name: 'Dietas Prescriptivas', slug: 'dietas-prescriptivas', parentCategory: 'Alimento para Mascotas', code: 'ALI-DIE', description: 'Alimento para condiciones especiales', status: true },
-	// Accesorios para Mascotas
-	{ name: 'Correas y Collares', slug: 'correas-collares', parentCategory: 'Accesorios para Mascotas', code: 'ACC-COR', description: 'Paseo y sujeción', status: true },
-	{ name: 'Juguetes', slug: 'juguetes', parentCategory: 'Accesorios para Mascotas', code: 'ACC-JUG', description: 'Juguetes variados', status: true },
-	{ name: 'Camas y Transportadoras', slug: 'camas-transportadoras', parentCategory: 'Accesorios para Mascotas', code: 'ACC-CAM', description: 'Descanso y transporte', status: true },
-	{ name: 'Ropa', slug: 'ropa', parentCategory: 'Accesorios para Mascotas', code: 'ACC-ROP', description: 'Ropa y disfraces', status: true },
 	// Higiene y Cuidado
 	{ name: 'Champús y Jabones', slug: 'champus-jabones', parentCategory: 'Higiene y Cuidado', code: 'HIG-CHA', description: 'Limpieza y baño', status: true },
 	{ name: 'Cepillos', slug: 'cepillos', parentCategory: 'Higiene y Cuidado', code: 'HIG-CEP', description: 'Cepillado y estética', status: true },
 	{ name: 'Arenas', slug: 'arenas', parentCategory: 'Higiene y Cuidado', code: 'HIG-ARE', description: 'Arena para gatos', status: true },
 	{ name: 'Eliminador de Olores', slug: 'eliminador-olores', parentCategory: 'Higiene y Cuidado', code: 'HIG-ELI', description: 'Sprays y polvos', status: true },
 	{ name: 'Pañales y Tapetes', slug: 'panales-tapetes', parentCategory: 'Higiene y Cuidado', code: 'HIG-PAN', description: 'Entrenamiento y limpieza', status: true },
-	// Acuariofilia
-	{ name: 'Peceras y Acuarios', slug: 'peceras-acuarios', parentCategory: 'Acuariofilia', code: 'ACU-PEC', description: 'Tanques y peceras', status: true },
-	{ name: 'Filtros y Bombas', slug: 'filtros-bombas', parentCategory: 'Acuariofilia', code: 'ACU-FIL', description: 'Filtración y oxigenación', status: true },
-	{ name: 'Alimento para Peces', slug: 'alimento-peces', parentCategory: 'Acuariofilia', code: 'ACU-ALI', description: 'Hojuelas y pellets', status: true },
-	{ name: 'Decoración', slug: 'decoracion-acuario', parentCategory: 'Acuariofilia', code: 'ACU-DEC', description: 'Plantas y adornos', status: true },
-	// Pequeños Mamíferos
-	{ name: 'Alimento Roedores', slug: 'alimento-roedores', parentCategory: 'Pequeños Mamíferos', code: 'MAM-ALI', description: 'Alimento para hamsters, conejos', status: true },
-	{ name: 'Jaulas y Hábitats', slug: 'jaulas-habitats', parentCategory: 'Pequeños Mamíferos', code: 'MAM-JAU', description: 'Casas y jaulas', status: true },
-	{ name: 'Sustratos', slug: 'sustratos', parentCategory: 'Pequeños Mamíferos', code: 'MAM-SUS', description: 'Viruta y lechos', status: true },
-	// Aves
-	{ name: 'Jaulas para Aves', slug: 'jaulas-aves', parentCategory: 'Aves', code: 'AVE-JAU', description: 'Jaulas y pajareras', status: true },
-	{ name: 'Alimento para Aves', slug: 'alimento-aves', parentCategory: 'Aves', code: 'AVE-ALI', description: 'Semillas y mezclas', status: true },
-	{ name: 'Juguetes para Aves', slug: 'juguetes-aves', parentCategory: 'Aves', code: 'AVE-JUG', description: 'Columpios y espejos', status: true },
 	// Veterinarian Specific
 	{ name: 'Material de Curación', slug: 'material-curacion', parentCategory: 'Veterinaria', code: 'VET-GUA', description: 'Gasas, vendas, guantes', status: true },
 	{ name: 'Instrumental', slug: 'instrumental', parentCategory: 'Veterinaria', code: 'VET-INS', description: 'Tijeras, pinzas', status: true },
@@ -114,16 +82,10 @@ const brands = [
 	{ name: 'NexGard', image: 'https://placehold.co/200x200.png?text=NexGard', status: true },
 	{ name: 'Bayer', image: 'https://logo.clearbit.com/bayer.com', status: true },
 	{ name: 'Virbac', image: 'https://logo.clearbit.com/virbac.com', status: true },
-	{ name: 'Kong', image: 'https://logo.clearbit.com/kongcompany.com', status: true },
-	{ name: 'Furminator', image: 'https://logo.clearbit.com/furminator.com', status: true },
 	{ name: 'Hill\'s Science Diet', image: 'https://logo.clearbit.com/hillspet.com', status: true },
 	{ name: 'Eukanuba', image: 'https://logo.clearbit.com/eukanuba.com', status: true },
 	{ name: 'Whiskas', image: 'https://logo.clearbit.com/whiskas.com', status: true },
 	{ name: 'Pedigree', image: 'https://logo.clearbit.com/pedigree.com', status: true },
-	{ name: 'Tetra', image: 'https://logo.clearbit.com/tetra-fish.com', status: true },
-	{ name: 'Wardley', image: 'https://placehold.co/200x200.png?text=Wardley', status: true },
-	{ name: 'Kaytee', image: 'https://logo.clearbit.com/kaytee.com', status: true },
-	{ name: 'Mazuri', image: 'https://logo.clearbit.com/mazuri.com', status: true },
 	{ name: 'Zoetis', image: 'https://logo.clearbit.com/zoetis.com', status: true },
 	{ name: 'Frontline', image: 'https://placehold.co/200x200.png?text=Frontline', status: true },
 ];
@@ -545,7 +507,7 @@ const products: IProductInput[] = [
 		productId: 4,
 		name: 'Carretilla 5.5ft3 Neumática',
 		slug: toSlug('Carretilla 5.5ft3 Neumática'),
-		category: 'Equipo',
+		category: 'Herramientas',
 		sku: `CAR-${uniqueStoreId.toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
 		images: [{ imgUrl: 'https://placehold.co/600x400.png?text=Carretilla', imgKey: 'placeholder' }],
 		tags: ['best-seller'],
@@ -668,7 +630,7 @@ const products: IProductInput[] = [
 		productId: 7,
 		name: 'Escalera de Tijera 6 peldaños',
 		slug: toSlug('Escalera de Tijera 6 peldaños'),
-		category: 'Equipo',
+		category: 'Herramientas',
 		sku: `ESC-${uniqueStoreId.toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
 		images: [{ imgUrl: 'https://placehold.co/600x400.png?text=Escalera', imgKey: 'placeholder' }],
 		tags: ['featured'],
@@ -914,7 +876,7 @@ const products: IProductInput[] = [
 		productId: 13,
 		name: 'Chaleco de Seguridad',
 		slug: toSlug('Chaleco de Seguridad'),
-		category: 'Equipo',
+		category: 'Herramientas',
 		sku: `CHA-${uniqueStoreId.toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
 		images: [{ imgUrl: 'https://placehold.co/600x400.png?text=Chaleco', imgKey: 'placeholder' }],
 		tags: ['new-arrival'],
@@ -1916,28 +1878,12 @@ export const globalCatalog = [
 				subcategories: [
 					'Alimento para Perros',
 					'Alimento para Gatos',
-					'Alimento para Aves',
-					'Alimento para Peces',
 					'Premios y Golosinas',
 					'Suplementos',
 					'Alimento Especializado'
 				],
 				units: ['Kilogramo', 'Gramo', 'Lata', 'Bolsa', 'Paquete'],
 				brands: ['Purina', 'Pedigree', 'Whiskas', 'Royal Canin', 'Hills', 'Iams', 'Eukanuba']
-			},
-			{
-				name: 'Accesorios',
-				subcategories: [
-					'Correas y Collares',
-					'Camas y Casas',
-					'Juguetes',
-					'Cepillos y Cuidado',
-					'Arenas y Desechables',
-					'Comederos y Bebederos',
-					'Transportadoras'
-				],
-				units: ['Pieza', 'Juego', 'Paquete', 'Kilogramo'],
-				brands: ['Petmate', 'Kong', 'Hartz', 'Trixie', 'Ferplast', 'Outward Hound']
 			}
 		]
 	},

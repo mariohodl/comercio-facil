@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import {
     Dialog,
     DialogContent,
@@ -34,6 +35,7 @@ export function SuggestedSubCategoriesDialog({
     storeId,
     onSuccess,
 }: SuggestedSubCategoriesDialogProps) {
+    const t = useTranslations('inventory')
     const { showSuccess, showError } = useToast()
     const [suggestions, setSuggestions] = useState<string[]>([])
     const [selected, setSelected] = useState<string[]>([])
@@ -98,10 +100,10 @@ export function SuggestedSubCategoriesDialog({
 
         setSaving(false)
         if (successCount > 0) {
-            showSuccess(`Added ${successCount} subcategories successfully`)
+            showSuccess(t('addedSuccess', { count: successCount }))
             onSuccess?.()
         } else {
-            showError('Failed to add subcategories')
+            showError(t('addFailed'))
         }
         onOpenChange(false)
     }
@@ -112,11 +114,12 @@ export function SuggestedSubCategoriesDialog({
                 <DialogHeader>
                     <div className="flex items-center gap-2 text-orange-600">
                         <Sparkles className="h-5 w-5" />
-                        <DialogTitle>AI Suggested Subcategories</DialogTitle>
+                        <DialogTitle>{t('aiSuggestionsTitle')}</DialogTitle>
                     </div>
                     <DialogDescription>
-                        Based on <strong>{categoryName}</strong>, here are some suggested subcategories.
-                        Select the ones you want to add.
+                        {t.rich('aiSuggestionsDescription', {
+                            categoryName: (chunks) => <strong>{categoryName}</strong>
+                        })}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -124,7 +127,7 @@ export function SuggestedSubCategoriesDialog({
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-8 text-slate-400 gap-2">
                             <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
-                            <p className="text-sm font-medium">Generating suggestions...</p>
+                            <p className="text-sm font-medium">{t('generatingSuggestions')}</p>
                         </div>
                     ) : suggestions.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
@@ -150,7 +153,7 @@ export function SuggestedSubCategoriesDialog({
                         </div>
                     ) : (
                         <div className="text-center py-8 text-slate-400">
-                            No suggestions found. You can try again or skip.
+                            {t('noSuggestionsFound')}
                         </div>
                     )}
                 </div>
@@ -159,7 +162,7 @@ export function SuggestedSubCategoriesDialog({
                     <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         {!loading && suggestions.length === 0 && (
                             <Button variant="outline" onClick={fetchSuggestions} disabled={saving} className="w-full sm:w-auto">
-                                Try Again
+                                {t('tryAgain')}
                             </Button>
                         )}
                         <Button
@@ -170,12 +173,12 @@ export function SuggestedSubCategoriesDialog({
                             {saving ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Saving...
+                                    {t('addingSubCategories')}
                                 </>
                             ) : (
                                 <>
                                     <Plus className="mr-2 h-4 w-4" />
-                                    Add Selected ({selected.length})
+                                    {t('addSelected', { count: selected.length })}
                                 </>
                             )}
                         </Button>
@@ -186,7 +189,7 @@ export function SuggestedSubCategoriesDialog({
                         disabled={saving}
                         className="text-slate-400 hover:text-slate-600 w-full sm:w-auto order-last sm:order-none"
                     >
-                        Skip
+                        {t('skip')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

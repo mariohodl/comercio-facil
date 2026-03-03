@@ -274,3 +274,37 @@ export async function extractProductClassificationWithAI(categoriesText: string,
         }
     }
 }
+
+export async function getSuggestedAbbreviation(unitName: string) {
+    if (!unitName) return ''
+
+    try {
+        const googleKey = process.env.GOOGLE_API_KEY
+        if (googleKey) {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${googleKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `Propose a single, standard, very short abbreviation (maximum 3-4 letters) for the measurement unit "${unitName}" in Spanish (e.g., "kilogramo" -> "kg", "pieza" -> "pz", "mililitro" -> "ml"). Return ONLY the abbreviation string, no punctuation or explanation.`
+                        }]
+                    }]
+                })
+            })
+
+            if (response.ok) {
+                const data = await response.json()
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+                if (text) {
+                    return text.trim().toLowerCase()
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error suggesting abbreviation:', error)
+    }
+
+    // Basic fallback if AI fails
+    return unitName.substring(0, 2).toLowerCase()
+}
