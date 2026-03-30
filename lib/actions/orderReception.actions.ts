@@ -1,6 +1,6 @@
 'use server'
 import { auth } from '@/auth'
-import { formatError } from '../utils'
+import { formatError, getMXNow } from '../utils'
 import { connectToDatabase } from '../db'
 import { IOrderReceptionInput } from '@/types'
 import OrderReception, {
@@ -154,7 +154,7 @@ export async function updateOrderReceptionToPaid(orderId: string) {
 		if (!order) throw new Error('OrderReception not found')
 		if (order.isPaid) throw new Error('OrderReception is already paid')
 		order.isPaid = true
-		order.paidAt = new Date()
+		order.paidAt = getMXNow()
 		await order.save()
 		//   if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
 		// await updateProductStock(order._id)

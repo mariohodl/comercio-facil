@@ -106,8 +106,8 @@ export default function CalculatorModal({ open, onOpenChange }: CalculatorModalP
         <Button
             variant="ghost"
             className={`h-14 text-xl font-semibold rounded-full ${variant === 'primary'
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
                 }`}
             onClick={onClick}
         >
@@ -117,18 +117,13 @@ export default function CalculatorModal({ open, onOpenChange }: CalculatorModalP
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md p-0 gap-0">
+            <DialogContent
+                className="sm:max-w-md p-0 gap-0 overflow-visible"
+                closeClassName="top-0 -translate-y-1/2 -right-2 h-9 w-9 bg-white text-red-500 shadow-xl border-none hover:bg-red-50 hover:text-red-600"
+            >
                 <DialogHeader className="p-6 pb-4">
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-xl font-bold">{t('calculator')}</DialogTitle>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-full bg-red-500 hover:bg-red-600 text-white"
-                            onClick={() => onOpenChange(false)}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
                     </div>
                 </DialogHeader>
 

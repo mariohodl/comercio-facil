@@ -113,7 +113,8 @@ export async function POST(req: Request) {
             phone: '0000000000',
         }
 
-        const orderDate = validation.data.createdAt ? new Date(validation.data.createdAt) : new Date()
+        const { getMXTime } = await import('@/lib/db/setup')
+        const orderDate = validation.data.createdAt ? new Date(validation.data.createdAt) : getMXTime()
 
         // Final safety check for customer ID format to prevent Mongoose CastError
         const isValidObjectId = (id: string) => /^[0-9a-fA-F]{24}$/.test(id);

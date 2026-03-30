@@ -1,6 +1,6 @@
 'use server';
 import { auth } from '@/auth';
-import { round2, formatError } from '../utils';
+import { round2, formatError, getMXNow } from '../utils';
 import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE, ROL_ADMIN, ROL_SUPER_ADMIN } from '../constants'
 import { OrderInputSchema } from '../validator';
 import Order, { IOrder } from '../db/models/order.model';
@@ -118,7 +118,7 @@ export async function approvePayPalOrder(
 		)
 			throw new Error('Error in paypal payment');
 		order.isPaid = true;
-		order.paidAt = new Date();
+		order.paidAt = getMXNow();
 		order.paymentResult = {
 			id: captureData.id,
 			status: captureData.status,
@@ -678,8 +678,27 @@ async function getTopSalesProducts(date: DateRange, storeId: string) {
 				totalSales: {
 					$sum: { $multiply: ['$items.quantity', '$items.price'] },
 				},
+				totalQuantity: { $sum: '$items.quantity' },
 			},
 		},
+		{
+			$lookup: {
+				from: 'products',
+				localField: 'productId',
+				foreignField: '_id',
+				as: 'productInfo',
+			},
+		},
+		{ $unwind: { path: '$productInfo', preserveNullAndEmptyArrays: true } },
+		{
+			$lookup: {
+				from: 'units',
+				localField: 'productInfo.unitId',
+				foreignField: '_id',
+				as: 'unitInfo',
+			},
+		},
+		{ $unwind: { path: '$unitInfo', preserveNullAndEmptyArrays: true } },
 		{
 			$sort: {
 				totalSales: -1,
@@ -693,6 +712,8 @@ async function getTopSalesProducts(date: DateRange, storeId: string) {
 				label: '$_id',
 				image: '$image',
 				value: '$totalSales',
+				quantity: '$totalQuantity',
+				unit: { $ifNull: ['$unitInfo.name', { $ifNull: ['$productInfo.unit', 'u.'] }] },
 			},
 		},
 	])
@@ -781,7 +802,7 @@ export async function updateOrderToPaid(orderId: string) {
 		if (!order) throw new Error('Order not found')
 		if (order.isPaid) throw new Error('Order is already paid')
 		order.isPaid = true
-		order.paidAt = new Date()
+		order.paidAt = getMXNow()
 		await order.save()
 		if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
 			await updateProductStock(order._id)

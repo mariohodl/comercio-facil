@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { auth } from '@/auth'
 import Image from 'next/image'
 import { APP_NAME } from '@/lib/constants'
+import { InstallPrompt } from './install-prompt'
 
 import {
   Sheet,
@@ -55,7 +56,8 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
 
   return (
     <div className='flex justify-end'>
-      <nav className='md:flex gap-3 hidden w-full'>
+      <nav className='md:flex gap-3 hidden w-full items-center justify-end'>
+        <InstallPrompt variant="button" className={forAdmin ? "border-gray-700 bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 hover:border-gray-600" : ""} />
         <LanguageSwitcher variant={forAdmin ? 'dark' : 'light'} />
         <UserButton variant={forAdmin ? 'dark' : 'light'} />
         {forAdmin ? null : <CartButton />}
@@ -100,6 +102,10 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 pb-6 space-y-5">
+              
+              {/* Install App - Highly visible if available */}
+              <InstallPrompt variant="menuItem" />
+
               {/* Account Section */}
               <div className="space-y-2">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 divide-y divide-gray-50 overflow-hidden">

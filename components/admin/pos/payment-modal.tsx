@@ -186,7 +186,7 @@ export default function PaymentModal({ totalAmount, groupRounding, onSuccess, st
                     {tPOS('add')} {formatCurrency(total)}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] overflow-visible" closeClassName="top-0 -translate-y-1/2 -right-2 h-9 w-9 bg-white text-orange shadow-xl border-none">
                 <DialogHeader>
                     <DialogTitle>{tPOS('paymentModal.title')}</DialogTitle>
                 </DialogHeader>

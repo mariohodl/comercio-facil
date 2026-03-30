@@ -144,7 +144,7 @@ export default function OverviewReport() {
         isEmptyState && 'mb-0 pb-0'
       )}>
         <div className="flex sm:flex-row sm:items-center gap-2 sm:gap-4">
-          <h1 className='text-2xl font-bold text-slate-900 tracking-tight whitespace-nowrap'>{t('welcome')}</h1>
+          <h1 className='text-xl md:text-2xl font-bold text-slate-900 tracking-tight whitespace-nowrap'>{t('welcome')}</h1>
           <div className="flex items-center gap-3">
             {!isEmptyState && !showChecklist && (
               <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm transition-all hover:shadow-md animate-in fade-in slide-in-from-left-4 duration-700">

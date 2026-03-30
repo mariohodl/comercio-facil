@@ -115,7 +115,7 @@ export default function CreateCustomerModal({ onSuccess, storeId }: CreateCustom
                     <Plus className="h-5 w-5" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[600px] overflow-visible" closeClassName="top-0 -translate-y-1/2 -right-2 h-9 w-9 bg-white text-teal-700 shadow-xl border-none">
                 <DialogHeader>
                     <DialogTitle>{t('createCustomer')}</DialogTitle>
                 </DialogHeader>

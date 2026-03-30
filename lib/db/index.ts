@@ -1,9 +1,31 @@
+// MUST register timezone plugin before ANY model is imported
+import './setup';
 import mongoose from 'mongoose';
-// Import models statically to avoid ESM issues in test environment
+
+/**
+ * TZ (Timezone) Management for MongoDB
+ */
+
+/**
+ * Import core models AFTER plugin registration.
+ * This guarantees those schemas inherit the global plugin.
+ */
 import './models/store.model';
+import './models/order.model';
 import './models/company.model';
 import './models/warehouse.model';
 import './models/attribute.model';
+import './models/product.model';
+import './models/user.model';
+import './models/customer.model';
+import './models/orderReception.model';
+import './models/cash-register.model';
+import './models/expense.model';
+import './models/proveedor.model';
+import './models/category.model';
+import './models/brand.model';
+import './models/unit.model';
+import './models/sub-category.model';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const cached = (global as any).mongoose || { conn: null, promise: null };

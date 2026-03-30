@@ -370,7 +370,11 @@ export default function POSPageClient({
                                 </div>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="bottom" className="h-[90vh] p-0 rounded-t-[2.5rem] border-none">
+                        <SheetContent
+                            side="bottom"
+                            className="h-[90vh] p-0 rounded-t-[2.5rem] border-none shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.3)]"
+                            closeClassName="top-0 -translate-y-1/2 right-8 h-9 w-9 bg-white text-blue-600 hover:bg-blue-50 border-none shadow-xl"
+                        >
                             <div className="h-full overflow-hidden">
                                 {mounted && <POSCart storeId={storeId} />}
                             </div>
