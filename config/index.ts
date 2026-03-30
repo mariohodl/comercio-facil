@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 // Environment variable schema to ensure the app is correctly configured.
 
 const isServer = typeof window === 'undefined';

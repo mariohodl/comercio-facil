@@ -10,6 +10,9 @@ export const SENDER_NAME = env.NEXT_PUBLIC_APP_NAME
 export const APP_URL = env.NEXT_PUBLIC_APP_URL
 export const APP_DESCRIPTION = env.NEXT_PUBLIC_APP_DESCRIPTION
 export const APP_SLOGAN = env.NEXT_PUBLIC_APP_SLOGAN
+export const APP_PHONE = '+52 33 1286 3593'
+export const APP_EMAIL = 'hola@comerciofacil.com'
+export const SUPPORT_EMAIL = 'soporte@comerciofacil.com'
 
 export const PAGE_SIZE = env.PAGE_SIZE
 export const FREE_SHIPPING_MIN_PRICE = env.FREE_SHIPPING_MIN_PRICE

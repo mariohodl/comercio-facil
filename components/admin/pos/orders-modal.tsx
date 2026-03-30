@@ -111,7 +111,7 @@ export default function OrdersModal({ open, onOpenChange, storeId, onOpenOrder }
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 gap-0 bg-[#F8F9FA]">
+                <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 gap-0 bg-[#F8F9FA] overflow-visible" closeClassName="top-0 -translate-y-1/2 -right-4 h-9 w-9 bg-white text-gray-900 shadow-xl border-none">
                     <DialogHeader className="p-4 bg-white border-b">
                         <div className="flex items-center justify-between">
                             <DialogTitle className="text-xl font-bold">{t('title')}</DialogTitle>

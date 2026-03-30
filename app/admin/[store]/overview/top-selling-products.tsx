@@ -10,6 +10,8 @@ interface TopSellingProductsProps {
         value: number
         image: string
         id: string
+        quantity?: number
+        unit?: string
     }[]
 }
 
@@ -40,23 +42,37 @@ export default function TopSellingProducts({ data }: TopSellingProductsProps) {
                                         )}
                                     </div>
                                     <div className={cn(
-                                        "absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shadow-lg border-2 border-white",
+                                        "absolute -top-2 -left-2 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black shadow-lg border-2 border-white transition-transform group-hover:scale-110",
                                         index === 0 ? "bg-orange text-white" :
                                             index === 1 ? "bg-slate-400 text-white" :
                                                 index === 2 ? "bg-amber-600 text-white" : "bg-slate-100 text-slate-500"
                                     )}>
-                                        {index + 1}
+                                        #{index + 1}
                                     </div>
                                 </div>
                                 <div className="min-w-0">
-                                    <p className='font-semibold text-slate-800 text-sm line-clamp-1 group-hover:text-orange transition-colors'>{product.label}</p>
-                                    <div className="flex items-center gap-2">
+                                    <p className='font-semibold text-slate-800 text-sm line-clamp-1 group-hover:text-orange transition-colors'>
+                                        {index < 3 && <span className="text-[10px] font-black mr-1.5 align-middle text-orange opacity-60 uppercase tracking-tighter">🏆 Top</span>}
+                                        {product.label}
+                                    </p>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
                                         <span className='text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded'>
                                             {formatCurrency(product.value)}
                                         </span>
-                                        <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-tighter">
-                                            {t('sales')}
-                                        </span>
+                                        {product.quantity !== undefined && (
+                                            <>
+                                                <span className="text-[8px] text-slate-300">•</span>
+                                                <span className="text-[10px] text-slate-500 font-black uppercase tracking-tight">
+                                                    {product.quantity} <span className="font-medium lowercase opacity-70 italic">
+                                                        {product.unit ? (
+                                                            product.quantity && product.quantity > 1
+                                                                ? (product.unit.toLowerCase().match(/[aeiou]$/i) ? `${product.unit}s` : `${product.unit}es`)
+                                                                : product.unit
+                                                        ) : 'u.'}
+                                                    </span>
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>

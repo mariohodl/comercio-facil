@@ -30,7 +30,7 @@ export default function VariantSelectorDialog({ open, onOpenChange, product }: V
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto overflow-x-visible" closeClassName="top-0 -translate-y-1/2 -right-2 h-9 w-9 bg-white text-slate-900 shadow-xl border-none">
                 <DialogHeader>
                     <DialogTitle>{product.name}</DialogTitle>
                     <DialogDescription>

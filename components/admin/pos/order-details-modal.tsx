@@ -35,7 +35,7 @@ export default function OrderDetailsModal({ open, onOpenChange, order }: OrderDe
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] bg-[#F8F9FA] p-0 gap-0 overflow-hidden border-none shadow-2xl">
+            <DialogContent className="sm:max-w-[500px] bg-[#F8F9FA] p-0 gap-0 overflow-y-auto overflow-x-visible border-none shadow-2xl" closeClassName="top-0 -translate-y-1/2 -right-2 h-9 w-9 bg-white text-slate-900 shadow-xl border-none">
                 <DialogHeader className="p-4 bg-white border-b sticky top-0 z-20 flex flex-row items-center justify-between">
                     <DialogTitle className="text-lg font-bold flex items-center gap-2">
                         {t('orderProducts')}

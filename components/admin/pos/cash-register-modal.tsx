@@ -166,7 +166,7 @@ export default function CashRegisterModal({ open, onOpenChange, storeId }: CashR
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] overflow-visible" closeClassName="top-0 -translate-y-1/2 -right-2 h-9 w-9 bg-white text-orange shadow-xl border-none">
                 <DialogHeader>
                     <DialogTitle>
                         {view === 'open' && 'Open Cash Register'}

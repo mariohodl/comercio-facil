@@ -30,7 +30,7 @@ export default function OrderSuccessModal({ open, onOpenChange, orderDetails, on
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md overflow-visible" closeClassName="top-0 -translate-y-1/2 -right-2 h-9 w-9 bg-white text-green-600 shadow-xl border-none">
                 <DialogHeader>
                     <div className="flex flex-col items-center gap-2 mb-4">
                         <CheckCircle2 className="h-16 w-16 text-green-500" />

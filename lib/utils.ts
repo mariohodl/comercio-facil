@@ -254,3 +254,8 @@ export const formatDate = (date: Date | string) => {
 		year: 'numeric'
 	})
 }
+
+export const getMXNow = (): Date => {
+	const now = new Date();
+	return new Date(now.getTime() - (6 * 60 * 60 * 1000));
+};

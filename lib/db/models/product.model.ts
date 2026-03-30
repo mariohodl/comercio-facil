@@ -1,3 +1,4 @@
+import '@/lib/db/setup';
 import { Document, Model, model, models, Schema } from 'mongoose'
 import { IProductInput } from '@/types'
 
