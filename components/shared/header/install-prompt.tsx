@@ -1,21 +1,48 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Download, Smartphone } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { create } from 'zustand'
 
 interface InstallPromptProps {
   variant?: 'icon' | 'menuItem' | 'button'
   className?: string
 }
 
+interface PwaStore {
+  deferredPrompt: any
+  isInstallable: boolean
+  isInstalled: boolean
+  setDeferredPrompt: (prompt: any) => void
+  setIsInstallable: (val: boolean) => void
+  setIsInstalled: (val: boolean) => void
+}
+
+const usePwaStore = create<PwaStore>((set) => ({
+  deferredPrompt: null,
+  isInstallable: false,
+  isInstalled: false,
+  setDeferredPrompt: (prompt) => set({ deferredPrompt: prompt }),
+  setIsInstallable: (val) => set({ isInstallable: val }),
+  setIsInstalled: (val) => set({ isInstalled: val }),
+}))
+
 export function InstallPrompt({ variant = 'icon', className }: InstallPromptProps) {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
-  const [isInstallable, setIsInstallable] = useState(false)
-  const [isInstalled, setIsInstalled] = useState(false)
+  const {
+    deferredPrompt,
+    isInstallable,
+    isInstalled,
+    setDeferredPrompt,
+    setIsInstallable,
+    setIsInstalled
+  } = usePwaStore()
 
   useEffect(() => {
+    // Only run on the client
+    if (typeof window === 'undefined') return
+
     // Check if app is already running in standalone mode (installed)
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true)
@@ -42,26 +69,27 @@ export function InstallPrompt({ variant = 'icon', className }: InstallPromptProp
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     window.addEventListener('appinstalled', handleAppInstalled)
 
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
       window.removeEventListener('appinstalled', handleAppInstalled)
     }
-  }, [])
+  }, [setDeferredPrompt, setIsInstallable, setIsInstalled])
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return
 
     // Show the install prompt
     deferredPrompt.prompt()
-    
+
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice
     console.log(`User response to the install prompt: ${outcome}`)
-    
+
     if (outcome === 'accepted') {
       setIsInstallable(false)
     }
-    
+
     // We've used the prompt, and can't use it again, throw it away
     setDeferredPrompt(null)
   }
@@ -71,15 +99,15 @@ export function InstallPrompt({ variant = 'icon', className }: InstallPromptProp
 
   if (variant === 'menuItem') {
     return (
-      <button 
+      <button
         onClick={handleInstallClick}
         className={cn(
           "w-full flex items-center gap-3.5 px-4 py-3.5 hover:bg-gray-50/50 transition-colors bg-white rounded-2xl shadow-sm border border-gray-100/80 text-left cursor-pointer group",
           className
         )}
       >
-        <div className="w-10 h-10 rounded-xl bg-purple-50 group-hover:bg-purple-100 transition-colors flex items-center justify-center">
-          <Download className="w-5 h-5 text-purple-500" />
+        <div className="w-10 h-10 rounded-xl bg-orange-50 group-hover:bg-orange-100 transition-colors flex items-center justify-center">
+          <Download className="w-5 h-5 text-orange-500" />
         </div>
         <div className="flex-1">
           <span className="text-sm font-semibold text-gray-800 block">Instalar Aplicación</span>
@@ -91,7 +119,7 @@ export function InstallPrompt({ variant = 'icon', className }: InstallPromptProp
 
   if (variant === 'button') {
     return (
-      <Button 
+      <Button
         onClick={handleInstallClick}
         variant="outline"
         className={cn("gap-2 border-orange-200 bg-orange-50/50 text-orange-600 hover:bg-orange-100/50 hover:text-orange-700", className)}

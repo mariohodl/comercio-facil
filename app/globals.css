@@ -10,6 +10,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     /* Primary - Orange */
     --primary: #EA8543;
     --primary-dark: #C46C32;
