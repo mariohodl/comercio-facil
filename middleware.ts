@@ -40,7 +40,15 @@ export default auth(async function middleware(req) {
 		const isVerifyingPhone = req.nextUrl.searchParams.get('verified') === '1';
 		const needsSetup = !storeId || (role === 'Admin' && !phoneVerified && !isVerifyingPhone);
 
-		if (needsSetup && !isSetupPage && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
+		// Exclude static assets from setup redirection
+		const isStaticAsset = 
+			pathname.startsWith('/api') || 
+			pathname.startsWith('/_next') || 
+			pathname.startsWith('/images') || 
+			pathname.startsWith('/icons') ||
+			pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|json|xml|txt)$/);
+
+		if (needsSetup && !isSetupPage && !isStaticAsset) {
 			return NextResponse.redirect(new URL('/admin/setup', req.url));
 		}
 
@@ -53,7 +61,7 @@ export default auth(async function middleware(req) {
 
 			// Role-based restrictions within admin
 			if (role === 'Seller') {
-				if (!pathname.startsWith('/admin/pos') && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
+				if (!pathname.startsWith('/admin/pos') && !isStaticAsset) {
 					return NextResponse.redirect(new URL(`/admin/pos/${storeId}`, req.url));
 				}
 			} else if (role === 'Admin' || role === 'SuperAdmin') {
@@ -79,10 +87,11 @@ export const config = {
 		 * Match all request paths except for the ones starting with:
 		 * - api (API routes)
 		 * - _next/static (static files)
-		 * 
 		 * - _next/image (image optimization files)
-		 * - favicon.ico (favicon file)
+		 * - images (public images)
+		 * - icons (public icons)
+		 * - favicon.ico, manifest.json, sitemap.xml, robots.txt
 		 */
-		'/((?!api|_next/static|_next/image|favicon.ico).*)',
+		'/((?!api|_next/static|_next/image|images|icons|favicon.ico|manifest.json|sitemap.xml|robots.txt).*)',
 	],
 };
