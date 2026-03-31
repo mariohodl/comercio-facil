@@ -56,8 +56,16 @@ export default function CredentialsSignInForm() {
         password: data.password,
       })
 
+      console.log('DEBUG: result from signIn:', result)
       if (result?.error) {
-        toast.error('Credenciales inválidas')
+        if (result.error === 'OAuthAccount' || result.error.includes('OAuthAccount')) {
+          toast.error('Acceso restringido: Cuenta de Google', {
+            description: 'Este correo está registrado vía Google. Haz clic en "Olvidaste tu contraseña" para crear una clave y poder entrar por aquí.',
+            duration: 8000,
+          })
+        } else {
+          toast.error('Credenciales inválidas')
+        }
         return
       }
 

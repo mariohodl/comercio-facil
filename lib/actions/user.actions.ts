@@ -20,7 +20,24 @@ import PasswordResetToken from '../db/models/password-reset-token.model'
 import { z } from 'zod'
 
 export async function signInWithCredentials(user: IUserSignIn) {
-	return await signIn('credentials', { ...user, redirect: false });
+	try {
+		await connectToDatabase();
+		const dbUser = await User.findOne({ email: user.email, isDeleted: { $ne: true } }) as any;
+
+		if (dbUser && !dbUser.password) {
+			return { error: 'OAuthAccount' };
+		}
+
+		return await signIn('credentials', { ...user, redirect: false });
+	} catch (e: any) {
+		console.log('DEBUG: signIn error:', { message: e.message, type: e.type, e });
+		if (e.message?.includes('OAuthAccount') || e.type?.includes('OAuthAccount')) {
+			return { error: 'OAuthAccount' };
+		}
+		// In V5, re-throwing might be needed to allow Auth.js to handle redirects, 
+		// but since we use redirect: false and manual redirects in client, we return the error.
+		return { error: e.type || e.message || 'CredentialsSignin' };
+	}
 }
 export const SignOut = async () => {
 	await signOut({ redirect: false });
@@ -51,10 +68,9 @@ export async function registerUser(userSignUp: IUserSignUp) {
 			console.warn(`Bot detected during registration attempt: ${userSignUp.email}`);
 			// Return success: true but do nothing, or return a fake success message
 			// to avoid letting the bot know it failed. 
-			// But the user asked to "Discard the request".
 			return {
 				success: true,
-				message: 'User created successfully. Please check your email for verification code.'
+				message: 'Usuario creado con éxito. Por favor, revisa tu correo electrónico para obtener el código de verificación.'
 			};
 		}
 
@@ -73,7 +89,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
 		// Check if user already exists
 		const existingUser = await User.findOne({ email: user.email });
 		if (existingUser) {
-			return { success: false, error: 'Email already registered' };
+			return { success: false, error: 'El correo electrónico ya está registrado' };
 		}
 
 		const trialStartDate = new Date();
@@ -100,12 +116,12 @@ export async function registerUser(userSignUp: IUserSignUp) {
 
 		return {
 			success: true,
-			message: 'User created successfully. Please check your email for verification code.',
+			message: 'Usuario creado con éxito. Por favor, revisa tu correo electrónico para obtener el código de verificación.',
 			redirectUrl: `/verify-email?email=${encodeURIComponent(user.email)}`
 		};
 	} catch (error: any) {
 		if (error.code === 11000) {
-			return { success: false, error: 'Email already registered' };
+			return { success: false, error: 'El correo electrónico ya está registrado' };
 		}
 		return { success: false, error: formatError(error) };
 	}
@@ -231,11 +247,20 @@ export async function updateStoreSettings(data: z.infer<typeof StoreSettingsSche
 		};
 		user.isStore = true;
 
+		// Handle phone number update
+		if (validatedData.phone) {
+			const formattedPhone = `+52${validatedData.phone}`;
+			if (user.phone !== formattedPhone) {
+				user.phone = formattedPhone;
+				user.phoneVerified = false; // Reset if phone changed
+			}
+		}
+
 		await user.save();
 
 		return {
 			success: true,
-			message: 'Store settings updated successfully',
+			message: 'Configuración de la tienda actualizada con éxito',
 			data: {
 				companyId: company._id.toString(),
 				companyName: company.name,
@@ -300,12 +325,12 @@ export async function updateUserName(user: IUserName) {
 		await connectToDatabase()
 		const session = await auth()
 		const currentUser = await User.findById(session?.user?.id)
-		if (!currentUser) throw new Error('User not found')
+		if (!currentUser) throw new Error('Usuario no encontrado')
 		currentUser.name = user.name
 		const updatedUser = await currentUser.save()
 		return {
 			success: true,
-			message: 'User updated successfully',
+			message: 'Usuario actualizado con éxito',
 			data: JSON.parse(JSON.stringify(updatedUser)),
 		}
 	} catch (error) {
@@ -317,10 +342,10 @@ export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
 	try {
 		await connectToDatabase()
 		const dbUser = await User.findOne({ _id: user._id, isDeleted: { $ne: true } })
-		if (!dbUser) throw new Error('User not found')
+		if (!dbUser) throw new Error('Usuario no encontrado')
 
 		if (dbUser.role === ROL_ADMIN && dbUser.isStore) {
-			throw new Error('Store Admin core details cannot be modified via this action')
+			throw new Error('Los detalles centrales del Administrador de la tienda no pueden modificarse mediante esta acción')
 		}
 
 		dbUser.name = user.name
@@ -330,7 +355,7 @@ export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
 		revalidatePath('/admin/users')
 		return {
 			success: true,
-			message: 'User updated successfully',
+			message: 'Usuario actualizado con éxito',
 			data: JSON.parse(JSON.stringify(updatedUser)),
 		}
 	} catch (error) {
@@ -341,7 +366,7 @@ export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
 export async function getUserById(userId: string) {
 	await connectToDatabase()
 	const user = await User.findOne({ _id: userId, isDeleted: { $ne: true } })
-	if (!user) throw new Error('User not found')
+	if (!user) throw new Error('Usuario no encontrado')
 	return JSON.parse(JSON.stringify(user)) as IUser
 }
 
@@ -351,10 +376,10 @@ export async function deleteUser(id: string) {
 	try {
 		await connectToDatabase()
 		const user = await User.findOne({ _id: id, isDeleted: { $ne: true } })
-		if (!user) throw new Error('User not found')
+		if (!user) throw new Error('Usuario no encontrado')
 
 		if (user.role === ROL_ADMIN && user.isStore) {
-			throw new Error('Store Admin users cannot be deleted')
+			throw new Error('Los usuarios administradores de la tienda no pueden ser eliminados')
 		}
 
 		user.isDeleted = true
@@ -364,7 +389,7 @@ export async function deleteUser(id: string) {
 		revalidatePath('/admin/users')
 		return {
 			success: true,
-			message: 'User deleted successfully',
+			message: 'Usuario eliminado con éxito',
 		}
 	} catch (error) {
 		return { success: false, message: formatError(error) }
@@ -455,7 +480,7 @@ export async function createStoreUser(data: z.infer<typeof StoreUserCreateSchema
 		// Resolve store slug to ID
 		const store = await Store.findOne({ slug: validatedData.storeId })
 		if (!store) {
-			return { success: false, message: 'Store not found' }
+			return { success: false, message: 'Tienda no encontrada' }
 		}
 
 		// Handle missing email/password for Sellers
@@ -474,7 +499,7 @@ export async function createStoreUser(data: z.infer<typeof StoreUserCreateSchema
 		// Check if user already exists
 		const existingUser = await User.findOne({ email: finalEmail })
 		if (existingUser) {
-			return { success: false, message: 'User with this email already exists' }
+			return { success: false, message: 'Ya existe un usuario con este correo electrónico' }
 		}
 
 		const hashedPassword = await bcrypt.hash(finalPassword!, 5)
@@ -497,7 +522,7 @@ export async function createStoreUser(data: z.infer<typeof StoreUserCreateSchema
 		})
 
 		revalidatePath(`/admin/${validatedData.storeId}/users`)
-		return { success: true, message: 'User created successfully' }
+		return { success: true, message: 'Usuario creado con éxito' }
 	} catch (error) {
 		return { success: false, message: formatError(error) }
 	}
@@ -512,7 +537,7 @@ export async function updateStoreUser(data: z.infer<typeof StoreUserUpdateSchema
 		if (!session?.user?.id) throw new Error('Unauthorized')
 
 		const user = await User.findOne({ _id: validatedData._id, isDeleted: { $ne: true } })
-		if (!user) throw new Error('User not found')
+		if (!user) throw new Error('Usuario no encontrado')
 
 		// Defensive check: Store Admin users can only change their password
 		if (user.role === 'Admin' && user.isStore) {
@@ -541,7 +566,7 @@ export async function updateStoreUser(data: z.infer<typeof StoreUserUpdateSchema
 			revalidatePath(`/admin/${validatedData.storeId as string}/users`)
 		}
 
-		return { success: true, message: 'User updated successfully' }
+		return { success: true, message: 'Usuario actualizado con éxito' }
 	} catch (error) {
 		return { success: false, message: formatError(error) }
 	}
@@ -596,7 +621,7 @@ export async function updateCompanyLogo(imageUrl: string) {
 
 		return {
 			success: true,
-			message: 'Company logo updated successfully',
+			message: 'Logo de la empresa actualizado con éxito',
 			remainingUpdates: 3 - (recentUpdates.length + 1)
 		}
 	} catch (error) {

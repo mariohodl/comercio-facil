@@ -291,7 +291,7 @@ export const UserSignInSchema = z.object({
 
 export const UserSignUpSchema = UserSignInSchema.extend({
 	name: UserName,
-	phone: z.string().min(1, 'El teléfono es obligatorio'),
+	phone: z.string().optional().default(''),
 	confirmPassword: Password,
 	promoCode: z.string().optional(),
 	middle_name_verification: z.string().optional(),
@@ -309,6 +309,7 @@ export const StoreSettingsSchema = z.object({
 	taxId: z.string().optional(),
 	storeId: StoreId,
 	industry: z.string().min(1, 'La industria es obligatoria'),
+	phone: z.string().length(10, 'El teléfono debe tener 10 dígitos'),
 	plan: z.enum(['BASIC', 'INTERMEDIATE', 'ADVANCED']).optional(),
 	planStatus: z.string().optional(),
 	trialEndDate: z.string().nullable().optional(),

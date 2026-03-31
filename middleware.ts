@@ -25,7 +25,7 @@ export default auth(async function middleware(req) {
 
 	// Handle role-based redirection for authenticated users
 	if (session?.user) {
-		const { role, storeId } = session.user;
+		const { role, storeId, phoneVerified } = session.user;
 
 		// SuperAdmin isolation (strictly verify access to root super-admin paths)
 		if (pathname.startsWith('/super-admin') && role !== 'SuperAdmin') {
@@ -36,8 +36,16 @@ export default auth(async function middleware(req) {
 		const isAuthPage = pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up');
 		const isSetupPage = pathname === '/admin/setup';
 
-		// If user has a store, don't let them go to setup or auth pages
-		if (storeId) {
+		// 1. Force setup if no storeId exists or phone is not verified (ONLY for Admin role)
+		const isVerifyingPhone = req.nextUrl.searchParams.get('verified') === '1';
+		const needsSetup = !storeId || (role === 'Admin' && !phoneVerified && !isVerifyingPhone);
+
+		if (needsSetup && !isSetupPage && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
+			return NextResponse.redirect(new URL('/admin/setup', req.url));
+		}
+
+		// 2. If setup is complete (store + phone), don't let them go back to setup or auth pages
+		if (storeId && phoneVerified) {
 			if (isAuthPage || isSetupPage) {
 				const targetPath = role === 'SuperAdmin' ? '/super-admin' : `/admin/${storeId}/overview`;
 				return NextResponse.redirect(new URL(targetPath, req.url));
@@ -56,12 +64,7 @@ export default auth(async function middleware(req) {
 			}
 		}
 
-		// If no storeId yet (and not a SuperAdmin), force setup 
-		if (!storeId && role !== 'SuperAdmin' && !isSetupPage && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
-			return NextResponse.redirect(new URL('/admin/setup', req.url));
-		}
-
-		// Authenticated users without storeId on auth pages go to setup
+		// 3. Authenticated users (without storeId/verification) on auth pages go to setup
 		if (isAuthPage) {
 			return NextResponse.redirect(new URL('/admin/setup', req.url));
 		}

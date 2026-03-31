@@ -28,6 +28,8 @@ export default {
 				token.storeId = user.storeId;
 				token.storeName = user.storeName;
 				token.isStore = user.isStore;
+				token.phone = user.phone;
+				token.phoneVerified = user.phoneVerified;
 				token.companyId = user.companyId;
 				token.companyName = user.companyName;
 			}
@@ -49,9 +51,15 @@ export default {
 			if (session?.user?.companyName && trigger === 'update') {
 				token.companyName = session.user.companyName;
 			}
+			if (session?.user?.phone !== undefined && trigger === 'update') {
+				token.phone = session.user.phone;
+			}
+			if (session?.user?.phoneVerified !== undefined && trigger === 'update') {
+				token.phoneVerified = session.user.phoneVerified;
+			}
 			return token;
 		},
-		session: async ({ session, user, trigger, token }: any) => {
+		session: async ({ session, token }: any) => {
 			session.user.id = token.sub;
 			session.user.role = token.role;
 			session.user.name = token.name;
@@ -60,15 +68,9 @@ export default {
 			session.user.storeName = token.storeName;
 			session.user.companyId = token.companyId;
 			session.user.companyName = token.companyName;
+			session.user.phone = token.phone || '';
+			session.user.phoneVerified = !!token.phoneVerified;
 
-			if (trigger === 'update') {
-				session.user.name = user.name;
-				session.user.storeId = token.storeId;
-				session.user.storeName = token.storeName;
-				session.user.isStore = token.isStore;
-				session.user.companyId = token.companyId;
-				session.user.companyName = token.companyName;
-			}
 			return session;
 		},
 	},
