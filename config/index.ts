@@ -51,6 +51,11 @@ const serverSchema = z.object({
 	OPENAI_API_KEY: z.string().optional(),
 	GOOGLE_API_KEY: z.string().optional(),
 
+	// Twilio
+	TWILIO_ACCOUNT_SID: z.string().min(1),
+	TWILIO_AUTH_TOKEN: z.string().min(1),
+	TWILIO_VERIFY_SERVICE_SID: z.string().min(1),
+
 	// Configuration
 	PAGE_SIZE: z.coerce.number().default(9),
 	FREE_SHIPPING_MIN_PRICE: z.coerce.number().default(35),
