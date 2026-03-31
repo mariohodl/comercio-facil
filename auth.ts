@@ -23,6 +23,8 @@ declare module 'next-auth' {
 			role: string;
 			storeId: string;
 			isStore: boolean;
+			phone: string;
+			phoneVerified: boolean;
 			storeName: string;
 			companyId: string;
 			companyName: string;
@@ -36,6 +38,8 @@ declare module 'next-auth' {
 		role: string;
 		storeId: string;
 		isStore: boolean;
+		phone: string;
+		phoneVerified: boolean;
 		storeName: string;
 		companyId: string;
 		companyName: string;
@@ -105,6 +109,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					.populate('business.defaultStoreId')
 					.populate('business.companyId') as any;
 
+				if (DBuser && !DBuser.password) {
+					throw new Error('OAuthAccount');
+				}
+
 				if (DBuser && DBuser.password) {
 					const isMatch = await bcrypt.compare(
 						credentials.password as string,
@@ -120,6 +128,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 							role: DBuser.role,
 							storeId: defaultStore?.slug || '',
 							isStore: DBuser.isStore,
+							phone: DBuser.phone || '',
+							phoneVerified: DBuser.phoneVerified,
 							storeName: defaultStore?.name || '',
 							companyId: company?._id?.toString() || '',
 							companyName: company?.name || '',
@@ -212,6 +222,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 					role: DBuser.role,
 					storeId: defaultStore?.slug || '',
 					isStore: DBuser.isStore,
+					phone: DBuser.phone || '',
+					phoneVerified: DBuser.phoneVerified,
 					storeName: defaultStore?.name || '',
 					companyId: company?._id?.toString() || '',
 					companyName: company?.name || '',
@@ -271,12 +283,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		},
 		jwt: async ({ token, user, trigger, session }) => {
 			try {
+				await connectToDatabase();
+
+				// 1. Initial login (credentials OR social)
 				if (user) {
 					const u = user as any;
-					// For credentials, storeId is already passed. For social login via adapter, it's not.
+					// If social login (user exists but might not have store fields from adapter), search DB
 					if (!u.storeId && user.email) {
-						await connectToDatabase();
-
 						const dbUser = await User.findOne({ email: user.email })
 							.populate('business.defaultStoreId')
 							.populate('business.companyId') as any;
@@ -284,82 +297,79 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 						if (dbUser) {
 							token.role = dbUser.role || ROL_ADMIN;
 							token.isStore = !!dbUser.isStore;
-
+							token.phone = dbUser.phone || '';
+							token.phoneVerified = !!dbUser.phoneVerified;
 							const defaultStore = dbUser.business?.defaultStoreId;
 							const company = dbUser.business?.companyId;
-
 							token.storeId = defaultStore?.slug || '';
 							token.storeName = defaultStore?.name || '';
 							token.companyId = company?._id?.toString() || '';
 							token.companyName = company?.name || '';
 							token.plan = company?.plan || '';
 							token.planStatus = company?.planStatus || '';
-
-							// Safely handle dates
-							const trialEndDate = (company as any)?.trialEndDate;
-							if (trialEndDate instanceof Date) {
-								token.trialEndDate = trialEndDate.toISOString();
-							} else if (trialEndDate) {
-								token.trialEndDate = new Date(trialEndDate).toISOString();
-							} else {
-								token.trialEndDate = '';
-							}
 						}
 					} else {
+						// Credentials login (all data provided or in token)
 						token.role = u.role || ROL_ADMIN;
 						token.storeId = u.storeId || '';
 						token.storeName = u.storeName || '';
 						token.isStore = !!u.isStore;
+						token.phone = u.phone || '';
+						token.phoneVerified = !!u.phoneVerified;
 						token.companyId = u.companyId || '';
 						token.companyName = u.companyName || '';
 						token.plan = u.plan || '';
 						token.planStatus = u.planStatus || '';
-						token.trialEndDate = u.trialEndDate || '';
 					}
-					token.name = user.name || user.email!.split('@')[0];
 					token.sub = user.id;
 				}
 
-				if (session?.user?.name && trigger === 'update') {
-					token.name = session.user.name;
+				// 2. Critical: Update trigger (e.g. after phone verification)
+				// Re-fetch from DB to get absolute latest phoneVerified status
+				if (trigger === 'update') {
+					console.log('DEBUG: JWT Update triggered for', token.sub);
+					const dbUser = await User.findById(token.sub)
+						.populate('business.defaultStoreId')
+						.populate('business.companyId') as any;
+
+					if (dbUser) {
+						token.role = dbUser.role || ROL_ADMIN;
+						token.isStore = !!dbUser.isStore;
+						token.phone = dbUser.phone || '';
+						token.phoneVerified = !!dbUser.phoneVerified;
+						const defaultStore = dbUser.business?.defaultStoreId;
+						const company = dbUser.business?.companyId;
+
+						token.storeId = defaultStore?.slug || '';
+						token.storeName = defaultStore?.name || '';
+						token.companyId = company?._id?.toString() || '';
+						token.companyName = company?.name || '';
+						token.plan = company?.plan || '';
+						token.planStatus = company?.planStatus || '';
+
+						if (company?.trialEndDate) {
+							token.trialEndDate = new Date(company.trialEndDate).toISOString();
+						}
+
+						// Also allow manual updates from the session object if passed
+						if (session?.user?.name) token.name = session.user.name;
+					}
 				}
-				if (session?.user?.storeId && trigger === 'update') {
-					token.storeId = session.user.storeId;
-				}
-				if (session?.user?.storeName && trigger === 'update') {
-					token.storeName = session.user.storeName;
-				}
-				if (session?.user?.isStore !== undefined && trigger === 'update') {
-					token.isStore = session.user.isStore;
-				}
-				if (session?.user?.companyId && trigger === 'update') {
-					token.companyId = session.user.companyId;
-				}
-				if (session?.user?.companyName && trigger === 'update') {
-					token.companyName = session.user.companyName;
-				}
-				if (session?.user?.plan && trigger === 'update') {
-					token.plan = session.user.plan;
-				}
-				if (session?.user?.planStatus && trigger === 'update') {
-					token.planStatus = session.user.planStatus;
-				}
-				if (session?.user?.trialEndDate && trigger === 'update') {
-					token.trialEndDate = session.user.trialEndDate;
-				}
+
 				return token;
 			} catch (error) {
-				// console.error('JWT callback error:', error);
+				console.error('JWT callback error:', error);
 				return token;
 			}
 		},
-		session: async ({ session, user, trigger, token }) => {
+		session: async ({ session, token }) => {
 			session.user.id = token.sub as string;
 			session.user.role = token.role as string;
 			session.user.name = token.name;
-
 			session.user.storeId = token.storeId as string;
 			session.user.isStore = token.isStore as boolean;
+			session.user.phone = token.phone as string;
+			session.user.phoneVerified = token.phoneVerified as boolean;
 			session.user.storeName = token.storeName as string;
 			session.user.companyId = token.companyId as string;
 			session.user.companyName = token.companyName as string;
@@ -367,17 +377,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			session.user.planStatus = token.planStatus as string;
 			session.user.trialEndDate = token.trialEndDate as string;
 
-			if (trigger === 'update') {
-				session.user.name = user.name;
-				session.user.storeId = token.storeId as string;
-				session.user.storeName = token.storeName as string;
-				session.user.isStore = token.isStore as boolean;
-				session.user.companyId = token.companyId as string;
-				session.user.companyName = token.companyName as string;
-				session.user.plan = token.plan as string;
-				session.user.planStatus = token.planStatus as string;
-				session.user.trialEndDate = token.trialEndDate as string;
-			}
 			return session;
 		},
 	},

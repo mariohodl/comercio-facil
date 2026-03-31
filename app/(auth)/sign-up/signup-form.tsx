@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
-import { User, Mail, Phone, Lock, CheckCircle2, Loader2, ArrowRight, ShieldCheck } from 'lucide-react'
+import { User, Mail, Lock, Loader2, ArrowRight, ShieldCheck } from 'lucide-react'
 import {
   Form,
   FormControl,
@@ -31,7 +31,6 @@ const signUpDefaultValues =
       email: 'john@me.com',
       password: '123456',
       confirmPassword: '123456',
-      phone: '1234567890',
       promoCode: '',
       middle_name_verification: '',
     }
@@ -40,7 +39,6 @@ const signUpDefaultValues =
       email: '',
       password: '',
       confirmPassword: '',
-      phone: '',
       promoCode: '',
       middle_name_verification: '',
     }
@@ -149,55 +147,29 @@ export default function SignUpForm() {
               )}
             />
 
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <FormField
-                control={control}
-                name='email'
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel className='text-xs font-semibold uppercase tracking-wider text-gray-500'>Email</FormLabel>
-                    <FormControl>
-                      <div className='relative group'>
-                        <div className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange transition-colors'>
-                          <Mail className='w-4 h-4' />
-                        </div>
-                        <Input
-                          data-testid="sign-up-email-input"
-                          placeholder='juan@ejemplo.com'
-                          {...field}
-                          className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 shadow-sm transition-all'
-                        />
+            <FormField
+              control={control}
+              name='email'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel className='text-xs font-semibold uppercase tracking-wider text-gray-500'>Email</FormLabel>
+                  <FormControl>
+                    <div className='relative group'>
+                      <div className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange transition-colors'>
+                        <Mail className='w-4 h-4' />
                       </div>
-                    </FormControl>
-                    <FormMessage className='text-xs' />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={control}
-                name='phone'
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel className='text-xs font-semibold uppercase tracking-wider text-gray-500'>Teléfono</FormLabel>
-                    <FormControl>
-                      <div className='relative group'>
-                        <div className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange transition-colors'>
-                          <Phone className='w-4 h-4' />
-                        </div>
-                        <Input
-                          data-testid="sign-up-phone-input"
-                          placeholder='55 1234 5678'
-                          {...field}
-                          className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 shadow-sm transition-all'
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage className='text-xs' />
-                  </FormItem>
-                )}
-              />
-            </div>
+                      <Input
+                        data-testid="sign-up-email-input"
+                        placeholder='juan@ejemplo.com'
+                        {...field}
+                        className='pl-10 h-11 border-gray-200 focus:border-orange bg-gray-50/30 shadow-sm transition-all'
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage className='text-xs' />
+                </FormItem>
+              )}
+            />
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <FormField

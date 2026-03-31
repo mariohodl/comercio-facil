@@ -36,9 +36,9 @@
     "screenshots": [],
     "shortcuts": [
         {
-            "name": "Punto de Venta",
-            "short_name": "POS",
-            "description": "Abrir el punto de venta",
+            "name": "Inventario y Punto de Venta",
+            "short_name": "Inventario y POS",
+            "description": "Abrir el punto de venta y el inventario",
             "url": "/admin/pos",
             "icons": [
                 {

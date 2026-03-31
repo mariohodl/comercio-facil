@@ -15,6 +15,7 @@ export interface IUser extends Document, IUserInput {
 	isDeleted: boolean;
 	deletedAt?: Date | null;
 	phone: string;
+	phoneVerified: boolean;
 	promoCode?: string;
 	pin?: string;
 	business?: {
@@ -39,7 +40,8 @@ const userSchema = new Schema<IUser>(
 		status: { type: Boolean, default: true },
 		isDeleted: { type: Boolean, default: false },
 		deletedAt: { type: Date, default: null },
-		phone: { type: String },
+		phone: { type: String, default: '' },
+		phoneVerified: { type: Boolean, default: false },
 		business: {
 			companyId: { type: Schema.Types.ObjectId as any, ref: 'Company' },
 			stores: [{ type: Schema.Types.ObjectId as any, ref: 'Store' }],
