@@ -8,30 +8,30 @@ import User from '@/lib/db/models/user.model'
 export default async function AdminSetupPage(props: {
     searchParams: Promise<{ verified?: string }>
 }) {
+    const searchParams = await props.searchParams
+    const isAlreadySyncing = searchParams?.verified === '1'
     const session = await auth()
 
     if (!session?.user) {
         redirect('/sign-in')
     }
 
-    // 1. Check if user is already verified in DB (absolute truth)
+    // 1. If we just verified, redirect IMMEDIATELY without touching the DB
+    // This prevents MongoServerSelectionError during high-frequency sync reloads
+    if (isAlreadySyncing && session.user.storeId) {
+        redirect(`/admin/${session.user.storeId}/overview?verified=1`)
+    }
+
+    // 2. Check DB only if session is truly stuck and we are NOT in a sync transition
     await connectToDatabase()
     const dbUser = await User.findById(session.user.id)
         .populate('business.defaultStoreId')
         .lean() as any
 
-    // 2. If verified in DB but session says false, force sync ONE TIME
-    const searchParams = await props.searchParams
-    const isAlreadySyncing = searchParams?.verified === '1'
-
     if (dbUser?.phoneVerified) {
         const storeId = session.user.storeId || dbUser.business?.defaultStoreId?.slug
         if (storeId) {
-            // If we are already syncing/verified in URL, don't show SessionSync again to avoid loops
-            if (isAlreadySyncing) {
-                redirect(`/admin/${storeId}/overview?verified=1`)
-            }
-            
+            // High reliability fallback: if we were verified in DB but not in URL/Session, start sync
             return (
                 <div className="flex items-center justify-center min-h-screen bg-white">
                     <SessionSync redirectUrl={`/admin/${storeId}/overview`} />
