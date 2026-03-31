@@ -38,7 +38,7 @@ export default auth(async function middleware(req) {
 
 		// 1. Force setup if no storeId exists or phone is not verified (ONLY for Admin role)
 		const isVerifyingPhone = req.nextUrl.searchParams.get('verified') === '1';
-		const needsSetup = !storeId || (role === 'Admin' && !phoneVerified && !isVerifyingPhone);
+		const needsSetup = !storeId || (role === 'Admin' && !phoneVerified);
 
 		// Exclude static assets from setup redirection
 		const isStaticAsset = 
@@ -47,6 +47,12 @@ export default auth(async function middleware(req) {
 			pathname.startsWith('/images') || 
 			pathname.startsWith('/icons') ||
 			pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|json|xml|txt)$/);
+
+		// If they just verified, allow the request to bypass the setup redirect for 1 request
+		// even if the session is still stale, to prevent loops.
+		if (isVerifyingPhone) {
+			return NextResponse.next();
+		}
 
 		if (needsSetup && !isSetupPage && !isStaticAsset) {
 			return NextResponse.redirect(new URL('/admin/setup', req.url));
